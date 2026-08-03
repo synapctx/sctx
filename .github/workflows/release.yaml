@@ -247,7 +247,9 @@ jobs:
           class Sctx < Formula
             desc "Token-optimizing command wrapper for AI coding agents"
             homepage "https://synapctx.com/sctx/"
-            version "${NUMBER}"
+            # No explicit `version`: Homebrew scans it from the archive URL, and
+            # `brew audit` reports a hardcoded one as redundant. Verified that the
+            # scan yields the right value rather than assumed.
             license "MIT"
 
             on_macos do
