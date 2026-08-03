@@ -106,12 +106,21 @@ jobs:
           fi
           echo "private repositories this token was granted: $granted"
 
-          if ! gh api repos/synapctx/workspace-delta-daemon -q .full_name >/dev/null 2>&1; then
-            echo "::error::the token has organization access but not to workspace-delta-daemon."
-            echo "  Add it under the token's Repository access, then re-approve if prompted."
-            exit 1
-          fi
-          echo "  can read synapctx/workspace-delta-daemon"
+          # Every private repository the release needs, checked BEFORE the build.
+          # workspace-delta-daemon carries a relative `replace` to
+          # platform-contracts for the shared extractor, so a release needs both;
+          # discovering the second one during `go build` wastes a whole run.
+          fail=0
+          for repo in workspace-delta-daemon platform-contracts; do
+            if gh api "repos/synapctx/$repo" -q .full_name >/dev/null 2>&1; then
+              echo "  can read synapctx/$repo"
+            else
+              echo "::error::the token has organization access but not to synapctx/$repo."
+              echo "  Add it under the token's Repository access, then re-approve if prompted."
+              fail=1
+            fi
+          done
+          [ "$fail" = 0 ] || exit 1
 
       - name: Checkout Workspace Daemon
         uses: actions/checkout@v7
@@ -119,6 +128,19 @@ jobs:
           repository: synapctx/workspace-delta-daemon
           token: ${{ secrets.SCT__GITHUB_SYNAPCTX_BOT_PAT }}
           path: .workspace-daemon
+
+      # platform-contracts holds the SHARED Go extractor the daemon links, and the
+      # daemon's go.mod reaches it with a relative `replace` of
+      # ../../platform-contracts. From .workspace-daemon/app that resolves to the
+      # workspace root, so the path below is dictated by that directive rather
+      # than chosen — moving it silently breaks the build with a missing
+      # replacement directory.
+      - name: Checkout Platform Contracts
+        uses: actions/checkout@v7
+        with:
+          repository: synapctx/platform-contracts
+          token: ${{ secrets.SCT__GITHUB_SYNAPCTX_BOT_PAT }}
+          path: platform-contracts
 
       - name: Build Archives
         env:
