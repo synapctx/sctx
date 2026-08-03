@@ -8,7 +8,7 @@ import (
 )
 
 // A machine that installed sctx before the fallback was removed still has
-// `--fallback rtk` in its settings. The flag is inert, so this is not a
+// `--fallback legacy-wrapper` in its settings. The flag is inert, so this is not a
 // correctness fix — it is that a settings file naming a tool we removed tells
 // the next reader that sctx still depends on it.
 func TestReinstallStripsTheRemovedFallbackFlag(t *testing.T) {
@@ -19,7 +19,7 @@ func TestReinstallStripsTheRemovedFallbackFlag(t *testing.T) {
   "theme": "dark",
   "hooks": {
     "PreToolUse": [
-      {"matcher": "Bash", "hooks": [{"type": "command", "command": "/Users/x/.local/bin/sctx hook claude --fallback rtk"}]}
+      {"matcher": "Bash", "hooks": [{"type": "command", "command": "/Users/x/.local/bin/sctx hook claude --fallback legacy-wrapper"}]}
     ]
   }
 }`)
@@ -29,7 +29,7 @@ func TestReinstallStripsTheRemovedFallbackFlag(t *testing.T) {
 	}
 
 	got := read(t, settings)
-	if strings.Contains(got, "--fallback") || strings.Contains(got, "rtk") {
+	if strings.Contains(got, "--fallback") || strings.Contains(got, "legacy-wrapper") {
 		t.Errorf("stale flag survived reinstall:\n%s", got)
 	}
 	if !strings.Contains(got, "sctx hook claude") {

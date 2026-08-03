@@ -1,6 +1,8 @@
 // Package osproc runs wrapped commands via os/exec with exact exit-code
-// fidelity, SIGINT/SIGTERM forwarding to the child's process group, and
-// bounded-memory output capture.
+// fidelity, signal forwarding to the child, and bounded-memory output capture.
+//
+// Signal delivery is the one genuinely platform-specific part and lives in
+// procgroup_unix.go / procgroup_windows.go.
 package osproc
 
 import (
@@ -51,8 +53,9 @@ func (r *Runner) Run(ctx context.Context, c exec.Command) (exec.Outcome, error) 
 		cmd.Stdout = stdout
 	}
 	cmd.Stderr = stderr
-	// Own process group so signals reach the whole child tree.
-	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
+	// Own process group so signals reach the whole child tree, where the platform
+	// has such a thing — see procgroup_unix.go and procgroup_windows.go.
+	cmd.SysProcAttr = newProcessGroupAttr()
 
 	start := time.Now()
 	if err := cmd.Start(); err != nil {
@@ -68,10 +71,7 @@ func (r *Runner) Run(ctx context.Context, c exec.Command) (exec.Outcome, error) 
 		for {
 			select {
 			case sig := <-sigCh:
-				if s, ok := sig.(syscall.Signal); ok {
-					// Negative pid targets the process group.
-					_ = syscall.Kill(-cmd.Process.Pid, s)
-				}
+				forwardSignal(cmd.Process, sig)
 			case <-done:
 				return
 			}

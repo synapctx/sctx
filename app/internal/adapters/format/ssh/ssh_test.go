@@ -57,7 +57,7 @@ func TestDelegatesToTheRemoteCommandsFormatter(t *testing.T) {
 		// The shell strips the quotes, so this arrives as a single argv element.
 		"quoted remote command":  {[]string{"ssh", "vm", "docker ps"}, []string{"docker", "ps"}, "docker ps"},
 		"unquoted remote":        {[]string{"ssh", "vm", "docker", "ps"}, []string{"docker", "ps"}, "docker ps"},
-		"user@host":              {[]string{"ssh", "root@46.224.133.225", "docker ps"}, []string{"docker", "ps"}, "docker ps"},
+		"user@host":              {[]string{"ssh", "deploy@198.51.100.7", "docker ps"}, []string{"docker", "ps"}, "docker ps"},
 		"valueless flag":         {[]string{"ssh", "-q", "vm", "docker ps"}, []string{"docker", "ps"}, "docker ps"},
 		"clustered flags":        {[]string{"ssh", "-qt", "vm", "docker ps"}, []string{"docker", "ps"}, "docker ps"},
 		"flag with separate val": {[]string{"ssh", "-p", "2222", "vm", "docker ps"}, []string{"docker", "ps"}, "docker ps"},

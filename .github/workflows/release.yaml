@@ -71,34 +71,44 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist
-          for platform in darwin/arm64 darwin/amd64 linux/amd64 linux/arm64; do
+          for platform in darwin/arm64 darwin/amd64 linux/amd64 linux/arm64 windows/amd64 windows/arm64; do
             os="${platform%/*}"; arch="${platform#*/}"
             stage="dist/stage-$os-$arch"
             mkdir -p "$stage"
 
-            ( cd app && GOOS="$os" GOARCH="$arch" \
-                go build -ldflags "-s -w -X main.version=$VERSION" -o "../$stage/sctx" ./cmd/sctx )
-            ( cd .workspace-daemon/app && GOOS="$os" GOARCH="$arch" \
-                go build -ldflags "-s -w" -o "../../$stage/sctxd" ./cmd/sctxd )
+            # Windows needs the extension, or the binary is not executable.
+            ext=""
+            [ "$os" = "windows" ] && ext=".exe"
 
-            # The licence travels in the archive: Homebrew installs from the
-            # tarball, so a user who never opens the repository still gets terms.
+            ( cd app && GOOS="$os" GOARCH="$arch" \
+                go build -ldflags "-s -w -X main.version=$VERSION" -o "../$stage/sctx$ext" ./cmd/sctx )
+            ( cd .workspace-daemon/app && GOOS="$os" GOARCH="$arch" \
+                go build -ldflags "-s -w" -o "../../$stage/sctxd$ext" ./cmd/sctxd )
+
+            # The licence travels in the archive: an install from the archive is
+            # the only thing some users ever see, so the terms ship with it.
             cp LICENSE.txt README.md "$stage/"
 
-            # -C so the archive is flat; Homebrew's bin.install expects the
-            # binaries at the root.
-            tar -czf "dist/sctx_${NUMBER}_${os}_${arch}.tar.gz" \
-              -C "$stage" sctx sctxd LICENSE.txt README.md
+            # Archives are FLAT (no leading directory): Homebrew's bin.install
+            # expects the binaries at the root, and it keeps the manual install a
+            # single copy. Windows gets .zip because a tarball there is a tool
+            # requirement rather than a convention.
+            if [ "$os" = "windows" ]; then
+              ( cd "$stage" && zip -qr "../sctx_${NUMBER}_${os}_${arch}.zip" . )
+            else
+              tar -czf "dist/sctx_${NUMBER}_${os}_${arch}.tar.gz" \
+                -C "$stage" sctx sctxd LICENSE.txt README.md
+            fi
             rm -rf "$stage"
           done
-          ( cd dist && shasum -a 256 *.tar.gz > checksums.txt )
+          ( cd dist && shasum -a 256 *.tar.gz *.zip > checksums.txt )
           ls -l dist
 
       - name: Publish Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${{ steps.version.outputs.tag }}" dist/*.tar.gz dist/checksums.txt \
+          gh release create "${{ steps.version.outputs.tag }}" dist/*.tar.gz dist/*.zip dist/checksums.txt \
             --repo "$GITHUB_REPOSITORY" \
             --title "${{ steps.version.outputs.tag }}" \
             --generate-notes \

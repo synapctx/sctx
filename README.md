@@ -146,15 +146,29 @@ go install github.com/synapctx/sctx/cmd/sctx@latest
 ```
 
 **Binary** - download the archive for your platform from
-[Releases](https://github.com/synapctx/sctx/releases), then:
+[Releases](https://github.com/synapctx/sctx/releases).
+
+macOS and Linux:
 
 ```bash
 tar -xzf sctx_<version>_<os>_<arch>.tar.gz
-sudo install -m 0755 sctx /usr/local/bin/sctx
+sudo install -m 0755 sctx sctxd /usr/local/bin/
 ```
 
-Prebuilt archives cover macOS (Apple Silicon and Intel) and Linux (x86-64 and
-arm64). They contain no dynamically linked dependencies.
+Windows (PowerShell):
+
+```powershell
+Expand-Archive sctx_<version>_windows_amd64.zip -DestinationPath $env:LOCALAPPDATA\Programs\sctx
+# then add that directory to your PATH
+```
+
+Prebuilt archives cover **macOS** (Apple Silicon, Intel), **Linux** (x86-64,
+arm64) and **Windows** (x86-64, arm64). They are statically linked and depend on
+nothing at runtime.
+
+Keep `sctx` and `sctxd` in the same directory. `sctx watch` looks for its helper
+beside its own executable, so a matched pair always wins over an older copy
+elsewhere on `PATH`.
 
 &nbsp;
 

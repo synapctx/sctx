@@ -15,7 +15,7 @@ import (
 const theRealSettings = `{
   "hooks": {
     "PreToolUse": [
-      {"matcher": "Bash", "hooks": [{"type": "command", "command": "/Users/x/.local/bin/sctx hook claude --fallback rtk"}]}
+      {"matcher": "Bash", "hooks": [{"type": "command", "command": "/Users/x/.local/bin/sctx hook claude --fallback legacy-wrapper"}]}
     ]
   },
   "enabledPlugins": {"context7@claude-plugins-official": true},
@@ -265,7 +265,7 @@ func TestInvokesSctxHookIsWholeToken(t *testing.T) {
 		want     bool
 	}{
 		{"/opt/homebrew/bin/sctx hook claude", "claude", true},
-		{"/Users/x/.local/bin/sctx hook claude --fallback rtk", "claude", true},
+		{"/Users/x/.local/bin/sctx hook claude --fallback legacy-wrapper", "claude", true},
 		{"sctx hook claude-post-tool", "claude-post-tool", true},
 		{"/x/sctx hook claude-post-tool", "claude", false},
 		{"/x/sctx hook claude", "claude-post-tool", false},
