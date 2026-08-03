@@ -1,0 +1,2 @@
+go test fuzz v1
+string("<<'F''<<0'\nF\ngo test")

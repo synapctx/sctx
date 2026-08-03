@@ -1,0 +1,9 @@
+bin/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+.DS_Store
+.vscode/
+# Release archives built by release-sctx.sh
+dist/

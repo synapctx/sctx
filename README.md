@@ -1,0 +1,534 @@
+# sctx
+
+[Home](README.md) &nbsp;/
+
+&nbsp;
+
+**Token-optimizing command wrapper for AI coding agents.**
+
+`sctx` runs the commands your agent already runs and returns the same
+information in a fraction of the tokens - exit code intact, errors intact,
+every omission marked.
+
+For more details and guides, please visit [**synapctx.com/sctx**](https://synapctx.com/sctx/)
+
+&nbsp;
+
+[![SynapCTX](https://img.shields.io/badge/SynapCTX-sctx-2f6feb)](https://synapctx.com/sctx/)
+[![CI](https://github.com/synapctx/sctx/actions/workflows/ci.yaml/badge.svg)](https://github.com/synapctx/sctx/actions/workflows/ci.yaml)
+[![Go Reference](https://pkg.go.dev/badge/github.com/synapctx/sctx.svg)](https://pkg.go.dev/github.com/synapctx/sctx)
+[![GitHub Tag](https://img.shields.io/github/v/tag/synapctx/sctx?label=Version)](https://github.com/synapctx/sctx/tags)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE.txt)
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Overview
+
+An AI coding agent reads with its context window, and command output is the
+largest thing it reads that nobody chose. A test run that prints four hundred
+passing lines, a `git status` padded with hints, a recursive grep returning the
+same file forty times - all of it arrives in full, is paid for in full, and
+almost none of it is what the agent needed.
+
+`sctx` sits in front of those commands. It parses the output it recognises and
+re-renders it around the part that carries the signal: the failures, the changed
+files, the matches grouped by location. Everything else is summarised behind an
+explicit marker, so the agent can always tell that something was left out.
+
+&nbsp;
+
+**Measured across 5,669 real command runs: 46.3% of output tokens removed.**
+
+| Command | Output tokens removed | Runs measured |
+| :--- | ---: | ---: |
+| `go test` | **57.3%** | 450 |
+| `rg` | **56.0%** | 396 |
+| `grep` | **53.0%** | 2,000 |
+| `find` | **52.0%** | 158 |
+| `ls` | **29.1%** | 331 |
+| `git diff` | **24.6%** | 56 |
+
+&nbsp;
+
+Some commands appear in that ledger at 0%, and that is the design working. When
+output holds no redundancy - `cat` of a source file, a short `make` run - `sctx`
+returns it byte for byte. It compresses what is genuinely repetitive and steps
+out of the way everywhere else.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+### Why a wrapper rather than a bigger context window
+
+Because the cost is not only money. A context window filled with passing test
+lines is a context window that no longer holds the file the agent is editing,
+and quality degrades long before the window is full. Removing output the agent
+never needed buys attention, not just budget.
+
+And because correctness is not negotiable in this position. A wrapper sits
+between a developer's command and its result, so `sctx` is built to fail
+harmlessly: if a renderer cannot parse something, you get the original bytes;
+if a command fails, the diagnostics survive and only the noise shrinks. It never
+returns something an agent could mistake for the whole picture.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+### Where SynapCTX comes in
+
+`sctx` is free, MIT-licensed, and complete on its own. Install it, and it works.
+
+It is also the local half of [SynapCTX](https://synapctx.com/), a context engine
+for engineering organizations. Connect an account and `sctx` gains a second job:
+reporting what it saved, and keeping your working tree visible to the platform's
+retrieval.
+
+**For an individual developer**, that means your agent can ask about code across
+every repository you work in - not just the one that is open - and get answers
+about the version in front of you rather than the last commit.
+
+**For an organization**, it means the same knowledge graph and the same memory
+serve every developer's agent. Savings roll up per repository and per developer.
+Decisions recorded once are recalled by a teammate's agent months later. And
+questions that only a whole-estate view can answer - every caller of a function,
+every consumer of an endpoint, across repositories nobody has checked out -
+become answerable rather than guessed at.
+
+The boundary is deliberate: nothing in this repository requires an account, and
+nothing about `sctx` degrades without one.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Quick look
+
+```bash
+sctx go test ./...      # the failures and the counts, not 400 passing lines
+sctx git status         # the changed files, not the hints
+sctx grep -rn foo .     # matches grouped by file, with explicit +N markers
+sctx gain               # what it has saved you so far
+```
+
+Nothing else changes. The exit code is the command's own, stdout and stderr keep
+their meaning, and a pipeline behaves as it did before.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Install
+
+**Homebrew** - macOS and Linux:
+
+```bash
+brew install synapctx/tap/sctx
+```
+
+**Go** - any platform with a Go 1.26+ toolchain:
+
+```bash
+go install github.com/synapctx/sctx/cmd/sctx@latest
+```
+
+**Binary** - download the archive for your platform from
+[Releases](https://github.com/synapctx/sctx/releases), then:
+
+```bash
+tar -xzf sctx_<version>_<os>_<arch>.tar.gz
+sudo install -m 0755 sctx /usr/local/bin/sctx
+```
+
+Prebuilt archives cover macOS (Apple Silicon and Intel) and Linux (x86-64 and
+arm64). They contain no dynamically linked dependencies.
+
+&nbsp;
+
+Confirm the install and see the effective configuration:
+
+```bash
+sctx version
+sctx doctor
+```
+
+&nbsp;
+
+**Upgrading**
+
+```bash
+# Homebrew
+brew upgrade sctx
+
+# Go
+go install github.com/synapctx/sctx/cmd/sctx@latest
+```
+
+Configuration and the local savings ledger live in `~/.config/sctx` and are
+untouched by an upgrade.
+
+&nbsp;
+
+**Uninstalling**
+
+```bash
+# Optional: removes the savings ledger and any API keys
+brew uninstall sctx
+rm -rf ~/.config/sctx
+```
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Getting started
+
+`sctx` works the moment it is installed - put it in front of any command:
+
+```bash
+sctx go build ./...
+```
+
+To have it applied automatically, run:
+
+```bash
+sctx setup
+```
+
+&nbsp;
+
+This detects which AI coding agents are present, and for each one adds a short
+instruction file describing what `sctx` is and when to use it. For Claude Code it
+also registers a hook, so commands are wrapped as they are issued: you and your
+agent keep writing `go test ./...`, and the compact output is what arrives.
+
+```bash
+sctx setup                 # report what is installed, and what is missing
+sctx setup --install       # apply it
+sctx setup --list-agents   # every agent sctx knows how to configure
+sctx setup --agent <id>    # configure one explicitly
+```
+
+Two rules govern what it writes. It only adds configuration where an agent has
+already established its own, so nothing appears for a tool you do not use. And
+it never overwrites content you have edited - a customised instruction file is
+left as you wrote it, and only a missing reference is repaired.
+
+If no agent is detected, `sctx setup` reports what it looked for and writes
+nothing.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Command coverage
+
+Dedicated renderers:
+
+`go` &nbsp;·&nbsp; `git` &nbsp;·&nbsp; `grep` / `rg` &nbsp;·&nbsp;
+`ls` / `find` / `tree` &nbsp;·&nbsp; `cat` / `head` / `tail` &nbsp;·&nbsp;
+`diff` &nbsp;·&nbsp; `ps` &nbsp;·&nbsp; `du` &nbsp;·&nbsp; `make` &nbsp;·&nbsp;
+`docker` &nbsp;·&nbsp; `kubectl` &nbsp;·&nbsp; `gh` &nbsp;·&nbsp;
+`golangci-lint` &nbsp;·&nbsp; `pytest` &nbsp;·&nbsp; `ruff` &nbsp;·&nbsp;
+`mypy` &nbsp;·&nbsp; `pip` &nbsp;·&nbsp; `npm` / `pnpm` / `yarn` &nbsp;·&nbsp;
+`brew` &nbsp;·&nbsp; `mongosh` &nbsp;·&nbsp; `rsync` &nbsp;·&nbsp;
+`jq` / `curl` &nbsp;·&nbsp; `ssh`
+
+Any other command is passed through exactly as produced, with one exception: if
+its output is JSON, it is compacted. That restraint is deliberate - guessing at
+the structure of an unfamiliar format is how a wrapper starts hiding things - so
+an uncovered command costs you nothing and risks nothing.
+
+`ssh` is a special case worth knowing about. Its output is whatever ran on the
+far end, so `sctx` reads the remote command from the invocation and applies that
+command's renderer - `sctx ssh <host> '<command>'` compresses as though the
+command had run locally. It declines for interactive sessions, and for anything
+compound, where two programs' output cannot be rendered as one.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Guarantees
+
+These are the properties that make a wrapper safe to leave in place, and each is
+enforced by tests rather than convention.
+
+| | |
+| :--- | :--- |
+| **Exit codes are exact** | never inferred from the text, never rewritten |
+| **Errors survive compression** | when a command fails, the noise shrinks and every diagnostic remains |
+| **Elisions are always marked** | `…+12 more`, `×3`. No marker means nothing was removed |
+| **Failure degrades, never suppresses** | an unparseable format falls back to the original output; so does an internal error |
+| **Savings are measured conservatively** | the figure in `sctx gain` is a floor, not a flattering estimate |
+| **Nothing blocks your command** | accounting and reporting are off the critical path and cannot delay or fail a run |
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Commands
+
+| Command | Purpose |
+| :--- | :--- |
+| `sctx <cmd> [args...]` | run a command with token-optimized output |
+| `sctx -- <cmd>` | run a command that shares a name with an `sctx` subcommand |
+| `sctx gain` | savings report, overall and per command |
+| `sctx setup` | configure the AI coding agents you use |
+| `sctx doctor` | show the effective configuration |
+| `sctx init` | connect this installation to a SynapCTX account |
+| `sctx watch` | keep uncommitted code visible to your agent (requires an account) |
+| `sctx telemetry` | inspect or change what is shared |
+| `sctx flush` | send any queued usage events now |
+| `sctx version` | print the version |
+
+`sctx gain` accepts `--project` to scope to the current repository, `--since`
+for a time window, and `--format json` for machine-readable output.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Connecting a SynapCTX account
+
+Optional, and additive. Nothing about the behaviour above changes.
+
+```bash
+sctx init
+```
+
+The API key is read from a prompt, or from stdin when piped. It is never accepted
+as a command-line argument, where it would be visible to any process able to list
+the process table.
+
+One installation can hold a key per organization - run `sctx init` once for each,
+and `sctx doctor` will list them. Work in a repository is attributed to that
+repository's organization automatically; `sctx init --default` chooses which
+organization to credit for work outside any repository.
+
+With an account connected:
+
+- **Savings become visible across a team** in the SynapCTX console, per
+  repository and per developer, rather than only in your local ledger.
+- **`sctx watch` becomes available**, described below.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## `sctx watch` - uncommitted code your agent can see
+
+An index of a codebase is built from commits, which makes it reliably wrong about
+one thing: the code you are changing right now. An agent asking about a function
+you refactored ten minutes ago is answered from the version before you touched it.
+
+`sctx watch` closes that gap. It watches your working trees and sends the
+*structure* of uncommitted code - symbol names, signatures and doc comments - so
+retrieval answers with the version in front of you.
+
+```bash
+sctx watch                  # watches ~/git/github.com by default
+sctx watch --root ~/work    # or wherever your checkouts live
+```
+
+&nbsp;
+
+| | |
+| :--- | :--- |
+| **Sent** | symbol names, signatures, doc comments, content hashes |
+| **Never sent** | function bodies, file contents, anything `.gitignore`d |
+| **Who can see it** | only you. It is never shared with teammates, and it expires |
+| **How to stop** | stop the command. It runs in the foreground and installs nothing |
+
+&nbsp;
+
+That summary is printed every time, before anything is sent. Results originating
+from your working tree are labelled `UNCOMMITTED` in the answer, so they are never
+mistaken for code on a branch.
+
+This is the only command that requires an account, because there is nowhere to
+send working-tree structure without one. It runs a companion binary, `sctxd`,
+included in the Homebrew and release installs.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Configuration
+
+`sctx` resolves settings from the environment first, then
+`~/.config/sctx/config.toml` (written by `sctx init`), then built-in defaults.
+
+The file is optional. A missing one is normal, and a malformed one produces a
+single warning and is ignored - configuration problems cannot break a command.
+
+&nbsp;
+
+| Variable | Default | Purpose |
+| :--- | :--- | :--- |
+| `SCT__FORCE_TIER` | *(unset)* | pin the compression level: `aggressive`, `relaxed`, `verbatim`, `off` |
+| `SCT__TELEMETRY_ENABLED` | *(unset)* | force sharing on or off, overriding the saved answer |
+| `SCT__MAX_OUTPUT_BYTES` | `8388608` | output above this size is buffered to disk rather than memory |
+| `SCT__STATS_DB_PATH` | `~/.config/sctx/stats.db` | local savings ledger |
+| `SCT__SPOOL_DIR` | `~/.config/sctx/spool` | queue for usage events awaiting delivery |
+| `SCT__TELEMETRY_ENDPOINT` | `http://127.0.0.1:6221/v1/telemetry/exec` | usage-event destination; `sctx init` sets this to `https://sctx.synapctx.com/v1/telemetry/exec` |
+| `SCT__WORKSPACE_PROXY_URL` | `http://127.0.0.1:6220` | destination for `sctx watch`; `https://mcp.synapctx.com` for the hosted platform |
+| `SCT__WATCH_HELPER` | *(unset)* | path to `sctxd`, if it is not installed alongside `sctx` |
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Privacy
+
+Without an API key, nothing leaves the machine. The default destination is a
+loopback address, and delivery without a key is refused rather than attempted.
+
+With an account, two distinct things may be shared, and consent is asked for them
+separately because they are not the same request:
+
+- **Your savings** - command names and token counts, so your own console can
+  report what `sctx` saved. Covered by holding an account.
+- **Coverage gaps** - the *name alone* of a command no renderer matched, so the
+  most-needed renderer is built next. **Opt-in**, because its value comes from
+  pooling across users and an account is not agreement to that. `sctx setup` asks
+  once, and an empty answer declines.
+
+&nbsp;
+
+Paths, filenames, arguments and command output are never transmitted. The queue is
+inspectable, unrendered, at any time:
+
+```bash
+sctx telemetry             # what is currently shared
+sctx telemetry --preview   # the exact queued events, raw
+sctx telemetry --disable   # stop sharing, and delete anything queued
+```
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Building from source
+
+```bash
+git clone https://github.com/synapctx/sctx.git
+cd sctx
+make build     # ./bin/sctx
+make test
+make install   # ~/.local/bin/sctx
+```
+
+Requires Go 1.26 or newer. There are no code-generation steps, no external
+services and no private dependencies involved in building or testing.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Adding a renderer
+
+A renderer is a self-contained package, and new tools are the most useful
+contribution anyone can make.
+
+Implement `format.Formatter` (see `app/internal/domain/format/format.go`) in a new
+package under `app/internal/adapters/format/<tool>/`, register it in
+`app/cmd/sctx/main.go`, and add the command to the rewrite table in
+`app/internal/adapters/hook/rewrite.go` so the agent integration picks it up.
+
+Four rules, and they are the whole review:
+
+1. Return `format.ErrTierInapplicable` when a compression level does not apply, so
+   the next one is tried.
+2. Never emit an empty body for non-empty input.
+3. Mark every omission with an explicit `+N`.
+4. When the command failed, compress the noise and keep the error.
+
+**Build fixtures by running the real tool, on the platform it will run on.**
+Implementations of the same utility differ more than they appear to - GNU and BSD
+variants disagree on wording, ordering and diagnostics - and a renderer written
+from memory tends to decline on exactly the systems that matter.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Contributing
+
+Issues and pull requests are welcome. Please include tests, and run `make test`
+and `make vet` before submitting.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Security
+
+If you discover a security vulnerability, please report it privately to
+[security@synapctx.com](mailto:security@synapctx.com) rather than opening a
+public issue.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## License
+
+MIT - see [LICENSE.txt](LICENSE.txt).
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+&nbsp;
+
+---
+
+### SynapCTX
+
+[Website](https://synapctx.com) &nbsp;|&nbsp; [sctx](https://synapctx.com/sctx/) &nbsp;|&nbsp; [LinkedIn](https://www.linkedin.com/company/synapctx) &nbsp;|&nbsp; [BlueSky](https://bsky.app/profile/synapctx.com) &nbsp;|&nbsp; [GitHub](https://github.com/synapctx)
+
+<sub>&copy; SynapCTX. All rights reserved.</sub>
+
+&nbsp;

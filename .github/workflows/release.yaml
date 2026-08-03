@@ -1,0 +1,226 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-rc-[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-dev-[0-9]+'
+
+permissions:
+  contents: write # create the release and upload archives
+
+env:
+  GO_VERSION: '1.26'
+
+jobs:
+  release:
+    name: Build and Publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # release notes are generated from history
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: app/go.sum
+
+      - name: Resolve Version
+        id: version
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "number=${tag#v}" >> "$GITHUB_OUTPUT"
+          # -rc- and -dev- tags are prereleases, so `brew` and the Releases page
+          # do not offer them as the current version.
+          if [[ "$tag" == *-rc-* || "$tag" == *-dev-* ]]; then
+            echo "prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Test
+        working-directory: app
+        run: go test -race ./...
+
+      # The workspace daemon is a SEPARATE, PRIVATE repository, and it is
+      # deliberately not a dependency of this module — see the Public
+      # Buildability job in ci.yaml. A release ships it as a COMPILED binary, so
+      # nothing of its source is published.
+      #
+      # This step FAILS the release when the token is missing rather than
+      # shipping without it. An archive lacking sctxd installs cleanly and leaves
+      # `sctx watch` broken, which is the exact failure mode that is impossible to
+      # notice from the outside.
+      - name: Checkout Workspace Daemon
+        uses: actions/checkout@v4
+        with:
+          repository: synapctx/workspace-delta-daemon
+          token: ${{ secrets.SCT__GITHUB_SYNAPCTX_BOT_PAT }}
+          path: .workspace-daemon
+
+      - name: Build Archives
+        env:
+          CGO_ENABLED: '0'
+          VERSION: ${{ steps.version.outputs.tag }}
+          NUMBER: ${{ steps.version.outputs.number }}
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          for platform in darwin/arm64 darwin/amd64 linux/amd64 linux/arm64; do
+            os="${platform%/*}"; arch="${platform#*/}"
+            stage="dist/stage-$os-$arch"
+            mkdir -p "$stage"
+
+            ( cd app && GOOS="$os" GOARCH="$arch" \
+                go build -ldflags "-s -w -X main.version=$VERSION" -o "../$stage/sctx" ./cmd/sctx )
+            ( cd .workspace-daemon/app && GOOS="$os" GOARCH="$arch" \
+                go build -ldflags "-s -w" -o "../../$stage/sctxd" ./cmd/sctxd )
+
+            # The licence travels in the archive: Homebrew installs from the
+            # tarball, so a user who never opens the repository still gets terms.
+            cp LICENSE.txt README.md "$stage/"
+
+            # -C so the archive is flat; Homebrew's bin.install expects the
+            # binaries at the root.
+            tar -czf "dist/sctx_${NUMBER}_${os}_${arch}.tar.gz" \
+              -C "$stage" sctx sctxd LICENSE.txt README.md
+            rm -rf "$stage"
+          done
+          ( cd dist && shasum -a 256 *.tar.gz > checksums.txt )
+          ls -l dist
+
+      - name: Publish Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" dist/*.tar.gz dist/checksums.txt \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "${{ steps.version.outputs.tag }}" \
+            --generate-notes \
+            ${{ steps.version.outputs.prerelease == 'true' && '--prerelease' || '' }}
+
+      - name: Upload Archives as Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: sctx-${{ steps.version.outputs.tag }}
+          path: dist/*
+          retention-days: 14
+
+  homebrew:
+    name: Update Homebrew Tap
+    runs-on: ubuntu-latest
+    needs: release
+    # Stable releases only. A tap pointing at a release candidate would hand
+    # `brew install sctx` to users who did not ask to test one.
+    if: '!contains(github.ref, ''-rc-'') && !contains(github.ref, ''-dev-'')'
+    steps:
+      - name: Resolve Version
+        id: version
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "number=${tag#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout Tap
+        uses: actions/checkout@v4
+        with:
+          repository: synapctx/homebrew-tap
+          token: ${{ secrets.SCT__GITHUB_SYNAPCTX_BOT_PAT }}
+          path: tap
+
+      - name: Generate Formula
+        env:
+          TAG: ${{ steps.version.outputs.tag }}
+          NUMBER: ${{ steps.version.outputs.number }}
+        run: |
+          set -euo pipefail
+          base="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}"
+          # Checksums come from the release just published, so the formula can
+          # never disagree with the archives it points at.
+          curl -fsSL "$base/checksums.txt" -o checksums.txt
+          sha() { awk -v f="sctx_${NUMBER}_$1.tar.gz" '$2 == f || $2 == "*"f {print $1}' checksums.txt; }
+
+          for target in darwin_arm64 darwin_amd64 linux_amd64 linux_arm64; do
+            if [ -z "$(sha "$target")" ]; then
+              echo "::error::no checksum for $target; refusing to write a formula that cannot verify."
+              exit 1
+            fi
+          done
+
+          mkdir -p tap/Formula
+          cat > tap/Formula/sctx.rb <<FORMULA
+          # Generated by the sctx release workflow. Do not hand-edit.
+          class Sctx < Formula
+            desc "Token-optimizing command wrapper for AI coding agents"
+            homepage "https://synapctx.com/sctx/"
+            version "${NUMBER}"
+            license "MIT"
+
+            on_macos do
+              on_arm do
+                url "${base}/sctx_${NUMBER}_darwin_arm64.tar.gz"
+                sha256 "$(sha darwin_arm64)"
+              end
+              on_intel do
+                url "${base}/sctx_${NUMBER}_darwin_amd64.tar.gz"
+                sha256 "$(sha darwin_amd64)"
+              end
+            end
+
+            on_linux do
+              on_arm do
+                url "${base}/sctx_${NUMBER}_linux_arm64.tar.gz"
+                sha256 "$(sha linux_arm64)"
+              end
+              on_intel do
+                url "${base}/sctx_${NUMBER}_linux_amd64.tar.gz"
+                sha256 "$(sha linux_amd64)"
+              end
+            end
+
+            def install
+              # Both binaries, into the same bin: \`sctx watch\` looks beside its own
+              # executable first, so the helper it shipped with wins over any older
+              # copy elsewhere on PATH.
+              bin.install "sctx"
+              bin.install "sctxd"
+            end
+
+            def caveats
+              <<~EOS
+                Tell the AI coding agents you use that sctx is available:
+                  sctx setup --install
+
+                Everything works without an account. To connect one:
+                  sctx init
+              EOS
+            end
+
+            test do
+              assert_match "sctx", shell_output("#{bin}/sctx version")
+              # sctxd is launched by \`sctx watch\` and reads its configuration on
+              # stdin; given none it must refuse rather than wait for input.
+              assert_match "sctxd", shell_output("#{bin}/sctxd </dev/null 2>&1", 2)
+            end
+          end
+          FORMULA
+          sed -i 's/^          //' tap/Formula/sctx.rb
+          cat tap/Formula/sctx.rb
+
+      - name: Commit Formula
+        working-directory: tap
+        run: |
+          if git diff --quiet; then
+            echo "formula unchanged; nothing to push."
+            exit 0
+          fi
+          git config user.name "synapctx-bot"
+          git config user.email "bot@synapctx.com"
+          git add Formula/sctx.rb
+          git commit -m "sctx ${{ steps.version.outputs.tag }}"
+          git push

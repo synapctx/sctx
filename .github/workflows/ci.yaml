@@ -1,0 +1,128 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'develop'
+  pull_request:
+    branches:
+      - 'main'
+      - 'develop'
+
+permissions:
+  contents: read
+
+env:
+  GO_VERSION: '1.26'
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: app/go.sum
+
+      - name: Check Formatting
+        working-directory: app
+        run: |
+          unformatted="$(gofmt -l .)"
+          if [ -n "$unformatted" ]; then
+            echo "::error::gofmt would change these files:"
+            echo "$unformatted"
+            exit 1
+          fi
+
+      - name: Vet
+        working-directory: app
+        run: go vet ./...
+
+      - name: Test
+        working-directory: app
+        run: go test -race ./...
+
+  public-contract:
+    name: Public Buildability
+    runs-on: ubuntu-latest
+    # WHY THIS JOB EXISTS. sctx is public and free: anyone must be able to clone
+    # it and use the whole Go toolchain against it. That was broken once, and the
+    # break was invisible — `go build` passed because Go loads modules lazily, so
+    # an unused private dependency compiled fine here and failed `go mod tidy` for
+    # everyone else. `go build` succeeding does NOT prove this property; only
+    # checking every command does, which is why they are all listed below.
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: app/go.sum
+
+      - name: Assert No Private Dependencies
+        working-directory: app
+        run: |
+          # A private module reference is fatal regardless of whether anything
+          # imports it: it is in the graph, and the graph is what tidy resolves.
+          if grep -nE 'synapctx/(platform-contracts|workspace-delta-daemon|tenant-control-service)' go.mod go.sum; then
+            echo "::error::go.mod/go.sum reference a private SynapCTX module. sctx must stay buildable by anyone."
+            exit 1
+          fi
+          # A filesystem replace cannot resolve on anyone else's machine.
+          if grep -nE '^\s*replace\s' go.mod; then
+            echo "::error::go.mod contains a replace directive. It will not resolve for a public clone."
+            exit 1
+          fi
+
+      - name: Module Graph Resolves Cleanly
+        working-directory: app
+        run: |
+          go mod download
+          go mod verify
+          go mod tidy
+          # tidy rewriting anything means the committed go.mod/go.sum are not what
+          # a clean checkout produces, which a contributor hits immediately.
+          if ! git diff --quiet go.mod go.sum; then
+            echo "::error::go mod tidy changed go.mod/go.sum. Commit the result."
+            git diff go.mod go.sum
+            exit 1
+          fi
+
+  cross-compile:
+    name: Cross-compile
+    runs-on: ubuntu-latest
+    # Every platform a release ships, checked on every change rather than
+    # discovered at tag time when it is expensive to fix.
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { goos: darwin, goarch: arm64 }
+          - { goos: darwin, goarch: amd64 }
+          - { goos: linux, goarch: amd64 }
+          - { goos: linux, goarch: arm64 }
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: app/go.sum
+
+      - name: Build
+        working-directory: app
+        env:
+          CGO_ENABLED: '0'
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+        run: go build -o /dev/null ./cmd/sctx
