@@ -56,6 +56,50 @@ jobs:
       # shipping without it. An archive lacking sctxd installs cleanly and leaves
       # `sctx watch` broken, which is the exact failure mode that is impossible to
       # notice from the outside.
+      # A bare 404 from `checkout` cannot distinguish an invalid token from a
+      # valid one that was never granted the repository, and those have different
+      # fixes. This asks the token what it can actually see and says so, so the
+      # next person spends a minute rather than an afternoon.
+      - name: Verify Bot Access
+        env:
+          GH_TOKEN: ${{ secrets.SCT__GITHUB_SYNAPCTX_BOT_PAT }}
+        run: |
+          if [ -z "${GH_TOKEN:-}" ]; then
+            echo "::error::SCT__GITHUB_SYNAPCTX_BOT_PAT is empty or not visible to this repository."
+            echo "  For an ORGANIZATION secret, add this repository to the secret's repository access."
+            exit 1
+          fi
+
+          if ! who=$(gh api user -q .login 2>/dev/null); then
+            echo "::error::the token is not valid (GitHub rejected it). Check it has not expired."
+            exit 1
+          fi
+          echo "token acts as: $who"
+
+          # Classic tokens report their scopes in a header; fine-grained ones do
+          # not, which is itself the useful signal about which kind is in play.
+          scopes=$(gh api -i user 2>/dev/null | tr -d '\r' | awk -F': ' '/^[Xx]-[Oo]auth-[Ss]copes:/{print $2}')
+          if [ -n "$scopes" ]; then
+            echo "classic token, scopes: $scopes"
+            echo "  note: a classic token needs the full 'repo' scope to read a private repository."
+          else
+            echo "fine-grained token (no OAuth scopes header)"
+          fi
+
+          fail=0
+          for repo in synapctx/workspace-delta-daemon synapctx/homebrew-tap; do
+            if gh api "repos/$repo" -q .full_name >/dev/null 2>&1; then
+              echo "  can read $repo"
+            else
+              echo "::error::$who cannot see $repo."
+              echo "  A fine-grained token must have Resource owner = synapctx AND list this"
+              echo "  repository under Repository access, with Contents: Read and write."
+              echo "  Collaborator access on the account alone is not enough."
+              fail=1
+            fi
+          done
+          exit $fail
+
       - name: Checkout Workspace Daemon
         uses: actions/checkout@v7
         with:
