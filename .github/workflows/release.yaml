@@ -304,12 +304,37 @@ jobs:
       - name: Commit Formula
         working-directory: tap
         run: |
-          if git diff --quiet; then
+          # The formula must EXIST. If generation failed quietly there is nothing
+          # to commit, and "nothing to commit" must never read as success.
+          if [ ! -f Formula/sctx.rb ]; then
+            echo "::error::Formula/sctx.rb was not generated."
+            exit 1
+          fi
+
+          git config user.name "synapctx-bot"
+          git config user.email "bot@synapctx.com"
+
+          # STAGE FIRST, then compare the index against HEAD.
+          #
+          # `git diff` alone does not see UNTRACKED files, so on the first release
+          # into a fresh tap the brand-new formula read as "unchanged" and this job
+          # went green having pushed nothing — a released version with no way to
+          # install it. Comparing the index is what makes a new file visible.
+          git add Formula/sctx.rb
+          if git diff --cached --quiet; then
             echo "formula unchanged; nothing to push."
             exit 0
           fi
-          git config user.name "synapctx-bot"
-          git config user.email "bot@synapctx.com"
-          git add Formula/sctx.rb
+
           git commit -m "sctx ${{ steps.version.outputs.tag }}"
           git push
+
+          # Assert the push landed. This job's whole purpose is that a formula is
+          # reachable afterwards, and every step before this one can succeed
+          # without that being true.
+          git fetch -q origin
+          if ! git diff --quiet HEAD origin/HEAD -- Formula/sctx.rb; then
+            echo "::error::the pushed formula does not match the remote."
+            exit 1
+          fi
+          echo "formula published: $(git rev-parse --short HEAD)"
