@@ -86,19 +86,32 @@ jobs:
             echo "fine-grained token (no OAuth scopes header)"
           fi
 
-          fail=0
-          for repo in synapctx/workspace-delta-daemon synapctx/homebrew-tap; do
-            if gh api "repos/$repo" -q .full_name >/dev/null 2>&1; then
-              echo "  can read $repo"
-            else
-              echo "::error::$who cannot see $repo."
-              echo "  A fine-grained token must have Resource owner = synapctx AND list this"
-              echo "  repository under Repository access, with Contents: Read and write."
-              echo "  Collaborator access on the account alone is not enough."
-              fail=1
-            fi
-          done
-          exit $fail
+          # Probe the ORGANIZATION first, and only with PRIVATE repositories.
+          #
+          # A public repository proves nothing here: a fine-grained token can read
+          # any public repo whether or not it was granted it, so "can read the tap"
+          # is not evidence the token has any organization access at all. Listing
+          # PRIVATE org repositories returns exactly what the token was granted,
+          # which separates the three causes that all surface as one 404.
+          granted=$(gh api "orgs/synapctx/repos?type=private&per_page=100" -q '.[].name' 2>/dev/null | sort | tr '\n' ' ')
+          if [ -z "$granted" ]; then
+            echo "::error::$who can see NO private repository in the synapctx organization."
+            echo "  That is not a per-repository problem. Either:"
+            echo "    1. the token's Resource owner is the bot's personal account, not synapctx"
+            echo "       (a fine-grained token reaches exactly ONE owner, and collaborator"
+            echo "        access on the account does not extend it), or"
+            echo "    2. the organization has not approved the token yet - check"
+            echo "       Organization -> Settings -> Personal access tokens -> Pending requests."
+            exit 1
+          fi
+          echo "private repositories this token was granted: $granted"
+
+          if ! gh api repos/synapctx/workspace-delta-daemon -q .full_name >/dev/null 2>&1; then
+            echo "::error::the token has organization access but not to workspace-delta-daemon."
+            echo "  Add it under the token's Repository access, then re-approve if prompted."
+            exit 1
+          fi
+          echo "  can read synapctx/workspace-delta-daemon"
 
       - name: Checkout Workspace Daemon
         uses: actions/checkout@v7
