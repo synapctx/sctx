@@ -19,12 +19,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # release notes are generated from history
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v7
         with:
           go-version: ${{ env.GO_VERSION }}
           cache-dependency-path: app/go.sum
@@ -57,7 +57,7 @@ jobs:
       # `sctx watch` broken, which is the exact failure mode that is impossible to
       # notice from the outside.
       - name: Checkout Workspace Daemon
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: synapctx/workspace-delta-daemon
           token: ${{ secrets.SCT__GITHUB_SYNAPCTX_BOT_PAT }}
@@ -115,7 +115,7 @@ jobs:
             ${{ steps.version.outputs.prerelease == 'true' && '--prerelease' || '' }}
 
       - name: Upload Archives as Build Artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sctx-${{ steps.version.outputs.tag }}
           path: dist/*
@@ -137,7 +137,7 @@ jobs:
           echo "number=${tag#v}" >> "$GITHUB_OUTPUT"
 
       - name: Checkout Tap
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: synapctx/homebrew-tap
           token: ${{ secrets.SCT__GITHUB_SYNAPCTX_BOT_PAT }}
