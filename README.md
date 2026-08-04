@@ -41,23 +41,35 @@ explicit marker, so the agent can always tell that something was left out.
 
 &nbsp;
 
-**Measured across 5,669 real command runs: 46.3% of output tokens removed.**
+**Measured across 6,361 real command runs: 61% of output tokens removed.**
 
 | Command | Output tokens removed | Runs measured |
 | :--- | ---: | ---: |
-| `go test` | **57.3%** | 450 |
-| `rg` | **56.0%** | 396 |
-| `grep` | **53.0%** | 2,000 |
-| `find` | **52.0%** | 158 |
-| `ls` | **29.1%** | 331 |
-| `git diff` | **24.6%** | 56 |
+| `rg` | **91.4%** | 436 |
+| `go test` | **58.2%** | 613 |
+| `grep` | **52.6%** | 2,209 |
+| `find` | **48.1%** | 141 |
+| `git diff` | **26.0%** | 47 |
+| `ls` | **23.3%** | 319 |
+| `cat` | **0.5%** | 127 |
+| `make` | **0.0%** | 88 |
 
 &nbsp;
 
-Some commands appear in that ledger at 0%, and that is the design working. When
-output holds no redundancy - `cat` of a source file, a short `make` run - `sctx`
-returns it byte for byte. It compresses what is genuinely repetitive and steps
-out of the way everywhere else.
+This table is a **snapshot**, taken 2026-08-04. The figures move as the ledger
+grows, and a number written into a README stops moving the moment it is
+committed - the last snapshot here sat at 46.3% long after the measurement had
+risen. For the current numbers, refreshed hourly from the same telemetry:
+
+**→ [synapctx.com/sctx](https://synapctx.com/sctx/)**
+
+&nbsp;
+
+The last two rows are the design working, not a shortfall. When output holds no
+redundancy - `cat` of a source file, a short `make` run - `sctx` returns it byte
+for byte. It compresses what is genuinely repetitive and steps out of the way
+everywhere else, which is why a file dump saves nothing and a recursive `rg`
+saves almost everything.
 
 &nbsp;
 
@@ -105,7 +117,8 @@ every consumer of an endpoint, across repositories nobody has checked out -
 become answerable rather than guessed at.
 
 The boundary is deliberate: nothing in this repository requires an account, and
-nothing about `sctx` degrades without one.
+nothing about `sctx` degrades without one. What an account adds, and the live
+savings figures, are on [synapctx.com/sctx](https://synapctx.com/sctx/).
 
 &nbsp;
 
