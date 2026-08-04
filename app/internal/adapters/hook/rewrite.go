@@ -38,6 +38,65 @@ var noiseBuiltins = map[string]bool{
 	"return": true, "break": true, "continue": true, ":": true,
 }
 
+// unformattable are programs for which A FORMATTER IS NOT A COHERENT ARTEFACT, so
+// counting them as coverage gaps can only ever misdirect the roadmap. Two
+// categories, one rule each — this is not a list of things we have not got round to.
+//
+// WHY THIS EXISTS. The gap meter asked SEVEN times, in escalating counts
+// (25 → 27 → 34 → 45 → 48 → 64), for a `python3` formatter. There cannot be one:
+// python3's output is whatever the script prints. The shape is determined by USER
+// CODE, not by the program, so there is nothing to parse. Measured 2026-08-04: of
+// the recorded gaps, `sed` (207), `python3` (98), `deploy-bundle.sh` (25), `wc`
+// (23), `cp` (11) and `sleep` (10) — 374 events — were all of this kind, and they
+// were burying `terraform plan` (13), which is a real and valuable target because
+// plan output is enormous and highly structured.
+//
+// The meter cannot rank by VALUE and structurally never will: `spoolCoverageGap`
+// runs in the PreToolUse hook, BEFORE the command executes, and when the hook
+// declines to wrap, the output never passes through sctx at all. So every gap
+// event carries rawTokens=0 — not a bug, a consequence. Invocation count is the
+// only signal available, which makes excluding the incoherent entries the only way
+// the ranking means anything.
+//
+// This is the same discipline as noiseBuiltins above and the shell-keyword
+// entries in it: a detector that floods with non-actionable hits gets ignored, and
+// an ignored detector is worse than none because it reads as coverage.
+var unformattable = map[string]bool{
+	// 1. GENERAL-PURPOSE INTERPRETERS. Output is defined by the program they run,
+	// not by them. `python3 -m pytest` is worth wrapping, but that is a formatter
+	// for PYTEST — which already exists and has its own row.
+	"python": true, "python3": true, "perl": true, "ruby": true, "node": true,
+	"sh": true, "bash": true, "zsh": true, "osascript": true,
+	// awk and sed are stream editors: their output is the transformed stream, i.e.
+	// arbitrary text chosen by the expression. sed alone was the single largest
+	// entry in the gap list.
+	"awk": true, "sed": true,
+
+	// 2. NO MEANINGFUL OUTPUT TO COMPRESS. These are silent on success or emit a
+	// single scalar, so a formatter has nothing to do. Excluded on that basis, not
+	// on frequency.
+	"cp": true, "mv": true, "rm": true, "mkdir": true, "rmdir": true,
+	"touch": true, "chmod": true, "chown": true, "ln": true, "mktemp": true,
+	"sleep": true, "kill": true, "wait": true, "wc": true,
+	"basename": true, "dirname": true, "which": true, "test": true,
+}
+
+// isScript reports whether a program is a SCRIPT rather than a program we could
+// ship a formatter for. Same rule as the interpreters above — the output shape is
+// user code's, not ours — and it is why `deploy-bundle.sh` was being reported as a
+// gap 25 times. Matched on the basename so `./scripts/x.sh` is caught.
+func isScript(head string) bool {
+	if i := strings.LastIndexAny(head, `/\`); i >= 0 {
+		head = head[i+1:]
+	}
+	for _, ext := range []string{".sh", ".bash", ".zsh", ".py", ".pl", ".rb", ".js", ".ts"} {
+		if strings.HasSuffix(head, ext) {
+			return true
+		}
+	}
+	return false
+}
+
 // alreadyWrapped reports whether a segment head IS sctx, however it was
 // invoked. Compared by BASENAME because the live meter recorded `./bin/sctx`
 // as a coverage gap: a developer running a locally-built binary was reported
@@ -518,6 +577,13 @@ func gapSegment(cmd string) (string, bool) {
 			return "", false
 		}
 		if noiseBuiltins[h] {
+			continue
+		}
+		// NOT A GAP, and never will be — see unformattable. `continue` rather than
+		// declining outright, matching noiseBuiltins: in `python3 build.py && go test`
+		// the reportable gap is whatever go test's row does not cover, and stopping at
+		// the interpreter would hide it.
+		if unformattable[h] || isScript(h) {
 			continue
 		}
 		if reservedNames[h] {
