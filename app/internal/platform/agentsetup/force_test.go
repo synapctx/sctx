@@ -1,6 +1,8 @@
 package agentsetup
 
 import (
+	"github.com/synapctx/sctx/pkg/agentdoc"
+
 	"path/filepath"
 	"strings"
 	"testing"
@@ -58,7 +60,7 @@ func TestNoEmptyBlockIsLeftBehind(t *testing.T) {
 		}
 	}
 	got := read(t, claude)
-	if strings.Contains(got, BeginMarker) {
+	if strings.Contains(got, agentdoc.BeginMarker) {
 		t.Errorf("left an empty managed block behind:\n%s", got)
 	}
 	if !strings.Contains(got, "# Mine") || strings.Count(got, "SCTX.md") != 1 {

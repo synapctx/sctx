@@ -12,6 +12,7 @@ import (
 
 	"github.com/synapctx/sctx/internal/platform/agentsetup"
 	"github.com/synapctx/sctx/internal/platform/config"
+	"github.com/synapctx/sctx/pkg/agentdoc"
 )
 
 const setupUsage = `usage: sctx setup [--install] [--force] [--agent <id>] [--list-agents]`
@@ -44,7 +45,7 @@ func runSetup(cfg config.Config, args []string) int {
 			force = true
 			install = true
 		case "--list-agents":
-			for _, a := range agentsetup.KnownAgents {
+			for _, a := range agentdoc.KnownAgents {
 				fmt.Printf("  %-10s %-18s %s\n", a.ID, a.Name, a.Root)
 			}
 			return 0
@@ -55,7 +56,7 @@ func runSetup(cfg config.Config, args []string) int {
 				return 2
 			}
 			only = args[i]
-			if _, ok := agentsetup.AgentByID(only); !ok {
+			if _, ok := agentdoc.AgentByID(only); !ok {
 				fmt.Fprintf(os.Stderr, "sctx: setup: unknown agent %q (see --list-agents)\n", only)
 				return 2
 			}
@@ -83,7 +84,7 @@ func runSetup(cfg config.Config, args []string) int {
 	// the ONLY way a file is written where nothing was found, and it is explicit
 	// by construction.
 	if only != "" {
-		if a, ok := agentsetup.AgentByID(only); ok {
+		if a, ok := agentdoc.AgentByID(only); ok {
 			if err := os.MkdirAll(home+"/"+strings.SplitN(a.Detect[0], "/", 2)[0], 0o755); err != nil {
 				fmt.Fprintf(os.Stderr, "sctx: setup: %v\n", err)
 				return 1
@@ -167,10 +168,10 @@ func printHookStatus(w io.Writer, home, binary string) bool {
 // docsFor returns the instruction documents this machine should have. SYNAPCTX.md
 // is only offered once an API key exists: describing tools the agent cannot call
 // produces failed calls and teaches it the whole file is unreliable.
-func docsFor(cfg config.Config) []agentsetup.Doc {
-	docs := []agentsetup.Doc{agentsetup.SctxDoc}
+func docsFor(cfg config.Config) []agentdoc.Doc {
+	docs := []agentdoc.Doc{agentdoc.SctxDoc}
 	if len(orgSlugs(cfg)) > 0 {
-		docs = append(docs, agentsetup.SynapctxDoc)
+		docs = append(docs, agentdoc.SynapctxDoc)
 	}
 	return docs
 }
@@ -210,7 +211,7 @@ func printSetupStatus(w io.Writer, st agentsetup.Status, cfg config.Config, afte
 		fmt.Fprintf(w, "  %-13s %s\n", d.Name, d.Purpose)
 	}
 	if len(orgSlugs(cfg)) == 0 {
-		fmt.Fprintf(w, "  %-13s needs an API key first: sctx init\n", agentsetup.SynapctxDoc.Name)
+		fmt.Fprintf(w, "  %-13s needs an API key first: sctx init\n", agentdoc.SynapctxDoc.Name)
 	}
 }
 

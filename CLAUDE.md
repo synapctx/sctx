@@ -14,6 +14,18 @@ short: it states the invariants you must not break, not the history behind them.
   `internal/application` (run = the wrap-a-command pipeline; report = `gain`) →
   `internal/adapters` (osproc runner, `format/*` formatters, sqlite stats, spool
   telemetry) → `internal/platform` (config, tokenizer, iospill).
+- **`pkg/agentdoc` is the ONLY exported package, and it has one consumer.**
+  synapctx.com's `/sctx/` page publishes the same setup guidance for people who
+  have not installed the binary, so it holds the instruction documents, the
+  `KnownAgents` table and the pure block rendering. Everything that touches a
+  disk — detection, sidecar writes, the refusal to overwrite an edited file —
+  stays in `internal/platform/agentsetup`, because a web page sees no machine and
+  must not pretend to. Two rules keep it safe: it must stay **stdlib-only**, or
+  the website inherits sqlite and `x/term` by importing it; and
+  `Wrap`/`BlockOf` must round-trip, or guidance pasted by hand is not recognised
+  as ours and the next `--install` appends a second copy that then loads into
+  every session forever. Both are under test
+  (`TestAFileWrittenTheWayTheWebsiteDescribesItReportsTaught`).
 - **This module has NO private dependencies, and that is a hard requirement.**
   `sctx` is public and free: a stranger must be able to run `go build`, `go vet`,
   `go test`, `go mod tidy`, `go mod download` and `go mod verify` from a plain

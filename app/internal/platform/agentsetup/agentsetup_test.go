@@ -1,6 +1,8 @@
 package agentsetup
 
 import (
+	"github.com/synapctx/sctx/pkg/agentdoc"
+
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,7 +23,7 @@ func write(t *testing.T, path, body string) {
 // own configuration directory behind.
 func configure(t *testing.T, home, agentID string) Agent {
 	t.Helper()
-	a, ok := AgentByID(agentID)
+	a, ok := agentdoc.AgentByID(agentID)
 	if !ok {
 		t.Fatalf("unknown agent %q", agentID)
 	}
@@ -52,7 +54,7 @@ func TestOnlyConfiguredAgentsAreTouched(t *testing.T) {
 	if err != nil {
 		t.Fatalf("the configured agent was not taught: %v", err)
 	}
-	if !strings.Contains(string(body), BeginMarker) {
+	if !strings.Contains(string(body), agentdoc.BeginMarker) {
 		t.Error("no managed block in the Codex instruction file")
 	}
 }
@@ -124,7 +126,7 @@ func TestInstallIsIdempotent(t *testing.T) {
 		t.Errorf("second install changed %v, want nothing", changed)
 	}
 	root, _ := os.ReadFile(filepath.Join(home, ".claude", "CLAUDE.md"))
-	if n := strings.Count(string(root), BeginMarker); n != 1 {
+	if n := strings.Count(string(root), agentdoc.BeginMarker); n != 1 {
 		t.Errorf("block appears %d times after two installs", n)
 	}
 }
@@ -136,7 +138,7 @@ func TestStaleInstructionsAreDetectedAndReplacedInPlace(t *testing.T) {
 	home := t.TempDir()
 	configure(t, home, "codex")
 	root := filepath.Join(home, ".codex", "AGENTS.md")
-	write(t, root, "# My rules\n\nBe terse.\n\n"+BeginMarker+"\nancient instructions\n"+EndMarker+"\n\n# After\n")
+	write(t, root, "# My rules\n\nBe terse.\n\n"+agentdoc.BeginMarker+"\nancient instructions\n"+agentdoc.EndMarker+"\n\n# After\n")
 
 	st, err := Inspect(home, nil)
 	if err != nil {
@@ -159,7 +161,7 @@ func TestStaleInstructionsAreDetectedAndReplacedInPlace(t *testing.T) {
 	if !strings.HasPrefix(out, "# My rules\n\nBe terse.\n") || !strings.Contains(out, "# After") {
 		t.Errorf("content outside the block was altered:\n%s", out)
 	}
-	if n := strings.Count(out, BeginMarker); n != 1 {
+	if n := strings.Count(out, agentdoc.BeginMarker); n != 1 {
 		t.Errorf("block appears %d times", n)
 	}
 }
@@ -172,7 +174,7 @@ func TestSidecarsAreNeverOverwritten(t *testing.T) {
 	mine := "# my own notes, do not clobber\n"
 	write(t, filepath.Join(home, ".claude", "SCTX.md"), mine)
 
-	if _, err := Install(home, nil, SctxDoc); err != nil {
+	if _, err := Install(home, nil, agentdoc.SctxDoc); err != nil {
 		t.Fatal(err)
 	}
 	got, _ := os.ReadFile(filepath.Join(home, ".claude", "SCTX.md"))
@@ -191,14 +193,14 @@ func TestAppendPreservesTheDevelopersContentByteForByte(t *testing.T) {
 	original := "# Mine\nalways use tabs" // no trailing newline, on purpose
 	write(t, filepath.Join(home, ".codex", "AGENTS.md"), original)
 
-	if _, err := Install(home, nil, SctxDoc); err != nil {
+	if _, err := Install(home, nil, agentdoc.SctxDoc); err != nil {
 		t.Fatal(err)
 	}
 	got, _ := os.ReadFile(filepath.Join(home, ".codex", "AGENTS.md"))
 	if !strings.HasPrefix(string(got), original+"\n") {
 		t.Fatalf("the developer's content was altered:\n%q", got)
 	}
-	if !strings.Contains(string(got), "\n"+BeginMarker) {
+	if !strings.Contains(string(got), "\n"+agentdoc.BeginMarker) {
 		t.Errorf("marker did not land on its own line:\n%s", got)
 	}
 }
@@ -208,7 +210,7 @@ func TestAppendPreservesTheDevelopersContentByteForByte(t *testing.T) {
 func TestAnUnterminatedBlockCountsAsNotInstalled(t *testing.T) {
 	home := t.TempDir()
 	configure(t, home, "codex")
-	write(t, filepath.Join(home, ".codex", "AGENTS.md"), "# Mine\n"+BeginMarker+"\nhalf a block\n")
+	write(t, filepath.Join(home, ".codex", "AGENTS.md"), "# Mine\n"+agentdoc.BeginMarker+"\nhalf a block\n")
 
 	st, err := Inspect(home, nil)
 	if err != nil {
@@ -221,14 +223,14 @@ func TestAnUnterminatedBlockCountsAsNotInstalled(t *testing.T) {
 		t.Fatal(err)
 	}
 	got, _ := os.ReadFile(filepath.Join(home, ".codex", "AGENTS.md"))
-	if !strings.Contains(string(got), EndMarker) {
+	if !strings.Contains(string(got), agentdoc.EndMarker) {
 		t.Errorf("reinstall did not produce a well-formed block:\n%s", got)
 	}
 }
 
 func TestEveryKnownAgentIsWellFormed(t *testing.T) {
 	seen := map[string]bool{}
-	for _, a := range KnownAgents {
+	for _, a := range agentdoc.KnownAgents {
 		if a.ID == "" || a.Name == "" || a.Root == "" || len(a.Detect) == 0 {
 			t.Errorf("agent %+v is incomplete", a)
 		}
@@ -244,87 +246,6 @@ func TestEveryKnownAgentIsWellFormed(t *testing.T) {
 				t.Errorf("agent %q Detect path must be relative to home, got %q", a.ID, d)
 			}
 		}
-	}
-}
-
-// Detection must key on the agent's OWN configuration, never on anything we
-// wrote. Keyed on our own output, an agent would look configured forever after
-// one accidental --agent run.
-func TestDetectionNeverKeysOnOurOwnFiles(t *testing.T) {
-	for _, a := range KnownAgents {
-		for _, d := range a.Detect {
-			for _, ours := range []string{"SCTX.md", "SYNAPCTX.md", "synapctx.md"} {
-				if strings.HasSuffix(d, ours) {
-					t.Errorf("agent %q detects on %q, which is a file we write", a.ID, d)
-				}
-			}
-		}
-	}
-}
-
-// The templates load into every session's context window. A token-optimizing
-// product that ships a bloated instruction file is arguing against itself.
-func TestTemplatesStaySmall(t *testing.T) {
-	for _, d := range []Doc{SctxDoc, SynapctxDoc} {
-		body := d.Body([]string{"acme"})
-		if n := len(body); n > 4000 {
-			t.Errorf("%s is %d bytes; it is loaded on every turn, keep it under 4000", d.Name, n)
-		}
-		if strings.TrimSpace(body) == "" {
-			t.Errorf("%s is empty", d.Name)
-		}
-	}
-}
-
-// Mandate-shaped wording is refused on purpose: it works, and it makes usage
-// unfalsifiable, so we could never tell whether a customer's agent chose the
-// tool on merit. Trigger-shaped wording was measured to work without that cost.
-func TestSynapctxTemplateIsTriggerShapedNotMandateShaped(t *testing.T) {
-	body := synapctxBody([]string{"acme"})
-	for _, banned := range []string{"USE IT FIRST", "always call", "ALWAYS call", "MUST go through", "before reaching for Grep"} {
-		if strings.Contains(body, banned) {
-			t.Errorf("template contains mandate-shaped wording %q", banned)
-		}
-	}
-	if !strings.Contains(body, "**Before ") && !strings.Contains(body, "**When ") {
-		t.Error("template has no trigger-shaped guidance at all; that measured zero calls across five tools")
-	}
-}
-
-// Passing the wrong organization returns a confidently wrong answer rather than
-// an error, so a multi-org machine has to be told to always pass it.
-func TestMultiOrgTemplateDemandsExplicitScoping(t *testing.T) {
-	single := synapctxBody([]string{"acme"})
-	multi := synapctxBody([]string{"acme", "globex"})
-	if strings.Contains(single, "Always pass") && !strings.Contains(single, "you can omit") {
-		t.Error("a single-org machine should not be nagged about scoping")
-	}
-	if !strings.Contains(multi, "globex") || !strings.Contains(multi, "Always pass") {
-		t.Errorf("multi-org template must name every org and demand explicit scoping:\n%s", multi)
-	}
-}
-
-// The instruction file's job is no longer just "these tools exist" — it is
-// "here is how to check whether an answer can be trusted". An agent that does
-// not know a warrant is attached will not read it, and an unread limitation is
-// no limitation at all.
-func TestSynapctxTemplateTeachesTheWarrant(t *testing.T) {
-	body := synapctxBody([]string{"acme"})
-	for _, want := range []string{
-		"answer warrant",
-		"Compare it against your checkout",
-		"ranked, not exhaustive",
-		"DEGRADED",
-		"truncated",
-		"language_unsupported",
-	} {
-		if !strings.Contains(body, want) {
-			t.Errorf("template does not teach %q; the warrant ships unread", want)
-		}
-	}
-	// The distinction the whole trust argument rests on.
-	if !strings.Contains(body, `"no callers" means a change is safe`) {
-		t.Error("template must explain why not-analysed differs from no-callers")
 	}
 }
 

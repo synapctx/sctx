@@ -1,4 +1,4 @@
-package agentsetup
+package agentdoc
 
 // The agents we know how to teach.
 //
@@ -26,7 +26,7 @@ package agentsetup
 // whose "global rules" live in application settings rather than on disk, where
 // there is nothing for us to write.
 type Agent struct {
-	ID   string // stable identifier, also the --agent flag value
+	ID   string // stable identifier, also the --agent flag value and the ?agent= value
 	Name string // for humans
 
 	// Root is the instruction file, relative to the home directory. This is the

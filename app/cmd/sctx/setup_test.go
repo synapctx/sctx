@@ -9,13 +9,14 @@ import (
 
 	"github.com/synapctx/sctx/internal/platform/agentsetup"
 	"github.com/synapctx/sctx/internal/platform/config"
+	"github.com/synapctx/sctx/pkg/agentdoc"
 )
 
 // withAgent makes a home where one agent is configured but untaught.
 func withAgent(t *testing.T) agentsetup.Status {
 	t.Helper()
 	home := t.TempDir()
-	a, _ := agentsetup.AgentByID("claude")
+	a, _ := agentdoc.AgentByID("claude")
 	if err := os.MkdirAll(filepath.Join(home, a.Detect[0]), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -41,7 +42,7 @@ func emptyHome(t *testing.T) agentsetup.Status {
 func completeStatus(t *testing.T) agentsetup.Status {
 	t.Helper()
 	home := t.TempDir()
-	a, _ := agentsetup.AgentByID("claude")
+	a, _ := agentdoc.AgentByID("claude")
 	if err := os.MkdirAll(filepath.Join(home, a.Detect[0]), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -93,7 +94,7 @@ func TestSynapctxIsOnlyOfferedOnceAKeyExists(t *testing.T) {
 	}
 }
 
-func names(docs []agentsetup.Doc) []string {
+func names(docs []agentdoc.Doc) []string {
 	out := make([]string, 0, len(docs))
 	for _, d := range docs {
 		out = append(out, d.Name)

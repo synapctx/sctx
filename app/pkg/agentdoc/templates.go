@@ -1,4 +1,4 @@
-package agentsetup
+package agentdoc
 
 import (
 	"fmt"
