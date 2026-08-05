@@ -491,10 +491,10 @@ services and no private dependencies involved in building or testing.
 A renderer is a self-contained package, and new tools are the most useful
 contribution anyone can make.
 
-Implement `format.Formatter` (see `app/internal/domain/format/format.go`) in a new
-package under `app/internal/adapters/format/<tool>/`, register it in
-`app/cmd/sctx/main.go`, and add the command to the rewrite table in
-`app/internal/adapters/hook/rewrite.go` so the agent integration picks it up.
+Implement `format.Formatter` (see `internal/domain/format/format.go`) in a new
+package under `internal/adapters/format/<tool>/`, register it in
+`cmd/sctx/main.go`, and add the command to the rewrite table in
+`internal/adapters/hook/rewrite.go` so the agent integration picks it up.
 
 Four rules, and they are the whole review:
 

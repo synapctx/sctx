@@ -5,19 +5,19 @@ VERSION ?= $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS := -ldflags "-s -w -X main.version=$(VERSION)"
 
 build:
-	cd app && go build $(LDFLAGS) -o ../bin/$(BINARY) ./cmd/sctx
+	go build $(LDFLAGS) -o bin/$(BINARY) ./cmd/sctx
 
 test:
-	cd app && go test -race ./...
+	go test -race ./...
 
 vet:
-	cd app && go vet ./...
+	go vet ./...
 
 fmt:
-	cd app && gofmt -w .
+	gofmt -w .
 
 lint:
-	cd app && golangci-lint run || true
+	golangci-lint run || true
 
 install: build
 	install -m 0755 bin/$(BINARY) $(HOME)/.local/bin/$(BINARY)

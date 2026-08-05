@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-go@v7
         with:
           go-version: ${{ env.GO_VERSION }}
-          cache-dependency-path: app/go.sum
+          cache-dependency-path: go.sum
 
       - name: Resolve Version
         id: version
@@ -44,7 +44,6 @@ jobs:
           fi
 
       - name: Test
-        working-directory: app
         run: go test -race ./...
 
       # The workspace daemon is a SEPARATE, PRIVATE repository, and it is
@@ -159,8 +158,11 @@ jobs:
             ext=""
             [ "$os" = "windows" ] && ext=".exe"
 
-            ( cd app && GOOS="$os" GOARCH="$arch" \
-                go build -ldflags "-s -w -X main.version=$VERSION" -o "../$stage/sctx$ext" ./cmd/sctx )
+            # `$stage` is relative to the workspace root, and this build now runs
+            # there rather than inside app/ — so the output path lost a `../`
+            # when the module moved to the repository root.
+            ( GOOS="$os" GOARCH="$arch" \
+                go build -ldflags "-s -w -X main.version=$VERSION" -o "$stage/sctx$ext" ./cmd/sctx )
             ( cd .workspace-daemon/app && GOOS="$os" GOARCH="$arch" \
                 go build -ldflags "-s -w" -o "../../$stage/sctxd$ext" ./cmd/sctxd )
 

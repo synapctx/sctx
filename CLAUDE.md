@@ -8,8 +8,16 @@ short: it states the invariants you must not break, not the history behind them.
 
 ## Layout
 
-- Module root is `app/` — module path `github.com/synapctx/sctx`, with **no
-  `/app` segment**. Single entry point: `app/cmd/sctx`.
+- **Module root is the REPOSITORY root** — module path `github.com/synapctx/sctx`,
+  entry point `cmd/sctx`. This is the one repository in the org that does NOT use
+  the `app/` layout, and the reason is not style: for a root module path Go
+  resolves packages from the repository root, so with `go.mod` in `app/` the
+  module was fetchable but EMPTY at every documented import path. The advertised
+  `go install github.com/synapctx/sctx/cmd/sctx@latest` failed with "does not
+  contain package", and so did importing `pkg/agentdoc`. Nothing in the repo
+  caught it, because a local build never resolves through the proxy. Moving
+  `go.mod` back under `app/` reintroduces that silently — `make build` and
+  `go test ./...` would both still pass.
 - Hexagonal: `internal/domain` (ports: format, exec, stats, telemetry) →
   `internal/application` (run = the wrap-a-command pipeline; report = `gain`) →
   `internal/adapters` (osproc runner, `format/*` formatters, sqlite stats, spool
