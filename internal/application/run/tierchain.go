@@ -1,6 +1,7 @@
 package run
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 
@@ -21,7 +22,7 @@ type RenderResult struct {
 // error, panic, or anomalous render degrades to the next tier and ultimately
 // to verbatim — output is never suppressed. raw is the full captured stdout,
 // used both as the verbatim fallback and for the anomaly guard.
-func renderChain(ctx context.Context, f format.Formatter, in format.Input, raw []byte, forceTier string) RenderResult {
+func renderChain(ctx context.Context, f format.Formatter, in format.Input, raw, rawStderr []byte, forceTier string) RenderResult {
 	verbatim := RenderResult{Body: raw, Tier: format.TierVerbatim}
 
 	if forceTier == string(format.TierVerbatim) || forceTier == "off" || f == nil {
@@ -43,7 +44,21 @@ func renderChain(ctx context.Context, f format.Formatter, in format.Input, raw [
 	var anomaly string
 	declined := 0
 	for _, t := range tiers {
-		rendered, err := safeRender(ctx, t.fn, in)
+		// EACH TIER GETS ITS OWN READERS. Passing one Input to every tier meant the
+		// first tier to READ stdout left the next one an empty stream — and reading
+		// before deciding is the normal shape of a formatter, because you cannot
+		// tell whether output is yours without looking at it. So any formatter whose
+		// aggressive tier read and then declined had a DEAD relaxed tier, which the
+		// chain then reported as "no tier handles this invocation".
+		//
+		// It hid behind unit tests because a test constructs a fresh Input per tier,
+		// so the tier works in isolation and only fails in composition. Measured
+		// consequence before the fix: `make` 167 runs at 0% saved with 101 of them
+		// declining, and `ssh` declining 171 of 176.
+		attempt := in
+		attempt.Stdout = bytes.NewReader(raw)
+		attempt.Stderr = bytes.NewReader(rawStderr)
+		rendered, err := safeRender(ctx, t.fn, attempt)
 		switch {
 		case err == format.ErrTierInapplicable:
 			// A tier saying "not mine" is a DESIGN DECISION, not a failure: `go test

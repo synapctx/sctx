@@ -63,10 +63,10 @@ func TestTheMeterIgnoresLocalScripts(t *testing.T) {
 // This is the property that makes the exclusion safe rather than merely quieter.
 func TestAnExcludedProgramDoesNotHideARealGapBesideIt(t *testing.T) {
 	cases := []struct{ cmd, wantProgram string }{
-		{"python3 gen.py && terraform plan", "terraform plan"},
-		{"sed -i s/a/b/ x && cargo build", "cargo build"},
-		{"mkdir -p out && cargo build", "cargo build"},
-		{"./scripts/prep.sh && terraform apply", "terraform apply"},
+		{"python3 gen.py && vault read secret/db", "vault read"},
+		{"sed -i s/a/b/ x && mix test", "mix test"},
+		{"mkdir -p out && mix test", "mix test"},
+		{"./scripts/prep.sh && vault write secret/db x=1", "vault write"},
 	}
 	for _, tt := range cases {
 		seg, ok := gapSegment(tt.cmd)
@@ -85,9 +85,9 @@ func TestAnExcludedProgramDoesNotHideARealGapBesideIt(t *testing.T) {
 // broke, and `terraform plan` is the specific thing decontamination surfaced.
 func TestRealCoverageGapsAreStillReported(t *testing.T) {
 	cases := []struct{ cmd, wantProgram string }{
-		{"terraform plan", "terraform plan"},
-		{"terraform apply -auto-approve", "terraform apply"},
-		{"cargo build --release", "cargo build"},
+		{"vault read secret/db", "vault read"},
+		{"vault write secret/db x=1", "vault write"},
+		{"mix test --release", "mix test"},
 		// A covered program with an UNCOVERED subcommand is real signal: it says which
 		// subcommand to add, not which program.
 		{"go env GOPATH", "go env"},

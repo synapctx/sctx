@@ -49,6 +49,11 @@ var subcommandBearing = map[string]bool{
 	// where `terraform apply` is not, and that difference is the whole point of the
 	// meter.
 	"cargo": true, "terraform": true, "aws": true, "gcloud": true, "helm": true,
+	// The rest of the cloud/IaC family, added when they gained rewrite-table rows.
+	// Each takes a service or verb from its own vocabulary as argv[1] — never a
+	// path — so the key stays free of customer data while the meter keeps telling
+	// `terraform plan` from `terraform apply`.
+	"az": true, "tofu": true, "terragrunt": true, "pulumi": true,
 	"glab": true, "gt": true, "jj": true, "poetry": true, "uv": true,
 	"mix": true, "dotnet": true, "systemctl": true, "pre-commit": true,
 	"rustup": true, "deno": true, "bun": true, "apt": true, "apt-get": true,

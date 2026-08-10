@@ -155,6 +155,136 @@ var subcommandTable = map[string][]string{
 	"npm":  {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
 	"pnpm": {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
 	"yarn": {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
+
+	// ── Covered by the GENERIC formatter only, deliberately ──────────────────
+	//
+	// None of the rows below has a dedicated formatter, and that is the point.
+	// Every one of them either speaks JSON on request (the cloud CLIs default to
+	// it or take `--output json` / `--format json`) or prints long runs of
+	// repeated progress and status lines — the two shapes the generic formatter
+	// detects. It compacts what parses and collapses what repeats, and declines
+	// otherwise, so the worst case is exactly the verbatim output these commands
+	// produce today.
+	//
+	// WHY NOT SUBCOMMANDS. `aws` and `gcloud` alone have thousands of verbs
+	// between them; enumerating those is a treadmill no one can stay on, and the
+	// value is in the output SHAPE rather than the verb. A nil slice wraps every
+	// invocation and lets detection decide — the same arrangement `curl` and `jq`
+	// have always used.
+	//
+	// WHY WITHOUT MEASURED DEMAND, when this file's other rows were all earned by
+	// the coverage meter: the telemetry corpus is a single developer's macOS
+	// laptop, which has never run a cloud CLI. That is evidence about one estate,
+	// not about the world, and treating "absent from my laptop" as "absent from
+	// the market" would build a tool for an audience of one. These rows are an
+	// explicit bet on users we cannot see, priced at roughly nothing because they
+	// add no formatter to maintain and cannot render worse than verbatim.
+	"aws":        nil,
+	"gcloud":     nil,
+	"az":         nil,
+	"terraform":  nil,
+	"tofu":       nil,
+	"pulumi":     nil,
+	"helm":       nil,
+	"cargo":      {"test", "build", "check", "clippy", "run", "fmt", "tree", "add", "update"},
+	"dotnet":     {"build", "test", "restore", "run", "publish", "list"},
+	"mvn":        nil,
+	"gradle":     nil,
+	"./gradlew":  nil,
+	"composer":   {"install", "update", "require", "show", "outdated", "validate"},
+	"bundle":     {"install", "update", "exec", "list", "outdated"},
+	"uv":         {"pip", "run", "sync", "lock", "add", "tree"},
+	"poetry":     {"install", "update", "add", "show", "lock", "run"},
+	"tsc":        nil,
+	"eslint":     nil,
+	"systemctl":  {"status", "list-units", "list-unit-files", "show", "is-active", "cat"},
+	"journalctl": nil,
+	"df":         nil,
+	"terragrunt": nil,
+	// Keyed by the literal token, because matchSegment compares argv[0] as
+	// written rather than by basename — `./gradlew` is how projects invoke it.
+	"gradlew": nil,
+}
+
+// argvOneIsOperation names programs wrapped for EVERY invocation (a nil row
+// above) whose first argument is nonetheless an OPERATION, not a path.
+//
+// It exists because `nil` in subcommandTable was carrying two meanings at once.
+// For `ls`, `find`, `cat` and `make`, nil means "argv[1] is a path or target", and
+// joining it into a telemetry key would ship a customer's directory names to the
+// platform — the leak TestSubcommandTableIsCoveredByProgkey exists to prevent.
+// For `aws`, `gcloud` and `terraform`, nil means something different: wrap every
+// invocation because the VERB surface is too large to enumerate, while argv[1] is
+// still a bounded vocabulary the tool defines (`s3`, `compute`, `plan`) and is
+// exactly the dimension the coverage meter needs to distinguish
+// `terraform plan` from `terraform apply`.
+//
+// Listing them explicitly keeps the privacy guarantee intact — a program only
+// gets argv[1] recorded if it appears here or declares subcommands — while
+// letting the rewrite table stay off the enumeration treadmill.
+// Listed ONLY where argv[1] is genuinely from the tool's own vocabulary.
+// Deliberately absent: `tsc` and `eslint` (argv[1] is a path or a flag),
+// `journalctl` and `df` (flags), `mvn`/`gradle` (a goal is close, but a bare
+// `mvn -f pom.xml` puts a path there and the cost of being wrong is a leak).
+var argvOneIsOperation = map[string]bool{
+	"aws": true, "gcloud": true, "az": true,
+	"terraform": true, "tofu": true, "terragrunt": true, "pulumi": true, "helm": true,
+}
+
+// followFlags names, per program, the flags that make it stream until killed.
+//
+// A WRAPPED FOLLOW IS WORSE THAN NO WRAPPING AT ALL, which is why this exists.
+// sctx reads stdout to EOF before formatting, so `kubectl logs -f`, `tail -f` or
+// `journalctl -f` would buffer forever and the agent's timeout would fire having
+// been shown NOTHING — whereas unwrapped it would at least have seen the lines
+// printed so far. The saving is irrelevant next to that.
+//
+// SCOPED TO THE SUBCOMMAND THAT ACTUALLY STREAMS, never blanket per program,
+// because `-f` is among the most overloaded flags in unix. `docker build -f
+// Dockerfile`, `helm install -f values.yaml`, `make -f Makefile` and `grep -f
+// patterns` all name a FILE, and a program-wide rule would silently stop
+// wrapping every one of them — losing real coverage to protect against a case
+// that cannot arise.
+var followFlags = []string{"-f", "-F", "--follow"}
+
+// streamsForever reports whether this invocation follows output indefinitely.
+// program is argv[0]; args are the tokens after it.
+func streamsForever(program string, args []string) bool {
+	switch program {
+	case "tail", "journalctl":
+		// No subcommand: the flag alone decides.
+	case "kubectl", "docker":
+		// Only the log-streaming verbs. `docker compose logs -f` nests one deeper.
+		sub := ""
+		for _, a := range args {
+			if !strings.HasPrefix(a, "-") {
+				sub = a
+				break
+			}
+		}
+		if sub != "logs" && !(program == "docker" && sub == "compose" && containsToken(args, "logs")) {
+			return false
+		}
+	default:
+		return false
+	}
+	for _, a := range args {
+		for _, f := range followFlags {
+			if a == f {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func containsToken(args []string, want string) bool {
+	for _, a := range args {
+		if a == want {
+			return true
+		}
+	}
+	return false
 }
 
 // reservedNames are sctx's own native subcommands: rewriting a bare
@@ -551,6 +681,17 @@ func matchSegment(text string) (int, bool) {
 		if idx+1 >= len(tokens) || !contains(subs, tokens[idx+1].text) {
 			return 0, false
 		}
+	}
+
+	// A following command never reaches EOF, and sctx formats only after it does.
+	// Wrapping one turns "the agent sees output until its timeout" into "the agent
+	// sees nothing at all" — a strict regression that no saving could justify.
+	args := make([]string, 0, len(tokens)-idx)
+	for _, t := range tokens[idx+1:] {
+		args = append(args, t.text)
+	}
+	if streamsForever(program, args) {
+		return 0, false
 	}
 
 	return tokens[idx].offset, true

@@ -48,12 +48,15 @@ naturally** — including inside pipelines and ` + "`&&`" + ` sequences. Do not 
 ` + "`sctx`" + ` yourself on a covered command: it is not double-wrapped, but the
 token is wasted and the command reads as though it needed help.
 
-Covered today: ` + "`go`" + `, ` + "`git`" + `, ` + "`grep`/`rg`" + `, ` + "`ls`/`find`/`tree`" + `,
-` + "`cat`/`head`/`tail`" + `, ` + "`diff`" + `, ` + "`ps`" + `, ` + "`du`" + `, ` + "`make`" + `,
-` + "`golangci-lint`" + `, ` + "`gh`" + `, ` + "`docker`" + `, ` + "`kubectl`" + `, ` + "`pytest`" + `,
-` + "`ruff`" + `, ` + "`mypy`" + `, ` + "`pip`" + `, ` + "`npm`/`pnpm`/`yarn`" + `, ` + "`brew`" + `,
-` + "`mongosh`" + `, ` + "`ssh`" + ` (delegates to the remote command's formatter),
-` + "`rsync`" + `, ` + "`jq`/`curl`" + `.
+Wrapped today: ` + "`go`" + `, ` + "`git`" + `, ` + "`grep`/`rg`" + `, ` + "`ls`/`find`/`tree`" + `,
+` + "`cat`/`head`/`tail`" + `, ` + "`diff`" + `, ` + "`ps`" + `, ` + "`du`" + `, ` + "`df`" + `,
+` + "`make`" + `, ` + "`golangci-lint`" + `, ` + "`gh`" + `, ` + "`docker`" + `, ` + "`kubectl`" + `,
+` + "`helm`" + `, ` + "`aws`/`gcloud`/`az`" + `, ` + "`terraform`/`tofu`/`pulumi`" + `,
+` + "`pytest`" + `, ` + "`ruff`" + `, ` + "`mypy`" + `, ` + "`pip`/`uv`/`poetry`" + `,
+` + "`npm`/`pnpm`/`yarn`" + `, ` + "`cargo`" + `, ` + "`dotnet`" + `, ` + "`mvn`/`gradle`" + `,
+` + "`composer`" + `, ` + "`bundle`" + `, ` + "`tsc`/`eslint`" + `, ` + "`brew`" + `,
+` + "`systemctl`/`journalctl`" + `, ` + "`mongosh`" + `, ` + "`rsync`" + `, ` + "`jq`/`curl`" + `,
+` + "`ssh`" + ` (delegates to the remote command's formatter).
 
 **Coverage is per (program, SUBCOMMAND)**, which is why a command you expected to
 be wrapped sometimes is not — a program is rewritten only for the subcommands it
@@ -75,8 +78,10 @@ alone when wrapping could change what you conclude:
 ## When to type it yourself
 
 **When you are about to run something NOT in the list above and its output will
-be long.** ` + "`sctx <cmd>`" + ` still helps: JSON stdout is compacted automatically
-and repeated lines are collapsed, whatever the program.
+be long.** ` + "`sctx <cmd>`" + ` still helps, whatever the program: JSON stdout is
+compacted, and runs of repeated lines — the progress and status spam most tools
+emit — collapse to one line plus a count. Nothing is summarised and nothing is
+guessed at, so an unrecognised format costs you nothing.
 
 ` + "`sctx -- <cmd>`" + ` forces verbatim passthrough when you genuinely need every
 byte.

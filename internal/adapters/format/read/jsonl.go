@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/synapctx/sctx/internal/adapters/format/collapse"
 	"github.com/synapctx/sctx/internal/domain/format"
 )
 
@@ -32,7 +33,7 @@ const keepJSONLLines = 5
 // fall back to a lower tier rather than risk hiding non-JSON content (e.g.
 // a source file that happens to contain a couple of `{`/`}`-only lines).
 func renderJSONL(raw []byte) (format.Rendered, bool) {
-	lines := splitLines(raw)
+	lines := collapse.SplitLines(raw)
 	if len(lines) == 0 {
 		return format.Rendered{}, false
 	}

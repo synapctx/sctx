@@ -66,7 +66,7 @@ func TestRunClaudeNoFallback(t *testing.T) {
 		},
 		{
 			name:      "no rewrite rule applies",
-			stdin:     `{"tool_name":"Bash","tool_input":{"command":"cargo build"}}`,
+			stdin:     `{"tool_name":"Bash","tool_input":{"command":"mix test"}}`,
 			wantEmpty: true,
 		},
 		{
@@ -118,7 +118,7 @@ func TestAnUnmatchedCommandIsRecordedAsACoverageGap(t *testing.T) {
 	spoolDir := t.TempDir()
 	t.Setenv("SCT__SPOOL_DIR", spoolDir)
 
-	stdin := `{"tool_name":"Bash","tool_input":{"command":"cargo build"}}`
+	stdin := `{"tool_name":"Bash","tool_input":{"command":"mix test"}}`
 	var out bytes.Buffer
 	if code := runClaude(nil, strings.NewReader(stdin), &out, "v-test"); code != 0 {
 		t.Fatalf("runClaude() exit code = %d, want 0", code)
@@ -136,8 +136,8 @@ func TestAnUnmatchedCommandIsRecordedAsACoverageGap(t *testing.T) {
 	if ev.Kind != telemetry.KindCoverageGap {
 		t.Errorf("Kind = %q, want %q", ev.Kind, telemetry.KindCoverageGap)
 	}
-	if ev.Program != "cargo build" {
-		t.Errorf("Program = %q, want %q", ev.Program, "cargo build")
+	if ev.Program != "mix test" {
+		t.Errorf("Program = %q, want %q", ev.Program, "mix test")
 	}
 	// Arguments must never reach telemetry — only the program key.
 	if ev.Command != ev.Program {
@@ -166,7 +166,7 @@ func TestACoveredCommandIsNotACoverageGap(t *testing.T) {
 // Shell builtins and already-wrapped commands must never reach the meter, or
 // the ranking that decides what to build next is dominated by `cd`.
 func TestNoiseIsNotRecordedAsACoverageGap(t *testing.T) {
-	for _, cmd := range []string{"cd /tmp", "echo hello", "sctx cargo build"} {
+	for _, cmd := range []string{"cd /tmp", "echo hello", "sctx mix test"} {
 		spoolDir := t.TempDir()
 		t.Setenv("SCT__SPOOL_DIR", spoolDir)
 		stdin := `{"tool_name":"Bash","tool_input":{"command":"` + cmd + `"}}`
@@ -190,7 +190,7 @@ func TestASpoolFailureNeverAffectsTheHook(t *testing.T) {
 	// os.MkdirAll fail inside spool.Append.
 	t.Setenv("SCT__SPOOL_DIR", filepath.Join(blocker, "spool"))
 
-	stdin := `{"tool_name":"Bash","tool_input":{"command":"cargo build"}}`
+	stdin := `{"tool_name":"Bash","tool_input":{"command":"mix test"}}`
 	var out bytes.Buffer
 	if code := runClaude(nil, strings.NewReader(stdin), &out, "v-test"); code != 0 {
 		t.Fatalf("runClaude() exit code = %d, want 0", code)
@@ -200,19 +200,19 @@ func TestASpoolFailureNeverAffectsTheHook(t *testing.T) {
 	}
 }
 
-// A gap inside a pipeline is still a gap: the meter must see `cargo build`, not
+// A gap inside a pipeline is still a gap: the meter must see `mix test`, not
 // nothing, or every pipelined command is invisible to it.
 func TestAGapInsideAPipelineIsStillRecorded(t *testing.T) {
 	spoolDir := t.TempDir()
 	t.Setenv("SCT__SPOOL_DIR", spoolDir)
 
-	stdin := `{"tool_name":"Bash","tool_input":{"command":"cargo build | tail -5"}}`
+	stdin := `{"tool_name":"Bash","tool_input":{"command":"mix test | tail -5"}}`
 	var out bytes.Buffer
 	runClaude(nil, strings.NewReader(stdin), &out, "v-test")
 
 	events := readSpoolEvents(t, spoolDir)
-	if len(events) != 1 || events[0].Program != "cargo build" {
-		t.Fatalf("events = %+v, want one recording \"cargo build\"", events)
+	if len(events) != 1 || events[0].Program != "mix test" {
+		t.Fatalf("events = %+v, want one recording \"mix test\"", events)
 	}
 }
 
@@ -220,7 +220,7 @@ func TestAGapAfterACdIsStillRecorded(t *testing.T) {
 	spoolDir := t.TempDir()
 	t.Setenv("SCT__SPOOL_DIR", spoolDir)
 
-	stdin := `{"tool_name":"Bash","tool_input":{"command":"cd sub && cargo build"}}`
+	stdin := `{"tool_name":"Bash","tool_input":{"command":"cd sub && mix test"}}`
 
 	var out bytes.Buffer
 	code := runClaude(nil, strings.NewReader(stdin), &out, "v-test")
@@ -232,8 +232,8 @@ func TestAGapAfterACdIsStillRecorded(t *testing.T) {
 	if len(events) != 1 {
 		t.Fatalf("spooled events = %d, want 1", len(events))
 	}
-	if events[0].Program != "cargo build" {
-		t.Errorf("Program = %q, want %q", events[0].Program, "cargo build")
+	if events[0].Program != "mix test" {
+		t.Errorf("Program = %q, want %q", events[0].Program, "mix test")
 	}
 }
 
@@ -257,7 +257,7 @@ func TestCommandSubstitutionIsNotRecorded(t *testing.T) {
 	spoolDir := t.TempDir()
 	t.Setenv("SCT__SPOOL_DIR", spoolDir)
 
-	stdin := `{"tool_name":"Bash","tool_input":{"command":"cargo build $(x)"}}`
+	stdin := `{"tool_name":"Bash","tool_input":{"command":"mix test $(x)"}}`
 
 	var out bytes.Buffer
 	code := runClaude(nil, strings.NewReader(stdin), &out, "v-test")
@@ -300,7 +300,7 @@ func TestDeriveProgram(t *testing.T) {
 		{"go test ./...", "go test"},
 		{"ls -la", "ls"},
 		{"terraform plan -out x", "terraform plan"},
-		{"cargo build 2>&1", "cargo build"},
+		{"mix test 2>&1", "mix test"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.cmd, func(t *testing.T) {
@@ -335,15 +335,28 @@ func TestACommandWithNoProgramTokenIsNotRecorded(t *testing.T) {
 	}
 }
 
+// uncoveredFixtures are commands sctx does NOT cover, used by the two tests
+// below. They prove nothing the moment sctx starts covering them, and that has
+// now happened TWICE — first when `ssh` gained a formatter, then when `cargo`,
+// `terraform` and `helm` were added to the rewrite table. Declared once so the
+// pair cannot drift apart, and guarded by TestGapFixturesAreActuallyUncovered so
+// the next such change fails there, with an explanation, rather than looking
+// like a regression in gap recording.
+//
+// Pick replacements that are COHERENT programs (something we could plausibly
+// write a formatter for) whose first argument is an operation, or the fixtures
+// stop resembling the real gaps they stand in for.
+var uncoveredFixtures = []string{
+	"mix test",
+	"vault read secret/db",
+	"wget https://example.com/x.tar.gz",
+}
+
 // The counterweight to the test above: the no-program-token guard must not turn
 // into a blanket refusal to record, or the gap meter goes blind and we build
 // formatters by guesswork.
 func TestRealCoverageGapsAreStillRecorded(t *testing.T) {
-	// These must be programs sctx does NOT cover, or the test asserts nothing —
-	// it started out using `ssh vm '...'`, and adding ssh to the rewrite table
-	// turned those into covered commands. TestGapFixturesAreActuallyUncovered
-	// guards that premise directly.
-	for _, cmd := range []string{"terraform plan", "helm upgrade api ./chart", "wget https://example.com/x.tar.gz"} {
+	for _, cmd := range uncoveredFixtures {
 		spoolDir := t.TempDir()
 		t.Setenv("SCT__SPOOL_DIR", spoolDir)
 		stdin := `{"tool_name":"Bash","tool_input":{"command":` + strconv.Quote(cmd) + `}}`
@@ -361,7 +374,7 @@ func TestRealCoverageGapsAreStillRecorded(t *testing.T) {
 // had to be re-pointed. This checks the premise directly so the next such change fails HERE,
 // with an explanation, instead of looking like a regression.
 func TestGapFixturesAreActuallyUncovered(t *testing.T) {
-	for _, cmd := range []string{"terraform plan", "helm upgrade api ./chart", "wget https://example.com/x.tar.gz"} {
+	for _, cmd := range uncoveredFixtures {
 		if _, covered := matchSegment(cmd); covered {
 			t.Errorf("%q is now COVERED by sctx, so it is no longer a coverage gap and cannot test gap recording; pick another program for TestRealCoverageGapsAreStillRecorded", cmd)
 		}

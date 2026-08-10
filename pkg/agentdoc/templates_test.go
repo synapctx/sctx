@@ -49,7 +49,22 @@ func TestDetectionNeverKeysOnOurOwnFiles(t *testing.T) {
 // developer-mcp-proxy (internal/adapters/api/mcp/alwaysoncost_test.go), which can
 // import the real estimator and also sees the tool descriptions this file must
 // not duplicate.
-const docTokenCeiling = 1000
+// RAISED 1000 -> 1150 on 2026-08-10, deliberately and for a stated reason, which
+// is the behaviour this guard exists to force rather than an escape from it.
+//
+// Coverage grew from ~25 programs to ~45 — the cloud CLIs (aws, gcloud, az), the
+// IaC family (terraform, tofu, pulumi, helm) and the language toolchains (cargo,
+// dotnet, mvn, gradle, composer, bundle). An agent that does not know a command
+// is wrapped will not benefit from it being wrapped, so the list IS the feature,
+// and it has no second vehicle: sctx is a CLI, with no tool descriptions to carry
+// the fact elsewhere. Cutting names to fit would trade a real capability for ~40
+// tokens.
+//
+// The rule that keeps this honest (org memory, 2026-08-10): when content has no
+// other vehicle, raise the number and record why; when it is DUPLICATED
+// elsewhere, delete it instead. SYNAPCTX.md was cut by 35% under the second half
+// of that rule on the same day.
+const docTokenCeiling = 1150
 
 func estimatedTokens(body string) int { return len(body) / 4 }
 

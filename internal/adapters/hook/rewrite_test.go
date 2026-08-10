@@ -54,7 +54,17 @@ func rewriteTestCases() []rewriteTestCase {
 		{"diff", "diff a b", "sctx diff a b", true},
 		{"cat", "cat file.txt", "sctx cat file.txt", true},
 		{"head", "head -n 5 file.txt", "sctx head -n 5 file.txt", true},
-		{"tail", "tail -f file.txt", "sctx tail -f file.txt", true},
+		{"tail", "tail -n 50 file.txt", "sctx tail -n 50 file.txt", true},
+		// A FOLLOWING COMMAND MUST NOT BE WRAPPED. sctx reads stdout to EOF before
+		// it formats, and `tail -f` never reaches EOF — so wrapping turns "the agent
+		// sees lines until its timeout" into "the agent sees nothing at all". This
+		// case previously asserted the opposite.
+		{"tail follows", "tail -f file.txt", "tail -f file.txt", false},
+		{"kubectl logs follows", "kubectl logs -f pod", "kubectl logs -f pod", false},
+		{"docker compose logs follows", "docker compose logs -f api", "docker compose logs -f api", false},
+		// …but -f meaning a FILE must keep its coverage.
+		{"docker build -f is a file", "docker build -f Dockerfile .", "sctx docker build -f Dockerfile .", true},
+		{"kubectl apply -f is a file", "kubectl apply -f manifest.yaml", "sctx kubectl apply -f manifest.yaml", true},
 
 		{"go env not in table", "go env GOPATH", "go env GOPATH", false},
 		{"docker save not in table", "docker save img", "docker save img", false},
@@ -92,7 +102,7 @@ func rewriteTestCases() []rewriteTestCase {
 
 		{"empty command", "", "", false},
 		{"whitespace only", "   ", "   ", false},
-		{"unknown program", "cargo build", "cargo build", false},
+		{"unknown program", "mix test", "mix test", false},
 
 		{"pytest", "pytest -q", "sctx pytest -q", true},
 		{"pytest piped to tail", "pytest 2>&1 | tail -50", "sctx pytest 2>&1 | tail -50", true},
@@ -249,17 +259,17 @@ func TestGapSegment(t *testing.T) {
 		wantProgram string
 		wantOK      bool
 	}{
-		{"bare uncovered program", "cargo build", "cargo build", true},
-		{"uncovered program piped to safe downstream", "cargo build 2>&1 | tail -5", "cargo build", true},
-		{"cd then uncovered program", "cd sub && cargo build", "cargo build", true},
-		{"covered program uncovered subcommand piped to head", "terraform plan -out x | head", "terraform plan", true},
+		{"bare uncovered program", "mix test", "mix test", true},
+		{"uncovered program piped to safe downstream", "mix test 2>&1 | tail -5", "mix test", true},
+		{"cd then uncovered program", "cd sub && mix test", "mix test", true},
+		{"uncovered program piped to head", "vault read secret/db | head", "vault read", true},
 		{"covered program uncovered subcommand", "go env GOPATH", "go env", true},
 
 		{"uncovered program piped to grep declines", "go test ./... | grep FAIL", "", false},
 		{"already-covered program declines", "git status", "", false},
-		{"file redirect declines", "cargo build > out.txt", "", false},
-		{"unsafe downstream pipe declines", "cargo build | grep x", "", false},
-		{"command substitution declines", "cargo build $(x)", "", false},
+		{"file redirect declines", "mix test > out.txt", "", false},
+		{"unsafe downstream pipe declines", "mix test | grep x", "", false},
+		{"command substitution declines", "mix test $(x)", "", false},
 		{"only noise builtin declines", "cd sub", "", false},
 		{"bare noise builtin declines", "echo hi", "", false},
 		{"already sctx-wrapped declines", "sctx npm test", "", false},

@@ -36,7 +36,7 @@ type Service struct {
 	runner   domexec.Runner
 	store    stats.Store       // may be nil (stats disabled)
 	emitter  telemetry.Emitter // may be nil (telemetry disabled)
-	sniff    format.Formatter  // JSON fallback for unmatched commands, may be nil
+	sniff    format.Formatter  // generic fallback for unmatched commands, may be nil
 	stdout   io.Writer
 	stderr   io.Writer
 	opts     Options
@@ -79,9 +79,23 @@ func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
 	}
 
 	formatter, matched := s.registry.ResolveByArgv(argv)
-	if !matched && s.sniff != nil && looksLikeJSON(raw) {
+	if !matched && s.sniff != nil {
+		// EVERY unmatched command gets the generic formatter, not just the ones
+		// whose output starts with `{`. The JSON-only gate that used to stand here
+		// is why the unmatched path saved exactly zero tokens across 179 runs and
+		// 50,124 raw tokens: anything printing repetitive TEXT paid full price
+		// while a general line collapser sat unreachable inside `read`.
+		//
+		// Safe unconditionally because both of the generic tiers DETECT before they
+		// act and decline otherwise, and the tier chain degrades to verbatim — so
+		// the worst case for a command nobody has ever formatted is exactly what
+		// happens today.
 		formatter = s.sniff
-		matched = true // the JSON sniffer still compresses; only "no formatter, no sniffer" counts as unmatched.
+
+		// matched stays FALSE. The generic formatter is a safety net, not
+		// coverage, and telemetry must keep telling the two apart or the
+		// coverage-gap meter goes blind: the old JSON sniffer reported itself as
+		// matched, which counted a sniffed command as a covered one.
 	}
 
 	in := format.Input{
@@ -92,7 +106,7 @@ func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
 		ExitCode: outcome.ExitCode,
 		Duration: outcome.Duration,
 	}
-	result := renderChain(ctx, formatter, in, raw, s.opts.ForceTier)
+	result := renderChain(ctx, formatter, in, raw, rawStderr, s.opts.ForceTier)
 
 	if _, err := s.stdout.Write(result.Body); err != nil {
 		return outcome.ExitCode, err
@@ -207,18 +221,8 @@ func deriveProgram(argv []string) string {
 	return progkey.Key(filepath.Base(argv[0]), next)
 }
 
-// looksLikeJSON reports whether the first non-whitespace byte starts a JSON
-// document.
-func looksLikeJSON(b []byte) bool {
-	for _, c := range b {
-		switch c {
-		case ' ', '\t', '\r', '\n':
-			continue
-		case '{', '[':
-			return true
-		default:
-			return false
-		}
-	}
-	return false
-}
+// looksLikeJSON is deliberately GONE. It gated the fallback on stdout starting
+// with `{` or `[`, which meant a command printing repetitive text got no
+// formatter at all. The generic formatter's own tiers now decide applicability
+// by parsing, which is both stricter (encoding/json, not a first-byte guess) and
+// wider (text gets the line collapser).

@@ -33,12 +33,12 @@ import (
 	"github.com/synapctx/sctx/internal/adapters/format/du"
 	"github.com/synapctx/sctx/internal/adapters/format/filediff"
 	"github.com/synapctx/sctx/internal/adapters/format/fs"
+	"github.com/synapctx/sctx/internal/adapters/format/generic"
 	ghfmt "github.com/synapctx/sctx/internal/adapters/format/gh"
 	gitfmt "github.com/synapctx/sctx/internal/adapters/format/git"
 	"github.com/synapctx/sctx/internal/adapters/format/golangcilint"
 	"github.com/synapctx/sctx/internal/adapters/format/gotest"
 	grepfmt "github.com/synapctx/sctx/internal/adapters/format/grep"
-	"github.com/synapctx/sctx/internal/adapters/format/jsoncompact"
 	kubectlfmt "github.com/synapctx/sctx/internal/adapters/format/kubectl"
 	"github.com/synapctx/sctx/internal/adapters/format/makefmt"
 	"github.com/synapctx/sctx/internal/adapters/format/mongosh"
@@ -187,7 +187,7 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string) int {
 	}
 
 	svc := run.NewService(registry, osproc.NewRunner(cfg.MaxOutputBytes),
-		statsStore, emitter, jsoncompact.New(),
+		statsStore, emitter, generic.New(),
 		os.Stdout, os.Stderr,
 		run.Options{Version: version, ForceTier: cfg.ForceTier})
 

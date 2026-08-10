@@ -40,15 +40,15 @@ func TestAPathQualifiedSctxIsRecognisedAsAlreadyWrapped(t *testing.T) {
 // The counterweight: a real gap must still be recorded, or the fixes above have
 // quietly turned the meter off.
 func TestRealGapsSurviveTheNoiseFilters(t *testing.T) {
-	for _, cmd := range []string{"cargo build", "cd sub && cargo build", "cargo build | tail -5"} {
+	for _, cmd := range []string{"mix test", "cd sub && mix test", "mix test | tail -5"} {
 		if _, ok := gapSegment(cmd); !ok {
-			t.Errorf("gapSegment(%q) recorded nothing; cargo build is a genuine gap", cmd)
+			t.Errorf("gapSegment(%q) recorded nothing; mix test is a genuine gap", cmd)
 		}
 	}
 }
 
 // KNOWN LIMITATION, pinned deliberately rather than fixed. A command inside a
-// loop BODY is not recorded: the segment is `do cargo build`, whose head is the
+// loop BODY is not recorded: the segment is `do mix test`, whose head is the
 // keyword, and gapSegment skips a noise-headed segment rather than looking past
 // the keyword within it.
 //
@@ -59,7 +59,7 @@ func TestRealGapsSurviveTheNoiseFilters(t *testing.T) {
 //
 // If loop bodies ever matter, change this test first and say why.
 func TestACommandInsideALoopBodyIsNotRecorded(t *testing.T) {
-	if seg, ok := gapSegment("for f in x; do cargo build; done"); ok {
+	if seg, ok := gapSegment("for f in x; do mix test; done"); ok {
 		t.Errorf("gapSegment recorded %q from a loop body — behaviour changed; is that intended?", seg)
 	}
 }

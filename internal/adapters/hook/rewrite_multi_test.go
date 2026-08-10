@@ -22,8 +22,8 @@ func TestEveryEligibleSegmentIsWrapped(t *testing.T) {
 			"go build ./... > out.txt && go vet ./...",
 			"go build ./... > out.txt && sctx go vet ./..."},
 		// An unknown program between two known ones must not break either.
-		{"unknown program between known ones", "git status && cargo build && go vet ./...",
-			"sctx git status && cargo build && sctx go vet ./..."},
+		{"unknown program between known ones", "git status && mix test && go vet ./...",
+			"sctx git status && mix test && sctx go vet ./..."},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			got, ok := rewrite(tc.in)

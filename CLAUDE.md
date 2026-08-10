@@ -64,6 +64,32 @@ make install   # ~/.local/bin/sctx
 - **Formatters**: one package per tool under `adapters/format/`, implementing
   `format.Formatter`, registered in `main.go`. `ErrTierInapplicable` means "try
   the next tier" (expected); any other error is an anomaly.
+- **EVERY TIER GETS ITS OWN READERS** (`renderChain`). One `format.Input` used to
+  be shared across the chain, so the first tier that READ stdout left the next an
+  empty stream — and reading before deciding is the normal shape of a formatter.
+  Any formatter whose aggressive tier read and then declined therefore had a
+  **dead relaxed tier**, reported as the innocuous "declined: no tier handles this
+  invocation". Measured cost: `make` 167 runs at 0% saved (101 declining), `ssh`
+  declining 171 of 176. Unit tests could not catch it because a test builds a
+  fresh Input per tier — the tier passes alone and fails only in composition, so
+  the guard (`TestEveryTierGetsItsOwnReaders`) drives `renderChain`, not a
+  formatter.
+- **The generic fallback (`adapters/format/generic`) applies to EVERY unmatched
+  command**, not just JSON. It compacts what parses as JSON and collapses runs of
+  identical (or identical-after-a-leading-timestamp) lines, sharing
+  `adapters/format/collapse` with `read`. It is safe without a per-tool fixture
+  precisely because it compresses only **provable redundancy** — a collapsed run
+  is reconstructible from the line plus its printed count — so it never assumes a
+  shape the way a speculative table parser would. It records itself as
+  `(generic)` with `FormatterMatched=false`, because a caught command is not a
+  covered one and the gap meter must keep telling them apart.
+- **A following command is never wrapped** (`streamsForever`). sctx reads stdout
+  to EOF before formatting, so wrapping `tail -f`, `kubectl logs -f` or
+  `journalctl -f` turns "the agent sees lines until its timeout" into "the agent
+  sees nothing". Scoped to the subcommand that actually streams, never per
+  program: `docker build -f Dockerfile`, `helm install -f values.yaml` and
+  `make -f Makefile` all name a FILE, and a blanket rule would silently drop their
+  coverage.
 - **Write a formatter against output captured from the real binary, on the
   platform the workload runs on.** Tool output differs by implementation and
   platform far more than it looks — capture fixtures by running the thing, never
