@@ -22,9 +22,127 @@
 package agentdoc
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"path"
 	"strings"
 )
+
+// Sidecar provenance.
+//
+// THE PROBLEM THIS SOLVES: a template fix used to reach no machine that had
+// already installed. `Install` refuses to overwrite an existing sidecar — right,
+// because a developer may have customised it — but it could not tell a CUSTOMISED
+// file from an untouched one carrying last release's text, so it treated both as
+// sacred. `Inspect` never read sidecars at all, so `sctx setup` did not even
+// report the drift. The result: correctness fixes (a tool that does not exist, a
+// false claim about a subcommand) shipped to new machines only, silently, and
+// adding a second org with `sctx init` never updated the scope section either.
+//
+// A hash of the body we wrote, written beside it, is what makes "ours and
+// untouched" a decidable question. Untouched files then update on a plain
+// `--install`; edited ones still refuse without `--force`.
+//
+// IN THE FILE rather than a local manifest, because synapctx.com serves these
+// same bytes for people who install by hand. A manifest would make the manual
+// path permanently unverifiable — the exact divergence the marker round-trip
+// rules already exist to prevent.
+const (
+	stampPrefix = "<!-- sctx-doc "
+	stampSuffix = " -->"
+)
+
+// SidecarState classifies an existing sidecar document. It is what decides
+// whether a fix may be delivered without asking.
+type SidecarState int
+
+const (
+	// SidecarMissing — no file. Write it.
+	SidecarMissing SidecarState = iota
+	// SidecarCurrent — ours, untouched, and already what we would write.
+	SidecarCurrent
+	// SidecarStale — ours, untouched, but the template has moved on. Safe to
+	// overwrite on a plain install: nothing of the developer's is in it.
+	SidecarStale
+	// SidecarEdited — stamped, but the body no longer hashes to its stamp. The
+	// developer changed it on purpose; refuse without --force.
+	SidecarEdited
+	// SidecarUnverifiable — no stamp, so it predates stamping (or was pasted
+	// from a pre-stamp page). We cannot prove it is untouched, so we do not
+	// touch it. Reported, with the one-time remedy.
+	SidecarUnverifiable
+)
+
+func (s SidecarState) String() string {
+	switch s {
+	case SidecarMissing:
+		return "missing"
+	case SidecarCurrent:
+		return "current"
+	case SidecarStale:
+		return "stale"
+	case SidecarEdited:
+		return "edited"
+	case SidecarUnverifiable:
+		return "unverifiable"
+	}
+	return "unknown"
+}
+
+// bodyHash is a short content hash. Truncated to 12 hex characters because this
+// detects accidental divergence, not a forgery — and a full hash would cost every
+// session tokens to say the same thing.
+func bodyHash(body string) string {
+	sum := sha256.Sum256([]byte(body))
+	return hex.EncodeToString(sum[:])[:12]
+}
+
+// Stamp returns the provenance line for a document body.
+func Stamp(body string) string { return stampPrefix + bodyHash(body) + stampSuffix }
+
+// StampedBody returns the exact bytes to WRITE for a sidecar: the stamp, then the
+// document. Both the installer and the website must use this, or a hand-installed
+// file is permanently unverifiable.
+func StampedBody(body string) string { return Stamp(body) + "\n" + body }
+
+// ParseStamp splits a stamped file into its recorded hash and the body beneath.
+// ok is false when the first line is not one of our stamps, which means the file
+// predates stamping — never that it is malformed.
+func ParseStamp(file string) (hash, rest string, ok bool) {
+	line, rest, found := strings.Cut(file, "\n")
+	if !found {
+		return "", file, false
+	}
+	line = strings.TrimSpace(line)
+	if !strings.HasPrefix(line, stampPrefix) || !strings.HasSuffix(line, stampSuffix) {
+		return "", file, false
+	}
+	return strings.TrimSuffix(strings.TrimPrefix(line, stampPrefix), stampSuffix), rest, true
+}
+
+// ClassifySidecar decides what may be done with an existing sidecar. Pass the
+// file exactly as read (empty if absent) and the body we would write now.
+//
+// The hash is checked BEFORE comparing against the wanted body, so any edit —
+// including one that happens to move the file toward the current template —
+// classifies as edited rather than stale. Being wrong in that direction costs a
+// `--force`; being wrong in the other overwrites someone's work.
+func ClassifySidecar(file, want string) SidecarState {
+	if file == "" {
+		return SidecarMissing
+	}
+	hash, rest, ok := ParseStamp(file)
+	if !ok {
+		return SidecarUnverifiable
+	}
+	if hash != bodyHash(rest) {
+		return SidecarEdited
+	}
+	if rest != want {
+		return SidecarStale
+	}
+	return SidecarCurrent
+}
 
 // Block delimiters. Everything between them is ours and is replaced wholesale on
 // reinstall; everything outside is the developer's and is never touched.
@@ -136,6 +254,14 @@ func WithoutBlock(s string) string {
 	}
 	return s[:i] + rest[j+len(EndMarker):]
 }
+
+// ReferencesDoc reports whether the developer already loads this document
+// themselves, in any path form. A document they reference is THEIRS — it may live
+// in a directory we never look at — so we must neither inspect it beside the
+// agent's instruction file nor write one there. Doing so would leave a second
+// copy that nothing includes, in a package whose rule is that nothing is created
+// speculatively.
+func ReferencesDoc(existing, name string) bool { return referencesDoc(existing, name) }
 
 // referencesDoc reports whether the file already loads a document by this name,
 // in any form an include can take: `@SCTX.md`, `@~/.claude/SCTX.md`,

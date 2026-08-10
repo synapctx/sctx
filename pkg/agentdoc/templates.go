@@ -53,7 +53,15 @@ Covered today: ` + "`go`" + `, ` + "`git`" + `, ` + "`grep`/`rg`" + `, ` + "`ls`
 ` + "`golangci-lint`" + `, ` + "`gh`" + `, ` + "`docker`" + `, ` + "`kubectl`" + `, ` + "`pytest`" + `,
 ` + "`ruff`" + `, ` + "`mypy`" + `, ` + "`pip`" + `, ` + "`npm`/`pnpm`/`yarn`" + `, ` + "`brew`" + `,
 ` + "`mongosh`" + `, ` + "`ssh`" + ` (delegates to the remote command's formatter),
-` + "`rsync`" + `, ` + "`jq`/`curl`" + `. ` + "`sctx doctor`" + ` prints the effective list.
+` + "`rsync`" + `, ` + "`jq`/`curl`" + `.
+
+**Coverage is per (program, SUBCOMMAND)**, which is why a command you expected to
+be wrapped sometimes is not — a program is rewritten only for the subcommands it
+has a formatter for. Plumbing verbs pass through raw (` + "`git rev-parse`" + `,
+` + "`go env`" + `); their output is a line or two, so "no compression markers" does not
+mean sctx is broken. Programs whose first argument is a path or host
+(` + "`grep`" + `, ` + "`ls`" + `, ` + "`cat`" + `, ` + "`curl`" + `, ` + "`ssh`" + `) take no
+subcommand and are always wrapped.
 
 **Where the hook declines, and why it matters to you.** It leaves a command
 alone when wrapping could change what you conclude:
@@ -73,6 +81,22 @@ and repeated lines are collapsed, whatever the program.
 ` + "`sctx -- <cmd>`" + ` forces verbatim passthrough when you genuinely need every
 byte.
 
+## The subcommand that changes what SynapCTX can answer
+
+` + "`sctx watch`" + ` streams the structural diff of the working tree — symbol names,
+signatures, doc comments, never bodies — so ` + "`retrieve_context`" + ` answers about
+the code being CHANGED rather than the last commit. Without it, uncommitted edits
+are invisible to every SynapCTX tool, and a result will confidently describe the
+committed version of a function just rewritten.
+
+It is foreground and per-developer. Suggest it when a session has substantial
+uncommitted work — but do not start a long-running foreground process on the
+developer's behalf without asking.
+
+` + "`sctx doctor`" + ` shows CONFIGURATION — version, masked per-org API-key prefixes,
+the default organization, and which agents here have been taught. It does not
+print the covered-command list.
+
 ## Reporting
 
 ` + "`sctx gain`" + ` shows tokens saved (` + "`--project`" + `, ` + "`--since 7d`" + `,
@@ -82,104 +106,96 @@ nothing — the fastest way to find an output shape worth compressing.
 }
 
 func synapctxBody(orgs []string) string {
+	// THE CREDENTIAL DECIDES, NOT THE ARGUMENT. This block used to say "always
+	// pass `organization`", which holds only for a key whose principal is a
+	// member of every organization it names. With one key PER organization —
+	// what `sctx init` produces, and the shipped topology — naming a different
+	// one is REFUSED, and the refusal is deliberately indistinguishable from "no
+	// such organization" so it cannot be used to enumerate them. Agents read
+	// that as a broken index and went hunting one; observed repeatedly in the
+	// field, which is what this wording exists to stop.
 	scope := `## Which organization you are asking
 
-Every tool takes an optional ` + "`organization`" + `. Pass the one that owns the
-repository you are working in — derive it from the working directory
-(` + "`.../<organization>/<repository>`" + `). Results never mix organizations.
+Every tool takes an optional ` + "`organization`" + `, but your API key decides which
+one answers. Omit it to search the key's own; naming one the key does not cover
+is refused. Results never mix organizations.
 `
 	switch len(orgs) {
 	case 0:
 	case 1:
 		scope = fmt.Sprintf(`## Which organization you are asking
 
-Configured: **%s**. It is the default, so you can omit `+"`organization`"+`.
+Configured: **%s**. It is your key's own organization, so omit `+"`organization`"+`.
 `, orgs[0])
 	default:
 		scope = fmt.Sprintf(`## Which organization you are asking
 
-Configured: %s. **Always pass `+"`organization`"+`**, derived from the working
-directory (`+"`.../<organization>/<repository>`"+`). Omitting it searches the
-default one — a wrong answer rather than an error, which is the harder failure
-to notice. Cross-organization questions are allowed but must name the other one
-explicitly; results never mix.
+Configured: %s — **each with its own API key**, and the key, not the
+`+"`organization`"+` argument, decides which one answers. Use the key for the
+organization owning your working directory (`+"`.../<organization>/<repository>`"+`)
+and OMIT `+"`organization`"+`; to ask about another, call through ITS key.
+
+Naming one your key does not cover is refused as "unknown or inactive" — the same
+wording as a genuinely missing org, so it cannot enumerate them. **Read it as
+"wrong key", not "broken index"**: it names the org your key IS scoped to.
 `, "**"+strings.Join(orgs, "**, **")+"**")
 	}
 
+	// WHAT BELONGS HERE, AND WHAT DOES NOT. This file and the MCP tool
+	// descriptions are BOTH sent at the start of every session, and they used to
+	// say ~55% of the same things — the customer paying twice for one sentence.
+	// The placement rule, so a future author does not re-merge them:
+	//
+	//   constrains ONE tool's inputs or when to call it  -> its description
+	//   qualifies an ANSWER (scope, ref, confidence)     -> rendered on the answer
+	//   is an ACTION                                     -> a tool
+	//   machine-local fact, or which tool to reach for   -> HERE
+	//
+	// If something seems to need two homes it is an answer-qualification dressed
+	// as doctrine; put it on the answer, where it arrives attached to the result
+	// it qualifies and cannot be forgotten by hour four.
+	//
+	// What stays here is what nothing else can deliver: that these tools EXIST
+	// (measured: 7.6x more invocation when this file is referenced), the triggers
+	// for reaching for them, and the credential routing, which depends on this
+	// machine's configuration and so cannot live in a shipped description.
 	return `# SynapCTX — the organization's code graph and memory
 
 SynapCTX indexes **every repository the organization owns**, including ones not
 checked out here, and holds durable memory shared with teammates' agents.
 
-Local tools see one checkout and the strings you already thought to search for.
-These see the organization, and state how far each answer can be trusted.
+Local tools see one checkout and the strings you thought to search for. These see
+the organization, and state how far each answer can be trusted.
 
 ` + scope + `
-An **organization** is the boundary — its own graph, memory and credentials.
-Nothing crosses it. A **project** groups the repositories making up one system
-inside one: pass ` + "`project_id`" + ` to ` + "`retrieve_context`" + ` when an
-organization runs several unrelated systems. Unclassified repositories are
-ALWAYS searched, so a project narrows what is definitely someone else's and
-never hides what nobody has classified.
+## When to reach for it
 
-## When to call which
+- **Before searching for something you cannot name exactly** — a convention, "how
+  does X work", an unfamiliar package: ` + "`retrieve_context`" + `.
+- **Before renaming, deleting or changing a shared signature** —
+  ` + "`find_references`" + ` and ` + "`get_dependents`" + `. They are exhaustive; ` + "`grep`" + ` is
+  not, and a call site in a repository you have not checked out is invisible
+  until it breaks.
+- **To verify one symbol, or to read code from a repository not checked out
+  here** — ` + "`get_symbol_source`" + ` and ` + "`get_source`" + `. Do not clone it.
+- **Starting unfamiliar work, or before re-deciding something** —
+  ` + "`recall_memory`" + `. Why a decision was made is rarely recoverable from code.
+- **The moment a decision is made or a convention is set** — ` + "`store_memory`" + `,
+  with the decision AND the why. It outlives this session and this machine, and
+  every teammate's agent can recall it.
 
-**Before searching for something you cannot name exactly** — a convention, "how
-does X work", an unfamiliar package — call ` + "`retrieve_context`" + `: semantic
-search over every indexed repository.
+## Read what each answer says about itself
 
-**Before renaming, deleting or changing the signature of anything shared** —
-call ` + "`find_references`" + ` (every call site) and ` + "`get_dependents`" + ` (every
-importing package, organization-wide). Both are exhaustive and report their own
-confidence. ` + "`grep`" + ` is neither, and a missed call site in a repository you do
-not have checked out is invisible until it breaks.
+Answers carry their own limits: what was searched, which ref, what was dropped,
+whether the signal degraded, whether a billing limit stopped the result. Those
+lines appear only when they apply, they are complete sentences, and each states
+its own next action — so read them rather than the summary alone.
 
-**Given a bare identifier**, call ` + "`resolve_symbol`" + ` first, then pass what it
-returns to the exhaustive tools.
+Nothing absent from a ranked answer licenses "it does not exist". The exhaustive
+tools are the ones that can settle that, and they say plainly when they cannot.
 
-**When you need code from a repository that is not checked out here** — call
-` + "`get_source`" + `. Do not clone it.
-
-**Starting unfamiliar work, or before re-deciding something** — call
-` + "`recall_memory`" + `. Why a decision was made is rarely recoverable from code.
-
-**The moment a decision is made, a non-obvious constraint is found, or a
-convention is set** — call ` + "`store_memory`" + ` with the decision AND the why. One
-memory per fact; no session narration, nothing derivable from code or git
-history, never secrets. Most worth calling and easiest to skip: the reasoning
-exists only at the moment it happens.
-
-## Every answer tells you how far to trust it
-
-Each ` + "`" + `retrieve_context` + "`" + ` result ends with an **answer warrant**. Read it; it is
-there so you never have to take a result on faith.
-
-- ` + "`" + `indexed: <repo> @ <sha> (<ref>, <time>)` + "`" + ` — the commit each repository was
-  indexed from. **Compare it against your checkout.** Equal means the result
-  describes the code in front of you and re-reading the file buys nothing.
-  Different means it may not, and reading the file is the right call. This is
-  the one claim in the response you can verify independently.
-- ` + "`" + `searched N repositories` + "`" + ` — the scope behind this answer. A thin result
-  from a narrowed scope reads exactly like an empty index.
-- ` + "`" + `ranked, not exhaustive` + "`" + ` — on every answer, because it is always true.
-  Nothing absent from a retrieval result licenses "X does not exist". For a
-  complete answer use ` + "`" + `find_references` + "`" + ` or ` + "`" + `get_dependents` + "`" + `.
-- ` + "`" + `DEGRADED` + "`" + ` — the semantic signal was unavailable; this came from keyword
-  and graph alone. Recall is meaningfully worse; treat it as a hint.
-- ` + "`" + `truncated` + "`" + ` — matches were dropped to fit ` + "`" + `max_tokens` + "`" + `, not because there
-  were none. Raise the budget rather than concluding absence.
-
-## What these cannot see
-
-Ranked search cannot tell you it missed something. The exhaustive tools CAN:
-` + "`" + `find_references` + "`" + ` reports ` + "`" + `language_unsupported` + "`" + ` rather than "no callers"
-when it cannot analyse a language, because **"no callers" means a change is safe
-and "not analysed" means we do not know**.
-
-A result labelled with a project name came from a different project in the same
-organization — usually worth knowing, not a mistake.
-
-Uncommitted edits are invisible unless the workspace daemon is running.
+**Uncommitted edits are invisible unless ` + "`" + `sctx watch` + "`" + ` is running** — the reason
+retrieval may describe the committed shape of code you just rewrote.
 
 If a local tool is the better choice, say which capability was missing.
 `

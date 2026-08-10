@@ -44,7 +44,12 @@ func TestAFileWrittenTheWayTheWebsiteDescribesItReportsTaught(t *testing.T) {
 			}
 			if a.Includes {
 				side := filepath.Join(filepath.Dir(root), agentdoc.SctxDoc.Name)
-				if err := os.WriteFile(side, []byte(agentdoc.SctxDoc.Body(nil)), 0o644); err != nil {
+				// StampedBody, because that is what the page serves. A manual
+				// install must land in the SAME state as `sctx setup --install`,
+				// including its provenance — otherwise every hand-configured
+				// machine is permanently "unverifiable" and never receives a
+				// template fix without a --force nobody knows to run.
+				if err := os.WriteFile(side, []byte(agentdoc.StampedBody(agentdoc.SctxDoc.Body(nil))), 0o644); err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -55,6 +60,14 @@ func TestAFileWrittenTheWayTheWebsiteDescribesItReportsTaught(t *testing.T) {
 			}
 			if !st.Complete() {
 				t.Fatalf("the installer does not recognise its own published guidance: %+v", st.Targets)
+			}
+			for _, tg := range st.Targets {
+				for _, s := range tg.Sidecars {
+					if s.State != agentdoc.SidecarCurrent {
+						t.Errorf("a document pasted exactly as the page describes reads as %v,\n"+
+							"not current — the manual and automatic paths have diverged", s.State)
+					}
+				}
 			}
 
 			// And the proof of the consequence: a subsequent install must be a

@@ -45,16 +45,60 @@ type (
 	Agent = agentdoc.Agent
 )
 
+// SidecarStatus is one instruction document beside an include-capable agent's
+// instruction file, and what we are allowed to do with it.
+type SidecarStatus struct {
+	Name  string // e.g. "SYNAPCTX.md"
+	Path  string // absolute
+	State agentdoc.SidecarState
+}
+
 // Target is one detected agent and what we found for it.
 type Target struct {
 	Agent
 	RootPath  string // absolute
 	Installed bool   // our block is present
 	Stale     bool   // present, but its content is not what we would write now
+	// Sidecars is populated for include-capable agents only. For the others the
+	// documents are inlined INTO the block, so Stale already covers them.
+	Sidecars []SidecarStatus
 }
 
 // OK reports whether this agent is taught and current.
-func (t Target) OK() bool { return t.Installed && !t.Stale }
+//
+// A missing or stale sidecar counts as not-OK, and that is a behaviour change
+// worth stating: previously a healthy block made a target OK, `install` skipped
+// it entirely, and so a DELETED SCTX.md was never restored and a template fix
+// never landed. Both were silent.
+//
+// Edited and unverifiable sidecars deliberately do NOT block. Neither has an
+// automatic remedy — one is the developer's file, the other cannot be proven
+// ours — so counting them would nag forever about something `--install` will not
+// fix. They are reported instead.
+func (t Target) OK() bool {
+	if !t.Installed || t.Stale {
+		return false
+	}
+	for _, s := range t.Sidecars {
+		if s.State == agentdoc.SidecarMissing || s.State == agentdoc.SidecarStale {
+			return false
+		}
+	}
+	return true
+}
+
+// Attention returns the sidecars a human has to decide about: ours-but-edited,
+// and pre-stamp files we cannot vouch for. Both are resolved by `--install
+// --force`, which is why they are surfaced rather than silently skipped.
+func (t Target) Attention() []SidecarStatus {
+	var out []SidecarStatus
+	for _, s := range t.Sidecars {
+		if s.State == agentdoc.SidecarEdited || s.State == agentdoc.SidecarUnverifiable {
+			out = append(out, s)
+		}
+	}
+	return out
+}
 
 // Status is the whole agent-side picture for one machine.
 type Status struct {
@@ -122,9 +166,45 @@ func Inspect(home string, orgs []string, docs ...Doc) (Status, error) {
 			// installing an empty block to prove it.
 			t.Installed = true
 		}
+		t.Sidecars = inspectSidecars(t, string(body), orgs, docs)
 		st.Targets = append(st.Targets, t)
 	}
 	return st, nil
+}
+
+// inspectSidecars classifies each document written beside an include-capable
+// agent's instruction file. Non-include agents get nil: their documents live
+// inside the managed block, where the block comparison already sees drift.
+//
+// A read error other than not-exist is reported as unverifiable rather than
+// returned: an unreadable sidecar must not fail the whole inspection, and it is
+// exactly the case where we must not write.
+func inspectSidecars(t Target, rootBody string, orgs []string, docs []Doc) []SidecarStatus {
+	if !t.Includes {
+		return nil
+	}
+	dir := filepath.Dir(t.RootPath)
+	out := make([]SidecarStatus, 0, len(docs))
+	for _, d := range docs {
+		// Not ours to manage. The developer's own include may point anywhere —
+		// `@~/docs/SCTX.md` — so looking beside the instruction file would report
+		// a phantom "missing" and then write a SECOND copy that nothing loads.
+		if agentdoc.ReferencesDoc(rootBody, d.Name) {
+			continue
+		}
+		s := SidecarStatus{Name: d.Name, Path: filepath.Join(dir, d.Name)}
+		content, err := os.ReadFile(s.Path)
+		switch {
+		case os.IsNotExist(err):
+			s.State = agentdoc.SidecarMissing
+		case err != nil:
+			s.State = agentdoc.SidecarUnverifiable
+		default:
+			s.State = agentdoc.ClassifySidecar(string(content), d.Body(orgs))
+		}
+		out = append(out, s)
+	}
+	return out
 }
 
 // configured reports whether an agent has left its own configuration here. Only
@@ -180,15 +260,23 @@ func install(home string, orgs []string, force bool, docs ...Doc) ([]string, err
 			return changed, fmt.Errorf("creating %s: %w", filepath.Dir(t.RootPath), err)
 		}
 		if t.Includes {
-			for _, d := range st.Docs {
-				side := filepath.Join(filepath.Dir(t.RootPath), d.Name)
-				if _, err := os.Stat(side); err == nil && !force {
+			for _, s := range t.Sidecars {
+				d, ok := docNamed(st.Docs, s.Name)
+				if !ok {
 					continue
 				}
-				if err := os.WriteFile(side, []byte(d.Body(orgs)), 0o644); err != nil {
-					return changed, fmt.Errorf("writing %s: %w", side, err)
+				verb, write := sidecarAction(s.State, force)
+				if !write {
+					continue
 				}
-				changed = append(changed, "wrote "+side)
+				// The STAMP is what makes the next update decidable. Written
+				// unconditionally, including on --force, so a forced overwrite
+				// leaves a file we can reason about instead of another
+				// unverifiable one.
+				if err := os.WriteFile(s.Path, []byte(agentdoc.StampedBody(d.Body(orgs))), 0o644); err != nil {
+					return changed, fmt.Errorf("writing %s: %w", s.Path, err)
+				}
+				changed = append(changed, verb+" "+s.Path)
 			}
 		}
 		body, err := os.ReadFile(t.RootPath)
@@ -214,6 +302,40 @@ func install(home string, orgs []string, force bool, docs ...Doc) ([]string, err
 		changed = append(changed, fmt.Sprintf("%s %s (%s)", verb, t.Name, t.RootPath))
 	}
 	return changed, nil
+}
+
+func docNamed(docs []Doc, name string) (Doc, bool) {
+	for _, d := range docs {
+		if d.Name == name {
+			return d, true
+		}
+	}
+	return Doc{}, false
+}
+
+// sidecarAction is the whole policy in one place: which states a plain install
+// may write, and what to call it afterwards.
+//
+// The asymmetry is deliberate. Being wrong about STALE costs a developer nothing
+// — the file was provably ours and untouched. Being wrong about EDITED destroys
+// work that cannot be recovered, so that one waits for an explicit --force.
+func sidecarAction(state agentdoc.SidecarState, force bool) (verb string, write bool) {
+	switch state {
+	case agentdoc.SidecarMissing:
+		return "wrote", true
+	case agentdoc.SidecarStale:
+		// Provably ours, provably untouched, and out of date: exactly the case
+		// this mechanism exists to deliver without asking.
+		return "updated", true
+	case agentdoc.SidecarCurrent:
+		// Already exactly right. --force still rewrites it, because --force means
+		// "put every document back on the shipped template" and a caller checking
+		// the report should see each one accounted for.
+		return "rewrote", force
+	case agentdoc.SidecarEdited, agentdoc.SidecarUnverifiable:
+		return "overwrote", force
+	}
+	return "", false
 }
 
 // upsertBlock replaces our delimited block, or appends one.

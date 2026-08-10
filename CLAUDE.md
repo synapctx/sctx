@@ -118,6 +118,26 @@ told `sctx` and SynapCTX exist. Three rules are load-bearing.
 - **Content lives between markers and is replaced in place.** An opening marker
   with no close counts as NOT installed. Never overwrite content a user edited;
   only repair a missing include.
+- **Sidecar documents carry a provenance STAMP** (`agentdoc.Stamp`, first line, a
+  short hash of the body). It is what makes "ours and untouched" decidable, and
+  without it a correctness fix reached no machine that had already installed:
+  `Install` refused to touch any existing sidecar because it could not tell
+  customised from a-release-behind, and `Inspect` never read sidecars at all, so
+  nothing even reported the drift. Now: stale-but-unedited updates on a plain
+  `--install`; edited and pre-stamp files are left alone and REPORTED, since
+  neither has a remedy `--install` can apply and a nag without one gets muted. A
+  document the developer includes themselves is never managed — their include may
+  point anywhere, and writing one beside the instruction file would leave a second
+  copy nothing loads. **The website must serve `StampedBody` too**, or every
+  hand-installed file is permanently unverifiable.
+- **The instruction files must not restate what the MCP tool descriptions say.**
+  Both are sent at the start of every session, and ~55-60% of SYNAPCTX.md was
+  duplicated there — the customer paying twice for one sentence. The placement
+  rule is written in `pkg/agentdoc/templates.go`: constrains one tool → its
+  description; qualifies an answer → rendered on the answer; an action → a tool;
+  existence, triggers and machine-local facts → here. `developer-mcp-proxy` holds
+  the cross-repo guards (a 10-word shingle comparison, and the COMBINED always-on
+  token cost) because only the private side can see both budgets.
 - **An include is recognised in any path form**, comparing the final path segment
   only, or the same document gets loaded twice for every session.
 

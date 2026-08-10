@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -202,8 +203,24 @@ func printSetupStatus(w io.Writer, st agentsetup.Status, cfg config.Config, afte
 			fmt.Fprintf(w, "  [ok]      %-16s %s\n", t.Name, t.RootPath)
 		case t.Stale:
 			fmt.Fprintf(w, "  [stale]   %-16s instructions are from an older sctx — %s\n", t.Name, t.RootPath)
+		case t.Installed:
+			// Taught, but a document beside it is missing or out of date. Naming
+			// the document matters: the instruction file itself is fine, so
+			// "[missing] Claude Code" would send someone looking at the wrong file.
+			fmt.Fprintf(w, "  [stale]   %-16s a document needs updating — %s\n", t.Name, filepath.Dir(t.RootPath))
 		default:
 			fmt.Fprintf(w, "  [missing] %-16s not told about SynapCTX — %s\n", t.Name, t.RootPath)
+		}
+		// Documents we may not touch. Reported rather than counted as incomplete:
+		// neither has a remedy a plain --install can apply, so nagging would be a
+		// warning with no action, which is how warnings get muted.
+		for _, s := range t.Attention() {
+			switch s.State {
+			case agentdoc.SidecarEdited:
+				fmt.Fprintf(w, "            %-13s edited here — left as is (--install --force to reset)\n", s.Name)
+			case agentdoc.SidecarUnverifiable:
+				fmt.Fprintf(w, "            %-13s predates provenance stamping — run --install --force once\n", s.Name)
+			}
 		}
 	}
 	fmt.Fprintln(w, "\nwhat gets installed")
