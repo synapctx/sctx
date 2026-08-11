@@ -1,6 +1,7 @@
-// Package agentsetup inspects and repairs the AGENT-SIDE half of a SynapCTX
-// install: the instruction files that tell a coding agent that `sctx` and the
-// SynapCTX MCP tools exist and when to reach for them.
+// Package agentsetup inspects and repairs the agent-side delivery path of a
+// SynapCTX install: the instruction files that tell a coding agent when to
+// reach for `sctx` and SynapCTX, plus the Codex MCP registrations that make
+// those tools exist.
 //
 // Why this is a product feature and not a README step. On 2026-07-31 we measured
 // what happens when those instructions are absent: retrieval ran at near parity
@@ -30,6 +31,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/synapctx/sctx/pkg/agentdoc"
@@ -59,6 +61,10 @@ type Target struct {
 	RootPath  string // absolute
 	Installed bool   // our block is present
 	Stale     bool   // present, but its content is not what we would write now
+	// CodexMCP is populated by InspectWithCodexMCP for the Codex target. Keeping
+	// it nil in Inspect preserves that function's instruction-only contract for
+	// callers and tests that do not hold credentials.
+	CodexMCP *CodexMCPStatus
 	// Sidecars is populated for include-capable agents only. For the others the
 	// documents are inlined INTO the block, so Stale already covers them.
 	Sidecars []SidecarStatus
@@ -76,6 +82,19 @@ type Target struct {
 // ours — so counting them would nag forever about something `--install` will not
 // fix. They are reported instead.
 func (t Target) OK() bool {
+	if !t.InstructionsOK() {
+		return false
+	}
+	if t.CodexMCP != nil && !t.CodexMCP.Complete() {
+		return false
+	}
+	return true
+}
+
+// InstructionsOK reports only whether this agent has current instructions.
+// MCP capability is deliberately separate: conflating the two is how Codex was
+// reported green while `codex mcp list` contained no SynapCTX server at all.
+func (t Target) InstructionsOK() bool {
 	if !t.Installed || t.Stale {
 		return false
 	}
@@ -85,6 +104,32 @@ func (t Target) OK() bool {
 		}
 	}
 	return true
+}
+
+// InspectWithCodexMCP adds the capability half of setup to the ordinary
+// instruction inspection. Only Codex consumes ~/.codex/config.toml; other
+// agents remain unchanged.
+func InspectWithCodexMCP(home string, orgTokens map[string]string, endpoint string, docs ...Doc) (Status, error) {
+	orgs := make([]string, 0, len(orgTokens))
+	for org := range orgTokens {
+		orgs = append(orgs, org)
+	}
+	sort.Strings(orgs)
+	st, err := Inspect(home, orgs, docs...)
+	if err != nil {
+		return Status{}, err
+	}
+	for i := range st.Targets {
+		if st.Targets[i].ID != "codex" || len(orgTokens) == 0 {
+			continue
+		}
+		mcp, err := InspectCodexMCP(home, endpoint, orgTokens)
+		if err != nil {
+			return Status{}, err
+		}
+		st.Targets[i].CodexMCP = &mcp
+	}
+	return st, nil
 }
 
 // Attention returns the sidecars a human has to decide about: ours-but-edited,

@@ -242,7 +242,7 @@ func runGain(ctx context.Context, cfg config.Config, args []string) int {
 	// machine-read, and written to stderr so it can never corrupt that contract.
 	if opts.Format != "json" {
 		if home, err := os.UserHomeDir(); err == nil {
-			if st, err := agentsetup.Inspect(home, orgSlugs(cfg), docsFor(cfg)...); err == nil {
+			if st, err := agentsetup.InspectWithCodexMCP(home, codexOrgTokens(cfg), cfg.WorkspaceProxyURL, docsFor(cfg)...); err == nil {
 				if notice := gainNotice(st); notice != "" {
 					fmt.Fprintf(os.Stderr, "\n%s\n", notice)
 				}
@@ -449,7 +449,7 @@ func runInit(ctx context.Context, cfg config.Config, args []string) int {
 	if home, homeErr := os.UserHomeDir(); homeErr == nil {
 		cfgAfter := cfg
 		cfgAfter.OrgTokens = orgTokens
-		if st, inspErr := agentsetup.Inspect(home, orgSlugs(cfgAfter), docsFor(cfgAfter)...); inspErr == nil && !st.Complete() {
+		if st, inspErr := agentsetup.InspectWithCodexMCP(home, codexOrgTokens(cfgAfter), cfgAfter.WorkspaceProxyURL, docsFor(cfgAfter)...); inspErr == nil && !st.Complete() {
 			fmt.Println()
 			fmt.Println(pendingLine(st))
 			fmt.Println("run: sctx setup --install")
@@ -638,8 +638,10 @@ func runDoctor(cfg config.Config) int {
 		fmt.Printf("force tier:     %s\n", cfg.ForceTier)
 	}
 	if home, err := os.UserHomeDir(); err == nil {
-		if st, err := agentsetup.Inspect(home, orgSlugs(cfg), docsFor(cfg)...); err == nil {
+		if st, err := agentsetup.InspectWithCodexMCP(home, codexOrgTokens(cfg), cfg.WorkspaceProxyURL, docsFor(cfg)...); err == nil {
 			printSetupStatus(os.Stdout, st, cfg, false)
+		} else {
+			fmt.Printf("\nagent setup:    error: %v\n", err)
 		}
 	}
 	return 0

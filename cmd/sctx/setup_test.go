@@ -94,6 +94,31 @@ func TestSynapctxIsOnlyOfferedOnceAKeyExists(t *testing.T) {
 	}
 }
 
+func TestCodexCredentialsKeepPerOrgKeysDespiteTelemetryOverride(t *testing.T) {
+	cfg := config.Config{
+		OrgTokens: map[string]string{
+			"acme":  "sctx_live_acme",
+			"other": "sctx_live_other",
+		},
+		TelemetryTokenEnv: "sctx_live_temporary_override",
+	}
+	got := codexOrgTokens(cfg)
+	if got["acme"] != "sctx_live_acme" || got["other"] != "sctx_live_other" {
+		t.Fatalf("telemetry override replaced org-scoped MCP credentials: %v", got)
+	}
+}
+
+func TestLegacyCredentialNeedsKnownOrgForCodex(t *testing.T) {
+	unknown := config.Config{LegacyToken: "sctx_live_legacy"}
+	if got := codexOrgTokens(unknown); len(got) != 0 {
+		t.Fatalf("invented an organization for a legacy key: %v", got)
+	}
+	known := config.Config{LegacyToken: "sctx_live_legacy", DefaultOrg: "acme"}
+	if got := codexOrgTokens(known); got["acme"] != "sctx_live_legacy" {
+		t.Fatalf("did not adopt a legacy key with a known org: %v", got)
+	}
+}
+
 func names(docs []agentdoc.Doc) []string {
 	out := make([]string, 0, len(docs))
 	for _, d := range docs {
@@ -142,6 +167,65 @@ func TestStatusForAnUndetectedMachineSaysWhatItLookedFor(t *testing.T) {
 	}
 	if !strings.Contains(out, "--list-agents") {
 		t.Errorf("must offer the escape hatch for an agent we do not detect:\n%s", out)
+	}
+}
+
+// This is the regression the feature exists for: before this test, setup could
+// write current Codex instructions, return success, and leave `codex mcp list`
+// empty. Exercise the command boundary, not only the config writer.
+func TestSetupInstallGivesCodexInstructionsAndMCPAbilityTogether(t *testing.T) {
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	if err := os.MkdirAll(filepath.Join(home, ".codex"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	cfg := config.Config{
+		OrgTokens:         map[string]string{"acme": "sctx_live_acme"},
+		DefaultOrg:        "acme",
+		WorkspaceProxyURL: "https://mcp.synapctx.com",
+		SpoolDir:          filepath.Join(home, ".config", "sctx", "spool"),
+	}
+	if code := runSetup(cfg, []string{"--install"}); code != 0 {
+		t.Fatalf("setup exit = %d, want 0", code)
+	}
+	st, err := agentsetup.InspectWithCodexMCP(home, codexOrgTokens(cfg), cfg.WorkspaceProxyURL, docsFor(cfg)...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !st.Complete() {
+		t.Fatalf("setup returned success without complete Codex capability: %+v", st.Targets)
+	}
+	if _, err := os.Stat(filepath.Join(home, ".claude")); !os.IsNotExist(err) {
+		t.Error("Codex-only setup created Claude configuration")
+	}
+}
+
+func TestStatusSeparatesCodexInstructionsFromMCPRegistration(t *testing.T) {
+	home := t.TempDir()
+	configure := filepath.Join(home, ".codex")
+	if err := os.MkdirAll(configure, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := agentsetup.Install(home, []string{"acme"}); err != nil {
+		t.Fatal(err)
+	}
+	cfg := config.Config{OrgTokens: map[string]string{"acme": "sctx_live_acme"}, WorkspaceProxyURL: "https://mcp.synapctx.com"}
+	st, err := agentsetup.InspectWithCodexMCP(home, codexOrgTokens(cfg), cfg.WorkspaceProxyURL, docsFor(cfg)...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var buf bytes.Buffer
+	printSetupStatus(&buf, st, cfg, false)
+	out := buf.String()
+	if !strings.Contains(out, "[ok]      OpenAI Codex CLI") {
+		t.Errorf("current instructions were not reported independently:\n%s", out)
+	}
+	if !strings.Contains(out, "Codex MCP servers") || !strings.Contains(out, "[missing ]") {
+		t.Errorf("missing MCP capability was not reported independently:\n%s", out)
+	}
+	if !strings.Contains(out, "sidecar files where includes are supported") ||
+		!strings.Contains(out, "otherwise inlined into the agent's root instructions") {
+		t.Errorf("instruction delivery did not distinguish sidecars from inline content:\n%s", out)
 	}
 }
 

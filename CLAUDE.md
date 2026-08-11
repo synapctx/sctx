@@ -135,8 +135,10 @@ make install   # ~/.local/bin/sctx
 
 ## `sctx setup`
 
-Installs the agent-side half: whether the coding agents on this machine have been
-told `sctx` and SynapCTX exist. Three rules are load-bearing.
+Installs and verifies the agent-side delivery path: whether the coding agents on
+this machine have been told `sctx` and SynapCTX exist, and whether OpenAI Codex
+has the MCP registrations that make the SynapCTX tools callable. Four rules are
+load-bearing.
 
 - **Write ONLY where an agent already left its own configuration.** Detection is
   by existence, nothing is created speculatively, and detection must never key on
@@ -166,6 +168,14 @@ told `sctx` and SynapCTX exist. Three rules are load-bearing.
   token cost) because only the private side can see both budgets.
 - **An include is recognised in any path form**, comparing the final path segment
   only, or the same document gets loaded twice for every session.
+- **Codex instructions and Codex MCP ability are separate setup states.** A
+  current `~/.codex/AGENTS.md` with an empty `codex mcp list` is broken, never
+  green. SynapCTX registrations live between owned markers in
+  `~/.codex/config.toml`; preserve everything outside, update the owned block on
+  endpoint/key/org changes, keep the file `0600`, never print a token, and refuse
+  a same-named unmanaged table rather than overwriting or duplicating it. Only
+  write this block when Codex was actually detected and at least one org key is
+  configured.
 
 ## `sctx watch`
 

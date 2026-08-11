@@ -99,6 +99,8 @@ func runSetup(cfg config.Config, args []string) int {
 	}
 
 	orgs := orgSlugs(cfg)
+	orgTokens := codexOrgTokens(cfg)
+	changedAny := false
 	if install {
 		installFn := agentsetup.Install
 		if force {
@@ -109,30 +111,56 @@ func runSetup(cfg config.Config, args []string) int {
 			fmt.Fprintf(os.Stderr, "sctx: setup: %v\n", err)
 			return 1
 		}
-		if len(changed) == 0 {
-			fmt.Println("already set up; nothing to change")
-		}
 		for _, c := range changed {
 			fmt.Println(c)
 		}
-		hookChanges, hookErr := agentsetup.InstallHooks(home, binary)
-		if hookErr != nil {
-			// A settings file we could not parse is one we must not write.
-			fmt.Fprintf(os.Stderr, "sctx: setup: hooks not installed: %v\n", hookErr)
+		changedAny = len(changed) > 0
+
+		instructionState, inspectErr := agentsetup.Inspect(home, orgs, docsFor(cfg)...)
+		if inspectErr != nil {
+			fmt.Fprintf(os.Stderr, "sctx: setup: %v\n", inspectErr)
+			return 1
 		}
-		changed = append(changed, hookChanges...)
-		if len(changed) > 0 {
-			fmt.Println("\nRestart your agent — instruction files and hooks are read at startup.")
+		if hasAgent(instructionState, "codex") && len(orgTokens) > 0 {
+			mcpChanges, mcpErr := agentsetup.InstallCodexMCP(home, cfg.WorkspaceProxyURL, orgTokens)
+			if mcpErr != nil {
+				fmt.Fprintf(os.Stderr, "sctx: setup: Codex MCP servers not installed: %v\n", mcpErr)
+			} else {
+				for _, c := range mcpChanges {
+					fmt.Println(c)
+				}
+				changedAny = changedAny || len(mcpChanges) > 0
+			}
+		}
+		if hasAgent(instructionState, "claude") {
+			hookChanges, hookErr := agentsetup.InstallHooks(home, binary)
+			if hookErr != nil {
+				// A settings file we could not parse is one we must not write.
+				fmt.Fprintf(os.Stderr, "sctx: setup: hooks not installed: %v\n", hookErr)
+			} else {
+				for _, c := range hookChanges {
+					fmt.Println(c)
+				}
+				changedAny = changedAny || len(hookChanges) > 0
+			}
+		}
+		if !changedAny {
+			fmt.Println("already set up; nothing to change")
+		} else {
+			fmt.Println("\nRestart your agent — instructions, hooks and MCP servers are read at startup.")
 		}
 	}
 
-	st, err := agentsetup.Inspect(home, orgs, docsFor(cfg)...)
+	st, err := agentsetup.InspectWithCodexMCP(home, orgTokens, cfg.WorkspaceProxyURL, docsFor(cfg)...)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "sctx: setup: %v\n", err)
 		return 1
 	}
 	printSetupStatus(os.Stdout, st, cfg, install)
-	hooksOK := printHookStatus(os.Stdout, home, binary)
+	hooksOK := true
+	if hasAgent(st, "claude") {
+		hooksOK = printHookStatus(os.Stdout, home, binary)
+	}
 	if st.Complete() && hooksOK {
 		return 0
 	}
@@ -171,15 +199,16 @@ func printHookStatus(w io.Writer, home, binary string) bool {
 // produces failed calls and teaches it the whole file is unreliable.
 func docsFor(cfg config.Config) []agentdoc.Doc {
 	docs := []agentdoc.Doc{agentdoc.SctxDoc}
-	if len(orgSlugs(cfg)) > 0 {
+	if len(codexOrgTokens(cfg)) > 0 {
 		docs = append(docs, agentdoc.SynapctxDoc)
 	}
 	return docs
 }
 
 func orgSlugs(cfg config.Config) []string {
-	slugs := make([]string, 0, len(cfg.OrgTokens))
-	for slug := range cfg.OrgTokens {
+	tokens := codexOrgTokens(cfg)
+	slugs := make([]string, 0, len(tokens))
+	for slug := range tokens {
 		slugs = append(slugs, slug)
 	}
 	sort.Strings(slugs)
@@ -199,7 +228,7 @@ func printSetupStatus(w io.Writer, st agentsetup.Status, cfg config.Config, afte
 	}
 	for _, t := range st.Targets {
 		switch {
-		case t.OK():
+		case t.InstructionsOK():
 			fmt.Fprintf(w, "  [ok]      %-16s %s\n", t.Name, t.RootPath)
 		case t.Stale:
 			fmt.Fprintf(w, "  [stale]   %-16s instructions are from an older sctx — %s\n", t.Name, t.RootPath)
@@ -223,7 +252,27 @@ func printSetupStatus(w io.Writer, st agentsetup.Status, cfg config.Config, afte
 			}
 		}
 	}
-	fmt.Fprintln(w, "\nwhat gets installed")
+	for _, t := range st.Targets {
+		if t.CodexMCP == nil {
+			continue
+		}
+		fmt.Fprintf(w, "\nCodex MCP servers (%s)\n", t.CodexMCP.ConfigPath)
+		state := "ok"
+		detail := "registered"
+		switch {
+		case len(t.CodexMCP.Conflicts) > 0:
+			state, detail = "conflict", "unmanaged registration with this name already exists"
+		case !t.CodexMCP.Installed:
+			state, detail = "missing", "not registered"
+		case t.CodexMCP.Stale:
+			state, detail = "stale", "endpoint, organizations or credentials changed"
+		}
+		for _, server := range t.CodexMCP.Servers {
+			fmt.Fprintf(w, "  [%-8s] %-24s %s\n", state, server, detail)
+		}
+	}
+	fmt.Fprintln(w, "\ninstruction documents")
+	fmt.Fprintln(w, "  written as sidecar files where includes are supported; otherwise inlined into the agent's root instructions")
 	for _, d := range st.Docs {
 		fmt.Fprintf(w, "  %-13s %s\n", d.Name, d.Purpose)
 	}
@@ -257,7 +306,7 @@ func nudgeSetup(cfg config.Config) {
 	if err != nil {
 		return
 	}
-	st, err := agentsetup.Inspect(home, orgSlugs(cfg), docsFor(cfg)...)
+	st, err := agentsetup.InspectWithCodexMCP(home, codexOrgTokens(cfg), cfg.WorkspaceProxyURL, docsFor(cfg)...)
 	if err != nil {
 		return
 	}
@@ -299,6 +348,11 @@ func gainNotice(st agentsetup.Status) string {
 
 func pendingLine(st agentsetup.Status) string {
 	pending := st.Pending()
+	for _, t := range pending {
+		if t.CodexMCP != nil && !t.CodexMCP.Complete() && t.InstructionsOK() {
+			return "OpenAI Codex has SynapCTX instructions but no usable MCP registration"
+		}
+	}
 	names := make([]string, 0, len(pending))
 	stale := true
 	for _, t := range pending {
@@ -311,6 +365,40 @@ func pendingLine(st agentsetup.Status) string {
 		return joinAnd(names) + " has SynapCTX instructions from an older sctx"
 	}
 	return joinAnd(names) + " has not been told SynapCTX exists"
+}
+
+func hasAgent(st agentsetup.Status, id string) bool {
+	for _, t := range st.Targets {
+		if t.ID == id {
+			return true
+		}
+	}
+	return false
+}
+
+// codexOrgTokens resolves the credentials Codex must persist. Sectioned keys
+// are the normal path and deliberately do not inherit the telemetry-only
+// SCT__TELEMETRY_TOKEN override: one org-scoped key copied onto every server
+// would make all but one fail. A legacy or environment key is usable only when
+// its organization is known, because the server name is part of the tool
+// namespace.
+func codexOrgTokens(cfg config.Config) map[string]string {
+	out := make(map[string]string, len(cfg.OrgTokens))
+	for org, token := range cfg.OrgTokens {
+		if strings.TrimSpace(org) != "" && strings.TrimSpace(token) != "" {
+			out[org] = token
+		}
+	}
+	if len(out) == 0 && cfg.DefaultOrg != "" {
+		token := cfg.TelemetryTokenEnv
+		if token == "" {
+			token = cfg.LegacyToken
+		}
+		if token != "" {
+			out[cfg.DefaultOrg] = token
+		}
+	}
+	return out
 }
 
 func joinAnd(names []string) string {

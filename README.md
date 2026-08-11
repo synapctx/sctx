@@ -242,7 +242,11 @@ sctx setup
 This detects which AI coding agents are present, and for each one adds a short
 instruction file describing what `sctx` is and when to use it. For Claude Code it
 also registers a hook, so commands are wrapped as they are issued: you and your
-agent keep writing `go test ./...`, and the compact output is what arrives.
+agent keep writing `go test ./...`, and the compact output is what arrives. When
+you have connected a SynapCTX account, it also registers every configured
+organization as a Streamable HTTP MCP server for OpenAI Codex. Instructions and
+tool access are checked separately, so setup cannot report Codex ready while its
+MCP server list is empty.
 
 ```bash
 sctx setup                 # report what is installed, and what is missing
@@ -255,6 +259,16 @@ Two rules govern what it writes. It only adds configuration where an agent has
 already established its own, so nothing appears for a tool you do not use. And
 it never overwrites content you have edited - a customised instruction file is
 left as you wrote it, and only a missing reference is repaired.
+
+Codex MCP entries live in a clearly marked block in `~/.codex/config.toml`.
+Everything outside that block is preserved, the file is kept mode `0600`, and a
+same-named registration outside the block is reported as a conflict rather than
+overwritten. The block contains the organization API keys already held in
+`~/.config/sctx/config.toml`; setup output and status never print them.
+
+Restart the agent after setup changes anything. For the VS Code Codex extension,
+restart the extension (or VS Code) before opening the next session; a new chat in
+an already-running extension may still use the old MCP inventory.
 
 If no agent is detected, `sctx setup` reports what it looked for and writes
 nothing.
