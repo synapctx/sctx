@@ -112,6 +112,31 @@ func TestNonIncludingAgentsGetTheTextNotAReference(t *testing.T) {
 	}
 }
 
+func TestClaudeAndCodexReceiveMultiOrgSynapctxGuidance(t *testing.T) {
+	home := t.TempDir()
+	configure(t, home, "claude")
+	configure(t, home, "codex")
+	if _, err := Install(home, []string{"acme", "globex-labs"}); err != nil {
+		t.Fatal(err)
+	}
+
+	claude := read(t, filepath.Join(home, ".claude", "SYNAPCTX.md"))
+	codex := read(t, filepath.Join(home, ".codex", "AGENTS.md"))
+	for agent, body := range map[string]string{"Claude": claude, "Codex": codex} {
+		for _, want := range []string{
+			"server `synapctx-acme`; Codex namespace `mcp__synapctx_acme__*`",
+			"server `synapctx-globex-labs`; Codex namespace `mcp__synapctx_globex_labs__*`",
+			"switch namespaces for each call",
+			"`store_memory`",
+			"`find_unused_endpoints`",
+		} {
+			if !strings.Contains(body, want) {
+				t.Errorf("%s instructions are missing multi-org SynapCTX guidance %q:\n%s", agent, want, body)
+			}
+		}
+	}
+}
+
 func TestInstallIsIdempotent(t *testing.T) {
 	home := t.TempDir()
 	configure(t, home, "claude")

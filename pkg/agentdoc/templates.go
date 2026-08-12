@@ -133,17 +133,28 @@ is refused. Results never mix organizations.
 Configured: **%s**. It is your key's own organization, so omit `+"`organization`"+`.
 `, orgs[0])
 	default:
+		var routes strings.Builder
+		for _, org := range orgs {
+			// MCP server names retain the organization slug, while Codex
+			// normalizes punctuation in the generated tool namespace.
+			codexOrg := strings.ReplaceAll(org, "-", "_")
+			fmt.Fprintf(&routes, "- **%s** → server `synapctx-%s`; Codex namespace `mcp__synapctx_%s__*`\n", org, org, codexOrg)
+		}
 		scope = fmt.Sprintf(`## Which organization you are asking
 
-Configured: %s — **each with its own API key**, and the key, not the
-`+"`organization`"+` argument, decides which one answers. Use the key for the
-organization owning your working directory (`+"`.../<organization>/<repository>`"+`)
-and OMIT `+"`organization`"+`; to ask about another, call through ITS key.
+Each configured organization has its own server and API key:
+
+%s
+Choose the server/namespace matching the organization that owns the working
+directory (`+"`.../<organization>/<repository>`"+`) and OMIT `+"`organization`"+`.
+For cross-organization work, switch namespaces for each call; one session may
+use several. The selected server's key, not the `+"`organization`"+` argument,
+decides which organization answers.
 
 Naming one your key does not cover is refused as "unknown or inactive" — the same
 wording as a genuinely missing org, so it cannot enumerate them. **Read it as
 "wrong key", not "broken index"**: it names the org your key IS scoped to.
-`, "**"+strings.Join(orgs, "**, **")+"**")
+`, routes.String())
 	}
 
 	// WHAT BELONGS HERE, AND WHAT DOES NOT. This file and the MCP tool
@@ -173,6 +184,10 @@ Local tools see one checkout and the strings you thought to search for. These se
 the organization, and state how far each answer can be trusted.
 
 ` + scope + `
+Some clients defer large tool catalogs. If a named tool is not initially
+visible, search or list the client's deferred tools for the selected server
+before falling back. Not initially displayed does not mean unavailable.
+
 ## When to reach for it
 
 - **Before searching for something you cannot name exactly** — a convention, "how
@@ -183,11 +198,19 @@ the organization, and state how far each answer can be trusted.
   until it breaks.
 - **To verify one symbol, or to read code from a repository not checked out
   here** — ` + "`get_symbol_source`" + ` and ` + "`get_source`" + `. Do not clone it.
+- **Before changing or retiring a service boundary** —
+  ` + "`get_service_dependencies`" + ` shows upstream and downstream services.
+- **When looking for routes that may be safe to remove** —
+  ` + "`find_unused_endpoints`" + ` produces a shortlist, not deletion authorization;
+  read its blind spots before acting.
 - **Starting unfamiliar work, or before re-deciding something** —
   ` + "`recall_memory`" + `. Why a decision was made is rarely recoverable from code.
 - **The moment a decision is made or a convention is set** — ` + "`store_memory`" + `,
   with the decision AND the why. It outlives this session and this machine, and
   every teammate's agent can recall it.
+- **When a memory is outdated** — write the replacement with ` + "`store_memory`" + `
+  and mark what it supersedes. Use ` + "`forget_memory`" + ` only for secrets or test
+  artifacts, not ordinary history.
 
 ## Read what each answer says about itself
 

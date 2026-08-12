@@ -117,18 +117,29 @@ func TestSynapctxTemplateIsTriggerShapedNotMandateShaped(t *testing.T) {
 // unknown or inactive" and was repeatedly mistaken for a broken index.
 func TestMultiOrgTemplateRoutesByCredential(t *testing.T) {
 	single := synapctxBody([]string{"acme"})
-	multi := synapctxBody([]string{"acme", "globex"})
+	multi := synapctxBody([]string{"acme", "globex-labs"})
 
 	if strings.Contains(single, "Always pass") {
 		t.Error("a single-org machine should not be nagged about scoping")
 	}
-	if !strings.Contains(multi, "globex") {
+	if !strings.Contains(multi, "globex-labs") {
 		t.Errorf("multi-org template must name every configured org:\n%s", multi)
 	}
+	for _, route := range []string{
+		"server `synapctx-acme`; Codex namespace `mcp__synapctx_acme__*`",
+		"server `synapctx-globex-labs`; Codex namespace `mcp__synapctx_globex_labs__*`",
+	} {
+		if !strings.Contains(multi, route) {
+			t.Errorf("multi-org template must map each org to its selectable server and namespace %q:\n%s", route, multi)
+		}
+	}
 	// The instruction that actually prevents the failure.
-	if !strings.Contains(multi, "its own API key") || !strings.Contains(multi, "OMIT") {
+	if !strings.Contains(multi, "its own server and API key") || !strings.Contains(multi, "OMIT") {
 		t.Errorf("multi-org template must route by credential and say to omit the\n"+
 			"organization argument, or every cross-org call is refused:\n%s", multi)
+	}
+	if !strings.Contains(multi, "switch namespaces for each call") {
+		t.Errorf("multi-org template must explain that cross-org work switches tool namespaces:\n%s", multi)
 	}
 	// And it must pre-empt the misreading, because the refusal cannot say more:
 	// its wording is deliberately identical to a genuinely unknown organization.
@@ -145,6 +156,36 @@ func TestMultiOrgTemplateRoutesByCredential(t *testing.T) {
 	if strings.Contains(multi, "Always pass") {
 		t.Errorf("multi-org template tells the agent to always pass `organization`,\n"+
 			"which with one key per organization is refused, not scoped:\n%s", multi)
+	}
+}
+
+func TestMultiOrgTemplateTeachesDeferredToolDiscovery(t *testing.T) {
+	body := synapctxBody([]string{"acme", "globex"})
+	flat := strings.Join(strings.Fields(body), " ")
+
+	if !strings.Contains(flat, "defer large tool catalogs") ||
+		!strings.Contains(flat, "search or list the client's deferred tools") {
+		t.Errorf("template must teach agents to discover deferred SynapCTX tools before falling back:\n%s", body)
+	}
+}
+
+func TestSynapctxTemplateHasATriggerForEveryTool(t *testing.T) {
+	body := synapctxBody([]string{"acme"})
+	for _, tool := range []string{
+		"retrieve_context",
+		"find_references",
+		"get_dependents",
+		"get_symbol_source",
+		"get_source",
+		"get_service_dependencies",
+		"find_unused_endpoints",
+		"recall_memory",
+		"store_memory",
+		"forget_memory",
+	} {
+		if !strings.Contains(body, "`"+tool+"`") {
+			t.Errorf("template has no trigger for %s", tool)
+		}
 	}
 }
 
