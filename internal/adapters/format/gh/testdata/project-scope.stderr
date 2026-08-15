@@ -1,0 +1,2 @@
+error: your authentication token is missing required scopes [read:project]
+To request it, run:  gh auth refresh -s read:project

@@ -19,6 +19,7 @@ var globalValueFlags = map[string]bool{
 
 var nestedFamilies = map[string]bool{
 	"pr": true, "issue": true, "run": true, "repo": true, "release": true,
+	"search": true, "workflow": true, "cache": true, "gist": true, "project": true,
 }
 
 // Parse locates gh's command after persistent flags. Unknown pre-command
@@ -112,6 +113,9 @@ func HasOption(args []string, names ...string) bool {
 			if arg == name || strings.HasPrefix(arg, name+"=") {
 				return true
 			}
+			if len(name) == 2 && name[0] == '-' && name[1] != '-' && strings.HasPrefix(arg, name) && len(arg) > len(name) {
+				return true
+			}
 		}
 	}
 	return false
@@ -121,7 +125,7 @@ func HasOption(args []string, names ...string) bool {
 // has dedicated or shape-only coverage. Mutating and prompt-driven commands
 // remain native; their usually short output offers no worthwhile saving.
 func SafeReadOnly(inv Invocation) bool {
-	if HasFlag(inv.Args, "--web") {
+	if HasFlag(inv.Args, "--web", "-w") {
 		return false
 	}
 	switch inv.Level1 + " " + inv.Level2 {
@@ -137,9 +141,73 @@ func SafeReadOnly(inv Invocation) bool {
 		return false
 	case "repo list", "repo view", "release list", "release view":
 		return true
+	case "search code", "search commits", "search issues", "search prs", "search repos":
+		return true
+	case "workflow list", "workflow ls", "cache list", "cache ls", "gist list", "gist ls", "project list", "project ls":
+		return true
+	case "workflow view":
+		return hasOperand(inv.Args, "-R", "--repo", "-r", "--ref")
+	case "gist view":
+		return hasOperand(inv.Args, "-f", "--filename")
+	case "project view", "project field-list", "project item-list":
+		return hasOperand(inv.Args, "--owner", "--format", "-q", "--jq", "-t", "--template", "-L", "--limit", "--field", "--field-id", "--query")
 	}
 	if inv.Level1 == "api" {
-		return !HasOption(inv.Args, "--input") || !optionIsStdin(inv.Args, "--input")
+		return safeAPI(inv.Args)
+	}
+	return false
+}
+
+func safeAPI(args []string) bool {
+	if optionIsStdin(args, "--input") {
+		return false
+	}
+	method, explicit := optionValue(args, "--method", "-X")
+	if explicit {
+		return strings.EqualFold(method, "GET")
+	}
+	// gh changes its default from GET to POST when parameters or an input body
+	// are supplied. Keep implicit mutations native and unbuffered.
+	return !HasOption(args, "-f", "--raw-field", "-F", "--field", "--input")
+}
+
+func optionValue(args []string, names ...string) (string, bool) {
+	for i, arg := range args {
+		for _, name := range names {
+			if arg == name {
+				if i+1 < len(args) {
+					return args[i+1], true
+				}
+				return "", true
+			}
+			if strings.HasPrefix(arg, name+"=") {
+				return strings.TrimPrefix(arg, name+"="), true
+			}
+			if len(name) == 2 && name[0] == '-' && name[1] != '-' && strings.HasPrefix(arg, name) && len(arg) > len(name) {
+				return strings.TrimPrefix(arg, name), true
+			}
+		}
+	}
+	return "", false
+}
+
+func hasOperand(args []string, valueFlags ...string) bool {
+	values := make(map[string]bool, len(valueFlags))
+	for _, flag := range valueFlags {
+		values[flag] = true
+	}
+	for i := 0; i < len(args); i++ {
+		arg := args[i]
+		if arg == "--" {
+			return i+1 < len(args)
+		}
+		if !strings.HasPrefix(arg, "-") || arg == "-" {
+			return true
+		}
+		name, attached := flagName(arg)
+		if values[name] && !attached {
+			i++
+		}
 	}
 	return false
 }

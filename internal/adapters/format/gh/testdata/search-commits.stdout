@@ -1,0 +1,5 @@
+cli/cli	78de8634435243cb2db1735a4874dce7fdfb5c98	Merge pull request #14056 from zwick/zwick-fix-project-item-add-output Fix project item-add output for non-TTY	babakks	2026-08-10T10:07:04+01:00
+cli/cli	e83adbc0642994fae7c39a9a012eb34b8c81f4f1	Merge pull request #13988 from cli/williammartin-fix-restwithnext-error-type Fix `RESTWithNext` error type, repairing `gh status` and attestation retries	williammartin	2026-08-01T09:52:46+02:00
+cli/cli	a6bcd08d07d1cbcb17cfce497c0cf261a966f703	Fix item-add output for non-TTY Co-authored-by: Copilot App <223556219+Copilot@users.noreply.github.com>	zwick	2026-08-03T13:41:03-04:00
+cli/cli	0492fd1135a54ef2d67b507d5dabfe39f5e65d12	chore(typos): fix typos in code and documentation	pstoeckle	2026-07-22T12:21:10+02:00
+cli/cli	c2ad3b0eb7ead66eec3a8a61239e10a765332ec7	Fix skill picker label wrapping (#13967) Co-authored-by: Copilot App <223556219+Copilot@users.noreply.github.com> Copilot-Session: 9bf61d1c-810a-4324-874c-665275a607a9	tommaso-moro	2026-07-30T14:43:52+01:00

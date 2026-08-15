@@ -132,7 +132,7 @@ var subcommandTable = map[string][]string{
 	"tree":          nil,
 	"docker":        {"ps", "images", "image", "logs", "compose", "build", "inspect", "stats", "network", "volume", "container", "pull", "push", "history", "top", "exec"},
 	"kubectl":       {"get", "describe", "logs", "top", "events", "rollout", "api-resources", "apply", "create", "delete", "patch", "scale", "label", "annotate", "exec"},
-	"gh":            {"pr", "issue", "run", "repo", "api", "release"},
+	"gh":            {"pr", "issue", "run", "repo", "api", "release", "search", "workflow", "cache", "gist", "project"},
 	"golangci-lint": {"run"},
 	"make":          nil,
 	"ps":            nil,
