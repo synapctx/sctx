@@ -1,13 +1,12 @@
 package docker
 
 import (
-	"bytes"
 	"context"
 	"strings"
 
+	"github.com/synapctx/sctx/internal/adapters/format/nested"
 	"github.com/synapctx/sctx/internal/domain/format"
 	"github.com/synapctx/sctx/internal/platform/dockerargv"
-	"github.com/synapctx/sctx/internal/platform/progkey"
 )
 
 func dockerTransportFailure(stderr []byte) bool {
@@ -30,45 +29,22 @@ func dockerTransportFailure(stderr []byte) bool {
 	return false
 }
 
-func (f *Formatter) execInner(in format.Input, sub string, rest []string) (format.Formatter, format.Input, error) {
-	if f.resolve == nil {
-		return nil, format.Input{}, format.ErrTierInapplicable
-	}
-	argv, ok := dockerargv.ExecCommand(sub, rest)
-	if !ok {
-		return nil, format.Input{}, format.ErrTierInapplicable
-	}
-	fm, ok := f.resolve(argv)
-	if !ok {
-		return nil, format.Input{}, format.ErrTierInapplicable
-	}
-	rawOut, rawErr := readAll(in.Stdout), readAll(in.Stderr)
-	if dockerTransportFailure(rawErr) {
-		return nil, format.Input{}, format.ErrTierInapplicable
-	}
-	next := ""
-	if len(argv) > 1 {
-		next = argv[1]
-	}
-	return fm, format.Input{
-		Argv: argv, Command: progkey.Key(argv[0], next),
-		Stdout: bytes.NewReader(rawOut), Stderr: bytes.NewReader(rawErr),
-		ExitCode: in.ExitCode, Duration: in.Duration,
-	}, nil
+func dockerExecTransportFailure(stderr []byte, _ int) bool {
+	return dockerTransportFailure(stderr)
 }
 
 func (f *Formatter) aggressiveExec(ctx context.Context, in format.Input, sub string, rest []string) (format.Rendered, error) {
-	fm, inner, err := f.execInner(in, sub, rest)
-	if err != nil {
-		return format.Rendered{}, err
+	argv, ok := dockerargv.ExecCommand(sub, rest)
+	if !ok {
+		return format.Rendered{}, format.ErrTierInapplicable
 	}
-	return fm.Aggressive(ctx, inner)
+	return nested.Aggressive(ctx, nested.Resolver(f.resolve), in, argv, dockerExecTransportFailure)
 }
 
 func (f *Formatter) relaxedExec(ctx context.Context, in format.Input, sub string, rest []string) (format.Rendered, error) {
-	fm, inner, err := f.execInner(in, sub, rest)
-	if err != nil {
-		return format.Rendered{}, err
+	argv, ok := dockerargv.ExecCommand(sub, rest)
+	if !ok {
+		return format.Rendered{}, format.ErrTierInapplicable
 	}
-	return fm.Relaxed(ctx, inner)
+	return nested.Relaxed(ctx, nested.Resolver(f.resolve), in, argv, dockerExecTransportFailure)
 }

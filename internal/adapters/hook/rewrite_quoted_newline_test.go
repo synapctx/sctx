@@ -16,13 +16,12 @@ import (
 func TestNewlineInsideQuotesIsText(t *testing.T) {
 	for _, tc := range []struct{ name, in, want string }{
 		{
-			// The exact shape that broke. ssh is now IN the table (the ssh formatter renders
-			// the remote command's output), so the command wraps — at offset 0, outside the
-			// quotes. The invariant this test exists for is unchanged and is asserted
-			// directly below: the quoted argument must come back byte-identical.
+			// The exact shape that broke. The shared nested-command grammar now declines
+			// multi-command remote scripts entirely: one formatter cannot own both outputs.
+			// The quoted argument still has to come back byte-identical.
 			"ssh with a multi-line single-quoted script",
 			"ssh host 'mkdir -p /tmp/x\nls -l /tmp/x'",
-			"sctx ssh host 'mkdir -p /tmp/x\nls -l /tmp/x'",
+			"ssh host 'mkdir -p /tmp/x\nls -l /tmp/x'",
 		},
 		{
 			// A table program with a quoted multi-line argument: the program itself may

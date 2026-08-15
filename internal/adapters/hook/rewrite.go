@@ -11,6 +11,7 @@ import (
 	"github.com/synapctx/sctx/internal/platform/ghargv"
 	"github.com/synapctx/sctx/internal/platform/gitargv"
 	"github.com/synapctx/sctx/internal/platform/kubectlargv"
+	"github.com/synapctx/sctx/internal/platform/sshargv"
 )
 
 // pipeSafeDownstream lists programs that are safe to leave downstream of a
@@ -153,9 +154,8 @@ var subcommandTable = map[string][]string{
 	"rsync": nil,
 	// ssh is wrapped so the ssh formatter can render the REMOTE command's output with that
 	// command's own formatter — `ssh host 'docker ps'` gets the docker renderer. Its first
-	// argument is a host, so no subcommand. Interactive sessions are not a concern here:
-	// this table only governs the PreToolUse hook, which sees agent Bash calls, and the
-	// formatter declines when no remote command is present.
+	// argument is a host, so no subcommand. The shared ssh argv grammar below admits only a
+	// finite, non-TTY remote command; an interactive ssh session must never be buffered.
 	"ssh": nil,
 	// jq and curl have no dedicated formatter; the run pipeline's JSON
 	// content-sniffer (jsoncompact) compacts their JSON stdout automatically,
@@ -340,26 +340,8 @@ func containsToken(args []string, want string) bool {
 }
 
 func kubectlExecSafe(args []string) bool {
-	separator := -1
-	for i, arg := range args {
-		if arg == "--" {
-			separator = i
-			break
-		}
-	}
-	if separator < 1 || separator+1 >= len(args) {
-		return false
-	}
-	program := args[separator+1]
-	if i := strings.LastIndexAny(program, `/\\`); i >= 0 {
-		program = program[i+1:]
-	}
-	switch program {
-	case "sh", "bash", "zsh", "fish", "dash", "ksh", "csh", "tcsh", "cmd", "cmd.exe", "powershell", "powershell.exe", "pwsh", "sctx":
-		return false
-	}
-	_, known := subcommandTable[program]
-	return known
+	inner, ok := kubectlargv.ExecCommand(args)
+	return ok && hookKnowsInner(inner)
 }
 
 func dockerInvocationSafe(argv []string) bool {
@@ -821,6 +803,15 @@ func matchSegment(text string) (int, bool) {
 		if !ok || !ghargv.SafeReadOnly(inv) {
 			return 0, false
 		}
+	} else if lookupProgram == "ssh" {
+		argv := make([]string, 0, len(tokens)-idx)
+		for _, token := range tokens[idx:] {
+			argv = append(argv, shellTokenValue(token.text))
+		}
+		inner, ok := sshargv.RemoteCommand(argv)
+		if !ok || !hookKnowsInner(inner) {
+			return 0, false
+		}
 	} else if len(subs) > 0 {
 		switch lookupProgram {
 		case "kubectl":
@@ -940,9 +931,25 @@ func deliberatelyUnbuffered(text string) bool {
 	case "gh":
 		inv, ok := ghargv.Parse(argv)
 		return ok && !ghargv.SafeReadOnly(inv)
+	case "ssh":
+		for i := range argv {
+			argv[i] = shellTokenValue(argv[i])
+		}
+		inner, ok := sshargv.RemoteCommand(argv)
+		return !ok || !hookKnowsInner(inner)
 	default:
 		return false
 	}
+}
+
+// shellTokenValue removes one matching outer quote pair for the parsers that
+// need argv values rather than source spans. The original token remains in the
+// command string; this copy exists only for a conservative classification.
+func shellTokenValue(s string) string {
+	if len(s) >= 2 && ((s[0] == '\'' && s[len(s)-1] == '\'') || (s[0] == '"' && s[len(s)-1] == '"')) {
+		return s[1 : len(s)-1]
+	}
+	return s
 }
 
 // tokenize splits s on runs of spaces/tabs, recording each token's byte

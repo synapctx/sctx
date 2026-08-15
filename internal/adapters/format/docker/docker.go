@@ -11,6 +11,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/synapctx/sctx/internal/adapters/format/nested"
 	"github.com/synapctx/sctx/internal/domain/format"
 	"github.com/synapctx/sctx/internal/platform/dockerargv"
 )
@@ -18,7 +19,7 @@ import (
 // Resolver looks up the formatter for a nested command executed in a
 // container. It is injected by main to keep this adapter independent of the
 // application registry package.
-type Resolver func(argv []string) (format.Formatter, bool)
+type Resolver = nested.Resolver
 
 // Formatter renders docker command output.
 type Formatter struct {

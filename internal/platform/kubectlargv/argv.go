@@ -4,7 +4,11 @@
 // from maintaining subtly different ideas of where the kubectl command is.
 package kubectlargv
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/synapctx/sctx/internal/platform/nestedcmd"
+)
 
 // Invocation is the command selected by kubectl and the arguments after it.
 type Invocation struct {
@@ -151,4 +155,25 @@ func HasFlag(args []string, names ...string) bool {
 		}
 	}
 	return false
+}
+
+// ExecCommand extracts the finite direct command following kubectl exec's
+// required separator. It is shared by the hook and formatter so interactive
+// flags and shell wrappers cannot be classified differently before and after
+// execution.
+func ExecCommand(args []string) ([]string, bool) {
+	separator := -1
+	for i, arg := range args {
+		if arg == "--" {
+			separator = i
+			break
+		}
+	}
+	if separator < 1 || separator+1 >= len(args) {
+		return nil, false
+	}
+	if HasFlag(args[:separator], "-i", "--stdin", "-t", "--tty") {
+		return nil, false
+	}
+	return nestedcmd.Direct(args[separator+1:])
 }

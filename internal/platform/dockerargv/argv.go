@@ -6,8 +6,9 @@
 package dockerargv
 
 import (
-	"path/filepath"
 	"strings"
+
+	"github.com/synapctx/sctx/internal/platform/nestedcmd"
 )
 
 // Invocation identifies a Docker command and the arguments after it.
@@ -239,8 +240,8 @@ func ExecCommand(command string, args []string) ([]string, bool) {
 	if compose && (!HasFlag(options, "-T", "--no-TTY") || optionEnabledByDefault(options, "--interactive")) {
 		return nil, false
 	}
-	inner := args[positional+1:]
-	if len(inner) == 0 || IsShell(inner[0]) || filepath.Base(inner[0]) == "sctx" {
+	inner, ok := nestedcmd.Direct(args[positional+1:])
+	if !ok {
 		return nil, false
 	}
 	return inner, true
@@ -272,15 +273,4 @@ func optionEnabledByDefault(args []string, name string) bool {
 		}
 	}
 	return true
-}
-
-// IsShell reports programs whose output grammar is selected by shell syntax
-// rather than the executable name.
-func IsShell(program string) bool {
-	switch filepath.Base(program) {
-	case "sh", "bash", "zsh", "fish", "dash", "ksh", "csh", "tcsh", "cmd", "cmd.exe", "powershell", "powershell.exe", "pwsh":
-		return true
-	default:
-		return false
-	}
 }

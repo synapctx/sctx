@@ -9,12 +9,13 @@ import (
 	"context"
 	"io"
 
+	"github.com/synapctx/sctx/internal/adapters/format/nested"
 	"github.com/synapctx/sctx/internal/domain/format"
 	"github.com/synapctx/sctx/internal/platform/kubectlargv"
 )
 
 // Resolver reports which formatter handles a nested kubectl exec command.
-type Resolver func(argv []string) (format.Formatter, bool)
+type Resolver = nested.Resolver
 
 // Formatter renders kubectl command output.
 type Formatter struct {
