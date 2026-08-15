@@ -337,7 +337,7 @@ func TestACommandWithNoProgramTokenIsNotRecorded(t *testing.T) {
 }
 
 func TestMeasuredNoFormatterCandidateIsNotRecordedAgain(t *testing.T) {
-	for _, command := range []string{"go doc ./internal/application/run", "go -C repo doc ./pkg"} {
+	for _, command := range []string{"go doc ./internal/application/run", "go -C repo doc ./pkg", "swag init -g main.go"} {
 		if segment, ok := gapSegment(command); ok {
 			t.Fatalf("gapSegment(%q) = %q; deliberately rejected candidate must not keep polluting ranking", command, segment)
 		}

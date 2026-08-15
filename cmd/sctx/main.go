@@ -29,6 +29,7 @@ import (
 
 	"github.com/synapctx/sctx/internal/adapters/exec/osproc"
 	"github.com/synapctx/sctx/internal/adapters/format/brew"
+	"github.com/synapctx/sctx/internal/adapters/format/dig"
 	dockerfmt "github.com/synapctx/sctx/internal/adapters/format/docker"
 	"github.com/synapctx/sctx/internal/adapters/format/du"
 	"github.com/synapctx/sctx/internal/adapters/format/filediff"
@@ -134,6 +135,7 @@ func realMain(args []string) int {
 func runWrapped(ctx context.Context, cfg config.Config, argv []string) int {
 	registry := run.NewRegistry()
 	registry.Register(gotest.New())
+	registry.Register(dig.New())
 	registry.Register(gitfmt.New())
 	registry.Register(dockerfmt.New(registry.ResolveBuiltInByArgv))
 	registry.Register(kubectlfmt.New(registry.ResolveBuiltInByArgv))

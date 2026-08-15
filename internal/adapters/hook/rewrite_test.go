@@ -26,6 +26,7 @@ func rewriteTestCases() []rewriteTestCase {
 		{"git status", "git status", "sctx git status", true},
 		{"git log", "git log --oneline", "sctx git log --oneline", true},
 		{"sqlite3", "sqlite3 app.db 'select * from jobs'", "sctx sqlite3 app.db 'select * from jobs'", true},
+		{"dig", "dig example.com A", "sctx dig example.com A", true},
 		{"git diff", "git diff HEAD~1", "sctx git diff HEAD~1", true},
 		{"git show", "git show HEAD", "sctx git show HEAD", true},
 		{"git add", "git add -A", "sctx git add -A", true},

@@ -289,7 +289,7 @@ Dedicated renderers:
 `docker` &nbsp;·&nbsp; `kubectl` &nbsp;·&nbsp; `gh` &nbsp;·&nbsp;
 `golangci-lint` &nbsp;·&nbsp; `pytest` &nbsp;·&nbsp; `ruff` &nbsp;·&nbsp;
 `mypy` &nbsp;·&nbsp; `pip` &nbsp;·&nbsp; `npm` / `pnpm` / `yarn` &nbsp;·&nbsp;
-`brew` &nbsp;·&nbsp; `mongosh` &nbsp;·&nbsp; `rsync` &nbsp;·&nbsp;
+`brew` &nbsp;·&nbsp; `mongosh` &nbsp;·&nbsp; `dig` &nbsp;·&nbsp; `rsync` &nbsp;·&nbsp;
 `ssh`
 
 Generic shape detection, not dedicated command parsers:

@@ -1,0 +1,18 @@
+
+; <<>> DiG 9.10.6 <<>> nonexistent-sctx-test.invalid A
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NXDOMAIN, id: 47590
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 0
+
+;; QUESTION SECTION:
+;nonexistent-sctx-test.invalid.	IN	A
+
+;; AUTHORITY SECTION:
+.			86369	IN	SOA	a.root-servers.net. nstld.verisign-grs.com. 2026081501 1800 900 604800 86400
+
+;; Query time: 49 msec
+;; SERVER: 100.95.0.251#53(100.95.0.251)
+;; WHEN: Sat Aug 15 22:46:09 BST 2026
+;; MSG SIZE  rcvd: 122
+

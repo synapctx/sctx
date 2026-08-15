@@ -168,6 +168,7 @@ var subcommandTable = map[string][]string{
 	// remain verbatim. Wrapping still reaches the generic JSON/repeat detector
 	// for caller-requested -json output and repetitive result streams.
 	"sqlite3": nil,
+	"dig":     nil,
 	"npm":     {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
 	"pnpm":    {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
 	"yarn":    {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
@@ -956,14 +957,23 @@ func gapSegment(cmd string) (string, bool) {
 // deliberatelyNoFormatter removes measured, consciously rejected candidates
 // from the gap ranking. `go doc` output is the documentation/API index the
 // caller requested; `-all` is explicitly exhaustive, so a formatter would save
-// tokens primarily by deleting the answer rather than compressing noise.
+// tokens primarily by deleting the answer rather than compressing noise. Swag
+// emits a handful of unique progress lines during generation, including useful
+// warnings, leaving no repetitive structure to compress safely.
 func deliberatelyNoFormatter(text string) bool {
 	tokens := tokenize(text)
 	idx := 0
 	for idx < len(tokens) && isAssignment(tokens[idx].text) {
 		idx++
 	}
-	if idx >= len(tokens) || filepathBase(shellTokenValue(tokens[idx].text)) != "go" {
+	if idx >= len(tokens) {
+		return false
+	}
+	command := filepathBase(shellTokenValue(tokens[idx].text))
+	if command == "swag" {
+		return true
+	}
+	if command != "go" {
 		return false
 	}
 	idx++
