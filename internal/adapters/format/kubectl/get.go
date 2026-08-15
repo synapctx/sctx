@@ -35,10 +35,22 @@ func aggressiveGet(in format.Input) (format.Rendered, error) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 	if strings.HasPrefix(strings.TrimSpace(lines[0]), "No resources found") {
-		return format.Rendered{Body: []byte(lines[0])}, nil
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	for _, line := range lines[1:] {
+		if strings.TrimSpace(line) == "" {
+			// `kubectl get TYPE,TYPE` emits multiple independently shaped
+			// tables separated by blank lines. A single header cannot safely
+			// describe every following row.
+			return format.Rendered{}, format.ErrTierInapplicable
+		}
 	}
 
 	names, starts := parseHeader(lines[0])
+	if colIndex(names, "TYPE") >= 0 && colIndex(names, "REASON") >= 0 && colIndex(names, "OBJECT") >= 0 && colIndex(names, "MESSAGE") >= 0 {
+		in.Stdout = bytes.NewReader(raw)
+		return aggressiveEvents(in)
+	}
 	nameIdx := colIndex(names, "NAME")
 	if nameIdx < 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
@@ -46,6 +58,7 @@ func aggressiveGet(in format.Input) (format.Rendered, error) {
 	ageIdx := colIndex(names, "AGE")
 	readyIdx := colIndex(names, "READY")
 	statusIdx := colIndex(names, "STATUS")
+	namespaceIdx := colIndex(names, "NAMESPACE")
 
 	var rows [][]string
 	for _, line := range lines[1:] {
@@ -55,7 +68,16 @@ func aggressiveGet(in format.Input) (format.Rendered, error) {
 		rows = append(rows, splitColumns(line, starts))
 	}
 	if len(rows) == 0 {
-		return format.Rendered{Body: []byte("0 items")}, nil
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	// Many resources (NetworkPolicy, Service, ConfigMap, CRDs, ...) do not
+	// expose READY/STATUS. Calling every such row "not ready" is incorrect;
+	// preserve their native table and merely cap very large results.
+	if statusIdx < 0 {
+		if len(rows) <= maxGetWideRows {
+			return format.Rendered{}, format.ErrTierInapplicable
+		}
+		return format.Rendered{Body: renderCappedTable(lines[0], lines[1:], maxGetWideRows)}, nil
 	}
 
 	isHealthy := func(cols []string) bool {
@@ -77,7 +99,11 @@ func aggressiveGet(in format.Input) (format.Rendered, error) {
 
 	for _, cols := range rows {
 		if isHealthy(cols) {
-			healthyNames = append(healthyNames, cols[nameIdx])
+			name := cols[nameIdx]
+			if namespaceIdx >= 0 && cols[namespaceIdx] != "" {
+				name = cols[namespaceIdx] + "/" + name
+			}
+			healthyNames = append(healthyNames, name)
 			continue
 		}
 		notReady++
@@ -107,18 +133,27 @@ func aggressiveGet(in format.Input) (format.Rendered, error) {
 		}
 	}
 
-	for _, l := range otherLines {
-		b.WriteString("\n")
-		b.WriteString(l)
+	if len(otherLines) > 0 {
+		var header []string
+		for i, name := range names {
+			if i != ageIdx {
+				header = append(header, name)
+			}
+		}
+		b.WriteString("\nnot ready: ")
+		b.WriteString(strings.Join(header, " | "))
+		for _, l := range otherLines {
+			b.WriteString("\n  ")
+			b.WriteString(l)
+		}
 	}
 
 	return format.Rendered{Body: []byte(b.String())}, nil
 }
 
-// aggressiveGetJSON delegates `kubectl get -o json` to the generic JSON
-// compactor, which is a better fit than kubectl's own table parser for a
-// (usually deeply nested) List object.
-func aggressiveGetJSON(ctx context.Context, in format.Input) (format.Rendered, error) {
+// aggressiveJSON delegates a user-requested native JSON document to the
+// generic JSON compactor. No output-format flag is injected.
+func aggressiveJSON(ctx context.Context, in format.Input) (format.Rendered, error) {
 	raw := readAll(in.Stdout)
 	if len(raw) == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
@@ -136,10 +171,10 @@ func aggressiveGetWide(in format.Input) (format.Rendered, error) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 	if strings.HasPrefix(strings.TrimSpace(lines[0]), "No resources found") {
-		return format.Rendered{Body: []byte(lines[0])}, nil
+		return format.Rendered{}, format.ErrTierInapplicable
 	}
-	if len(lines) < 2 {
-		return format.Rendered{Body: []byte(lines[0])}, nil
+	if len(lines) <= maxGetWideRows+1 {
+		return format.Rendered{}, format.ErrTierInapplicable
 	}
 	body := renderCappedTable(lines[0], lines[1:], maxGetWideRows)
 	return format.Rendered{Body: body}, nil

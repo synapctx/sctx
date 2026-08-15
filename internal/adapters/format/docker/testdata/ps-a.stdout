@@ -1,0 +1,7 @@
+CONTAINER ID   IMAGE          COMMAND                  CREATED         STATUS                     PORTS     NAMES
+3de9dd72c6db   cc6ebc51755d   "sh -c 'echo COMPOSE…"   6 minutes ago   Exited (9) 6 minutes ago             sctx-formatter-20260815-restarting-1
+45c273b9ff7a   cc6ebc51755d   "sh -c 'i=0; while […"   6 minutes ago   Up 6 minutes (healthy)               sctx-formatter-20260815-healthy-1
+3ef3c872695c   cc6ebc51755d   "sh -c 'echo COMPOSE…"   6 minutes ago   Exited (7) 6 minutes ago             sctx-formatter-20260815-failed-1
+9170cb3cb81f   cc6ebc51755d   "sh -c 'echo EXITED_…"   6 minutes ago   Exited (7) 6 minutes ago             sctx-formatter-20260815-exited
+e47c867f9ebc   cc6ebc51755d   "sleep 3600"             6 minutes ago   Up 6 minutes (unhealthy)             sctx-formatter-20260815-unhealthy
+f79c772357d9   cc6ebc51755d   "sh -c 'i=0; while […"   6 minutes ago   Up 6 minutes (healthy)               sctx-formatter-20260815-running-with-an-intentionally-very-long-container-name

@@ -21,27 +21,25 @@ func isSeparatorLine(trimmed string) bool {
 	return true
 }
 
-// filterRelaxedLines drops empty and pure-separator lines and collapses
-// runs of consecutive identical lines into a single line with a ×N marker.
+// filterRelaxedLines preserves every unique line and collapses only exact
+// consecutive runs of at least three lines. Blank lines and separators are
+// part of native diagnostics and remain authoritative.
 func filterRelaxedLines(lines []string) []string {
 	var out []string
 	i := 0
 	for i < len(lines) {
 		line := lines[i]
-		trimmed := strings.TrimSpace(line)
-		if trimmed == "" || isSeparatorLine(trimmed) {
-			i++
-			continue
-		}
 		j := i + 1
 		for j < len(lines) && lines[j] == line {
 			j++
 		}
 		count := j - i
-		if count > 1 {
+		if count >= 3 {
 			out = append(out, fmt.Sprintf("%s ×%d", line, count))
 		} else {
-			out = append(out, line)
+			for k := 0; k < count; k++ {
+				out = append(out, line)
+			}
 		}
 		i = j
 	}
@@ -61,19 +59,6 @@ func relaxedFilter(in format.Input) (format.Rendered, error) {
 	outLines := filterRelaxedLines(splitLines(rawOut))
 	errLines := filterRelaxedLines(splitLines(rawErr))
 
-	if len(outLines) == 0 && len(errLines) == 0 {
-		// Filtering removed everything (pure noise); never emit an empty
-		// body for non-empty raw input, so fall back to a minimal summary.
-		summary := firstNonEmptyLine(rawOut)
-		if summary == "" {
-			summary = firstNonEmptyLine(rawErr)
-		}
-		if summary == "" {
-			summary = "(no output)"
-		}
-		return format.Rendered{Body: []byte(summary), FoldStderr: len(rawErr) > 0}, nil
-	}
-
 	var body []string
 	body = append(body, outLines...)
 	body = append(body, errLines...)
@@ -82,13 +67,4 @@ func relaxedFilter(in format.Input) (format.Rendered, error) {
 		Body:       []byte(strings.Join(body, "\n")),
 		FoldStderr: len(errLines) > 0,
 	}, nil
-}
-
-func firstNonEmptyLine(raw []byte) string {
-	for _, l := range splitLines(raw) {
-		if strings.TrimSpace(l) != "" {
-			return l
-		}
-	}
-	return ""
 }

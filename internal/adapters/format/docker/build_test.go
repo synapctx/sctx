@@ -79,8 +79,8 @@ func TestAggressiveBuild(t *testing.T) {
 				t.Errorf("body missing %q, got: %q", want, body)
 			}
 		}
-		if strings.Contains(body, "0.523 added 120 packages") {
-			t.Errorf("body still contains raw RUN progress noise: %q", body)
+		if !strings.Contains(body, "0.523 added 120 packages") {
+			t.Errorf("body dropped build-step output: %q", body)
 		}
 		if len(out.Body) >= len(buildKitPlainFixture) {
 			t.Errorf("body not smaller than raw: %d >= %d", len(out.Body), len(buildKitPlainFixture))
@@ -142,12 +142,8 @@ func TestAggressiveBuild(t *testing.T) {
 		}
 
 		in2 := format.Input{Argv: []string{"docker", "build", "-t", "myapp", "."}, Stdout: strings.NewReader(failed), ExitCode: 1}
-		out, err := f.Relaxed(context.Background(), in2)
-		if err != nil {
-			t.Fatalf("Relaxed() error = %v", err)
-		}
-		if !strings.Contains(string(out.Body), "ERROR: process") {
-			t.Errorf("relaxed body dropped ERROR line: %q", out.Body)
+		if _, err := f.Relaxed(context.Background(), in2); err != format.ErrTierInapplicable {
+			t.Fatalf("Relaxed() error = %v, want verbatim fallback", err)
 		}
 	})
 }

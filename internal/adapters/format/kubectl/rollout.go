@@ -58,6 +58,9 @@ func aggressiveRolloutStatus(in format.Input) (format.Rendered, error) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 	out := collapseRepeatedLines(lines)
+	if len(out) == len(lines) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	return format.Rendered{Body: []byte(strings.Join(out, "\n"))}, nil
 }
 

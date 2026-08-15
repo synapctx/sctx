@@ -52,14 +52,23 @@ func TestAggressiveGet(t *testing.T) {
 		}
 	})
 
-	t.Run("no resources passes through verbatim", func(t *testing.T) {
+	t.Run("no resources declines because native output is already minimal", func(t *testing.T) {
 		in := format.Input{Argv: []string{"kubectl", "get", "pods"}, Stdout: strings.NewReader(kubectlGetNoResourcesFixture)}
-		out, err := f.Aggressive(context.Background(), in)
-		if err != nil {
-			t.Fatalf("Aggressive() error = %v", err)
+		if _, err := f.Aggressive(context.Background(), in); err != format.ErrTierInapplicable {
+			t.Fatalf("Aggressive() error = %v, want inapplicable", err)
 		}
-		if got, want := string(out.Body), strings.TrimRight(kubectlGetNoResourcesFixture, "\n"); got != want {
-			t.Errorf("body = %q, want %q", got, want)
+	})
+
+	t.Run("short non-status and multi-table output stay verbatim", func(t *testing.T) {
+		fixtures := []string{
+			"NAME     TYPE        CLUSTER-IP\nservice/x ClusterIP   10.0.0.1\n",
+			"NAME READY STATUS AGE\npod/x 1/1 Running 1m\n\nNAME TYPE CLUSTER-IP AGE\nservice/x ClusterIP 10.0.0.1 1m\n",
+		}
+		for _, raw := range fixtures {
+			in := format.Input{Argv: []string{"kubectl", "get", "services"}, Stdout: strings.NewReader(raw)}
+			if _, err := f.Aggressive(context.Background(), in); err != format.ErrTierInapplicable {
+				t.Errorf("Aggressive() error = %v for %q", err, raw)
+			}
 		}
 	})
 

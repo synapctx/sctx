@@ -26,8 +26,11 @@ func TestSubcommand(t *testing.T) {
 		{"skip namespace flag", []string{"kubectl", "-n", "prod", "get", "pods"}, "get", []string{"pods"}},
 		{"skip namespace long flag", []string{"kubectl", "--namespace", "prod", "get", "pods"}, "get", []string{"pods"}},
 		{"skip context flag", []string{"kubectl", "--context", "dev", "describe", "pod", "web"}, "describe", []string{"pod", "web"}},
-		{"skip output flag", []string{"kubectl", "-o", "json", "get", "pods"}, "get", []string{"pods"}},
+		{"all value globals", []string{"kubectl", "--as", "alice", "--cluster", "dev", "--request-timeout", "5s", "-s", "https://cluster", "get", "pods"}, "get", []string{"pods"}},
+		{"boolean globals", []string{"kubectl", "--warnings-as-errors", "--disable-compression=false", "get", "pods"}, "get", []string{"pods"}},
 		{"equals form does not consume", []string{"kubectl", "-n=prod", "get", "pods"}, "get", []string{"pods"}},
+		{"attached shorthand", []string{"kubectl", "-nprod", "-v5", "get", "pods"}, "get", []string{"pods"}},
+		{"unknown global declines", []string{"kubectl", "--unknown", "value", "get", "pods"}, "", nil},
 		{"no subcommand", []string{"kubectl"}, "", nil},
 	}
 	for _, tc := range tests {
@@ -51,7 +54,7 @@ func TestOutputFormat(t *testing.T) {
 		{[]string{"get", "pods", "-o", "json"}, "json"},
 		{[]string{"get", "pods", "--output=yaml"}, "yaml"},
 		{[]string{"get", "pods", "-o=wide"}, "wide"},
-		{[]string{"-o", "json", "get", "pods"}, "json"},
+		{[]string{"pod/x", "--", "tool", "-o", "json"}, ""},
 		{[]string{"get", "pods"}, ""},
 	}
 	for _, tc := range tests {

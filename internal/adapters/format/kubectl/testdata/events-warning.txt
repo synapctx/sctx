@@ -1,0 +1,5 @@
+LAST SEEN           TYPE      REASON    OBJECT           MESSAGE
+17s (x3 over 51s)   Warning   Failed    Pod/bad-image    Failed to pull image "registry.invalid/sctx/does-not-exist:never": failed to pull and unpack image "registry.invalid/sctx/does-not-exist:never": failed to resolve reference "registry.invalid/sctx/does-not-exist:never": failed to do request: Head "https://registry.invalid/v2/sctx/does-not-exist/manifests/never": dial tcp: lookup registry.invalid on 8.8.8.8:53: no such host
+17s (x3 over 51s)   Warning   Failed    Pod/bad-image    Error: ErrImagePull
+6s (x5 over 49s)    Warning   BackOff   Pod/crash-loop   Back-off restarting failed container app in pod crash-loop_sctx-formatter-20260815-a(6059e6fa-eff8-4dd7-9ac2-4c3fe1084964)
+3s (x3 over 51s)    Warning   Failed    Pod/bad-image    Error: ImagePullBackOff

@@ -12,14 +12,26 @@ import (
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
+	"github.com/synapctx/sctx/internal/platform/dockerargv"
 )
 
+// Resolver looks up the formatter for a nested command executed in a
+// container. It is injected by main to keep this adapter independent of the
+// application registry package.
+type Resolver func(argv []string) (format.Formatter, bool)
+
 // Formatter renders docker command output.
-type Formatter struct{}
+type Formatter struct {
+	resolve Resolver
+}
 
 // New constructs a docker Formatter.
-func New() *Formatter {
-	return &Formatter{}
+func New(resolve ...Resolver) *Formatter {
+	f := &Formatter{}
+	if len(resolve) > 0 {
+		f.resolve = resolve[0]
+	}
+	return f
 }
 
 // Descriptor claims all docker invocations; subcommand dispatch happens
@@ -28,69 +40,42 @@ func (f *Formatter) Descriptor() format.Match {
 	return format.Match{Command: "docker"}
 }
 
-// dockerGlobalFlagsWithValue are docker's own global options that consume
-// the next argv slot, so they must not be mistaken for the subcommand.
-// -D/--debug is bare and needs no entry here.
-var dockerGlobalFlagsWithValue = map[string]bool{
-	"--context":   true,
-	"-H":          true,
-	"--host":      true,
-	"--config":    true,
-	"-l":          true,
-	"--log-level": true,
-}
-
-// nestedSubcommands are docker's own "object subcommand" groups: the token
-// after them is itself a subcommand (e.g. "network ls", "compose ps") rather
-// than an argument.
-var nestedSubcommands = map[string]bool{
-	"compose":   true,
-	"network":   true,
-	"volume":    true,
-	"container": true,
-}
-
 // subcommand returns the docker subcommand (e.g. "ps", or "compose ps") and
-// the arguments that follow it, skipping argv[0] and any global flags (and
-// their values).
+// the arguments that follow it. Docker and Compose globals are parsed by the
+// shared grammar also used by the hook and stats key.
 func subcommand(argv []string) (sub string, rest []string) {
-	if len(argv) <= 1 {
+	inv, ok := dockerargv.Parse(argv)
+	if !ok {
 		return "", nil
 	}
-	args := argv[1:]
-	for i := 0; i < len(args); i++ {
-		a := args[i]
-		if a == "--" {
-			continue
+	if inv.Command == "compose" {
+		nested, ok := dockerargv.ParseCompose(inv)
+		if !ok {
+			return "compose", nil
 		}
-		if strings.HasPrefix(a, "-") {
-			// Flags of the form --key=value never consume the next slot.
-			if strings.Contains(a, "=") {
-				continue
-			}
-			if dockerGlobalFlagsWithValue[a] {
-				i++
-			}
-			continue
-		}
-		if nestedSubcommands[a] {
-			for j := i + 1; j < len(args); j++ {
-				b := args[j]
-				if strings.HasPrefix(b, "-") {
-					continue
-				}
-				return a + " " + b, args[j+1:]
-			}
-			return a, nil
-		}
-		return a, args[i+1:]
+		return "compose " + nested.Command, nested.Args
 	}
-	return "", nil
+	if inv.Command == "network" || inv.Command == "volume" || inv.Command == "container" || inv.Command == "image" {
+		for i, arg := range inv.Args {
+			if !strings.HasPrefix(arg, "-") {
+				return inv.Command + " " + arg, inv.Args[i+1:]
+			}
+		}
+	}
+	return inv.Command, inv.Args
 }
 
 // Aggressive dispatches to a per-subcommand structured renderer.
 func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Rendered, error) {
-	sub, _ := subcommand(in.Argv)
+	sub, rest := subcommand(in.Argv)
+	if sub == "" || explicitOutputContract(in.Argv, sub, rest) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	// A nested command's non-zero exit belongs to that command, not
+	// necessarily to Docker. Let its formatter retain and render the failure.
+	if sub == "exec" || sub == "compose exec" {
+		return f.aggressiveExec(ctx, in, sub, rest)
+	}
 
 	// A non-zero exit almost always means an error on stderr that these
 	// structured parsers don't understand; degrade to relaxed line
@@ -102,7 +87,7 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 	switch sub {
 	case "ps", "container ls":
 		return aggressivePs(in)
-	case "images":
+	case "images", "image ls":
 		return aggressiveImages(in)
 	case "logs":
 		return aggressiveLogs(in)
@@ -139,7 +124,60 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 
 // Relaxed applies heuristic line-level filtering to any docker subcommand.
 func (f *Formatter) Relaxed(ctx context.Context, in format.Input) (format.Rendered, error) {
+	sub, rest := subcommand(in.Argv)
+	if !textSubcommand(sub) || explicitOutputContract(in.Argv, sub, rest) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	if sub == "exec" || sub == "compose exec" {
+		return f.relaxedExec(ctx, in, sub, rest)
+	}
+	// Docker/daemon failures are already finite and diagnostic-heavy. Keep
+	// their native streams byte-for-byte instead of folding stderr into a
+	// human summary merely to claim a relaxed match.
+	if in.ExitCode != 0 {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	return relaxedFilter(in)
+}
+
+func textSubcommand(sub string) bool {
+	switch sub {
+	case "ps", "container ls", "images", "image ls", "logs", "build", "pull", "push", "inspect", "stats", "history", "top", "network ls", "volume ls",
+		"compose ps", "compose up", "compose build", "compose logs", "compose down", "exec", "compose exec":
+		return true
+	default:
+		return false
+	}
+}
+
+// explicitOutputContract reports modes where stdout is a user-selected data
+// contract, identifier stream, or non-human progress format. Those bytes are
+// authoritative and bypass both Docker tiers.
+func explicitOutputContract(argv []string, sub string, rest []string) bool {
+	switch sub {
+	case "inspect":
+		_, ok := dockerargv.OptionValue(rest, "-f", "--format")
+		return ok
+	case "ps", "container ls", "images", "image ls", "stats", "history", "network ls", "volume ls", "compose ps":
+		if _, ok := dockerargv.OptionValue(rest, "--format"); ok {
+			return true
+		}
+		return dockerargv.HasFlag(rest, "-q", "--quiet")
+	case "build", "compose build":
+		if dockerargv.HasFlag(rest, "-q", "--quiet") {
+			return true
+		}
+		if progress, ok := dockerargv.OptionValue(rest, "--progress"); ok && (progress == "json" || progress == "quiet" || progress == "rawjson") {
+			return true
+		}
+		// Compose's --progress is a parent option and is not present in rest.
+		if top, ok := dockerargv.Parse(argv); ok && top.Command == "compose" {
+			if progress, ok := dockerargv.OptionValue(top.Args, "--progress"); ok && (progress == "json" || progress == "quiet" || progress == "rawjson") {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // readAll drains a possibly-nil io.Reader.

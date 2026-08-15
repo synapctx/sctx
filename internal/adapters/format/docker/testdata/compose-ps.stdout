@@ -1,0 +1,4 @@
+NAME                                   IMAGE                                                                     COMMAND                  SERVICE      CREATED         STATUS                     PORTS
+sctx-formatter-20260815-failed-1       sha256:cc6ebc51755d9fcfc750a0b71961a9c0aa8bd2d281b323a67da961e894f60ae2   "sh -c 'echo COMPOSE…"   failed       6 minutes ago   Exited (7) 6 minutes ago   
+sctx-formatter-20260815-healthy-1      sha256:cc6ebc51755d9fcfc750a0b71961a9c0aa8bd2d281b323a67da961e894f60ae2   "sh -c 'i=0; while […"   healthy      6 minutes ago   Up 6 minutes (healthy)     
+sctx-formatter-20260815-restarting-1   sha256:cc6ebc51755d9fcfc750a0b71961a9c0aa8bd2d281b323a67da961e894f60ae2   "sh -c 'echo COMPOSE…"   restarting   6 minutes ago   Exited (9) 6 minutes ago   

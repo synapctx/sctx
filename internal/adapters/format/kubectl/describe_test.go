@@ -51,37 +51,26 @@ Events:
   Normal  Started    5m    kubelet            Started container web
 `
 
-func TestAggressiveDescribe(t *testing.T) {
+func TestDescribeWithoutProvableRepetitionStaysVerbatim(t *testing.T) {
 	f := New()
 	in := format.Input{Argv: []string{"kubectl", "describe", "pod", "web-7d8f9c6b5d-abcde"}, Stdout: strings.NewReader(kubectlDescribeFixture)}
-	out, err := f.Aggressive(context.Background(), in)
+	if _, err := f.Aggressive(context.Background(), in); err != format.ErrTierInapplicable {
+		t.Fatalf("Aggressive() error = %v, want inapplicable so every resource-specific field remains native", err)
+	}
+}
+
+func TestDescribeOnlyCollapsesExactRuns(t *testing.T) {
+	raw := kubectlDescribeFixture + "Repeated diagnostic\nRepeated diagnostic\nRepeated diagnostic\n"
+	in := format.Input{Argv: []string{"kubectl", "describe", "pod", "web"}, Stdout: strings.NewReader(raw)}
+	out, err := New().Aggressive(context.Background(), in)
 	if err != nil {
-		t.Fatalf("Aggressive() error = %v", err)
+		t.Fatal(err)
 	}
 	body := string(out.Body)
-
-	for _, want := range []string{
-		"Name:             web-7d8f9c6b5d-abcde",
-		"Namespace:        default",
-		"Status:           Running",
-		"Containers:",
-		"Conditions:",
-		"Events:",
-		"Normal  Scheduled  5m    default-scheduler  Successfully assigned default/web-7d8f9c6b5d-abcde to node-1",
-		"Normal  Started    5m    kubelet            Started container web",
-	} {
+	for _, want := range []string{"Image:         nginx:1.25", "Container ID:  containerd://abc123", "Repeated diagnostic ×3"} {
 		if !strings.Contains(body, want) {
-			t.Errorf("body missing %q, got: %q", want, body)
+			t.Errorf("body missing %q", want)
 		}
-	}
-	if !strings.Contains(body, "…+") {
-		t.Errorf("body missing elision marker, got: %q", body)
-	}
-	if strings.Contains(body, "Container ID:  containerd://abc123") {
-		t.Errorf("body still contains elided container detail: %q", body)
-	}
-	if len(out.Body) >= len(kubectlDescribeFixture) {
-		t.Errorf("body not smaller than raw: %d >= %d", len(out.Body), len(kubectlDescribeFixture))
 	}
 }
 

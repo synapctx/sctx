@@ -1,0 +1,262 @@
+[
+    {
+        "Id": "45c273b9ff7ac9a7c8dc60a873952a57491638bf4dec6935447380b477cfe9d0",
+        "Created": "2026-08-15T07:54:05.661905169Z",
+        "Path": "sh",
+        "Args": [
+            "-c",
+            "i=0; while [ $i -lt 30 ]; do echo compose-repeat; i=$((i+1)); done; echo COMPOSE_UNIQUE_SENTINEL; sleep 3600"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 1381,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2026-08-15T07:54:05.734430419Z",
+            "FinishedAt": "0001-01-01T00:00:00Z",
+            "Health": {
+                "Status": "healthy",
+                "FailingStreak": 0,
+                "Log": [
+                    {
+                        "Start": "2026-08-15T08:00:34.842411501Z",
+                        "End": "2026-08-15T08:00:34.898929126Z",
+                        "ExitCode": 0,
+                        "Output": ""
+                    },
+                    {
+                        "Start": "2026-08-15T08:00:35.900361419Z",
+                        "End": "2026-08-15T08:00:35.943813085Z",
+                        "ExitCode": 0,
+                        "Output": ""
+                    },
+                    {
+                        "Start": "2026-08-15T08:00:36.948951419Z",
+                        "End": "2026-08-15T08:00:36.992211919Z",
+                        "ExitCode": 0,
+                        "Output": ""
+                    },
+                    {
+                        "Start": "2026-08-15T08:00:37.997625045Z",
+                        "End": "2026-08-15T08:00:38.047057628Z",
+                        "ExitCode": 0,
+                        "Output": ""
+                    },
+                    {
+                        "Start": "2026-08-15T08:00:39.051882545Z",
+                        "End": "2026-08-15T08:00:39.087775045Z",
+                        "ExitCode": 0,
+                        "Output": ""
+                    }
+                ]
+            }
+        },
+        "Image": "sha256:cc6ebc51755d9fcfc750a0b71961a9c0aa8bd2d281b323a67da961e894f60ae2",
+        "ResolvConfPath": "/var/lib/docker/containers/45c273b9ff7ac9a7c8dc60a873952a57491638bf4dec6935447380b477cfe9d0/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/45c273b9ff7ac9a7c8dc60a873952a57491638bf4dec6935447380b477cfe9d0/hostname",
+        "HostsPath": "/var/lib/docker/containers/45c273b9ff7ac9a7c8dc60a873952a57491638bf4dec6935447380b477cfe9d0/hosts",
+        "LogPath": "/var/lib/docker/containers/45c273b9ff7ac9a7c8dc60a873952a57491638bf4dec6935447380b477cfe9d0/45c273b9ff7ac9a7c8dc60a873952a57491638bf4dec6935447380b477cfe9d0-json.log",
+        "Name": "/sctx-formatter-20260815-healthy-1",
+        "RestartCount": 0,
+        "Driver": "overlayfs",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "sctx-formatter-20260815_default",
+            "PortBindings": {},
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": false,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "ConsoleSize": [
+                0,
+                0
+            ],
+            "CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "private",
+            "Dns": null,
+            "DnsOptions": null,
+            "DnsSearch": null,
+            "ExtraHosts": [],
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": null,
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": null,
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": null,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/acpi",
+                "/proc/asound",
+                "/proc/interrupts",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/sys/devices/virtual/powercap",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "Storage": {
+            "RootFS": {
+                "Snapshot": {
+                    "Name": "overlayfs"
+                }
+            }
+        },
+        "Mounts": [],
+        "Config": {
+            "Hostname": "45c273b9ff7a",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": true,
+            "AttachStderr": true,
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/go/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "GOLANG_VERSION=1.26.5",
+                "GOTOOLCHAIN=local",
+                "GOPATH=/go"
+            ],
+            "Cmd": [
+                "sh",
+                "-c",
+                "i=0; while [ $i -lt 30 ]; do echo compose-repeat; i=$((i+1)); done; echo COMPOSE_UNIQUE_SENTINEL; sleep 3600"
+            ],
+            "Healthcheck": {
+                "Test": [
+                    "CMD",
+                    "true"
+                ],
+                "Interval": 1000000000,
+                "Timeout": 1000000000,
+                "Retries": 2
+            },
+            "Image": "sctx-formatter-test:20260815",
+            "Volumes": null,
+            "WorkingDir": "/go",
+            "Entrypoint": null,
+            "Labels": {
+                "com.docker.compose.config-hash": "d21fef721750a6949cc6ec09c1f78d25b3ca690b27709f7fce3b4c73c2b98e6c",
+                "com.docker.compose.container-number": "1",
+                "com.docker.compose.depends_on": "",
+                "com.docker.compose.image": "sha256:cc6ebc51755d9fcfc750a0b71961a9c0aa8bd2d281b323a67da961e894f60ae2",
+                "com.docker.compose.oneoff": "False",
+                "com.docker.compose.project": "sctx-formatter-20260815",
+                "com.docker.compose.project.config_files": "/private/tmp/sctx-docker-fixtures/compose.yaml",
+                "com.docker.compose.project.working_dir": "/private/tmp/sctx-docker-fixtures",
+                "com.docker.compose.service": "healthy",
+                "com.docker.compose.version": "5.3.0",
+                "com.synapctx.sctx.formatter-test": "true"
+            }
+        },
+        "NetworkSettings": {
+            "SandboxID": "ef2cb7360654d0c324fea9517efa379f8ade95feae47d5da3b0cb1e57b4b4cd6",
+            "SandboxKey": "/var/run/docker/netns/ef2cb7360654",
+            "Ports": {},
+            "Networks": {
+                "sctx-formatter-20260815_default": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": [
+                        "sctx-formatter-20260815-healthy-1",
+                        "healthy"
+                    ],
+                    "DriverOpts": null,
+                    "GwPriority": 0,
+                    "NetworkID": "a87aa6c04e63f3d098743ad28388bae80a3a6ce968b1a9ab53a08083b3164cff",
+                    "EndpointID": "3682d36276b104aeac8f9eb95bffb25568b52a68fdd9c8c22e5b8d0250124d3c",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.4",
+                    "MacAddress": "06:ee:a3:23:6d:5f",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": [
+                        "sctx-formatter-20260815-healthy-1",
+                        "healthy",
+                        "45c273b9ff7a"
+                    ]
+                }
+            }
+        },
+        "ImageManifestDescriptor": {
+            "mediaType": "application/vnd.oci.image.manifest.v1+json",
+            "digest": "sha256:5edba8c95d83430214eed455226a360d9b5e12bb291b271cb19e3e86415713cf",
+            "size": 1615,
+            "platform": {
+                "architecture": "arm64",
+                "os": "linux"
+            }
+        }
+    }
+]

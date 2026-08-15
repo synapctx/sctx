@@ -5,6 +5,8 @@ import (
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
+	"github.com/synapctx/sctx/internal/platform/dockerargv"
+	"github.com/synapctx/sctx/internal/platform/kubectlargv"
 )
 
 // Registry resolves a wrapped command's argv to the formatter that claims
@@ -64,7 +66,6 @@ var subcommandPrograms = map[string]bool{
 // so it is not mistaken for the subcommand (e.g. `git -C path status`).
 var valueFlags = map[string]map[string]bool{
 	"git":     {"-C": true, "-c": true, "--git-dir": true, "--work-tree": true},
-	"docker":  {"--context": true, "-H": true, "--host": true},
 	"kubectl": {"--context": true, "-n": true, "--namespace": true, "--kubeconfig": true},
 }
 
@@ -78,6 +79,32 @@ func CommandKey(argv []string) string {
 	}
 	if !subcommandPrograms[program] {
 		return program
+	}
+	if program == "kubectl" {
+		inv, ok := kubectlargv.Parse(append([]string{program}, rest...))
+		if !ok {
+			return program
+		}
+		return program + " " + inv.Command
+	}
+	if program == "docker" {
+		inv, ok := dockerargv.Parse(append([]string{program}, rest...))
+		if !ok {
+			return program
+		}
+		if inv.Command == "compose" {
+			if nested, ok := dockerargv.ParseCompose(inv); ok {
+				return program + " compose " + nested.Command
+			}
+		}
+		if inv.Command == "network" || inv.Command == "volume" || inv.Command == "container" || inv.Command == "image" {
+			for _, arg := range inv.Args {
+				if !strings.HasPrefix(arg, "-") {
+					return program + " " + inv.Command + " " + arg
+				}
+			}
+		}
+		return program + " " + inv.Command
 	}
 	skipNext := false
 	for _, a := range rest {

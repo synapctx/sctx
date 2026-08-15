@@ -63,6 +63,13 @@ func TestCommandKey(t *testing.T) {
 	}{
 		{[]string{"go", "test", "./..."}, "go test"},
 		{[]string{"git", "-C", "x", "status"}, "git status"},
+		{[]string{"kubectl", "--context", "dev", "--request-timeout", "5s", "-n", "ns", "get", "pods"}, "kubectl get"},
+		{[]string{"kubectl", "--warnings-as-errors", "exec", "pod/x", "--", "go", "test"}, "kubectl exec"},
+		{[]string{"kubectl", "--unknown", "value", "get"}, "kubectl"},
+		{[]string{"docker", "-c", "desktop-linux", "ps", "-a"}, "docker ps"},
+		{[]string{"docker", "compose", "-f", "compose.yml", "ps"}, "docker compose ps"},
+		{[]string{"docker", "network", "ls"}, "docker network ls"},
+		{[]string{"docker", "--unknown", "value", "ps"}, "docker"},
 		{[]string{"grep", "-rn", "pattern"}, "grep"}, // arbitrary args stay out of the key
 		{[]string{"ls"}, "ls"},
 		{nil, ""},

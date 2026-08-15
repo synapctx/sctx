@@ -69,30 +69,32 @@ func aggressiveImages(in format.Input) (format.Rendered, error) {
 
 	names, starts := parseHeader(lines[0])
 	repoIdx, tagIdx, sizeIdx := colIndex(names, "REPOSITORY"), colIndex(names, "TAG"), colIndex(names, "SIZE")
-	if repoIdx < 0 || tagIdx < 0 || colIndex(names, "IMAGE ID") < 0 || sizeIdx < 0 {
+	imageIdx, diskIdx := colIndex(names, "IMAGE"), colIndex(names, "DISK USAGE")
+	legacy := repoIdx >= 0 && tagIdx >= 0 && sizeIdx >= 0
+	current := imageIdx >= 0 && diskIdx >= 0
+	idPresent := colIndex(names, "IMAGE ID") >= 0 || colIndex(names, "ID") >= 0
+	if !idPresent || (!legacy && !current) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
 	var out []string
-	total := 0.0
-	haveTotal := true
 	dangling := 0
 	for _, line := range lines[1:] {
 		if strings.TrimSpace(line) == "" {
 			continue
 		}
 		cols := splitColumns(line, starts)
-		repo, tag, size := cols[repoIdx], cols[tagIdx], cols[sizeIdx]
-		if repo == "<none>" {
+		ref, size := "", ""
+		if legacy {
+			ref, size = cols[repoIdx]+":"+cols[tagIdx], cols[sizeIdx]
+		} else {
+			ref, size = cols[imageIdx], cols[diskIdx]
+		}
+		if ref == "<none>" || strings.HasPrefix(ref, "<none>:") {
 			dangling++
 			continue
 		}
-		if v, ok := parseSize(size); ok {
-			total += v
-		} else {
-			haveTotal = false
-		}
-		out = append(out, fmt.Sprintf("%s:%s %s", repo, tag, size))
+		out = append(out, fmt.Sprintf("%s %s", ref, size))
 	}
 
 	count := len(out) + dangling
@@ -101,10 +103,6 @@ func aggressiveImages(in format.Input) (format.Rendered, error) {
 	}
 
 	firstLine := fmt.Sprintf("%d images", count)
-	if haveTotal && total > 0 {
-		firstLine += fmt.Sprintf(", total ≈%s", formatSize(total))
-	}
-
 	var b strings.Builder
 	b.WriteString(firstLine)
 	for _, l := range out {

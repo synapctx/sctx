@@ -1,0 +1,14 @@
+NAME                       READY   STATUS             RESTARTS      AGE
+bad-image                  0/1     ImagePullBackOff   0             24s
+crash-loop                 0/1     Error              2 (20s ago)   24s
+go-runner                  1/1     Running            0             24s
+repeater-588bf9699-2wh4k   1/1     Running            0             25s
+repeater-588bf9699-5zfmj   1/1     Running            0             25s
+repeater-588bf9699-82llw   1/1     Running            0             25s
+repeater-588bf9699-99npk   1/1     Running            0             25s
+repeater-588bf9699-k4jwf   1/1     Running            0             25s
+repeater-588bf9699-k8v4h   1/1     Running            0             25s
+repeater-588bf9699-m4sv4   1/1     Running            0             25s
+repeater-588bf9699-qp2v6   1/1     Running            0             25s
+repeater-588bf9699-wspnh   1/1     Running            0             25s
+repeater-588bf9699-xch7w   1/1     Running            0             25s

@@ -1,18 +1,19 @@
 package kubectl
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
 )
 
-// maxEventsRows caps the number of rows kept from `kubectl events` and
-// `kubectl get events`.
-const maxEventsRows = 20
+// maxNormalEventRows caps routine event rows. Warning rows are never capped:
+// they are the error signal this formatter exists to preserve.
+const maxNormalEventRows = 20
 
 // aggressiveEvents parses the events table (LAST SEEN/TYPE/REASON/OBJECT/
-// MESSAGE), promoting Warning-type rows ahead of Normal ones before
-// capping, so the most actionable events survive the cap.
+// MESSAGE), promoting every Warning-type row ahead of Normal ones and only
+// capping the Normal tail.
 func aggressiveEvents(in format.Input) (format.Rendered, error) {
 	raw := readAll(in.Stdout)
 	lines := splitLines(raw)
@@ -30,6 +31,7 @@ func aggressiveEvents(in format.Input) (format.Rendered, error) {
 	typeIdx := colIndex(names, "TYPE")
 
 	var warnings, others []string
+	reordered := false
 	for _, line := range lines[1:] {
 		if strings.TrimSpace(line) == "" {
 			continue
@@ -37,6 +39,9 @@ func aggressiveEvents(in format.Input) (format.Rendered, error) {
 		if typeIdx >= 0 {
 			cols := splitColumns(line, starts)
 			if typeIdx < len(cols) && cols[typeIdx] == "Warning" {
+				if len(others) > 0 {
+					reordered = true
+				}
 				warnings = append(warnings, line)
 				continue
 			}
@@ -47,10 +52,27 @@ func aggressiveEvents(in format.Input) (format.Rendered, error) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
-	ordered := make([]string, 0, len(warnings)+len(others))
-	ordered = append(ordered, warnings...)
-	ordered = append(ordered, others...)
-
-	body := renderCappedTable(lines[0], ordered, maxEventsRows)
-	return format.Rendered{Body: body}, nil
+	shownNormal := others
+	elidedNormal := 0
+	if len(shownNormal) > maxNormalEventRows {
+		elidedNormal = len(shownNormal) - maxNormalEventRows
+		shownNormal = shownNormal[:maxNormalEventRows]
+	}
+	if !reordered && elidedNormal == 0 {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	var b strings.Builder
+	b.WriteString(lines[0])
+	for _, line := range warnings {
+		b.WriteByte('\n')
+		b.WriteString(line)
+	}
+	for _, line := range shownNormal {
+		b.WriteByte('\n')
+		b.WriteString(line)
+	}
+	if elidedNormal > 0 {
+		fmt.Fprintf(&b, "\n…+%d Normal rows", elidedNormal)
+	}
+	return format.Rendered{Body: []byte(b.String())}, nil
 }

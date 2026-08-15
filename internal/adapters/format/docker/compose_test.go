@@ -34,6 +34,30 @@ func TestAggressiveComposePs(t *testing.T) {
 	}
 }
 
+func TestComposeV5LifecycleProgress(t *testing.T) {
+	raw := " Network demo_default Creating \n" +
+		" Network demo_default Created \n" +
+		" Container demo-api-1 Creating \n" +
+		" Container demo-api-1 Created \n" +
+		" Container demo-api-1 Starting \n" +
+		" Container demo-api-1 Started \n"
+	out, err := New().Aggressive(context.Background(), format.Input{
+		Argv: []string{"docker", "compose", "up", "-d"}, Stderr: strings.NewReader(raw),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	body := string(out.Body)
+	for _, want := range []string{"2 resources (…+4 transitions)", "Network demo_default: created", "Container demo-api-1: started"} {
+		if !strings.Contains(body, want) {
+			t.Errorf("body missing %q: %q", want, body)
+		}
+	}
+	if !out.FoldStderr {
+		t.Error("stderr progress was not folded")
+	}
+}
+
 const composeUpFixture = "[+] Running 4/4\n" +
 	" ✔ Network myapp_default        Created                                        0.1s\n" +
 	" ✔ Volume \"myapp_data\"          Created                                        0.0s\n" +

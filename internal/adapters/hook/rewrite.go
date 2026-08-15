@@ -4,7 +4,12 @@
 // their habits.
 package hook
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/synapctx/sctx/internal/platform/dockerargv"
+	"github.com/synapctx/sctx/internal/platform/kubectlargv"
+)
 
 // pipeSafeDownstream lists programs that are safe to leave downstream of a
 // wrapped segment in a pipeline: they only ever narrow/truncate the stream
@@ -119,8 +124,8 @@ var subcommandTable = map[string][]string{
 	"ls":            nil,
 	"find":          nil,
 	"tree":          nil,
-	"docker":        {"ps", "images", "logs", "compose", "build", "inspect", "stats", "network", "volume", "container", "pull", "push", "history", "top"},
-	"kubectl":       {"get", "describe", "logs", "top", "events", "rollout", "api-resources", "apply", "create", "delete", "patch", "scale", "label", "annotate"},
+	"docker":        {"ps", "images", "image", "logs", "compose", "build", "inspect", "stats", "network", "volume", "container", "pull", "push", "history", "top", "exec"},
+	"kubectl":       {"get", "describe", "logs", "top", "events", "rollout", "api-resources", "apply", "create", "delete", "patch", "scale", "label", "annotate", "exec"},
 	"gh":            {"pr", "issue", "run", "repo", "api", "release"},
 	"golangci-lint": {"run"},
 	"make":          nil,
@@ -253,16 +258,56 @@ func streamsForever(program string, args []string) bool {
 	switch program {
 	case "tail", "journalctl":
 		// No subcommand: the flag alone decides.
-	case "kubectl", "docker":
-		// Only the log-streaming verbs. `docker compose logs -f` nests one deeper.
-		sub := ""
-		for _, a := range args {
-			if !strings.HasPrefix(a, "-") {
-				sub = a
-				break
-			}
+	case "kubectl":
+		inv, ok := kubectlargv.Parse(append([]string{program}, args...))
+		if !ok {
+			return false
 		}
-		if sub != "logs" && !(program == "docker" && sub == "compose" && containsToken(args, "logs")) {
+		switch inv.Command {
+		case "logs":
+			return kubectlargv.HasFlag(inv.Args, "-f", "--follow")
+		case "get", "events":
+			return kubectlargv.HasFlag(inv.Args, "-w", "--watch", "--watch-only")
+		case "exec":
+			return kubectlargv.HasFlag(inv.Args, "-i", "--stdin", "-t", "--tty")
+		case "attach", "edit", "port-forward", "proxy":
+			return true
+		case "debug", "run":
+			return kubectlargv.HasFlag(inv.Args, "-i", "--stdin", "-t", "--tty", "--attach")
+		default:
+			return false
+		}
+	case "docker":
+		inv, ok := dockerargv.Parse(append([]string{program}, args...))
+		if !ok {
+			return false
+		}
+		if inv.Command == "logs" {
+			return dockerargv.HasFlag(inv.Args, "-f", "--follow")
+		}
+		if inv.Command == "stats" {
+			return !dockerargv.HasFlag(inv.Args, "--no-stream")
+		}
+		if inv.Command == "attach" || inv.Command == "events" {
+			return true
+		}
+		if inv.Command != "compose" {
+			return false
+		}
+		nested, ok := dockerargv.ParseCompose(inv)
+		if !ok {
+			return false
+		}
+		switch nested.Command {
+		case "logs":
+			return dockerargv.HasFlag(nested.Args, "-f", "--follow")
+		case "stats":
+			return !dockerargv.HasFlag(nested.Args, "--no-stream")
+		case "up":
+			return !dockerargv.HasFlag(nested.Args, "-d", "--detach")
+		case "attach", "events", "watch":
+			return true
+		default:
 			return false
 		}
 	default:
@@ -285,6 +330,73 @@ func containsToken(args []string, want string) bool {
 		}
 	}
 	return false
+}
+
+func kubectlExecSafe(args []string) bool {
+	separator := -1
+	for i, arg := range args {
+		if arg == "--" {
+			separator = i
+			break
+		}
+	}
+	if separator < 1 || separator+1 >= len(args) {
+		return false
+	}
+	program := args[separator+1]
+	if i := strings.LastIndexAny(program, `/\\`); i >= 0 {
+		program = program[i+1:]
+	}
+	switch program {
+	case "sh", "bash", "zsh", "fish", "dash", "ksh", "csh", "tcsh", "cmd", "cmd.exe", "powershell", "powershell.exe", "pwsh", "sctx":
+		return false
+	}
+	_, known := subcommandTable[program]
+	return known
+}
+
+func dockerInvocationSafe(argv []string) bool {
+	inv, ok := dockerargv.Parse(argv)
+	if !ok {
+		return false
+	}
+	switch inv.Command {
+	case "ps", "images", "logs", "build", "inspect", "stats", "pull", "push", "history", "top":
+		return true
+	case "network", "volume", "container", "image":
+		return len(inv.Args) > 0 && inv.Args[0] == "ls"
+	case "exec":
+		inner, ok := dockerargv.ExecCommand("exec", inv.Args)
+		return ok && hookKnowsInner(inner)
+	case "compose":
+		nested, ok := dockerargv.ParseCompose(inv)
+		if !ok {
+			return false
+		}
+		switch nested.Command {
+		case "ps", "up", "build", "logs", "down":
+			return true
+		case "exec":
+			inner, ok := dockerargv.ExecCommand("compose exec", nested.Args)
+			return ok && hookKnowsInner(inner)
+		default:
+			return false
+		}
+	default:
+		return false
+	}
+}
+
+func hookKnowsInner(argv []string) bool {
+	if len(argv) == 0 {
+		return false
+	}
+	program := argv[0]
+	if i := strings.LastIndexAny(program, `/\\`); i >= 0 {
+		program = program[i+1:]
+	}
+	_, known := subcommandTable[program]
+	return known && program != "sctx"
 }
 
 // reservedNames are sctx's own native subcommands: rewriting a bare
@@ -678,8 +790,31 @@ func matchSegment(text string) (int, bool) {
 		return 0, false
 	}
 	if len(subs) > 0 {
-		if idx+1 >= len(tokens) || !contains(subs, tokens[idx+1].text) {
-			return 0, false
+		switch program {
+		case "kubectl":
+			argv := make([]string, 0, len(tokens)-idx)
+			for _, token := range tokens[idx:] {
+				argv = append(argv, token.text)
+			}
+			inv, ok := kubectlargv.Parse(argv)
+			if !ok || !contains(subs, inv.Command) {
+				return 0, false
+			}
+			if inv.Command == "exec" && !kubectlExecSafe(inv.Args) {
+				return 0, false
+			}
+		case "docker":
+			argv := make([]string, 0, len(tokens)-idx)
+			for _, token := range tokens[idx:] {
+				argv = append(argv, token.text)
+			}
+			if !dockerInvocationSafe(argv) {
+				return 0, false
+			}
+		default:
+			if idx+1 >= len(tokens) || !contains(subs, tokens[idx+1].text) {
+				return 0, false
+			}
 		}
 	}
 

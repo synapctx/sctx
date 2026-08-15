@@ -31,20 +31,27 @@ var durationSuffixRe = regexp.MustCompile(`^[\d.]+s$`)
 // handling: Relaxed's line-level filtering already preserves ERROR/failure
 // lines verbatim.
 func aggressiveBuild(in format.Input) (format.Rendered, error) {
-	raw := readAll(in.Stdout)
+	rawOut, rawErr := readAll(in.Stdout), readAll(in.Stderr)
+	raw := append(append([]byte(nil), rawOut...), rawErr...)
 	lines := splitLines(raw)
 	if len(lines) == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
 	if steps, final, noise, ok := parseHashProgress(lines); ok {
-		return renderBuildSteps(steps, final, noise)
+		out, err := renderBuildSteps(steps, final, noise)
+		out.FoldStderr = len(rawErr) > 0
+		return out, err
 	}
 	if steps, final, noise, ok := parseArrowProgress(lines); ok {
-		return renderBuildSteps(steps, final, noise)
+		out, err := renderBuildSteps(steps, final, noise)
+		out.FoldStderr = len(rawErr) > 0
+		return out, err
 	}
 	if steps, final, noise, ok := parseLegacyProgress(lines); ok {
-		return renderBuildSteps(steps, final, noise)
+		out, err := renderBuildSteps(steps, final, noise)
+		out.FoldStderr = len(rawErr) > 0
+		return out, err
 	}
 	return format.Rendered{}, format.ErrTierInapplicable
 }
@@ -65,6 +72,9 @@ func parseHashProgress(lines []string) (steps []string, final []string, noise in
 	for _, line := range lines {
 		m := hashLineRe.FindStringSubmatch(line)
 		if m == nil {
+			if strings.TrimSpace(line) != "" {
+				final = append(final, line)
+			}
 			continue
 		}
 		ok = true
@@ -92,7 +102,9 @@ func parseHashProgress(lines []string) (steps []string, final []string, noise in
 			if si.title == "" {
 				si.title = rest
 			} else {
-				noise++
+				// Build-step output, warnings and diagnostics are not progress
+				// noise. Keep them even on a successful build.
+				final = append(final, "#"+id+" "+rest)
 			}
 		}
 	}
@@ -126,6 +138,9 @@ func parseArrowProgress(lines []string) (steps []string, final []string, noise i
 			continue
 		}
 		if !strings.HasPrefix(trimmed, "=>") {
+			if trimmed != "" && !strings.HasPrefix(trimmed, "[+] Building") {
+				final = append(final, raw)
+			}
 			continue
 		}
 		ok = true
@@ -189,7 +204,9 @@ func parseLegacyProgress(lines []string) (steps []string, final []string, noise 
 		case trimmed == "":
 			// ignore
 		default:
-			noise++
+			if trimmed != "" {
+				final = append(final, trimmed)
+			}
 		}
 	}
 	if !ok {

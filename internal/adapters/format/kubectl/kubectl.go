@@ -8,17 +8,27 @@ import (
 	"bytes"
 	"context"
 	"io"
-	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
+	"github.com/synapctx/sctx/internal/platform/kubectlargv"
 )
 
-// Formatter renders kubectl command output.
-type Formatter struct{}
+// Resolver reports which formatter handles a nested kubectl exec command.
+type Resolver func(argv []string) (format.Formatter, bool)
 
-// New constructs a kubectl Formatter.
-func New() *Formatter {
-	return &Formatter{}
+// Formatter renders kubectl command output.
+type Formatter struct {
+	resolve Resolver
+}
+
+// New constructs a kubectl Formatter. The optional resolver enables safe
+// delegation for non-interactive `kubectl exec -- COMMAND` invocations.
+func New(resolve ...Resolver) *Formatter {
+	f := &Formatter{}
+	if len(resolve) > 0 {
+		f.resolve = resolve[0]
+	}
+	return f
 }
 
 // Descriptor claims all kubectl invocations; subcommand dispatch happens
@@ -27,61 +37,24 @@ func (f *Formatter) Descriptor() format.Match {
 	return format.Match{Command: "kubectl"}
 }
 
-// kubectlGlobalFlagsWithValue are kubectl's own global options that consume
-// the next argv slot, so they must not be mistaken for the subcommand.
-var kubectlGlobalFlagsWithValue = map[string]bool{
-	"-n":           true,
-	"--namespace":  true,
-	"--context":    true,
-	"--kubeconfig": true,
-	"-o":           true,
-	"--output":     true,
-}
-
 // subcommand returns the kubectl subcommand (e.g. "get") and the arguments
 // that follow it, skipping argv[0] and any global flags (and their values).
 func subcommand(argv []string) (sub string, rest []string) {
-	if len(argv) <= 1 {
+	inv, ok := kubectlargv.Parse(argv)
+	if !ok {
 		return "", nil
 	}
-	args := argv[1:]
-	for i := 0; i < len(args); i++ {
-		a := args[i]
-		if a == "--" {
-			continue
-		}
-		if strings.HasPrefix(a, "-") {
-			// Flags of the form --key=value never consume the next slot.
-			if strings.Contains(a, "=") {
-				continue
-			}
-			if kubectlGlobalFlagsWithValue[a] {
-				i++
-			}
-			continue
-		}
-		return a, args[i+1:]
-	}
-	return "", nil
+	return inv.Command, inv.Args
 }
 
-// outputFormat scans args (argv without argv[0]) for a -o/--output value,
-// regardless of its position relative to the subcommand.
+// outputFormat scans command-local args for a -o/--output value. It stops at
+// `--`, so a nested exec command's own -o flag is never attributed to kubectl.
 func outputFormat(args []string) string {
-	for i := 0; i < len(args); i++ {
-		a := args[i]
-		switch {
-		case strings.HasPrefix(a, "-o="):
-			return strings.TrimPrefix(a, "-o=")
-		case strings.HasPrefix(a, "--output="):
-			return strings.TrimPrefix(a, "--output=")
-		case a == "-o" || a == "--output":
-			if i+1 < len(args) {
-				return args[i+1]
-			}
-		}
+	value, ok := kubectlargv.OptionValue(args, "-o", "--output")
+	if !ok {
+		return ""
 	}
-	return ""
+	return value
 }
 
 // getEventsAliases are the resource-type spellings that route `kubectl get
@@ -92,6 +65,9 @@ var getEventsAliases = map[string]bool{"events": true, "event": true, "ev": true
 // Aggressive dispatches to a per-subcommand structured renderer.
 func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Rendered, error) {
 	sub, rest := subcommand(in.Argv)
+	if sub == "exec" {
+		return f.aggressiveExec(ctx, in, rest)
+	}
 
 	// A non-zero exit almost always means an error on stderr that these
 	// structured parsers don't understand; degrade to relaxed line
@@ -99,21 +75,31 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 	if in.ExitCode != 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
+	outFmt := outputFormat(rest)
+	if outFmt == "json" {
+		return aggressiveJSON(ctx, in)
+	}
 
 	switch sub {
 	case "get":
-		outFmt := ""
-		if len(in.Argv) > 1 {
-			outFmt = outputFormat(in.Argv[1:])
-		}
 		switch outFmt {
 		case "":
+			if _, raw := kubectlargv.OptionValue(rest, "--raw"); raw {
+				return format.Rendered{}, format.ErrTierInapplicable
+			}
+			if kubectlargv.HasFlag(rest, "--no-headers") {
+				return format.Rendered{}, format.ErrTierInapplicable
+			}
 			if len(rest) > 0 && getEventsAliases[rest[0]] {
 				return aggressiveEvents(in)
 			}
+			if kubectlargv.HasFlag(rest, "--show-labels", "-L", "--label-columns") {
+				return aggressiveGetWide(in)
+			}
+			if _, sorted := kubectlargv.OptionValue(rest, "--sort-by"); sorted {
+				return aggressiveGetWide(in)
+			}
 			return aggressiveGet(in)
-		case "json":
-			return aggressiveGetJSON(ctx, in)
 		case "wide":
 			return aggressiveGetWide(in)
 		default:
@@ -126,7 +112,7 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 	case "logs":
 		return aggressiveLogs(in)
 	case "top":
-		return aggressiveTop(in)
+		return aggressiveTop(in, rest)
 	case "events":
 		return aggressiveEvents(in)
 	case "rollout":
@@ -142,6 +128,18 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 
 // Relaxed applies heuristic line-level filtering to any kubectl subcommand.
 func (f *Formatter) Relaxed(ctx context.Context, in format.Input) (format.Rendered, error) {
+	sub, rest := subcommand(in.Argv)
+	if sub == "exec" {
+		return f.relaxedExec(ctx, in, rest)
+	}
+	if outputFormat(rest) != "" {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	if sub == "get" {
+		if _, raw := kubectlargv.OptionValue(rest, "--raw"); raw {
+			return format.Rendered{}, format.ErrTierInapplicable
+		}
+	}
 	return relaxedFilter(in)
 }
 

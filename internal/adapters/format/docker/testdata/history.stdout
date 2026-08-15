@@ -1,0 +1,15 @@
+IMAGE          CREATED         CREATED BY                                      SIZE      COMMENT
+0320630d84e8   2 minutes ago   CMD ["sleep" "3600"]                            0B        buildkit.dockerfile.v0
+<missing>      2 minutes ago   RUN /bin/sh -c printf 'fixture\n' > /fixture…   8.19kB    buildkit.dockerfile.v0
+<missing>      2 minutes ago   RUN /bin/sh -c echo "BUILD_STEP_OUTPUT_SENTI…   4.1kB     buildkit.dockerfile.v0
+<missing>      2 minutes ago   LABEL com.synapctx.sctx.formatter-test=true     0B        buildkit.dockerfile.v0
+<missing>      5 weeks ago     WORKDIR /go                                     4.1kB     buildkit.dockerfile.v0
+<missing>      5 weeks ago     RUN /bin/sh -c mkdir -p "$GOPATH/src" "$GOPA…   16.4kB    buildkit.dockerfile.v0
+<missing>      5 weeks ago     COPY /target/ / # buildkit                      277MB     buildkit.dockerfile.v0
+<missing>      5 weeks ago     ENV PATH=/go/bin:/usr/local/go/bin:/usr/loca…   0B        buildkit.dockerfile.v0
+<missing>      5 weeks ago     ENV GOPATH=/go                                  0B        buildkit.dockerfile.v0
+<missing>      5 weeks ago     ENV GOTOOLCHAIN=local                           0B        buildkit.dockerfile.v0
+<missing>      5 weeks ago     ENV GOLANG_VERSION=1.26.5                       0B        buildkit.dockerfile.v0
+<missing>      5 weeks ago     RUN /bin/sh -c apk add --no-cache ca-certifi…   1.33MB    buildkit.dockerfile.v0
+<missing>      2 months ago    CMD ["/bin/sh"]                                 0B        buildkit.dockerfile.v0
+<missing>      2 months ago    ADD alpine-minirootfs-3.24.1-aarch64.tar.gz …   9.31MB    buildkit.dockerfile.v0

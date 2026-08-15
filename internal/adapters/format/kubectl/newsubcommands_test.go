@@ -77,22 +77,11 @@ cache-1    50m          80Mi
 db-1       500m         200Mi
 `
 
-func TestAggressiveTop(t *testing.T) {
+func TestAggressiveTopShortTableStaysNative(t *testing.T) {
 	f := New()
 	in := format.Input{Argv: []string{"kubectl", "top", "pods"}, Stdout: strings.NewReader(kubectlTopPodsFixture)}
-	out, err := f.Aggressive(context.Background(), in)
-	if err != nil {
-		t.Fatalf("Aggressive() error = %v", err)
-	}
-	body := string(out.Body)
-	dbIdx := strings.Index(body, "db-1")
-	apiIdx := strings.Index(body, "api-1")
-	webIdx := strings.Index(body, "web-1")
-	if dbIdx < 0 || apiIdx < 0 || webIdx < 0 {
-		t.Fatalf("body missing rows: %q", body)
-	}
-	if !(dbIdx < apiIdx && apiIdx < webIdx) {
-		t.Errorf("rows not sorted by CPU descending: %q", body)
+	if _, err := f.Aggressive(context.Background(), in); err != format.ErrTierInapplicable {
+		t.Fatalf("Aggressive() error = %v, want inapplicable", err)
 	}
 }
 
@@ -178,6 +167,13 @@ func TestAggressiveRolloutStatus(t *testing.T) {
 	}
 }
 
+func TestAggressiveRolloutStatusOneLineStaysNative(t *testing.T) {
+	in := format.Input{Argv: []string{"kubectl", "rollout", "status", "deployment/web"}, Stdout: strings.NewReader("deployment \"web\" successfully rolled out\n")}
+	if _, err := New().Aggressive(context.Background(), in); err != format.ErrTierInapplicable {
+		t.Fatalf("Aggressive() error = %v, want inapplicable", err)
+	}
+}
+
 func TestAggressiveRolloutHistory(t *testing.T) {
 	f := New()
 	var b strings.Builder
@@ -257,6 +253,62 @@ func TestAggressiveDeleteGroupsByVerb(t *testing.T) {
 	}
 	if !strings.Contains(string(out.Body), "3 deleted:") {
 		t.Errorf("body missing grouped deleted verb, got: %q", out.Body)
+	}
+}
+
+func TestAggressiveDeletePreservesNamespaceSuffix(t *testing.T) {
+	raw := "configmap \"a\" deleted from fixture namespace\nconfigmap \"b\" deleted from fixture namespace\n"
+	out, err := New().Aggressive(context.Background(), format.Input{Argv: []string{"kubectl", "delete", "configmap", "a", "b"}, Stdout: strings.NewReader(raw)})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if body := string(out.Body); !strings.Contains(body, "2 deleted from fixture namespace:") || !strings.Contains(body, "configmap \"a\"") {
+		t.Fatalf("body = %q", body)
+	}
+}
+
+func TestAggressiveResultLinesPreservesDryRunMode(t *testing.T) {
+	raw := "deployment.apps/web configured (server dry run)\nservice/web unchanged (server dry run)\ndeployment.apps/api configured (server dry run)\n"
+	in := format.Input{Argv: []string{"kubectl", "apply", "--dry-run=server", "-f", "x.yaml"}, Stdout: strings.NewReader(raw)}
+	out, err := New().Aggressive(context.Background(), in)
+	if err != nil {
+		t.Fatal(err)
+	}
+	body := string(out.Body)
+	for _, want := range []string{"2 configured (server dry run):", "1 unchanged (server dry run):", "deployment.apps/web", "service/web"} {
+		if !strings.Contains(body, want) {
+			t.Errorf("body missing %q: %q", want, body)
+		}
+	}
+}
+
+func TestEveryResultSubcommandRoutesThroughNativeVerbParser(t *testing.T) {
+	tests := []struct {
+		command string
+		line    string
+	}{
+		{"apply", "deployment.apps/x configured\n"},
+		{"create", "configmap/x created\n"},
+		{"delete", "pod/x deleted\n"},
+		{"patch", "configmap/x patched\n"},
+		{"scale", "deployment.apps/x scaled\n"},
+		{"label", "pod/x labeled\n"},
+		{"annotate", "pod/x annotated\n"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.command, func(t *testing.T) {
+			// Two lines are required for the grouped render to be smaller than
+			// native output in the real tier chain; direct routing is what this
+			// inspection test verifies.
+			raw := tc.line + tc.line
+			out, err := New().Aggressive(context.Background(), format.Input{Argv: []string{"kubectl", tc.command}, Stdout: strings.NewReader(raw)})
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !strings.Contains(string(out.Body), "2 ") {
+				t.Fatalf("body = %q", out.Body)
+			}
+		})
 	}
 }
 

@@ -1,0 +1,18 @@
+1.26-alpine: Pulling from library/golang
+d344016b160c: Pulling fs layer
+4f4fb700ef54: Pulling fs layer
+22db0ab2cdc6: Pulling fs layer
+7af76316f7ca: Pulling fs layer
+4f4fb700ef54: Already exists
+4f4fb700ef54: Pull complete
+7af76316f7ca: Download complete
+d344016b160c: Download complete
+22db0ab2cdc6: Download complete
+d344016b160c: Pull complete
+5f2b78b9fb44: Download complete
+d8d0d4b5f57c: Download complete
+7af76316f7ca: Pull complete
+22db0ab2cdc6: Pull complete
+Digest: sha256:70b46548e42db77e0966aaf3619fd068734dc6c77584d526b91126504fd95816
+Status: Downloaded newer image for golang:1.26-alpine
+docker.io/library/golang:1.26-alpine

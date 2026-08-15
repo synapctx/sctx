@@ -21,7 +21,10 @@ var resultVerbs = map[string]bool{
 	"labeled":    true,
 	"annotated":  true,
 	"pruned":     true,
+	"restarted":  true,
 }
+
+var resultSuffixes = []string{" (server dry run)", " (dry run)"}
 
 // maxResultLinesPerVerb caps the number of object names listed per result
 // verb before eliding the rest with a "…+N more" marker.
@@ -48,17 +51,39 @@ func aggressiveResultLines(in format.Input) (format.Rendered, error) {
 		if trimmed == "" {
 			continue
 		}
+		if deletedAt := strings.LastIndex(trimmed, " deleted from "); deletedAt > 0 && strings.HasSuffix(trimmed, " namespace") {
+			obj := strings.TrimSpace(trimmed[:deletedAt])
+			result := strings.TrimSpace(trimmed[deletedAt+1:])
+			if _, ok := items[result]; !ok {
+				order = append(order, result)
+			}
+			items[result] = append(items[result], obj)
+			continue
+		}
+		suffix := ""
+		for _, candidate := range resultSuffixes {
+			if strings.HasSuffix(trimmed, candidate) {
+				suffix = candidate
+				trimmed = strings.TrimSuffix(trimmed, candidate)
+				break
+			}
+		}
 		fields := strings.Fields(trimmed)
+		if len(fields) == 0 {
+			other = append(other, line)
+			continue
+		}
 		verb := fields[len(fields)-1]
 		if !resultVerbs[verb] {
 			other = append(other, line)
 			continue
 		}
 		obj := strings.TrimSpace(strings.TrimSuffix(trimmed, verb))
-		if _, ok := items[verb]; !ok {
-			order = append(order, verb)
+		result := verb + suffix
+		if _, ok := items[result]; !ok {
+			order = append(order, result)
 		}
-		items[verb] = append(items[verb], obj)
+		items[result] = append(items[result], obj)
 	}
 
 	if len(order) == 0 {

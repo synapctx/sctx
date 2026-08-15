@@ -18,7 +18,8 @@ var layerLineRe = regexp.MustCompile(`^[0-9a-f]{12}: `)
 // collapsed to a single "…+N layers" marker; the leading repository line and
 // the terminal Digest/Status/digest line are kept verbatim.
 func aggressivePullPush(in format.Input) (format.Rendered, error) {
-	raw := readAll(in.Stdout)
+	rawOut, rawErr := readAll(in.Stdout), readAll(in.Stderr)
+	raw := append(append([]byte(nil), rawOut...), rawErr...)
 	lines := splitLines(raw)
 	if len(lines) == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
@@ -48,5 +49,5 @@ func aggressivePullPush(in format.Input) (format.Rendered, error) {
 		b.WriteString("\n")
 		b.WriteString(l)
 	}
-	return format.Rendered{Body: []byte(b.String())}, nil
+	return format.Rendered{Body: []byte(b.String()), FoldStderr: len(rawErr) > 0}, nil
 }

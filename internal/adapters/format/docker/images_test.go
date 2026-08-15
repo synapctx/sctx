@@ -25,7 +25,7 @@ func TestAggressiveImages(t *testing.T) {
 			t.Fatalf("Aggressive() error = %v", err)
 		}
 		body := string(out.Body)
-		if !strings.HasPrefix(body, "4 images, total ≈") {
+		if !strings.HasPrefix(body, "4 images\n") {
 			t.Errorf("body missing summary, got: %q", body)
 		}
 		for _, want := range []string{"nginx:1.25 187MB", "postgres:16 438MB", "+2 dangling"} {
@@ -51,6 +51,20 @@ func TestAggressiveImages(t *testing.T) {
 			t.Errorf("body = %q, want %q", got, "0 images")
 		}
 	})
+}
+
+func TestAggressiveImagesDocker29(t *testing.T) {
+	raw := "IMAGE                          ID             DISK USAGE   CONTENT SIZE   EXTRA\n" +
+		"sctx-formatter-test:20260815   cc6ebc51755d        356MB         68.6MB   U\n"
+	out, err := New().Aggressive(context.Background(), format.Input{
+		Argv: []string{"docker", "images"}, Stdout: strings.NewReader(raw),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got := string(out.Body); got != "1 images\nsctx-formatter-test:20260815 356MB" {
+		t.Fatalf("body = %q", got)
+	}
 }
 
 func TestParseSizeFormatSize(t *testing.T) {

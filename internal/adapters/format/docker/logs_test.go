@@ -2,7 +2,6 @@ package docker
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"testing"
 
@@ -24,10 +23,14 @@ func TestAggressiveLogs(t *testing.T) {
 		}
 	})
 
-	t.Run("long logs keep head and tail with a marker", func(t *testing.T) {
+	t.Run("exact repeats collapse but a unique middle error remains", func(t *testing.T) {
 		var lines []string
-		for i := 0; i < 60; i++ {
-			lines = append(lines, fmt.Sprintf("2024-01-01T00:00:%02dZ line %d", i%60, i))
+		for i := 0; i < 30; i++ {
+			lines = append(lines, "steady-state")
+		}
+		lines = append(lines, "UNIQUE_ERROR_SENTINEL")
+		for i := 0; i < 30; i++ {
+			lines = append(lines, "steady-state")
 		}
 		raw := strings.Join(lines, "\n")
 		in := format.Input{Argv: []string{"docker", "logs", "web"}, Stdout: strings.NewReader(raw)}
@@ -36,14 +39,11 @@ func TestAggressiveLogs(t *testing.T) {
 			t.Fatalf("Aggressive() error = %v", err)
 		}
 		body := string(out.Body)
-		if !strings.Contains(body, "…+35 lines") {
-			t.Errorf("body missing elision marker, got: %q", body)
+		if strings.Count(body, "steady-state ×30") != 2 {
+			t.Errorf("body missing exact repeat markers, got: %q", body)
 		}
-		if !strings.Contains(body, "line 0") || !strings.Contains(body, "line 59") {
-			t.Errorf("body missing head/tail content: %q", body)
-		}
-		if strings.Contains(body, "line 30") {
-			t.Errorf("body still contains an elided middle line: %q", body)
+		if !strings.Contains(body, "UNIQUE_ERROR_SENTINEL") {
+			t.Errorf("body dropped unique middle error: %q", body)
 		}
 		if len(out.Body) >= len(raw) {
 			t.Errorf("body not smaller than raw: %d >= %d", len(out.Body), len(raw))

@@ -1,0 +1,4 @@
+CONTAINER ID   NAME                                                                             CPU %     MEM USAGE / LIMIT     MEM %     NET I/O         BLOCK I/O         PIDS
+f79c772357d9   sctx-formatter-20260815-running-with-an-intentionally-very-long-container-name   1.02%     61.12MiB / 23.43GiB   0.25%     1.59kB / 126B   79.8MB / 63.6MB   1
+e47c867f9ebc   sctx-formatter-20260815-unhealthy                                                1.14%     600KiB / 23.43GiB     0.00%     1.17kB / 126B   53.2kB / 0B       1
+45c273b9ff7a   sctx-formatter-20260815-healthy-1                                                1.00%     8.719MiB / 23.43GiB   0.04%     1.75kB / 126B   1.29MB / 62.2MB   1

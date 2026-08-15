@@ -11,7 +11,7 @@ import (
 func TestRelaxedFilter(t *testing.T) {
 	f := New()
 
-	t.Run("drops blank and separator lines, dedupes repeats", func(t *testing.T) {
+	t.Run("preserves structure and dedupes exact runs", func(t *testing.T) {
 		raw := "header\n\n---\nrepeated\nrepeated\nrepeated\nfooter\n"
 		in := format.Input{Argv: []string{"docker", "ps"}, Stdout: strings.NewReader(raw)}
 		out, err := f.Relaxed(context.Background(), in)
@@ -19,8 +19,8 @@ func TestRelaxedFilter(t *testing.T) {
 			t.Fatalf("Relaxed() error = %v", err)
 		}
 		body := string(out.Body)
-		if strings.Contains(body, "---") {
-			t.Errorf("body still contains separator: %q", body)
+		if !strings.Contains(body, "\n\n---\n") {
+			t.Errorf("body did not preserve blank/separator structure: %q", body)
 		}
 		if !strings.Contains(body, "repeated ×3") {
 			t.Errorf("body missing dedupe marker, got: %q", body)

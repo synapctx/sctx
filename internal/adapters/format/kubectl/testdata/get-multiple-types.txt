@@ -1,0 +1,5 @@
+NAME                       READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/repeater   10/10   10           10          25s
+
+NAME               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)   AGE
+service/repeater   ClusterIP   10.104.102.49   <none>        80/TCP    24s
