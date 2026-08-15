@@ -338,15 +338,6 @@ func streamsForever(program string, args []string) bool {
 	return false
 }
 
-func containsToken(args []string, want string) bool {
-	for _, a := range args {
-		if a == want {
-			return true
-		}
-	}
-	return false
-}
-
 func kubectlExecSafe(args []string) bool {
 	inner, ok := kubectlargv.ExecCommand(args)
 	return ok && hookKnowsInner(inner)

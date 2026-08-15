@@ -7,20 +7,6 @@ import (
 	"github.com/synapctx/sctx/internal/domain/format"
 )
 
-// isSeparatorLine reports whether trimmed is a pure separator line made
-// entirely of dash/equals/underscore characters.
-func isSeparatorLine(trimmed string) bool {
-	if trimmed == "" {
-		return false
-	}
-	for _, r := range trimmed {
-		if r != '-' && r != '=' && r != '_' {
-			return false
-		}
-	}
-	return true
-}
-
 // filterRelaxedLines preserves every unique line and collapses only exact
 // consecutive runs of at least three lines. Blank lines and separators are
 // part of native diagnostics and remain authoritative.
