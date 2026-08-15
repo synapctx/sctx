@@ -336,6 +336,14 @@ func TestACommandWithNoProgramTokenIsNotRecorded(t *testing.T) {
 	}
 }
 
+func TestMeasuredNoFormatterCandidateIsNotRecordedAgain(t *testing.T) {
+	for _, command := range []string{"go doc ./internal/application/run", "go -C repo doc ./pkg"} {
+		if segment, ok := gapSegment(command); ok {
+			t.Fatalf("gapSegment(%q) = %q; deliberately rejected candidate must not keep polluting ranking", command, segment)
+		}
+	}
+}
+
 // uncoveredFixtures are commands sctx does NOT cover, used by the two tests
 // below. They prove nothing the moment sctx starts covering them, and that has
 // now happened TWICE — first when `ssh` gained a formatter, then when `cargo`,

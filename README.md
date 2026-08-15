@@ -290,12 +290,19 @@ Dedicated renderers:
 `golangci-lint` &nbsp;·&nbsp; `pytest` &nbsp;·&nbsp; `ruff` &nbsp;·&nbsp;
 `mypy` &nbsp;·&nbsp; `pip` &nbsp;·&nbsp; `npm` / `pnpm` / `yarn` &nbsp;·&nbsp;
 `brew` &nbsp;·&nbsp; `mongosh` &nbsp;·&nbsp; `rsync` &nbsp;·&nbsp;
-`jq` / `curl` &nbsp;·&nbsp; `ssh`
+`ssh`
 
-Any other command is passed through exactly as produced, with one exception: if
-its output is JSON, it is compacted. That restraint is deliberate - guessing at
-the structure of an unfamiliar format is how a wrapper starts hiding things - so
-an uncovered command costs you nothing and risks nothing.
+Generic shape detection, not dedicated command parsers:
+
+`jq` / `curl` / `sqlite3` &nbsp;·&nbsp; `aws` / `gcloud` / `az` &nbsp;·&nbsp;
+`terraform` / `tofu` / `pulumi` &nbsp;·&nbsp; `helm` &nbsp;·&nbsp; `cargo` &nbsp;·&nbsp;
+`dotnet` &nbsp;·&nbsp; `mvn` / `gradle` &nbsp;·&nbsp; `composer` / `bundle` &nbsp;·&nbsp;
+`uv` / `poetry` &nbsp;·&nbsp; `tsc` / `eslint` &nbsp;·&nbsp;
+`systemctl` / `journalctl` &nbsp;·&nbsp; `df`
+
+These are wrapped so the generic formatter can compact valid JSON/NDJSON and
+collapse provably repeated lines. Unique or unrecognised output remains
+verbatim. They are reported as `(generic)`, never as dedicated coverage.
 
 `ssh` is a special case worth knowing about. Its output is whatever ran on the
 far end, so `sctx` reads the remote command from the invocation and applies that

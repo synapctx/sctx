@@ -158,6 +158,37 @@ func TestNativeJSONLinesMeasurements(t *testing.T) {
 	})
 }
 
+func TestNativeSQLiteGenericCoverage(t *testing.T) {
+	if _, err := exec.LookPath("sqlite3"); err != nil {
+		t.Skip("sqlite3 not installed")
+	}
+	query := `WITH RECURSIVE n(x) AS (VALUES(1) UNION ALL SELECT x+1 FROM n WHERE x<100) SELECT x AS seq, 'ready' AS status, printf('pod-%03d', x) AS resource FROM n;`
+	rawJSON, err := exec.Command("sqlite3", "-json", ":memory:", query).Output()
+	if err != nil {
+		t.Fatalf("native sqlite3 -json: %v", err)
+	}
+	body, tier := render(t, string(rawJSON))
+	if tier != "aggressive" {
+		t.Fatalf("sqlite3 JSON tier = %s", tier)
+	}
+	rawTokens := tokenizer.Estimate(int64(len(rawJSON)))
+	outTokens := tokenizer.Estimate(int64(len(body)))
+	if outTokens >= rawTokens {
+		t.Fatalf("sqlite3 JSON did not save tokens: %d >= %d", outTokens, rawTokens)
+	}
+	t.Logf("sqlite3 native JSON: %d -> %d estimated tokens (%.1f%% saved)", rawTokens, outTokens,
+		100*float64(rawTokens-outTokens)/float64(rawTokens))
+
+	rawDefault, err := exec.Command("sqlite3", ":memory:", query).Output()
+	if err != nil {
+		t.Fatalf("native sqlite3 default output: %v", err)
+	}
+	defaultBody, defaultTier := render(t, string(rawDefault))
+	if defaultTier != "verbatim" || defaultBody != string(rawDefault) {
+		t.Fatalf("unique schema-less rows changed: tier=%s", defaultTier)
+	}
+}
+
 func assertMeasuredJSONLinesGain(t *testing.T, command string, raw []byte) {
 	t.Helper()
 	body, tier := render(t, string(raw))

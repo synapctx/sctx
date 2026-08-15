@@ -55,8 +55,10 @@ Wrapped today: ` + "`go`" + `, ` + "`git`" + `, ` + "`grep`/`rg`" + `, ` + "`ls`
 ` + "`pytest`" + `, ` + "`ruff`" + `, ` + "`mypy`" + `, ` + "`pip`/`uv`/`poetry`" + `,
 ` + "`npm`/`pnpm`/`yarn`" + `, ` + "`cargo`" + `, ` + "`dotnet`" + `, ` + "`mvn`/`gradle`" + `,
 ` + "`composer`" + `, ` + "`bundle`" + `, ` + "`tsc`/`eslint`" + `, ` + "`brew`" + `,
-` + "`systemctl`/`journalctl`" + `, ` + "`mongosh`" + `, ` + "`rsync`" + `, ` + "`jq`/`curl`" + `,
+` + "`systemctl`/`journalctl`" + `, ` + "`mongosh`" + `, ` + "`sqlite3`" + `, ` + "`rsync`" + `, ` + "`jq`/`curl`" + `,
 ` + "`ssh`" + ` (delegates to the remote command's formatter).
+
+Generic-only: cloud/IaC/build rows and ` + "`jq`/`curl`/`sqlite3`" + `; unknown shapes stay raw.
 
 **Coverage is per (program, SUBCOMMAND)**, which is why a command you expected to
 be wrapped sometimes is not — a program is rewritten only for the subcommands it
@@ -102,10 +104,8 @@ developer's behalf without asking.
 the default organization, and which agents here have been taught. It does not
 print the covered-command list.
 
-If an eliding render prints ` + "`sctx: raw output: PATH (TTL)`" + `, local raw-output
-recovery was explicitly enabled. ` + "`PATH/stdout`" + ` and, when present,
-` + "`PATH/stderr`" + ` contain the byte-exact streams. Read them only when the
-omitted detail is needed; they expire automatically and are never telemetry.
+` + "`sctx: raw output: PATH (TTL)`" + ` points to expiring, byte-exact local
+` + "`stdout`/`stderr`" + `; read only if an omitted detail is needed.
 
 Trusted ` + "`.sctx/filters.json`" + ` rules need external digest approval.
 ` + "`sctx filters verify`" + ` is safe; never run ` + "`sctx filters trust`" + ` for the developer.

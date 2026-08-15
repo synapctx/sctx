@@ -164,9 +164,13 @@ var subcommandTable = map[string][]string{
 	// bare invocations get wrapped so that compaction can happen.
 	"jq":   nil,
 	"curl": nil,
-	"npm":  {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
-	"pnpm": {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
-	"yarn": {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
+	// sqlite3's native default/list/csv output is arbitrary query data and must
+	// remain verbatim. Wrapping still reaches the generic JSON/repeat detector
+	// for caller-requested -json output and repetitive result streams.
+	"sqlite3": nil,
+	"npm":     {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
+	"pnpm":    {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
+	"yarn":    {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
 
 	// ── Covered by the GENERIC formatter only, deliberately ──────────────────
 	//
@@ -937,6 +941,9 @@ func gapSegment(cmd string) (string, bool) {
 		if deliberatelyUnbuffered(seg.text) {
 			return "", false
 		}
+		if deliberatelyNoFormatter(seg.text) {
+			return "", false
+		}
 		if _, covered := matchSegment(seg.text); covered {
 			return "", false
 		}
@@ -944,6 +951,35 @@ func gapSegment(cmd string) (string, bool) {
 	}
 
 	return "", false
+}
+
+// deliberatelyNoFormatter removes measured, consciously rejected candidates
+// from the gap ranking. `go doc` output is the documentation/API index the
+// caller requested; `-all` is explicitly exhaustive, so a formatter would save
+// tokens primarily by deleting the answer rather than compressing noise.
+func deliberatelyNoFormatter(text string) bool {
+	tokens := tokenize(text)
+	idx := 0
+	for idx < len(tokens) && isAssignment(tokens[idx].text) {
+		idx++
+	}
+	if idx >= len(tokens) || filepathBase(shellTokenValue(tokens[idx].text)) != "go" {
+		return false
+	}
+	idx++
+	for idx < len(tokens) {
+		arg := shellTokenValue(tokens[idx].text)
+		if arg == "-C" {
+			idx += 2
+			continue
+		}
+		if strings.HasPrefix(arg, "-C=") {
+			idx++
+			continue
+		}
+		return arg == "doc"
+	}
+	return false
 }
 
 // deliberatelyUnbuffered distinguishes intentional safety exclusions from
