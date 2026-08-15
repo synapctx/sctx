@@ -14,6 +14,7 @@ type RenderResult struct {
 	Body       []byte
 	Tier       format.Tier
 	FoldStderr bool
+	Elided     bool
 	Note       string
 	Anomaly    string
 }
@@ -80,6 +81,7 @@ func renderChain(ctx context.Context, f format.Formatter, in format.Input, raw, 
 			Body:       ensureTrailingNewline(rendered.Body),
 			Tier:       t.tier,
 			FoldStderr: rendered.FoldStderr,
+			Elided:     rendered.Elided,
 			Note:       rendered.Note,
 			Anomaly:    anomaly,
 		}

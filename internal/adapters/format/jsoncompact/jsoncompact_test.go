@@ -50,6 +50,9 @@ func TestFormatter_Relaxed(t *testing.T) {
 		if strings.Contains(string(out.Body), "\n") {
 			t.Fatalf("Relaxed() body still contains whitespace: %s", out.Body)
 		}
+		if out.Elided {
+			t.Fatal("lossless whitespace compaction reported content elision")
+		}
 	})
 
 	t.Run("already-compact JSON is inapplicable", func(t *testing.T) {
@@ -99,6 +102,20 @@ func TestFormatter_Aggressive(t *testing.T) {
 		}
 		if len(out.Body) >= len(raw) {
 			t.Fatalf("Aggressive() body (%d bytes) not smaller than raw (%d bytes)", len(out.Body), len(raw))
+		}
+		if !out.Elided {
+			t.Fatal("long-string truncation did not report content elision")
+		}
+	})
+
+	t.Run("aggressive whitespace-only reduction is lossless", func(t *testing.T) {
+		raw := "{\n  \"alpha\": 1,\n  \"beta\": 2\n}\n"
+		out, err := New().Aggressive(context.Background(), input(raw))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if out.Elided {
+			t.Fatal("unchanged JSON values reported content elision")
 		}
 	})
 

@@ -9,13 +9,15 @@ package config
 
 import (
 	"fmt"
-	"github.com/synapctx/sctx/internal/domain/telemetry"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 
 	env "github.com/cloudresty/go-env"
+
+	"github.com/synapctx/sctx/internal/domain/telemetry"
 )
 
 // defaultLocalEndpoint is where telemetry goes before `sctx init` has written a
@@ -83,9 +85,15 @@ type Config struct {
 	TelemetryExplicit bool
 	ForceTier         string // aggressive | relaxed | verbatim | off | ""
 	MaxOutputBytes    int64
-	StatsDBPath       string
-	SpoolDir          string
-	ConfigFilePath    string
+	// RawCache is deliberately opt-in: persisting command output beyond process
+	// exit changes the privacy posture even when files are local and owner-only.
+	RawCacheEnabled  bool
+	RawCacheDir      string
+	RawCacheTTL      time.Duration
+	RawCacheMaxBytes int64
+	StatsDBPath      string
+	SpoolDir         string
+	ConfigFilePath   string
 }
 
 // TokenForOrg returns the API key to deliver an event attributed to org
@@ -145,6 +153,8 @@ func Load() (Config, error) {
 		OrgTokens:              fv.orgTokens,
 		DefaultOrg:             env.Get("SCT__TELEMETRY_DEFAULT_ORG", fv.defaultOrg),
 		ForceTier:              env.Get("SCT__FORCE_TIER", ""),
+		RawCacheEnabled:        env.Get("SCT__RAW_CACHE_ENABLED", "false") == "true",
+		RawCacheDir:            env.Get("SCT__RAW_CACHE_DIR", filepath.Join(base, "raw")),
 		StatsDBPath:            env.Get("SCT__STATS_DB_PATH", filepath.Join(base, "stats.db")),
 		SpoolDir:               env.Get("SCT__SPOOL_DIR", filepath.Join(base, "spool")),
 		ConfigFilePath:         configPath,
@@ -179,6 +189,16 @@ func Load() (Config, error) {
 	cfg.MaxOutputBytes, err = strconv.ParseInt(raw, 10, 64)
 	if err != nil {
 		return Config{}, fmt.Errorf("parsing SCT__MAX_OUTPUT_BYTES: %w", err)
+	}
+	rawCacheTTL := env.Get("SCT__RAW_CACHE_TTL", "24h")
+	cfg.RawCacheTTL, err = time.ParseDuration(rawCacheTTL)
+	if err != nil || cfg.RawCacheTTL <= 0 {
+		return Config{}, fmt.Errorf("parsing SCT__RAW_CACHE_TTL: %q must be a positive duration", rawCacheTTL)
+	}
+	rawCacheMax := env.Get("SCT__RAW_CACHE_MAX_BYTES", "67108864")
+	cfg.RawCacheMaxBytes, err = strconv.ParseInt(rawCacheMax, 10, 64)
+	if err != nil || cfg.RawCacheMaxBytes <= 0 {
+		return Config{}, fmt.Errorf("parsing SCT__RAW_CACHE_MAX_BYTES: %q must be a positive integer", rawCacheMax)
 	}
 
 	return cfg, nil

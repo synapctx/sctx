@@ -124,3 +124,19 @@ func TestRenderChain(t *testing.T) {
 		})
 	}
 }
+
+func TestRenderChainPreservesElisionSignal(t *testing.T) {
+	raw := []byte("one\ntwo\nthree\n")
+	f := &fakeFormatter{
+		aggressive: func(format.Input) (format.Rendered, error) {
+			return format.Rendered{Body: []byte("summary"), Elided: true}, nil
+		},
+		relaxed: func(format.Input) (format.Rendered, error) {
+			return format.Rendered{}, format.ErrTierInapplicable
+		},
+	}
+	result := renderChain(context.Background(), f, format.Input{}, raw, nil, "")
+	if !result.Elided {
+		t.Fatal("tier chain dropped formatter elision signal")
+	}
+}

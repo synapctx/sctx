@@ -61,6 +61,7 @@ import (
 	"github.com/synapctx/sctx/internal/platform/agentsetup"
 	"github.com/synapctx/sctx/internal/platform/config"
 	"github.com/synapctx/sctx/internal/platform/gitrepo"
+	"github.com/synapctx/sctx/internal/platform/rawcache"
 )
 
 var version = "dev" // set via -ldflags at release time
@@ -186,10 +187,15 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string) int {
 		emitter = spooler
 	}
 
+	var recovery *rawcache.Cache
+	if cfg.RawCacheEnabled {
+		recovery = rawcache.New(cfg.RawCacheDir, cfg.RawCacheTTL, cfg.RawCacheMaxBytes)
+	}
+
 	svc := run.NewService(registry, osproc.NewRunner(cfg.MaxOutputBytes),
 		statsStore, emitter, generic.New(),
 		os.Stdout, os.Stderr,
-		run.Options{Version: version, ForceTier: cfg.ForceTier})
+		run.Options{Version: version, ForceTier: cfg.ForceTier, RawCache: recovery})
 
 	code, err := svc.Execute(ctx, argv)
 	if err != nil {
@@ -604,6 +610,11 @@ func runDoctor(cfg config.Config) int {
 	fmt.Printf("sctx %s\n", version)
 	fmt.Printf("stats db:       %s\n", cfg.StatsDBPath)
 	fmt.Printf("spool dir:      %s\n", cfg.SpoolDir)
+	if cfg.RawCacheEnabled {
+		fmt.Printf("raw recovery:   enabled (%s, %s, max %d bytes)\n", cfg.RawCacheDir, cfg.RawCacheTTL, cfg.RawCacheMaxBytes)
+	} else {
+		fmt.Println("raw recovery:   disabled (opt in with SCT__RAW_CACHE_ENABLED=true)")
+	}
 	fmt.Printf("config file:    %s\n", cfg.ConfigFilePath)
 	fmt.Printf("telemetry:      enabled=%t mode=%s\n", cfg.TelemetryEnabled, telemetryMode(cfg))
 	fmt.Printf("endpoint:       %s\n", cfg.TelemetryEndpoint)

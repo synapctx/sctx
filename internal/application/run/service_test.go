@@ -3,12 +3,18 @@ package run
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"io"
+	"os"
+	"path/filepath"
+	"strings"
 	"testing"
+	"time"
 
 	domexec "github.com/synapctx/sctx/internal/domain/exec"
 	"github.com/synapctx/sctx/internal/domain/format"
 	"github.com/synapctx/sctx/internal/domain/telemetry"
+	"github.com/synapctx/sctx/internal/platform/rawcache"
 )
 
 // spillString is a minimal domexec.Spill backed by an in-memory string.
@@ -23,6 +29,71 @@ type fakeRunner struct {
 	stdout   string
 	stderr   string
 	exitCode int
+}
+
+func TestExecuteRawRecoveryIsLocalAndOnlyForElision(t *testing.T) {
+	const secretRaw = "first\nsecret-sentinel\nlast\n"
+	newService := func(t *testing.T, elided bool) (*Service, *bytes.Buffer, *fakeEmitter, string) {
+		t.Helper()
+		registry := NewRegistry()
+		registry.Register(&fakeFormatter{
+			match: format.Match{Command: "tool"},
+			aggressive: func(format.Input) (format.Rendered, error) {
+				return format.Rendered{Body: []byte("summary"), Elided: elided}, nil
+			},
+			relaxed: func(format.Input) (format.Rendered, error) {
+				return format.Rendered{}, format.ErrTierInapplicable
+			},
+		})
+		root := filepath.Join(t.TempDir(), "raw")
+		stderr := &bytes.Buffer{}
+		emitter := &fakeEmitter{}
+		svc := NewService(registry, fakeRunner{stdout: secretRaw}, nil, emitter, nil,
+			&bytes.Buffer{}, stderr, Options{
+				Version:  "v",
+				RawCache: rawcache.New(root, time.Hour, 1024),
+			})
+		return svc, stderr, emitter, root
+	}
+
+	t.Run("elided output is recoverable", func(t *testing.T) {
+		svc, stderr, emitter, root := newService(t, true)
+		if _, err := svc.Execute(context.Background(), []string{"tool"}); err != nil {
+			t.Fatal(err)
+		}
+		entries, err := os.ReadDir(root)
+		if err != nil || len(entries) != 1 {
+			t.Fatalf("cache entries = %d, %v", len(entries), err)
+		}
+		path := filepath.Join(root, entries[0].Name(), "stdout")
+		got, err := os.ReadFile(path)
+		if err != nil || string(got) != secretRaw {
+			t.Fatalf("cached stdout = %q, %v", got, err)
+		}
+		if !strings.Contains(stderr.String(), filepath.Dir(path)) {
+			t.Fatalf("recovery hint = %q", stderr.String())
+		}
+		payload, err := json.Marshal(emitter.events)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if bytes.Contains(payload, []byte("secret-sentinel")) || bytes.Contains(payload, []byte(root)) {
+			t.Fatalf("telemetry contains raw output or recovery path: %s", payload)
+		}
+	})
+
+	t.Run("lossless render creates no cache or hint", func(t *testing.T) {
+		svc, stderr, _, root := newService(t, false)
+		if _, err := svc.Execute(context.Background(), []string{"tool"}); err != nil {
+			t.Fatal(err)
+		}
+		if stderr.Len() != 0 {
+			t.Fatalf("unexpected recovery hint: %q", stderr.String())
+		}
+		if _, err := os.Stat(root); !os.IsNotExist(err) {
+			t.Fatalf("lossless render created cache: %v", err)
+		}
+	})
 }
 
 func (r fakeRunner) Run(_ context.Context, _ domexec.Command) (domexec.Outcome, error) {

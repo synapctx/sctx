@@ -39,5 +39,5 @@ func (f *formatter) Relaxed(_ context.Context, in format.Input) (format.Rendered
 	if body == "" {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
-	return format.Rendered{Body: []byte(body)}, nil
+	return format.Rendered{Body: []byte(body), Elided: true}, nil
 }

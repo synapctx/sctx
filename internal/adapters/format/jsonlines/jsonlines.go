@@ -93,7 +93,8 @@ func Render(raw []byte) (format.Rendered, bool) {
 		return format.Rendered{}, false
 	}
 	return format.Rendered{
-		Body: body,
-		Note: fmt.Sprintf("jsonl: kept %d of %d records", keep, len(jsonRecords)),
+		Body:   body,
+		Note:   fmt.Sprintf("jsonl: kept %d of %d records", keep, len(jsonRecords)),
+		Elided: len(jsonRecords) > keep,
 	}, true
 }

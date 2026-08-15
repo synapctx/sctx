@@ -437,6 +437,10 @@ single warning and is ignored - configuration problems cannot break a command.
 | `SCT__FORCE_TIER` | *(unset)* | pin the compression level: `aggressive`, `relaxed`, `verbatim`, `off` |
 | `SCT__TELEMETRY_ENABLED` | *(unset)* | force sharing on or off, overriding the saved answer |
 | `SCT__MAX_OUTPUT_BYTES` | `8388608` | output above this size is buffered to disk rather than memory |
+| `SCT__RAW_CACHE_ENABLED` | `false` | retain byte-exact raw output locally when a formatter explicitly omits content |
+| `SCT__RAW_CACHE_DIR` | `~/.config/sctx/raw` | owner-only recovery cache directory |
+| `SCT__RAW_CACHE_TTL` | `24h` | maximum lifetime of a recovery entry |
+| `SCT__RAW_CACHE_MAX_BYTES` | `67108864` | total recovery-cache size limit; oldest entries are removed first |
 | `SCT__STATS_DB_PATH` | `~/.config/sctx/stats.db` | local savings ledger |
 | `SCT__SPOOL_DIR` | `~/.config/sctx/spool` | queue for usage events awaiting delivery |
 | `SCT__TELEMETRY_ENDPOINT` | `http://127.0.0.1:6221/v1/telemetry/exec` | usage-event destination; `sctx init` sets this to `https://sctx.synapctx.com/v1/telemetry/exec` |
@@ -450,6 +454,12 @@ single warning and is ignored - configuration problems cannot break a command.
 &nbsp;
 
 ## Privacy
+
+Raw-output recovery is off by default because retaining command output after
+the process exits changes the local privacy posture. When explicitly enabled,
+sctx writes only genuinely elided runs to an owner-only local directory, prints
+the recovery path, expires entries after the configured TTL, and bounds total
+disk use. Raw bytes and recovery paths are never added to telemetry.
 
 Without an API key, nothing leaves the machine. The default destination is a
 loopback address, and delivery without a key is refused rather than attempted.

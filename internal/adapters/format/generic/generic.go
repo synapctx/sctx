@@ -125,7 +125,7 @@ func (f *Formatter) Relaxed(ctx context.Context, in format.Input) (format.Render
 	if body == "" {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
-	return format.Rendered{Body: []byte(body)}, nil
+	return format.Rendered{Body: []byte(body), Elided: true}, nil
 }
 
 func readAll(r io.Reader) ([]byte, error) {

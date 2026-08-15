@@ -7,6 +7,7 @@ package run
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -22,12 +23,14 @@ import (
 	"github.com/synapctx/sctx/internal/domain/stats"
 	"github.com/synapctx/sctx/internal/domain/telemetry"
 	"github.com/synapctx/sctx/internal/platform/gitrepo"
+	"github.com/synapctx/sctx/internal/platform/rawcache"
 	"github.com/synapctx/sctx/internal/platform/tokenizer"
 )
 
 type Options struct {
 	Version   string
 	ForceTier string
+	RawCache  *rawcache.Cache
 }
 
 type Service struct {
@@ -122,6 +125,14 @@ func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
 			return outcome.ExitCode, err
 		}
 		emittedStderr = len(rawStderr)
+	}
+	if result.Elided && s.opts.RawCache != nil {
+		if entry, err := s.opts.RawCache.Store(raw, rawStderr); err == nil {
+			hint := fmt.Sprintf("sctx: raw output: %s (%s)\n", entry.Path, s.opts.RawCache.TTL)
+			if n, err := s.stderr.Write([]byte(hint)); err == nil {
+				emittedStderr += n
+			}
+		}
 	}
 
 	s.account(ctx, argv, formatter, formatterMatched, outcome, result, int64(len(raw)+len(rawStderr)), int64(len(result.Body)+emittedStderr))

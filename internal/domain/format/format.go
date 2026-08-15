@@ -51,6 +51,10 @@ type Rendered struct {
 	// FoldStderr indicates the formatter absorbed stderr into Body, so the
 	// pipeline must not re-emit raw stderr.
 	FoldStderr bool
+	// Elided reports that content, rather than merely insignificant formatting,
+	// was omitted. It opts the render into local raw-output recovery when that
+	// privacy-sensitive feature is enabled.
+	Elided bool
 }
 
 // Match declares which commands a formatter claims. Command is matched on

@@ -102,6 +102,11 @@ developer's behalf without asking.
 the default organization, and which agents here have been taught. It does not
 print the covered-command list.
 
+If an eliding render prints ` + "`sctx: raw output: PATH (TTL)`" + `, local raw-output
+recovery was explicitly enabled. ` + "`PATH/stdout`" + ` and, when present,
+` + "`PATH/stderr`" + ` contain the byte-exact streams. Read them only when the
+omitted detail is needed; they expire automatically and are never telemetry.
+
 ## Reporting
 
 ` + "`sctx gain`" + ` shows tokens saved (` + "`--project`" + `, ` + "`--since 7d`" + `,

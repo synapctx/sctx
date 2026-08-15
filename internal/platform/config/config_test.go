@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 )
 
 // withHome points $HOME at a fresh temp dir for the duration of the test so
@@ -23,6 +24,7 @@ func clearTelemetryEnv(t *testing.T) {
 	t.Helper()
 	for _, k := range []string{
 		"SCT__TELEMETRY_ENDPOINT", "SCT__TELEMETRY_TOKEN", "SCT__TELEMETRY_ENABLED",
+		"SCT__RAW_CACHE_ENABLED", "SCT__RAW_CACHE_DIR", "SCT__RAW_CACHE_TTL", "SCT__RAW_CACHE_MAX_BYTES",
 	} {
 		t.Setenv(k, "")
 		os.Unsetenv(k)
@@ -94,6 +96,32 @@ func TestLoadPrecedence(t *testing.T) {
 				t.Errorf("ConfigFilePath = %q, want %q", cfg.ConfigFilePath, wantConfigPath)
 			}
 		})
+	}
+}
+
+func TestRawCacheIsOptInAndBoundedByConfiguration(t *testing.T) {
+	home := withHome(t)
+	clearTelemetryEnv(t)
+	cfg, err := Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.RawCacheEnabled {
+		t.Fatal("raw cache must default off")
+	}
+	if cfg.RawCacheDir != filepath.Join(home, ".config", "sctx", "raw") || cfg.RawCacheTTL != 24*time.Hour || cfg.RawCacheMaxBytes != 64*1024*1024 {
+		t.Fatalf("unexpected defaults: dir=%q ttl=%v max=%d", cfg.RawCacheDir, cfg.RawCacheTTL, cfg.RawCacheMaxBytes)
+	}
+
+	t.Setenv("SCT__RAW_CACHE_ENABLED", "true")
+	t.Setenv("SCT__RAW_CACHE_TTL", "30m")
+	t.Setenv("SCT__RAW_CACHE_MAX_BYTES", "4096")
+	cfg, err = Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !cfg.RawCacheEnabled || cfg.RawCacheTTL != 30*time.Minute || cfg.RawCacheMaxBytes != 4096 {
+		t.Fatalf("env raw cache settings not applied: %+v", cfg)
 	}
 }
 

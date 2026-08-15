@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"reflect"
 
 	"github.com/synapctx/sctx/internal/domain/format"
 )
@@ -79,8 +80,9 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 	}
 
 	return format.Rendered{
-		Body: body,
-		Note: fmt.Sprintf("%s json → %s", humanBytes(len(raw)), humanBytes(len(body))),
+		Body:   body,
+		Note:   fmt.Sprintf("%s json → %s", humanBytes(len(raw)), humanBytes(len(body))),
+		Elided: !reflect.DeepEqual(doc, elided),
 	}, nil
 }
 
