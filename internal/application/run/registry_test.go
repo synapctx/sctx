@@ -2,6 +2,7 @@ package run
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/synapctx/sctx/internal/domain/format"
@@ -53,6 +54,52 @@ func TestResolveByArgv(t *testing.T) {
 				t.Fatalf("formatter = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestProjectFormatterCannotShadowBuiltinWithoutExplicitOverride(t *testing.T) {
+	r := NewRegistry()
+	builtin := &stubFormatter{match: format.Match{Command: "make"}}
+	local := &stubFormatter{match: format.Match{Command: "make", Subcommands: []string{"lint"}}}
+	r.Register(builtin)
+	r.RegisterProject(local, false)
+	if got, _ := r.ResolveByArgv([]string{"make", "lint"}); got != builtin {
+		t.Fatal("unprivileged project formatter shadowed built-in")
+	}
+
+	r = NewRegistry()
+	r.Register(builtin)
+	r.RegisterProject(local, true)
+	if got, _ := r.ResolveByArgv([]string{"make", "lint"}); got != local {
+		t.Fatal("explicit trusted override did not select project formatter")
+	}
+}
+
+type exactProjectFormatter struct {
+	*stubFormatter
+	want []string
+}
+
+func (f *exactProjectFormatter) MatchesArgv(argv []string) bool {
+	return strings.Join(argv, "\x00") == strings.Join(f.want, "\x00")
+}
+func (f *exactProjectFormatter) MatchSpecificity() int { return len(f.want) - 1 }
+
+func TestProjectFormatterUsesExactArgvMatcherIncludingFlags(t *testing.T) {
+	r := NewRegistry()
+	local := &exactProjectFormatter{
+		stubFormatter: &stubFormatter{match: format.Match{Command: "check"}},
+		want:          []string{"./scripts/check", "--ci"},
+	}
+	r.RegisterProject(local, false)
+	if got, found := r.ResolveByArgv([]string{"./scripts/check", "--ci"}); !found || got != local {
+		t.Fatal("exact project argv did not resolve")
+	}
+	if _, found := r.ResolveByArgv([]string{"./scripts/check", "--local"}); found {
+		t.Fatal("non-matching project argv resolved")
+	}
+	if _, found := r.ResolveBuiltInByArgv([]string{"./scripts/check", "--ci"}); found {
+		t.Fatal("project formatter leaked into nested built-in resolver")
 	}
 }
 

@@ -45,6 +45,7 @@ import (
 	"github.com/synapctx/sctx/internal/adapters/format/mypy"
 	npmfmt "github.com/synapctx/sctx/internal/adapters/format/npm"
 	pipfmt "github.com/synapctx/sctx/internal/adapters/format/pip"
+	"github.com/synapctx/sctx/internal/adapters/format/projectfilter"
 	"github.com/synapctx/sctx/internal/adapters/format/psproc"
 	"github.com/synapctx/sctx/internal/adapters/format/pytest"
 	"github.com/synapctx/sctx/internal/adapters/format/read"
@@ -100,6 +101,8 @@ func realMain(args []string) int {
 		return 0
 	case "gain":
 		return runGain(ctx, cfg, args[1:])
+	case "filters":
+		return runFilters(args[1:])
 	case "flush":
 		return runFlush(ctx, cfg)
 	case "init":
@@ -132,8 +135,8 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string) int {
 	registry := run.NewRegistry()
 	registry.Register(gotest.New())
 	registry.Register(gitfmt.New())
-	registry.Register(dockerfmt.New(registry.ResolveByArgv))
-	registry.Register(kubectlfmt.New(registry.ResolveByArgv))
+	registry.Register(dockerfmt.New(registry.ResolveBuiltInByArgv))
+	registry.Register(kubectlfmt.New(registry.ResolveBuiltInByArgv))
 	registry.Register(ghfmt.New())
 	registry.Register(golangcilint.New())
 	registry.Register(makefmt.New())
@@ -147,11 +150,12 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string) int {
 	registry.Register(du.New())
 	registry.Register(rsync.New())
 	// ssh delegates to the REMOTE command's formatter, so it needs to look formatters up.
-	// Registered last and given registry.ResolveByArgv as a method value: the resolver is
-	// bound to the registry that is being populated, so it sees every formatter regardless
-	// of registration order. The adapter declares the function type itself rather than
+	// Registered last and given the built-in-only resolver as a method value: the resolver is
+	// bound to the registry that is being populated, so it sees every built-in formatter
+	// regardless of registration order without applying checkout-local trust to a remote
+	// host. The adapter declares the function type itself rather than
 	// importing the application package, keeping the dependency pointing inwards.
-	registry.Register(ssh.New(registry.ResolveByArgv))
+	registry.Register(ssh.New(registry.ResolveBuiltInByArgv))
 	for _, f := range pipfmt.All() {
 		registry.Register(f)
 	}
@@ -167,6 +171,7 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string) int {
 	for _, f := range read.All() {
 		registry.Register(f)
 	}
+	registerProjectFilters(registry)
 
 	// Stats and telemetry are auxiliary: a failure disables them with a
 	// warning, never the wrapped command. Assignment into the interface
@@ -210,6 +215,28 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string) int {
 		_ = spooler.AutoFlush(ctx)
 	}
 	return code
+}
+
+func registerProjectFilters(registry *run.Registry) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return
+	}
+	trustPath, err := projectfilter.DefaultTrustPath()
+	if err != nil {
+		return
+	}
+	loaded, trusted, err := projectfilter.LoadTrustedFrom(wd, trustPath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "sctx: project filters disabled: %v\n", err)
+		return
+	}
+	if !trusted {
+		return
+	}
+	for _, formatter := range loaded.Formatters() {
+		registry.RegisterProject(formatter, formatter.OverrideBuiltin())
+	}
 }
 
 const gainUsage = `usage: sctx gain [--project|-p] [--since <dur>] [--failures|-F] [--format text|json]`
@@ -727,6 +754,9 @@ Usage:
                               being sent. Off until you say otherwise.
     --preview                   print the events queued on THIS machine, verbatim
     --enable / --disable        record your decision
+  sctx filters verify        validate .sctx/filters.json and all inline fixtures
+  sctx filters status        show its digest and content-bound trust state
+  sctx filters trust --yes   approve that exact digest for this checkout
   sctx doctor                show effective configuration
   sctx version               show version
 

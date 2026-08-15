@@ -341,11 +341,50 @@ enforced by tests rather than convention.
 | `sctx init` | connect this installation to a SynapCTX account |
 | `sctx watch` | keep uncommitted code visible to your agent (requires an account) |
 | `sctx telemetry` | inspect or change what is shared |
+| `sctx filters verify` | validate project-local filters and their inline fixtures |
+| `sctx filters trust --yes` | approve the exact current project-filter digest |
 | `sctx flush` | send any queued usage events now |
 | `sctx version` | print the version |
 
 `sctx gain` accepts `--project` to scope to the current repository, `--since`
 for a time window, and `--format json` for machine-readable output.
+
+### Trusted project-local filters
+
+Internal CLIs and project-specific `make` targets can declare conservative
+line filters in `.sctx/filters.json`. The format cannot run shell commands or
+regular expressions: it supports exact argv prefixes, exact/prefix line
+removal, and repeated-line collapsing. Failed commands always remain verbatim,
+and every removed line is represented by an exact count.
+
+```json
+{
+  "version": 1,
+  "filters": [{
+    "id": "make-lint",
+    "command": "make",
+    "args_prefix": ["lint"],
+    "finite": true,
+    "override_builtin": true,
+    "drop_line_prefixes": ["checking cached module "],
+    "collapse_repeats": true,
+    "fixtures": [{
+      "name": "native successful lint",
+      "stdout": "checking cached module a\nchecking cached module b\nchecking cached module c\nchecking cached module d\nchecking cached module e\nchecking cached module f\nchecking cached module g\nchecking cached module h\nlint passed\n",
+      "applied": true,
+      "expected_stdout": "lint passed\n…+8 lines filtered by project rule make-lint"
+    }]
+  }]
+}
+```
+
+Run `sctx filters verify`, inspect the file and its fixture results, then run
+`sctx filters trust --yes`. Trust is stored outside the repository and bound to
+both the checkout path and SHA-256 digest. Any edit disables the filters until
+the new content is explicitly approved. Built-in formatters remain
+authoritative unless a trusted rule sets `override_builtin`. Every rule must
+also assert `finite: true`; streaming/watch/server commands must never be
+buffered behind a project filter.
 
 &nbsp;
 

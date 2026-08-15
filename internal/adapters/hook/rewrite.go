@@ -7,6 +7,7 @@ package hook
 import (
 	"strings"
 
+	"github.com/synapctx/sctx/internal/adapters/format/projectfilter"
 	"github.com/synapctx/sctx/internal/platform/dockerargv"
 	"github.com/synapctx/sctx/internal/platform/ghargv"
 	"github.com/synapctx/sctx/internal/platform/gitargv"
@@ -674,6 +675,10 @@ func Rewrite(cmd string) (string, bool) {
 // every other byte of cmd untouched. `cd sub && go test ./...` and
 // `go test ./... 2>&1 | tail -50` both rewrite; anything ambiguous declines.
 func rewrite(cmd string) (string, bool) {
+	return rewriteWithProject(cmd, "", nil)
+}
+
+func rewriteWithProject(cmd, root string, matchers []projectfilter.Matcher) (string, bool) {
 	segs, ok := splitSegments(cmd)
 	if !ok || len(segs) == 0 {
 		return cmd, false
@@ -706,6 +711,9 @@ func rewrite(cmd string) (string, bool) {
 		}
 		off, ok := matchSegment(seg.text)
 		if !ok {
+			off, ok = matchProjectSegment(seg.text, root, matchers)
+		}
+		if !ok {
 			continue
 		}
 		positions = append(positions, seg.start+off)
@@ -719,6 +727,41 @@ func rewrite(cmd string) (string, bool) {
 		out = out[:pos] + "sctx " + out[pos:]
 	}
 	return out, true
+}
+
+func matchProjectSegment(text, root string, matchers []projectfilter.Matcher) (int, bool) {
+	if root == "" || len(matchers) == 0 {
+		return 0, false
+	}
+	tokens := tokenize(text)
+	idx := 0
+	for idx < len(tokens) && isAssignment(tokens[idx].text) {
+		idx++
+	}
+	if idx >= len(tokens) {
+		return 0, false
+	}
+	program := shellTokenValue(tokens[idx].text)
+	if reservedNames[filepathBase(program)] || alreadyWrapped(program) {
+		return 0, false
+	}
+	argv := []string{program}
+	for _, token := range tokens[idx+1:] {
+		argv = append(argv, shellTokenValue(token.text))
+	}
+	for _, matcher := range matchers {
+		if matcher.Matches(root, argv) {
+			return tokens[idx].offset, true
+		}
+	}
+	return 0, false
+}
+
+func filepathBase(path string) string {
+	if i := strings.LastIndexAny(path, `/\`); i >= 0 {
+		return path[i+1:]
+	}
+	return path
 }
 
 // wrappable reports whether segment i in segs is safe to prefix with

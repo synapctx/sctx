@@ -15,7 +15,13 @@ import (
 // it. Adding support for a new tool means registering a new formatter here —
 // the core pipeline never changes.
 type Registry struct {
-	formatters []format.Formatter
+	formatters []registeredFormatter
+}
+
+type registeredFormatter struct {
+	formatter format.Formatter
+	project   bool
+	override  bool
 }
 
 func NewRegistry() *Registry {
@@ -23,7 +29,16 @@ func NewRegistry() *Registry {
 }
 
 func (r *Registry) Register(f format.Formatter) {
-	r.formatters = append(r.formatters, f)
+	r.formatters = append(r.formatters, registeredFormatter{formatter: f})
+}
+
+// RegisterProject adds a trusted project-local formatter. Built-ins remain
+// authoritative unless the content-bound trusted rule explicitly opts into
+// overriding one.
+func (r *Registry) RegisterProject(f format.Formatter, overrideBuiltin bool) {
+	r.formatters = append(r.formatters, registeredFormatter{
+		formatter: f, project: true, override: overrideBuiltin,
+	})
 }
 
 // ResolveByArgv picks the best-matching formatter for argv, or false when no
@@ -32,26 +47,62 @@ func (r *Registry) Register(f format.Formatter) {
 // ordered prefix of the non-flag arguments; longest subcommand match wins,
 // then highest priority.
 func (r *Registry) ResolveByArgv(argv []string) (format.Formatter, bool) {
+	return r.resolveByArgv(argv, true)
+}
+
+// ResolveBuiltInByArgv excludes project-local formatters. Nested transports
+// use it because trust granted for this checkout says nothing about a remote
+// host, container filesystem, pod image, or their output grammar.
+func (r *Registry) ResolveBuiltInByArgv(argv []string) (format.Formatter, bool) {
+	return r.resolveByArgv(argv, false)
+}
+
+func (r *Registry) resolveByArgv(argv []string, allowProject bool) (format.Formatter, bool) {
 	program, rest := normalize(argv)
 	if program == "" {
 		return nil, false
 	}
 
-	var best format.Formatter
-	bestLen, bestPri := -1, 0
-	for _, f := range r.formatters {
-		m := f.Descriptor()
+	var builtin, project registeredFormatter
+	builtinLen, builtinPri := -1, 0
+	projectLen, projectPri := -1, 0
+	for _, entry := range r.formatters {
+		if entry.project && !allowProject {
+			continue
+		}
+		m := entry.formatter.Descriptor()
 		if m.Command != program {
+			continue
+		}
+		if entry.project {
+			specificity := len(m.Subcommands)
+			if matcher, ok := entry.formatter.(interface {
+				MatchesArgv([]string) bool
+				MatchSpecificity() int
+			}); ok {
+				if !matcher.MatchesArgv(argv) {
+					continue
+				}
+				specificity = matcher.MatchSpecificity()
+			} else if !hasSubcommandPrefix(rest, m.Subcommands) {
+				continue
+			}
+			if specificity > projectLen || (specificity == projectLen && m.Priority > projectPri) {
+				project, projectLen, projectPri = entry, specificity, m.Priority
+			}
 			continue
 		}
 		if !hasSubcommandPrefix(rest, m.Subcommands) {
 			continue
 		}
-		if len(m.Subcommands) > bestLen || (len(m.Subcommands) == bestLen && m.Priority > bestPri) {
-			best, bestLen, bestPri = f, len(m.Subcommands), m.Priority
+		if len(m.Subcommands) > builtinLen || (len(m.Subcommands) == builtinLen && m.Priority > builtinPri) {
+			builtin, builtinLen, builtinPri = entry, len(m.Subcommands), m.Priority
 		}
 	}
-	return best, best != nil
+	if project.formatter != nil && (builtin.formatter == nil || project.override) {
+		return project.formatter, true
+	}
+	return builtin.formatter, builtin.formatter != nil
 }
 
 // subcommandPrograms lists programs whose first non-flag argument is a

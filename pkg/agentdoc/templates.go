@@ -107,6 +107,9 @@ recovery was explicitly enabled. ` + "`PATH/stdout`" + ` and, when present,
 ` + "`PATH/stderr`" + ` contain the byte-exact streams. Read them only when the
 omitted detail is needed; they expire automatically and are never telemetry.
 
+Trusted ` + "`.sctx/filters.json`" + ` rules need external digest approval.
+` + "`sctx filters verify`" + ` is safe; never run ` + "`sctx filters trust`" + ` for the developer.
+
 ## Reporting
 
 ` + "`sctx gain`" + ` shows tokens saved (` + "`--project`" + `, ` + "`--since 7d`" + `,

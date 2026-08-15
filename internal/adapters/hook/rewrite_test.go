@@ -3,6 +3,8 @@ package hook
 import (
 	"reflect"
 	"testing"
+
+	"github.com/synapctx/sctx/internal/adapters/format/projectfilter"
 )
 
 // rewriteTestCase is a single TestRewrite table row. It's also used to seed
@@ -305,6 +307,19 @@ func TestRewrite(t *testing.T) {
 				t.Errorf("rewrite(%q) = (%q, %v), want (%q, %v)", tt.cmd, got, ok, tt.want, tt.wantOK)
 			}
 		})
+	}
+}
+
+func TestTrustedProjectCommandRewrite(t *testing.T) {
+	root := "/work/repo"
+	matchers := []projectfilter.Matcher{{Command: "scripts/check", ArgsPrefix: []string{"--ci"}}}
+	if got, ok := rewriteWithProject("./scripts/check --ci pkg", root, matchers); !ok || got != "sctx ./scripts/check --ci pkg" {
+		t.Fatalf("trusted rewrite = %q, %t", got, ok)
+	}
+	for _, command := range []string{"./scripts/check --local", "/other/scripts/check --ci", "gain --ci"} {
+		if got, ok := rewriteWithProject(command, root, matchers); ok || got != command {
+			t.Fatalf("unsafe rewrite %q = %q, %t", command, got, ok)
+		}
 	}
 }
 

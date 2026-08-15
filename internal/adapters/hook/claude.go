@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/synapctx/sctx/internal/adapters/format/projectfilter"
 	"github.com/synapctx/sctx/internal/platform/progkey"
 
 	"github.com/cloudresty/ulid"
@@ -69,7 +70,8 @@ func runClaude(_ []string, in io.Reader, out io.Writer, version string) int {
 		return 0
 	}
 
-	if rewritten, ok := rewrite(cmd); ok {
+	root, matchers := trustedProjectMatchers()
+	if rewritten, ok := rewriteWithProject(cmd, root, matchers); ok {
 		writeRewrite(out, rewritten)
 		return 0
 	}
@@ -82,6 +84,22 @@ func runClaude(_ []string, in io.Reader, out io.Writer, version string) int {
 		spoolCoverageGap(seg, version)
 	}
 	return 0
+}
+
+func trustedProjectMatchers() (string, []projectfilter.Matcher) {
+	wd, err := os.Getwd()
+	if err != nil {
+		return "", nil
+	}
+	trustPath, err := projectfilter.DefaultTrustPath()
+	if err != nil {
+		return "", nil
+	}
+	loaded, trusted, err := projectfilter.LoadTrustedFrom(wd, trustPath)
+	if err != nil || !trusted {
+		return "", nil
+	}
+	return loaded.Root, loaded.Matchers()
 }
 
 // spoolCoverageGap records a command sctx does not rewrite.
