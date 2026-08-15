@@ -47,7 +47,11 @@ const (
 // fail to cover, and combine them with other customers'". A decision made
 // against the older, broader text does not transfer — it was an answer to a
 // different question.
-const CurrentDisclosure = 2
+// Bumped to 3 on 2026-08-15 when formatter selection, actual reduction and a
+// fixed privacy-safe decline category became separate fields. No arguments,
+// paths or output were added, but the payload still grew and prior consent does
+// not silently extend to it.
+const CurrentDisclosure = 3
 
 // ConsentRecord is a customer's answer, as stored.
 type ConsentRecord struct {
@@ -104,7 +108,8 @@ const ConsentDisclosure = `Every record sctx sends carries exactly these fields:
   token counts                 bytes in, bytes out, tokens saved
   the exit code                whether the command succeeded
   how long it took             milliseconds
-  which formatter matched      or that none did
+  which formatter matched      and which formatter path was selected
+  whether output was reduced   and why output stayed native when it was not
   the sctx version             and when it happened
 
 NEVER: command ARGUMENTS, file paths, file contents, environment variables,
@@ -119,11 +124,14 @@ That one record shape serves two purposes, and only the second is a question.
    switching it off leaves your savings dashboard empty. It needs an API key —
    without one, nothing leaves your machine at all.
 
-2. THE COMMANDS WE FAIL TO COVER — this is what we are asking about.
+2. COVERAGE AND SAFETY POSTURE — this is what we are asking about.
    When sctx meets a command it has no formatter for, we would like to record it
    (the measurement fields are empty for these; there was nothing to measure).
-   We may combine these with other customers' to rank what to build next, and
-   THAT is why it is a question rather than a term in a contract.
+   We also record a fixed reason when the hook deliberately leaves a known
+   command untouched, such as streaming output or an unsafe shell pipeline.
+   We may combine these with other customers' to rank what to build next and
+   audit safety choices. THAT is why it is a question rather than a term in a
+   contract.
 
    sctx is built by people whose code is mostly Go, and it shows: the formatters
    cover what we run. If your work is Rust, Python or Java, these are the only

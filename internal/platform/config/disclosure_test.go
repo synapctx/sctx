@@ -26,11 +26,14 @@ var disclosedFields = map[string]string{
 	"exitCode":         "the exit code",
 	"durationMs":       "how long it took",
 	"formatterMatched": "which formatter matched",
+	"formatterKind":    "which formatter path was selected",
+	"outputReduced":    "whether output was reduced",
+	"declineReason":    "why output stayed native",
 	"version":          "the sctx version",
 	"at":               "and when it happened",
 	"tier":             "which formatter matched", // which of aggressive/relaxed/verbatim ran
 	"id":               "",                        // random ULID, for de-duplication on ingest
-	"kind":             "",                        // exec_savings | coverage_gap, the event's own type
+	"kind":             "",                        // exec_savings | coverage_gap | coverage_decline
 	"tool":             "",                        // constant "sctx"
 }
 

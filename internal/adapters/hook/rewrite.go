@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/synapctx/sctx/internal/adapters/format/projectfilter"
+	"github.com/synapctx/sctx/internal/domain/telemetry"
 	"github.com/synapctx/sctx/internal/platform/dockerargv"
 	"github.com/synapctx/sctx/internal/platform/ghargv"
 	"github.com/synapctx/sctx/internal/platform/gitargv"
@@ -945,6 +946,9 @@ func gapSegment(cmd string) (string, bool) {
 		if reservedNames[h] {
 			return "", false
 		}
+		if segmentStreamsForever(seg.text) {
+			continue
+		}
 		if !wrappable(segs, i) {
 			return "", false
 		}
@@ -961,6 +965,76 @@ func gapSegment(cmd string) (string, bool) {
 	}
 
 	return "", false
+}
+
+// declineSegment returns only a normalized program-bearing segment and a fixed
+// reason. It never returns argv, paths, redirects, or output. These events make
+// deliberate hook safety choices measurable without mixing them into formatter
+// gaps.
+func declineSegment(cmd string) (string, string, bool) {
+	segs, ok := splitSegments(cmd)
+	if !ok {
+		if seg, ok := recognizableHead(cmd); ok {
+			return seg, telemetry.DeclineUnsafeShellShape, true
+		}
+		return "", "", false
+	}
+	for i, seg := range segs {
+		if seg.pipeFrom {
+			continue
+		}
+		if _, known := recognizableHead(seg.text); !known {
+			continue
+		}
+		if segmentStreamsForever(seg.text) {
+			return seg.text, telemetry.DeclineStreaming, true
+		}
+		if hasDisallowedRedirect(seg.text) {
+			return seg.text, telemetry.DeclineUnsafeShellShape, true
+		}
+		for j := i + 1; j < len(segs) && segs[j].pipeFrom; j++ {
+			if !pipeSafeDownstream[segmentHead(segs[j].text)] {
+				return seg.text, telemetry.DeclineDownstreamTransform, true
+			}
+			if hasDisallowedRedirect(segs[j].text) {
+				return seg.text, telemetry.DeclineUnsafeShellShape, true
+			}
+		}
+	}
+	return "", "", false
+}
+
+func recognizableHead(text string) (string, bool) {
+	tokens := tokenize(text)
+	idx := 0
+	for idx < len(tokens) && isAssignment(tokens[idx].text) {
+		idx++
+	}
+	if idx >= len(tokens) {
+		return "", false
+	}
+	program := filepathBase(shellTokenValue(tokens[idx].text))
+	if _, known := subcommandTable[program]; !known {
+		return "", false
+	}
+	return text, true
+}
+
+func segmentStreamsForever(text string) bool {
+	tokens := tokenize(text)
+	idx := 0
+	for idx < len(tokens) && isAssignment(tokens[idx].text) {
+		idx++
+	}
+	if idx >= len(tokens) {
+		return false
+	}
+	program := filepathBase(shellTokenValue(tokens[idx].text))
+	args := make([]string, 0, len(tokens)-idx-1)
+	for _, token := range tokens[idx+1:] {
+		args = append(args, shellTokenValue(token.text))
+	}
+	return streamsForever(program, args)
 }
 
 // deliberatelyNoFormatter removes measured, consciously rejected candidates

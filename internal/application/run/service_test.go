@@ -111,23 +111,30 @@ type fakeEmitter struct {
 func (e *fakeEmitter) Emit(ev telemetry.Event)       { e.events = append(e.events, ev) }
 func (e *fakeEmitter) Flush(_ context.Context) error { return nil }
 
-func TestExecuteEmitsFormatterMatchedAndProgram(t *testing.T) {
+func TestExecuteEmitsUnambiguousFormatterDimensions(t *testing.T) {
 	tests := []struct {
-		name            string
-		argv            []string
-		stdout          string
-		registerMatcher bool
-		enableSniff     bool
-		wantProgram     string
-		wantMatched     bool
+		name              string
+		argv              []string
+		stdout            string
+		registerMatcher   bool
+		registeredDecline bool
+		enableSniff       bool
+		forceTier         string
+		wantProgram       string
+		wantMatched       bool
+		wantKind          string
+		wantReduced       bool
+		wantReason        string
 	}{
 		{
 			name:            "registered formatter matches",
 			argv:            []string{"go", "test", "./..."},
-			stdout:          "ok\n",
+			stdout:          "native output with enough bytes to save tokens\n",
 			registerMatcher: true,
 			wantProgram:     "go test",
 			wantMatched:     true,
+			wantKind:        telemetry.FormatterKindDedicated,
+			wantReduced:     true,
 		},
 		{
 			name:        "no formatter, no sniff: unmatched",
@@ -135,6 +142,38 @@ func TestExecuteEmitsFormatterMatchedAndProgram(t *testing.T) {
 			stdout:      "plain text\n",
 			wantProgram: "terraform plan",
 			wantMatched: false,
+			wantKind:    telemetry.FormatterKindNone,
+			wantReason:  telemetry.DeclineUnsupportedCommand,
+		},
+		{
+			name:        "generic compression is reduced but not dedicated",
+			argv:        []string{"internal-tool", "report"},
+			stdout:      "native output with enough bytes to save tokens\n",
+			enableSniff: true,
+			wantProgram: "internal-tool",
+			wantKind:    telemetry.FormatterKindGeneric,
+			wantReduced: true,
+		},
+		{
+			name:              "dedicated formatter can decline",
+			argv:              []string{"go", "test", "./..."},
+			stdout:            "unrecognized native output\n",
+			registerMatcher:   true,
+			registeredDecline: true,
+			wantProgram:       "go test",
+			wantMatched:       true,
+			wantKind:          telemetry.FormatterKindDedicated,
+			wantReason:        telemetry.DeclineUnrecognizedOutput,
+		},
+		{
+			name:        "explicit force-tier bypass is classified",
+			argv:        []string{"internal-tool", "report"},
+			stdout:      "native output\n",
+			enableSniff: true,
+			forceTier:   "verbatim",
+			wantProgram: "internal-tool",
+			wantKind:    telemetry.FormatterKindGeneric,
+			wantReason:  telemetry.DeclineExplicitBypass,
 		},
 	}
 
@@ -142,15 +181,31 @@ func TestExecuteEmitsFormatterMatchedAndProgram(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			registry := NewRegistry()
 			if tt.registerMatcher {
+				aggressive := func(format.Input) (format.Rendered, error) { return format.Rendered{Body: []byte("x")}, nil }
+				if tt.registeredDecline {
+					aggressive = func(format.Input) (format.Rendered, error) { return format.Rendered{}, format.ErrTierInapplicable }
+				}
 				registry.Register(&fakeFormatter{
 					match:      format.Match{Command: "go", Subcommands: []string{"test"}},
-					aggressive: func(format.Input) (format.Rendered, error) { return format.Rendered{Body: []byte("x")}, nil },
-					relaxed:    func(format.Input) (format.Rendered, error) { return format.Rendered{Body: []byte("x")}, nil },
+					aggressive: aggressive,
+					relaxed: func(format.Input) (format.Rendered, error) {
+						if tt.registeredDecline {
+							return format.Rendered{}, format.ErrTierInapplicable
+						}
+						return format.Rendered{Body: []byte("x")}, nil
+					},
 				})
 			}
 
 			emitter := &fakeEmitter{}
-			svc := NewService(registry, fakeRunner{stdout: tt.stdout, exitCode: 0}, nil, emitter, nil, &bytes.Buffer{}, &bytes.Buffer{}, Options{Version: "v"})
+			var sniff format.Formatter
+			if tt.enableSniff {
+				sniff = &fakeFormatter{
+					aggressive: func(format.Input) (format.Rendered, error) { return format.Rendered{Body: []byte("x")}, nil },
+					relaxed:    func(format.Input) (format.Rendered, error) { return format.Rendered{}, format.ErrTierInapplicable },
+				}
+			}
+			svc := NewService(registry, fakeRunner{stdout: tt.stdout, exitCode: 0}, nil, emitter, sniff, &bytes.Buffer{}, &bytes.Buffer{}, Options{Version: "v", ForceTier: tt.forceTier})
 
 			if _, err := svc.Execute(context.Background(), tt.argv); err != nil {
 				t.Fatalf("Execute: %v", err)
@@ -165,6 +220,10 @@ func TestExecuteEmitsFormatterMatchedAndProgram(t *testing.T) {
 			}
 			if ev.FormatterMatched != tt.wantMatched {
 				t.Errorf("FormatterMatched = %v, want %v", ev.FormatterMatched, tt.wantMatched)
+			}
+			if ev.FormatterKind != tt.wantKind || ev.OutputReduced != tt.wantReduced || ev.DeclineReason != tt.wantReason {
+				t.Errorf("dimensions = kind %q reduced %t reason %q; want %q %t %q",
+					ev.FormatterKind, ev.OutputReduced, ev.DeclineReason, tt.wantKind, tt.wantReduced, tt.wantReason)
 			}
 		})
 	}

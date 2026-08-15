@@ -10,8 +10,9 @@ import (
 // exists so the default is a fallback, not the actual policy for a real kind.
 func TestEveryEventKindHasAPurpose(t *testing.T) {
 	kinds := map[string]string{
-		KindExecSavings: PurposeService,
-		KindCoverageGap: PurposeImprovement,
+		KindExecSavings:     PurposeService,
+		KindCoverageGap:     PurposeImprovement,
+		KindCoverageDecline: PurposeImprovement,
 	}
 	for kind, want := range kinds {
 		if got := PurposeOf(kind); got != want {

@@ -82,8 +82,14 @@ func runClaude(_ []string, in io.Reader, out io.Writer, version string) int {
 	// identify, and shell builtins with no output worth compressing.
 	if seg, ok := gapSegment(cmd); ok {
 		spoolCoverageGap(seg, version)
+	} else if seg, reason, ok := declineSegment(cmd); ok {
+		spoolCoverageDecline(seg, reason, version)
 	}
 	return 0
+}
+
+func spoolCoverageDecline(segText, reason, version string) {
+	spoolImprovementEvent(telemetry.KindCoverageDecline, segText, reason, version)
 }
 
 func trustedProjectMatchers() (string, []projectfilter.Matcher) {
@@ -117,6 +123,10 @@ func trustedProjectMatchers() (string, []projectfilter.Matcher) {
 // command line — it may still be a compound command's individual piece
 // (e.g. "npm test" out of "cd sub && npm test").
 func spoolCoverageGap(segText, version string) {
+	spoolImprovementEvent(telemetry.KindCoverageGap, segText, coverageGapReason(segText), version)
+}
+
+func spoolImprovementEvent(kind, segText, reason, version string) {
 	// Consent gates COLLECTION, not just delivery. Writing a refused customer's
 	// commands to a local spool that a later `sctx flush` would drain is the same
 	// data leaving by a slower route — and the file itself is a record they did
@@ -145,20 +155,36 @@ func spoolCoverageGap(segText, version string) {
 		repoName = gitrepo.Detect(wd)
 	}
 	program := deriveProgram(segText)
-
 	_ = spool.Append(dir, telemetry.Event{
 		ID:             id,
-		Kind:           telemetry.KindCoverageGap,
+		Kind:           kind,
 		Tool:           "sctx",
 		Version:        version,
 		RepositoryName: repoName,
 		// Command is set to Program, never the full command line: args may
 		// contain secrets and only the program/subcommand key is needed for
 		// coverage-gap aggregation.
-		Command: program,
-		Program: program,
-		At:      time.Now().UTC(),
+		Command:       program,
+		Program:       program,
+		DeclineReason: reason,
+		At:            time.Now().UTC(),
 	})
+}
+
+func coverageGapReason(command string) string {
+	tokens := tokenize(command)
+	idx := 0
+	for idx < len(tokens) && isAssignment(tokens[idx].text) {
+		idx++
+	}
+	if idx >= len(tokens) {
+		return telemetry.DeclineUnsupportedCommand
+	}
+	program := filepathBase(shellTokenValue(tokens[idx].text))
+	if _, known := subcommandTable[program]; known {
+		return telemetry.DeclineUnsupportedSubcommand
+	}
+	return telemetry.DeclineUnsupportedCommand
 }
 
 // deriveProgram returns the same "program + first subcommand" key used by

@@ -22,31 +22,18 @@ import (
 func sctxBody([]string) string {
 	return `# sctx — token-optimized command output
 
-` + "`sctx`" + ` runs a developer command and re-renders its output token-minimally.
-It exists because command output is the largest uncontrolled cost in an agent
-session: a test run, a ` + "`git log`" + `, a ` + "`kubectl get`" + ` can each spend thousands
-of tokens restating things you do not need.
+` + "`sctx`" + ` runs developer commands and renders their output token-minimally.
 
 ## What it guarantees
 
-Read these once — they are why you can act on compressed output instead of
-re-running the command verbatim to check.
-
-- **The exit code is exact.** Never inferred from the text.
-- **Error signal is never compressed away.** A failing command keeps its
-  diagnostics; compression targets repetition and noise, not failure.
-- **Every elision is marked** — ` + "`…+N`" + ` (N more lines) or ` + "`×N`" + ` (repeated N
-  times). If you see no marker, nothing was dropped.
-- **Any parse failure degrades to raw output.** Tiers fall back
-  aggressive → relaxed → verbatim. Output is never suppressed, so an unexpected
-  format costs you nothing.
+- Exit codes are exact; failure diagnostics remain.
+- Elisions are marked ` + "`…+N`" + ` or ` + "`×N`" + `; no marker means nothing was dropped.
+- Parse failure falls back aggressive → relaxed → verbatim; output is never suppressed.
 
 ## You do not need to type it
 
-A PreToolUse hook rewrites covered commands automatically. **Write commands
-naturally** — including inside pipelines and ` + "`&&`" + ` sequences. Do not prefix
-` + "`sctx`" + ` yourself on a covered command: it is not double-wrapped, but the
-token is wasted and the command reads as though it needed help.
+A PreToolUse hook rewrites covered commands. **Write them naturally**, including
+pipelines and ` + "`&&`" + `; do not prefix ` + "`sctx`" + ` yourself.
 
 Wrapped today: ` + "`go`" + `, ` + "`git`" + `, ` + "`grep`/`rg`" + `, ` + "`ls`/`find`/`tree`" + `,
 ` + "`cat`/`head`/`tail`" + `, ` + "`diff`" + `, ` + "`ps`" + `, ` + "`du`" + `, ` + "`df`" + `,
@@ -60,49 +47,35 @@ Wrapped today: ` + "`go`" + `, ` + "`git`" + `, ` + "`grep`/`rg`" + `, ` + "`ls`
 
 Generic-only: cloud/IaC/build rows and ` + "`jq`/`curl`/`sqlite3`" + `; unknown shapes stay raw.
 
-**Coverage is per (program, SUBCOMMAND)**, which is why a command you expected to
-be wrapped sometimes is not — a program is rewritten only for the subcommands it
-has a formatter for. Plumbing verbs pass through raw (` + "`git rev-parse`" + `,
-` + "`go env`" + `); their output is a line or two, so "no compression markers" does not
-mean sctx is broken. Programs whose first argument is a path or host
-(` + "`grep`" + `, ` + "`ls`" + `, ` + "`cat`" + `, ` + "`curl`" + `, ` + "`ssh`" + `) take no
-subcommand and are always wrapped.
+Coverage is per (program, subcommand). Uncovered plumbing such as
+` + "`git rev-parse`" + ` and ` + "`go env`" + ` stays raw. Path/host-first commands
+(` + "`grep`" + `, ` + "`ls`" + `, ` + "`cat`" + `, ` + "`curl`" + `, ` + "`ssh`" + `) are always wrapped.
 
-**Where the hook declines, and why it matters to you.** It leaves a command
-alone when wrapping could change what you conclude:
+The hook declines when wrapping could change the conclusion:
 
-- a downstream ` + "`grep`/`sed`/`awk`/`wc`/`jq`" + ` — filtering already-compressed
-  output would make something look ABSENT that is merely elided;
+- downstream ` + "`grep`/`sed`/`awk`/`wc`/`jq`" + ` (an elided match could look absent);
 - file redirects (` + "`> out.txt`" + `), command substitution (` + "`$(…)`" + `), subshells.
 
 ` + "`2>&1`" + ` is fine, and so are pure pagers (` + "`| head`" + `, ` + "`| tail`" + `).
 
 ## When to type it yourself
 
-**When you are about to run something NOT in the list above and its output will
-be long.** ` + "`sctx <cmd>`" + ` still helps, whatever the program: JSON stdout is
-compacted, and runs of repeated lines — the progress and status spam most tools
-emit — collapse to one line plus a count. Nothing is summarised and nothing is
-guessed at, so an unrecognised format costs you nothing.
+**When an unlisted command may be long**, use ` + "`sctx <cmd>`" + `: JSON is compacted
+and repeated lines collapse. Unrecognized output stays raw.
 
 ` + "`sctx -- <cmd>`" + ` forces verbatim passthrough when you genuinely need every
 byte.
 
 ## The subcommand that changes what SynapCTX can answer
 
-` + "`sctx watch`" + ` streams the structural diff of the working tree — symbol names,
-signatures, doc comments, never bodies — so ` + "`retrieve_context`" + ` answers about
-the code being CHANGED rather than the last commit. Without it, uncommitted edits
-are invisible to every SynapCTX tool, and a result will confidently describe the
-committed version of a function just rewritten.
+` + "`sctx watch`" + ` streams uncommitted symbol/signature/doc changes so
+` + "`retrieve_context`" + ` sees the code being changed, not only the last commit.
 
-It is foreground and per-developer. Suggest it when a session has substantial
-uncommitted work — but do not start a long-running foreground process on the
-developer's behalf without asking.
+It is foreground and per-developer; suggest it for substantial edits, but ask
+before starting it.
 
-` + "`sctx doctor`" + ` shows CONFIGURATION — version, masked per-org API-key prefixes,
-the default organization, and which agents here have been taught. It does not
-print the covered-command list.
+` + "`sctx doctor`" + ` shows configuration, masked key prefixes, default org and
+taught agents—not command coverage.
 
 ` + "`sctx: raw output: PATH (TTL)`" + ` points to expiring, byte-exact local
 ` + "`stdout`/`stderr`" + `; read only if an omitted detail is needed.
@@ -185,50 +158,30 @@ wording as a genuinely missing org, so it cannot enumerate them. **Read it as
 	// machine's configuration and so cannot live in a shipped description.
 	return `# SynapCTX — the organization's code graph and memory
 
-SynapCTX indexes **every repository the organization owns**, including ones not
-checked out here, and holds durable memory shared with teammates' agents.
-
-Local tools see one checkout and the strings you thought to search for. These see
-the organization, and state how far each answer can be trusted.
+SynapCTX indexes every repository in the organization and shared durable memory.
 
 ` + scope + `
-Some clients defer large tool catalogs. If a named tool is not initially
-visible, search or list the client's deferred tools for the selected server
-before falling back. Not initially displayed does not mean unavailable.
+Some clients defer large tool catalogs. If a tool is hidden, search or list the
+client's deferred tools for that server before falling back.
 
 ## When to reach for it
 
-- **Before searching for something you cannot name exactly** — a convention, "how
-  does X work", an unfamiliar package: ` + "`retrieve_context`" + `.
+- **Before searching for a convention or unfamiliar design**: ` + "`retrieve_context`" + `.
 - **Before renaming, deleting or changing a shared signature** —
-  ` + "`find_references`" + ` and ` + "`get_dependents`" + `. They are exhaustive; ` + "`grep`" + ` is
-  not, and a call site in a repository you have not checked out is invisible
-  until it breaks.
-- **To verify one symbol, or to read code from a repository not checked out
-  here** — ` + "`get_symbol_source`" + ` and ` + "`get_source`" + `. Do not clone it.
-- **Before changing or retiring a service boundary** —
-  ` + "`get_service_dependencies`" + ` shows upstream and downstream services.
-- **When looking for routes that may be safe to remove** —
-  ` + "`find_unused_endpoints`" + ` produces a shortlist, not deletion authorization;
-  read its blind spots before acting.
-- **Starting unfamiliar work, or before re-deciding something** —
-  ` + "`recall_memory`" + `. Why a decision was made is rarely recoverable from code.
-- **The moment a decision is made or a convention is set** — ` + "`store_memory`" + `,
-  with the decision AND the why. It outlives this session and this machine, and
-  every teammate's agent can recall it.
-- **When a memory is outdated** — write the replacement with ` + "`store_memory`" + `
-  and mark what it supersedes. Use ` + "`forget_memory`" + ` only for secrets or test
-  artifacts, not ordinary history.
+  ` + "`find_references`" + ` and ` + "`get_dependents`" + `; unlike ` + "`grep`" + `, they cross repositories.
+- **To verify a symbol or read an absent checkout**: ` + "`get_symbol_source`" + ` or ` + "`get_source`" + `.
+- **Before changing a service boundary**: ` + "`get_service_dependencies`" + `.
+- **When assessing removable routes**: ` + "`find_unused_endpoints`" + `; it is a shortlist.
+- **Before re-deciding or starting unfamiliar work**: ` + "`recall_memory`" + `.
+- **When a decision or convention is set**: ` + "`store_memory`" + ` with its why.
+- **When memory is outdated**: supersede it with ` + "`store_memory`" + `; use
+  ` + "`forget_memory`" + ` only for secrets or test artifacts.
 
 ## Read what each answer says about itself
 
-Answers carry their own limits: what was searched, which ref, what was dropped,
-whether the signal degraded, whether a billing limit stopped the result. Those
-lines appear only when they apply, they are complete sentences, and each states
-its own next action — so read them rather than the summary alone.
+Answers carry their own limits and next actions; read them, not only the summary.
 
-Nothing absent from a ranked answer licenses "it does not exist". The exhaustive
-tools are the ones that can settle that, and they say plainly when they cannot.
+Nothing absent from a ranked answer licenses "it does not exist".
 
 **Uncommitted edits are invisible unless ` + "`" + `sctx watch` + "`" + ` is running** — the reason
 retrieval may describe the committed shape of code you just rewrote.

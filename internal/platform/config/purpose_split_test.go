@@ -1,6 +1,7 @@
 package config
 
 import (
+	"strconv"
 	"testing"
 
 	"github.com/synapctx/sctx/internal/domain/telemetry"
@@ -12,7 +13,7 @@ import (
 // protect them from it.
 func TestDecliningDoesNotDarkenTheCustomersOwnSavingsReport(t *testing.T) {
 	withConfig(t, `telemetry_consent = "declined"
-telemetry_disclosure = "2"
+telemetry_disclosure = "`+strconv.Itoa(CurrentDisclosure)+`"
 `)
 	cfg, err := Load()
 	if err != nil {
@@ -29,7 +30,7 @@ telemetry_disclosure = "2"
 // The other half: consent buys us the improvement signal, and nothing more.
 func TestGrantingEnablesImprovementCollection(t *testing.T) {
 	withConfig(t, `telemetry_consent = "granted"
-telemetry_disclosure = "2"
+telemetry_disclosure = "`+strconv.Itoa(CurrentDisclosure)+`"
 `)
 	cfg, _ := Load()
 	if !cfg.PermitsPurpose(telemetry.PurposeImprovement) || !cfg.PermitsPurpose(telemetry.PurposeService) {

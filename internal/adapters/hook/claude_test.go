@@ -146,6 +146,18 @@ func TestAnUnmatchedCommandIsRecordedAsACoverageGap(t *testing.T) {
 	if ev.Version != "v-test" || ev.ID == "" {
 		t.Errorf("Version = %q, ID = %q", ev.Version, ev.ID)
 	}
+	if ev.DeclineReason != telemetry.DeclineUnsupportedCommand {
+		t.Errorf("DeclineReason = %q, want unsupported command", ev.DeclineReason)
+	}
+}
+
+func TestCoverageGapReasonDistinguishesKnownPrograms(t *testing.T) {
+	if got := coverageGapReason("npm publish"); got != telemetry.DeclineUnsupportedSubcommand {
+		t.Errorf("npm publish reason = %q", got)
+	}
+	if got := coverageGapReason("mix test"); got != telemetry.DeclineUnsupportedCommand {
+		t.Errorf("mix test reason = %q", got)
+	}
 }
 
 // A command sctx DOES cover is not a gap.
@@ -237,19 +249,39 @@ func TestAGapAfterACdIsStillRecorded(t *testing.T) {
 	}
 }
 
-func TestAnUnsafeDownstreamStageIsNotRecorded(t *testing.T) {
-	spoolDir := t.TempDir()
-	t.Setenv("SCT__SPOOL_DIR", spoolDir)
-
-	stdin := `{"tool_name":"Bash","tool_input":{"command":"go test ./... | grep FAIL"}}`
-
-	var out bytes.Buffer
-	code := runClaude(nil, strings.NewReader(stdin), &out, "v-test")
-	if code != 0 {
-		t.Fatalf("runClaude() exit code = %d, want 0", code)
+func TestDeliberateHookDeclinesAreClassifiedWithoutArguments(t *testing.T) {
+	tests := []struct {
+		command string
+		program string
+		reason  string
+	}{
+		{"go test ./... | grep SECRET", "go test", telemetry.DeclineDownstreamTransform},
+		{"docker logs --follow private-container", "docker logs", telemetry.DeclineStreaming},
+		{"go test ./private/... > secret.txt", "go test", telemetry.DeclineUnsafeShellShape},
 	}
-	if events := readSpoolEvents(t, spoolDir); len(events) != 0 {
-		t.Fatalf("spooled events = %d, want 0", len(events))
+	for _, tt := range tests {
+		t.Run(tt.reason, func(t *testing.T) {
+			spoolDir := t.TempDir()
+			t.Setenv("SCT__SPOOL_DIR", spoolDir)
+			stdinBytes, err := json.Marshal(toolCall{ToolName: "Bash", ToolInput: map[string]interface{}{"command": tt.command}})
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			var out bytes.Buffer
+			code := runClaude(nil, bytes.NewReader(stdinBytes), &out, "v-test")
+			if code != 0 {
+				t.Fatalf("runClaude() exit code = %d, want 0", code)
+			}
+			events := readSpoolEvents(t, spoolDir)
+			if len(events) != 1 {
+				t.Fatalf("spooled events = %d, want 1", len(events))
+			}
+			ev := events[0]
+			if ev.Kind != telemetry.KindCoverageDecline || ev.Program != tt.program || ev.Command != tt.program || ev.DeclineReason != tt.reason {
+				t.Errorf("event = %+v, want privacy-safe %s/%s/%s", ev, telemetry.KindCoverageDecline, tt.program, tt.reason)
+			}
+		})
 	}
 }
 

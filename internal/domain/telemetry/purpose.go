@@ -44,7 +44,7 @@ func PurposeOf(kind string) string {
 		// Aggregating it ACROSS customers is a separate question, answered by
 		// consent — but that boundary is on the server, not here.
 		return PurposeService
-	case KindCoverageGap:
+	case KindCoverageGap, KindCoverageDecline:
 		// Purely ours: it ranks which formatter to build next. It tells the
 		// customer nothing they do not already know from having run the command.
 		return PurposeImprovement

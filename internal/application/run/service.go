@@ -148,6 +148,30 @@ func (s *Service) account(ctx context.Context, argv []string, formatter format.F
 	if saved < 0 {
 		saved = 0
 	}
+	formatterKind := telemetry.FormatterKindNone
+	if formatterMatched {
+		formatterKind = telemetry.FormatterKindDedicated
+	} else if formatter != nil {
+		formatterKind = telemetry.FormatterKindGeneric
+	}
+	outputReduced := saved > 0
+	declineReason := ""
+	if !outputReduced {
+		switch {
+		case rawBytes == 0:
+			declineReason = telemetry.DeclineSilentCommand
+		case s.opts.ForceTier == string(format.TierVerbatim) || s.opts.ForceTier == "off":
+			declineReason = telemetry.DeclineExplicitBypass
+		case result.Tier != format.TierVerbatim:
+			declineReason = telemetry.DeclineNoNetSaving
+		case formatterKind == telemetry.FormatterKindDedicated:
+			declineReason = telemetry.DeclineUnrecognizedOutput
+		case formatterKind == telemetry.FormatterKindGeneric:
+			declineReason = telemetry.DeclineArbitraryOutput
+		default:
+			declineReason = telemetry.DeclineUnsupportedCommand
+		}
+	}
 
 	id, err := ulid.New()
 	if err != nil {
@@ -196,6 +220,9 @@ func (s *Service) account(ctx context.Context, argv []string, formatter format.F
 			ExitCode:         outcome.ExitCode,
 			DurationMS:       outcome.Duration.Milliseconds(),
 			FormatterMatched: formatterMatched,
+			FormatterKind:    formatterKind,
+			OutputReduced:    outputReduced,
+			DeclineReason:    declineReason,
 			At:               now,
 		})
 	}
