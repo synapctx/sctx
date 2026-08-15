@@ -6,6 +6,7 @@ import (
 
 	"github.com/synapctx/sctx/internal/domain/format"
 	"github.com/synapctx/sctx/internal/platform/dockerargv"
+	"github.com/synapctx/sctx/internal/platform/ghargv"
 	"github.com/synapctx/sctx/internal/platform/gitargv"
 	"github.com/synapctx/sctx/internal/platform/kubectlargv"
 )
@@ -86,6 +87,17 @@ func CommandKey(argv []string) string {
 			return program
 		}
 		return program + " " + inv.Command
+	}
+	if program == "gh" {
+		inv, ok := ghargv.Parse(append([]string{program}, rest...))
+		if !ok {
+			return program
+		}
+		key := program + " " + inv.Level1
+		if inv.Level2 != "" {
+			key += " " + inv.Level2
+		}
+		return key
 	}
 	if program == "kubectl" {
 		inv, ok := kubectlargv.Parse(append([]string{program}, rest...))

@@ -2,68 +2,74 @@ package gh
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/synapctx/sctx/internal/domain/format"
 )
 
-func TestAggressiveListPRs(t *testing.T) {
+func TestAggressiveNativeLists(t *testing.T) {
 	f := New()
-	stdout := strings.Join([]string{
-		"101\tFix crash in parser\tfix-parser\tOPEN",
-		"102\tAdd retry logic to the network client so it survives flaky intermittent connections gracefully\tadd-retry\tOPEN",
-		"103\tUpdate deps\tdeps\tDRAFT",
-		"104\tRefactor storage layer\trefactor-storage\tOPEN",
-		"105\tBump go version\tbump-go\tMERGED",
-	}, "\n")
-	in := format.Input{
-		Argv:   []string{"gh", "pr", "list"},
-		Stdout: strings.NewReader(stdout),
+	tests := []struct {
+		name, raw, want string
+		argv            []string
+	}{
+		{
+			name: "pull requests",
+			argv: []string{"gh", "pr", "list"},
+			raw: "14148\tUpdate glamour to v2\theaths:issue3718\tDRAFT\t2026-08-15T00:09:53Z\n" +
+				"14136\tAdd worktree checkout to gh issue develop\tfeature/worktree\tOPEN\t2026-08-13T10:26:41Z\n" +
+				"14130\tSupport additional repository selectors\tfeature/selectors\tOPEN\t2026-08-12T09:20:11Z\n" +
+				"14122\tAvoid duplicate API requests in status\tfix/status\tOPEN\t2026-08-11T08:19:10Z\n" +
+				"14118\tDocument extension authentication behavior\tdocs/auth\tDRAFT\t2026-08-10T07:18:09Z\n",
+			want: "#14148 DRAFT Update glamour to v2 [heaths:issue3718]",
+		},
+		{
+			name: "issues",
+			argv: []string{"gh", "issue", "list"},
+			raw: "14151\tOPEN\t3x-ui\tneeds-triage\t2026-08-15T02:25:48Z\n" +
+				"14145\tOPEN\tLs\tneeds-triage, bug\t2026-08-14T04:09:36Z\n" +
+				"14140\tOPEN\tImprove authentication error details\tneeds-triage\t2026-08-13T03:08:35Z\n" +
+				"14133\tOPEN\tStatus output is difficult to scan\tbug\t2026-08-12T02:07:34Z\n" +
+				"14125\tOPEN\tRepository list should retain visibility\tenhancement\t2026-08-11T01:06:33Z\n",
+			want: "#14145 OPEN Ls [needs-triage, bug]",
+		},
 	}
-	out, err := f.Aggressive(context.Background(), in)
-	if err != nil {
-		t.Fatalf("Aggressive() error = %v", err)
-	}
-	body := string(out.Body)
-	if !strings.HasPrefix(body, "5 pull requests\n") {
-		t.Errorf("missing summary line: %q", body)
-	}
-	if !strings.Contains(body, "#101 OPEN Fix crash in parser") {
-		t.Errorf("missing row: %q", body)
-	}
-	if strings.Contains(body, "gracefully") {
-		t.Errorf("title not truncated: %q", body)
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			out, err := f.Aggressive(context.Background(), format.Input{Argv: tt.argv, Stdout: strings.NewReader(tt.raw)})
+			if err != nil {
+				t.Fatalf("Aggressive() error = %v", err)
+			}
+			if !strings.Contains(string(out.Body), tt.want) {
+				t.Fatalf("body missing %q: %q", tt.want, out.Body)
+			}
+		})
 	}
 }
 
-func TestAggressiveListIssues(t *testing.T) {
+func TestAggressiveReleaseListCapsLargeResult(t *testing.T) {
 	f := New()
-	stdout := "5\tCrash on startup\tbug\n6\tFeature request\tenhancement\n"
-	in := format.Input{
-		Argv:   []string{"gh", "issue", "list"},
-		Stdout: strings.NewReader(stdout),
+	var raw strings.Builder
+	for i := 0; i < listCap+5; i++ {
+		fmt.Fprintf(&raw, "Release %d\t\tv2.%d.0\t2026-07-%02dT02:04:00Z\n", i, i, i%28+1)
 	}
-	out, err := f.Aggressive(context.Background(), in)
+	out, err := f.Aggressive(context.Background(), format.Input{Argv: []string{"gh", "release", "list", "--limit", "35"}, Stdout: strings.NewReader(raw.String())})
 	if err != nil {
 		t.Fatalf("Aggressive() error = %v", err)
 	}
-	if !strings.HasPrefix(string(out.Body), "2 issues\n") {
-		t.Errorf("missing summary line: %q", out.Body)
+	if !strings.Contains(string(out.Body), "…+5 more rows") {
+		t.Fatalf("missing release elision: %q", out.Body)
 	}
 }
 
-func TestAggressiveListEmptyPassthrough(t *testing.T) {
+func TestAggressiveListEmptyAndUnexpectedDecline(t *testing.T) {
 	f := New()
-	in := format.Input{
-		Argv:   []string{"gh", "pr", "list"},
-		Stdout: strings.NewReader("no pull requests match your search in owner/repo\n"),
-	}
-	out, err := f.Aggressive(context.Background(), in)
-	if err != nil {
-		t.Fatalf("Aggressive() error = %v", err)
-	}
-	if string(out.Body) != "no pull requests match your search in owner/repo" {
-		t.Errorf("body = %q, want verbatim passthrough", out.Body)
+	for _, raw := range []string{"", "not a native table row\n"} {
+		in := format.Input{Argv: []string{"gh", "pr", "list"}, Stdout: strings.NewReader(raw)}
+		if _, err := f.Aggressive(context.Background(), in); err != format.ErrTierInapplicable {
+			t.Errorf("raw %q error = %v, want ErrTierInapplicable", raw, err)
+		}
 	}
 }

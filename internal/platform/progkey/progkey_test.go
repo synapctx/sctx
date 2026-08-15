@@ -57,6 +57,20 @@ func TestFromArgvGitGlobals(t *testing.T) {
 	}
 }
 
+func TestFromArgvGHGlobals(t *testing.T) {
+	for _, tt := range []struct {
+		argv []string
+		want string
+	}{
+		{[]string{"/usr/local/bin/gh", "-R", "private-owner/private-repo", "pr", "list"}, "gh pr"},
+		{[]string{"gh", "--repo=private-owner/private-repo", "issue", "list"}, "gh issue"},
+	} {
+		if got := FromArgv(tt.argv); got != tt.want {
+			t.Fatalf("FromArgv(%v) = %q, want %q without repository data", tt.argv, got, tt.want)
+		}
+	}
+}
+
 // TestKeyKeepsRealSubcommands — the fix must not flatten everything. The subcommand is what
 // makes the meter actionable: `terraform plan` is output-heavy where `terraform apply` is
 // not, and a formatter is written for one and not the other.

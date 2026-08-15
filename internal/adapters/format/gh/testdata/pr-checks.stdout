@@ -1,0 +1,5 @@
+build-linux	pass	1m2s	https://github.com/cli/cli/actions/runs/1
+build-macos	pass	1m8s	https://github.com/cli/cli/actions/runs/2
+build-windows	pass	2m1s	https://github.com/cli/cli/actions/runs/3
+unit-tests	pass	42s	https://github.com/cli/cli/actions/runs/4
+lint	fail	30s	https://github.com/cli/cli/actions/runs/5

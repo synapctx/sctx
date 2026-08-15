@@ -7,90 +7,76 @@ import (
 	"github.com/synapctx/sctx/internal/domain/format"
 )
 
-// maxBodyLines is the truncation width applied to `pr view`/`issue view`
-// bodies before an elision marker is emitted.
-const maxBodyLines = 25
+type viewOptions struct {
+	bodyCap     int
+	repeatedKey string
+	repeatedCap int
+}
 
-// aggressiveView renders `gh pr view` / `gh issue view` output, keeping the
-// title, state/author/labels metadata, and body truncated to maxBodyLines
-// with an explicit "...+N lines" marker. Any comment thread section is
-// dropped in favor of an explicit "...+N comments" marker.
-func aggressiveView(in format.Input) (format.Rendered, error) {
+// aggressiveView parses gh's current `key:\tvalue` metadata, `--` delimiter,
+// and Markdown body. Empty metadata and capped body/assets are always counted.
+func aggressiveView(in format.Input, opts viewOptions) (format.Rendered, error) {
 	raw := readAll(in.Stdout)
 	lines := splitLines(raw)
-	if len(lines) == 0 || strings.TrimSpace(lines[0]) == "" {
+	if len(lines) == 0 {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	delim := -1
+	for i, line := range lines {
+		if line == "--" {
+			delim = i
+			break
+		}
+	}
+	if delim < 1 {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
-	title := lines[0]
-
 	var meta []string
-	i := 1
-	for ; i < len(lines); i++ {
-		trimmed := strings.TrimSpace(lines[i])
-		if trimmed == "" {
-			i++
-			break
+	emptyMeta, repeated := 0, 0
+	for _, line := range lines[:delim] {
+		key, value, ok := strings.Cut(line, "\t")
+		if !ok || !strings.HasSuffix(key, ":") {
+			return format.Rendered{}, format.ErrTierInapplicable
 		}
-		meta = append(meta, trimmed)
-	}
-
-	var body []string
-	var comments []string
-	inComments := false
-	footer := ""
-
-	for ; i < len(lines); i++ {
-		line := lines[i]
-		trimmed := strings.TrimSpace(line)
-		switch {
-		case trimmed == "Comments":
-			inComments = true
-			continue
-		case strings.HasPrefix(trimmed, "----"):
-			continue
-		case strings.HasPrefix(trimmed, "View this"):
-			footer = line
+		if strings.TrimSpace(value) == "" {
+			emptyMeta++
 			continue
 		}
-		if inComments {
-			if trimmed != "" {
-				comments = append(comments, line)
+		if opts.repeatedKey != "" && strings.TrimSuffix(key, ":") == opts.repeatedKey {
+			repeated++
+			if repeated > opts.repeatedCap {
+				continue
 			}
-			continue
 		}
-		body = append(body, line)
+		meta = append(meta, line)
+	}
+	if emptyMeta > 0 {
+		meta = append(meta, fmt.Sprintf("…+%d empty metadata fields", emptyMeta))
+	}
+	if repeated > opts.repeatedCap {
+		meta = append(meta, fmt.Sprintf("…+%d more %ss", repeated-opts.repeatedCap, opts.repeatedKey))
 	}
 
+	body := lines[delim+1:]
 	for len(body) > 0 && strings.TrimSpace(body[len(body)-1]) == "" {
 		body = body[:len(body)-1]
 	}
-
-	var bodyOut []string
-	if len(body) > maxBodyLines {
-		bodyOut = append(bodyOut, body[:maxBodyLines]...)
-		bodyOut = append(bodyOut, fmt.Sprintf("…+%d lines", len(body)-maxBodyLines))
-	} else {
-		bodyOut = body
+	shownBody := body
+	if opts.bodyCap > 0 && len(shownBody) > opts.bodyCap {
+		shownBody = shownBody[:opts.bodyCap]
 	}
-
-	var b strings.Builder
-	b.WriteString(title)
-	for _, m := range meta {
-		b.WriteByte('\n')
-		b.WriteString(m)
+	out := append([]string{}, meta...)
+	if len(shownBody) > 0 {
+		out = append(out, "--")
+		out = append(out, shownBody...)
 	}
-	if len(bodyOut) > 0 {
-		b.WriteString("\n\n")
-		b.WriteString(strings.Join(bodyOut, "\n"))
+	if extra := len(body) - len(shownBody); extra > 0 {
+		out = append(out, fmt.Sprintf("…+%d body lines", extra))
 	}
-	if len(comments) > 0 {
-		fmt.Fprintf(&b, "\n\n…+%d comments", len(comments))
+	rendered := strings.Join(out, "\n")
+	if len(rendered) >= len(raw) {
+		return format.Rendered{}, format.ErrTierInapplicable
 	}
-	if footer != "" {
-		b.WriteByte('\n')
-		b.WriteString(footer)
-	}
-
-	return format.Rendered{Body: []byte(b.String())}, nil
+	return format.Rendered{Body: []byte(rendered)}, nil
 }

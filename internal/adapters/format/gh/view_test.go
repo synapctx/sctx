@@ -2,74 +2,75 @@ package gh
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/synapctx/sctx/internal/domain/format"
 )
 
-func TestAggressiveViewLongBody(t *testing.T) {
+func TestAggressiveViewCurrentNativeShape(t *testing.T) {
 	f := New()
-	var bodyLines []string
-	for i := 1; i <= 40; i++ {
-		bodyLines = append(bodyLines, "body line")
-		_ = i
+	var body strings.Builder
+	for i := 1; i <= 45; i++ {
+		fmt.Fprintf(&body, "body line %02d\n", i)
 	}
-	stdout := "Fix crash in parser #123\n" +
-		"Open • octocat wants to merge 3 commits into main from fix-branch\n" +
-		"Labels: bug, urgent\n" +
-		"\n" +
-		strings.Join(bodyLines, "\n") + "\n" +
-		"\n" +
-		"View this pull request on GitHub: https://github.com/owner/repo/pull/123\n"
+	raw := "title:\tUpdate glamour to v2\n" +
+		"state:\tDRAFT\n" +
+		"author:\theaths\n" +
+		"labels:\texternal, needs-triage\n" +
+		"assignees:\t\n" +
+		"reviewers:\tCopilot (AI)\n" +
+		"projects:\t\n" +
+		"milestone:\t\n" +
+		"number:\t14148\n" +
+		"url:\thttps://github.com/cli/cli/pull/14148\n" +
+		"additions:\t36\n" +
+		"deletions:\t40\n" +
+		"auto-merge:\tdisabled\n--\n" + body.String()
 
-	in := format.Input{
-		Argv:   []string{"gh", "pr", "view", "123"},
-		Stdout: strings.NewReader(stdout),
-	}
-	out, err := f.Aggressive(context.Background(), in)
+	out, err := f.Aggressive(context.Background(), format.Input{
+		Argv: []string{"gh", "pr", "view", "14148"}, Stdout: strings.NewReader(raw),
+	})
 	if err != nil {
 		t.Fatalf("Aggressive() error = %v", err)
 	}
-	body := string(out.Body)
-	if !strings.HasPrefix(body, "Fix crash in parser #123") {
-		t.Errorf("missing title: %q", body)
+	got := string(out.Body)
+	for _, want := range []string{"title:\tUpdate glamour to v2", "…+3 empty metadata fields", "body line 40", "…+5 body lines"} {
+		if !strings.Contains(got, want) {
+			t.Errorf("body missing %q: %q", want, got)
+		}
 	}
-	if !strings.Contains(body, "…+15 lines") {
-		t.Errorf("missing truncation marker: %q", body)
-	}
-	if !strings.Contains(body, "View this pull request on GitHub") {
-		t.Errorf("missing footer: %q", body)
+	if strings.Contains(got, "body line 41") {
+		t.Errorf("body cap was not applied: %q", got)
 	}
 }
 
-func TestAggressiveViewWithComments(t *testing.T) {
-	f := New()
-	stdout := "Add feature X #42\n" +
-		"Open • octocat wants to merge 1 commit into main from feature-x\n" +
-		"\n" +
-		"Summary of the change.\n" +
-		"\n" +
-		"Comments\n" +
-		"--------\n" +
-		"user1 commented: looks good\n" +
-		"user2 commented: needs a test\n" +
-		"\n" +
-		"View this pull request on GitHub: https://github.com/owner/repo/pull/42\n"
-
-	in := format.Input{
-		Argv:   []string{"gh", "pr", "view", "42"},
-		Stdout: strings.NewReader(stdout),
+func TestAggressiveReleaseViewCountsAssets(t *testing.T) {
+	var raw strings.Builder
+	raw.WriteString("title:\tGitHub CLI 2.97.0\ntag:\tv2.97.0\ndraft:\tfalse\nprerelease:\tfalse\n")
+	for i := 0; i < 15; i++ {
+		fmt.Fprintf(&raw, "asset:\tgh_2.97.0_%02d.tar.gz\n", i)
 	}
-	out, err := f.Aggressive(context.Background(), in)
+	raw.WriteString("--\nRelease notes.\n")
+	out, err := New().Aggressive(context.Background(), format.Input{
+		Argv: []string{"gh", "release", "view", "v2.97.0"}, Stdout: strings.NewReader(raw.String()),
+	})
 	if err != nil {
 		t.Fatalf("Aggressive() error = %v", err)
 	}
-	body := string(out.Body)
-	if !strings.Contains(body, "…+2 comments") {
-		t.Errorf("missing comments marker: %q", body)
+	if got := string(out.Body); !strings.Contains(got, "…+3 more assets") {
+		t.Fatalf("missing counted asset elision: %q", got)
 	}
-	if strings.Contains(body, "user1 commented") {
-		t.Errorf("comment thread not dropped: %q", body)
+}
+
+func TestAggressiveViewUnexpectedShapeDeclines(t *testing.T) {
+	for _, raw := range []string{"", "Title first\nOpen • old presentation format\n"} {
+		_, err := New().Aggressive(context.Background(), format.Input{
+			Argv: []string{"gh", "pr", "view", "1"}, Stdout: strings.NewReader(raw),
+		})
+		if err != format.ErrTierInapplicable {
+			t.Errorf("raw %q error = %v, want ErrTierInapplicable", raw, err)
+		}
 	}
 }

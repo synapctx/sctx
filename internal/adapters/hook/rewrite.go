@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/synapctx/sctx/internal/platform/dockerargv"
+	"github.com/synapctx/sctx/internal/platform/ghargv"
 	"github.com/synapctx/sctx/internal/platform/gitargv"
 	"github.com/synapctx/sctx/internal/platform/kubectlargv"
 )
@@ -787,8 +788,11 @@ func matchSegment(text string) (int, bool) {
 	}
 	program := tokens[idx].text
 	lookupProgram := program
-	if i := strings.LastIndexAny(lookupProgram, `/\`); i >= 0 && lookupProgram[i+1:] == "git" {
-		lookupProgram = "git"
+	if i := strings.LastIndexAny(lookupProgram, `/\`); i >= 0 {
+		base := lookupProgram[i+1:]
+		if base == "git" || base == "gh" {
+			lookupProgram = base
+		}
 	}
 
 	if reservedNames[lookupProgram] {
@@ -806,6 +810,15 @@ func matchSegment(text string) (int, bool) {
 		}
 		inv, ok := gitargv.Parse(argv)
 		if !ok || !gitargv.SafeToBuffer(inv) {
+			return 0, false
+		}
+	} else if lookupProgram == "gh" {
+		argv := make([]string, 0, len(tokens)-idx)
+		for _, token := range tokens[idx:] {
+			argv = append(argv, token.text)
+		}
+		inv, ok := ghargv.Parse(argv)
+		if !ok || !ghargv.SafeReadOnly(inv) {
 			return 0, false
 		}
 	} else if len(subs) > 0 {
@@ -916,15 +929,20 @@ func deliberatelyUnbuffered(text string) bool {
 	if i := strings.LastIndexAny(program, `/\`); i >= 0 {
 		program = program[i+1:]
 	}
-	if program != "git" {
-		return false
-	}
-	argv := []string{"git"}
+	argv := []string{program}
 	for _, token := range tokens[idx+1:] {
 		argv = append(argv, token.text)
 	}
-	inv, ok := gitargv.Parse(argv)
-	return ok && !gitargv.SafeToBuffer(inv)
+	switch program {
+	case "git":
+		inv, ok := gitargv.Parse(argv)
+		return ok && !gitargv.SafeToBuffer(inv)
+	case "gh":
+		inv, ok := ghargv.Parse(argv)
+		return ok && !ghargv.SafeReadOnly(inv)
+	default:
+		return false
+	}
 }
 
 // tokenize splits s on runs of spaces/tabs, recording each token's byte

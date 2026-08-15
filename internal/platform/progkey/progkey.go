@@ -25,6 +25,7 @@ package progkey
 import (
 	"strings"
 
+	"github.com/synapctx/sctx/internal/platform/ghargv"
 	"github.com/synapctx/sctx/internal/platform/gitargv"
 )
 
@@ -87,9 +88,9 @@ func Key(program, next string) string {
 	return program + " " + next
 }
 
-// FromArgv derives a key from a full argv. Git is special because global
-// options may precede its command; it uses the same parser as the hook and
-// formatter so `git -C repo status` is still attributed to `git status`.
+// FromArgv derives a key from a full argv. Git and gh are special because
+// global options may precede their commands; they use the same parsers as the
+// hook and formatters so repository selectors never become telemetry keys.
 func FromArgv(argv []string) string {
 	if len(argv) == 0 {
 		return ""
@@ -98,6 +99,12 @@ func FromArgv(argv []string) string {
 	if program == "git" {
 		if inv, ok := gitargv.Parse(append([]string{"git"}, argv[1:]...)); ok {
 			return Key(program, inv.Command)
+		}
+		return program
+	}
+	if program == "gh" {
+		if inv, ok := ghargv.Parse(append([]string{"gh"}, argv[1:]...)); ok {
+			return Key(program, inv.Level1)
 		}
 		return program
 	}

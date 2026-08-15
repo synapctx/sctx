@@ -65,6 +65,8 @@ func TestCommandKey(t *testing.T) {
 		{[]string{"git", "-C", "x", "status"}, "git status"},
 		{[]string{"git", "--no-pager", "--git-dir=/tmp/repo.git", "--work-tree", "/tmp/repo", "--namespace", "tenant", "status"}, "git status"},
 		{[]string{"git", "--unknown", "value", "status"}, "git"},
+		{[]string{"gh", "-R", "cli/cli", "pr", "checks", "12"}, "gh pr checks"},
+		{[]string{"gh", "api", "repos/cli/cli"}, "gh api"},
 		{[]string{"kubectl", "--context", "dev", "--request-timeout", "5s", "-n", "ns", "get", "pods"}, "kubectl get"},
 		{[]string{"kubectl", "--warnings-as-errors", "exec", "pod/x", "--", "go", "test"}, "kubectl exec"},
 		{[]string{"kubectl", "--unknown", "value", "get"}, "kubectl"},

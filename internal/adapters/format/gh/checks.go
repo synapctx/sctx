@@ -2,13 +2,15 @@ package gh
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
 )
 
-// aggressiveChecks renders `gh pr checks` output into one compact line per
-// check ("<name> <state>"), preceded by a count/failure summary line.
+// aggressiveChecks retains actionable checks and replaces passing/skipped
+// rows with explicit counted elisions. Native exit 1 means checks failed and
+// is still a valid query result.
 func aggressiveChecks(in format.Input) (format.Rendered, error) {
 	raw := readAll(in.Stdout)
 	lines := splitLines(raw)
@@ -16,39 +18,79 @@ func aggressiveChecks(in format.Input) (format.Rendered, error) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
-	type check struct{ name, state string }
-	var checks []check
-	failing := 0
+	type check struct{ name, state, duration, url string }
+	var actionable []check
+	counts := make(map[string]int)
+	total := 0
 
 	for _, line := range lines {
 		if strings.TrimSpace(line) == "" {
 			continue
 		}
-		var cols []string
-		if strings.Contains(line, "\t") {
-			cols = strings.Split(line, "\t")
-		} else {
-			cols = strings.Fields(line)
+		if !strings.Contains(line, "\t") {
+			return format.Rendered{}, format.ErrTierInapplicable
 		}
-		if len(cols) < 2 {
-			continue
+		cols := strings.Split(line, "\t")
+		if len(cols) < 4 {
+			return format.Rendered{}, format.ErrTierInapplicable
+		}
+		for i := range cols {
+			cols[i] = strings.TrimSpace(cols[i])
 		}
 		name := strings.TrimSpace(cols[0])
-		state := strings.TrimSpace(cols[1])
-		if strings.EqualFold(state, "fail") || strings.EqualFold(state, "failure") {
-			failing++
+		state := strings.ToLower(strings.TrimSpace(cols[1]))
+		if name == "" || state == "" {
+			return format.Rendered{}, format.ErrTierInapplicable
 		}
-		checks = append(checks, check{name, state})
+		total++
+		counts[state]++
+		if state != "pass" && state != "success" && state != "skipping" && state != "skipped" {
+			actionable = append(actionable, check{name: name, state: state, duration: cols[2], url: cols[3]})
+		}
 	}
-	if len(checks) == 0 {
+	if total == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
 	var b strings.Builder
-	fmt.Fprintf(&b, "%d checks (%d failing)", len(checks), failing)
-	for _, c := range checks {
-		fmt.Fprintf(&b, "\n%s %s", c.name, c.state)
+	fmt.Fprintf(&b, "%d checks: %s", total, checkCountSummary(counts))
+	for _, c := range actionable {
+		fmt.Fprintf(&b, "\n%s\t%s\t%s\t%s", c.name, c.state, c.duration, c.url)
 	}
+	passing := counts["pass"] + counts["success"]
+	skipped := counts["skipping"] + counts["skipped"]
+	if passing > 0 {
+		fmt.Fprintf(&b, "\n…+%d passing checks", passing)
+	}
+	if skipped > 0 {
+		fmt.Fprintf(&b, "\n…+%d skipped checks", skipped)
+	}
+	body := b.String()
+	if len(body) >= len(raw) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	return format.Rendered{Body: []byte(body), Note: fmt.Sprintf("%d checks", total)}, nil
+}
 
-	return format.Rendered{Body: []byte(b.String())}, nil
+func checkCountSummary(counts map[string]int) string {
+	order := []string{"fail", "failure", "pending", "queued", "in_progress", "pass", "success", "skipping", "skipped", "cancel"}
+	var parts []string
+	seen := make(map[string]bool)
+	for _, state := range order {
+		if n := counts[state]; n > 0 {
+			parts = append(parts, fmt.Sprintf("%d %s", n, state))
+			seen[state] = true
+		}
+	}
+	var rest []string
+	for state := range counts {
+		if !seen[state] {
+			rest = append(rest, state)
+		}
+	}
+	sort.Strings(rest)
+	for _, state := range rest {
+		parts = append(parts, fmt.Sprintf("%d %s", counts[state], state))
+	}
+	return strings.Join(parts, ", ")
 }

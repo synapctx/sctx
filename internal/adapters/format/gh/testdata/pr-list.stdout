@@ -1,0 +1,5 @@
+14148	Update glamour to v2	heaths:issue3718	DRAFT	2026-08-15T00:09:53Z
+14136	Add worktree checkout to gh issue develop	feature/worktree	OPEN	2026-08-13T10:26:41Z
+14130	Support additional repository selectors	feature/selectors	OPEN	2026-08-12T09:20:11Z
+14122	Avoid duplicate API requests in status	fix/status	OPEN	2026-08-11T08:19:10Z
+14118	Document extension authentication behavior	docs/auth	DRAFT	2026-08-10T07:18:09Z
