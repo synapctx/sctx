@@ -55,7 +55,7 @@ Wrapped today: ` + "`go`" + `, ` + "`git`" + `, ` + "`grep`/`rg`" + `, ` + "`ls`
 ` + "`pytest`" + `, ` + "`ruff`" + `, ` + "`mypy`" + `, ` + "`pip`/`uv`/`poetry`" + `,
 ` + "`npm`/`pnpm`/`yarn`" + `, ` + "`cargo`" + `, ` + "`dotnet`" + `, ` + "`mvn`/`gradle`" + `,
 ` + "`composer`" + `, ` + "`bundle`" + `, ` + "`tsc`/`eslint`" + `, ` + "`brew`" + `,
-` + "`systemctl`/`journalctl`" + `, ` + "`mongosh`/`sqlite3`/`dig`" + `, ` + "`rsync`" + `, ` + "`jq`/`curl`" + `,
+` + "`systemctl`/`journalctl`" + `, ` + "`mongosh`/`sqlite3`/`dig`/`psql`" + `, ` + "`rsync`" + `, ` + "`jq`/`curl`" + `,
 ` + "`ssh`" + ` (delegates to the remote command's formatter).
 
 Generic-only: cloud/IaC/build rows and ` + "`jq`/`curl`/`sqlite3`" + `; unknown shapes stay raw.

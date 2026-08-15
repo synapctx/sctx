@@ -48,6 +48,7 @@ import (
 	pipfmt "github.com/synapctx/sctx/internal/adapters/format/pip"
 	"github.com/synapctx/sctx/internal/adapters/format/projectfilter"
 	"github.com/synapctx/sctx/internal/adapters/format/psproc"
+	"github.com/synapctx/sctx/internal/adapters/format/psql"
 	"github.com/synapctx/sctx/internal/adapters/format/pytest"
 	"github.com/synapctx/sctx/internal/adapters/format/read"
 	"github.com/synapctx/sctx/internal/adapters/format/rsync"
@@ -136,6 +137,7 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string) int {
 	registry := run.NewRegistry()
 	registry.Register(gotest.New())
 	registry.Register(dig.New())
+	registry.Register(psql.New())
 	registry.Register(gitfmt.New())
 	registry.Register(dockerfmt.New(registry.ResolveBuiltInByArgv))
 	registry.Register(kubectlfmt.New(registry.ResolveBuiltInByArgv))

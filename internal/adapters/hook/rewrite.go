@@ -169,6 +169,7 @@ var subcommandTable = map[string][]string{
 	// for caller-requested -json output and repetitive result streams.
 	"sqlite3": nil,
 	"dig":     nil,
+	"psql":    nil,
 	"npm":     {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
 	"pnpm":    {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
 	"yarn":    {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
@@ -860,6 +861,14 @@ func matchSegment(text string) (int, bool) {
 		if !ok || !hookKnowsInner(inner) {
 			return 0, false
 		}
+	} else if lookupProgram == "psql" {
+		argv := make([]string, 0, len(tokens)-idx)
+		for _, token := range tokens[idx:] {
+			argv = append(argv, shellTokenValue(token.text))
+		}
+		if !psqlSafeToBuffer(argv) {
+			return 0, false
+		}
 	} else if len(subs) > 0 {
 		switch lookupProgram {
 		case "kubectl":
@@ -1026,9 +1035,60 @@ func deliberatelyUnbuffered(text string) bool {
 		}
 		inner, ok := sshargv.RemoteCommand(argv)
 		return !ok || !hookKnowsInner(inner)
+	case "psql":
+		for i := range argv {
+			argv[i] = shellTokenValue(argv[i])
+		}
+		return !psqlSafeToBuffer(argv)
 	default:
 		return false
 	}
+}
+
+// psqlSafeToBuffer admits only invocations whose argv proves they terminate.
+// A bare client is interactive. Script files are also declined because their
+// contents may contain \watch or another interactive meta-command that the hook
+// cannot inspect safely.
+func psqlSafeToBuffer(argv []string) bool {
+	finite := false
+	for i := 1; i < len(argv); i++ {
+		arg := argv[i]
+		switch {
+		case arg == "-c" || arg == "--command":
+			if i+1 >= len(argv) || !psqlCommandFinite(argv[i+1]) {
+				return false
+			}
+			finite = true
+			i++
+		case strings.HasPrefix(arg, "--command="):
+			if !psqlCommandFinite(strings.TrimPrefix(arg, "--command=")) {
+				return false
+			}
+			finite = true
+		case strings.HasPrefix(arg, "-c") && len(arg) > 2:
+			if !psqlCommandFinite(arg[2:]) {
+				return false
+			}
+			finite = true
+		case arg == "-f" || arg == "--file" || strings.HasPrefix(arg, "--file=") || (strings.HasPrefix(arg, "-f") && len(arg) > 2):
+			return false
+		case arg == "-l" || arg == "--list" || arg == "-?" || arg == "--help" || strings.HasPrefix(arg, "--help=") || arg == "-V" || arg == "--version":
+			finite = true
+		}
+	}
+	return finite
+}
+
+func psqlCommandFinite(command string) bool {
+	lower := strings.ToLower(command)
+	// Meta-commands can watch forever, prompt, open an editor, include an
+	// arbitrary script, or execute a shell command. SQL containing a literal
+	// backslash is conservatively left native too; under-wrapping is preferable
+	// to buffering an interactive psql process.
+	if strings.Contains(command, `\`) {
+		return false
+	}
+	return !(strings.Contains(lower, "copy") && strings.Contains(lower, "from stdin"))
 }
 
 // shellTokenValue removes one matching outer quote pair for the parsers that
