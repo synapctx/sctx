@@ -6,6 +6,7 @@ import (
 
 	"github.com/synapctx/sctx/internal/domain/format"
 	"github.com/synapctx/sctx/internal/platform/dockerargv"
+	"github.com/synapctx/sctx/internal/platform/gitargv"
 	"github.com/synapctx/sctx/internal/platform/kubectlargv"
 )
 
@@ -65,7 +66,6 @@ var subcommandPrograms = map[string]bool{
 // valueFlags lists per-program global flags that consume the next argument,
 // so it is not mistaken for the subcommand (e.g. `git -C path status`).
 var valueFlags = map[string]map[string]bool{
-	"git":     {"-C": true, "-c": true, "--git-dir": true, "--work-tree": true},
 	"kubectl": {"--context": true, "-n": true, "--namespace": true, "--kubeconfig": true},
 }
 
@@ -79,6 +79,13 @@ func CommandKey(argv []string) string {
 	}
 	if !subcommandPrograms[program] {
 		return program
+	}
+	if program == "git" {
+		inv, ok := gitargv.Parse(append([]string{program}, rest...))
+		if !ok {
+			return program
+		}
+		return program + " " + inv.Command
 	}
 	if program == "kubectl" {
 		inv, ok := kubectlargv.Parse(append([]string{program}, rest...))

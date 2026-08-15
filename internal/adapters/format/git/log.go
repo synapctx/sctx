@@ -19,9 +19,7 @@ func logArgsAlreadyCompact(args []string) bool {
 		switch {
 		case a == "--oneline":
 			return true
-		case strings.HasPrefix(a, "--format"):
-			return true
-		case strings.HasPrefix(a, "--pretty"):
+		case a == "--pretty=oneline":
 			return true
 		}
 	}
@@ -59,6 +57,9 @@ func aggressiveLogCompact(raw []byte, lines []string) (format.Rendered, error) {
 // caller already requested a compact/custom format (one line per commit),
 // the content is left as-is and only capped to the most recent commits.
 func aggressiveLog(in format.Input, args []string) (format.Rendered, error) {
+	if logArgsUnsafeToParse(args) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	raw := readAll(in.Stdout)
 	lines := splitLines(raw)
 	if len(lines) == 0 {
@@ -119,8 +120,15 @@ func aggressiveLog(in format.Input, args []string) (format.Rendered, error) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
+	shown := commits
+	extra := 0
+	if len(commits) > logCompactCap {
+		shown = commits[:logCompactCap]
+		extra = len(commits) - logCompactCap
+	}
+
 	var b strings.Builder
-	for i, c := range commits {
+	for i, c := range shown {
 		if i > 0 {
 			b.WriteByte('\n')
 		}
@@ -134,8 +142,24 @@ func aggressiveLog(in format.Input, args []string) (format.Rendered, error) {
 		}
 		fmt.Fprintf(&b, "%s %s (%s, %s)", short, c.subject, c.author, when)
 	}
+	if extra > 0 {
+		fmt.Fprintf(&b, "\n…+%d more commits", extra)
+	}
 
-	return format.Rendered{Body: []byte(b.String())}, nil
+	return format.Rendered{Body: []byte(b.String()), Note: fmt.Sprintf("%d commits (%d shown)", len(commits), len(shown))}, nil
+}
+
+func logArgsUnsafeToParse(args []string) bool {
+	for _, a := range args {
+		switch {
+		case strings.HasPrefix(a, "--format"), strings.HasPrefix(a, "--pretty") && a != "--pretty=oneline":
+			return true
+		case a == "-p", a == "-u", a == "--patch", a == "--stat", a == "--shortstat", a == "--numstat",
+			a == "--name-only", a == "--name-status", a == "--raw", a == "--summary", a == "--graph":
+			return true
+		}
+	}
+	return false
 }
 
 // relativeTime renders a coarse human-relative duration from t to now,

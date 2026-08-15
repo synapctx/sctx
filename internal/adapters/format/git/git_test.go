@@ -16,6 +16,16 @@ func TestDescriptor(t *testing.T) {
 	}
 }
 
+func TestDedicatedCoverageClassification(t *testing.T) {
+	f := New()
+	if !f.Dedicated([]string{"git", "-C", "/repo", "status"}) {
+		t.Error("status should be dedicated")
+	}
+	if f.Dedicated([]string{"git", "check-ignore", "file"}) {
+		t.Error("generic finite fallback must not be labelled dedicated")
+	}
+}
+
 func TestSubcommand(t *testing.T) {
 	tests := []struct {
 		name string
@@ -61,18 +71,14 @@ func TestNonZeroExitDegradesReadOnlyAggressive(t *testing.T) {
 	if _, err := f.Aggressive(context.Background(), in); err != format.ErrTierInapplicable {
 		t.Errorf("err = %v, want ErrTierInapplicable", err)
 	}
-	// Relaxed tier must still preserve the fatal error.
+	// Relaxed also declines so the tier chain emits both native streams byte-for-byte.
 	in2 := format.Input{
 		Argv:     []string{"git", "log"},
 		Stdout:   strings.NewReader(""),
 		Stderr:   strings.NewReader("fatal: bad revision 'nope'\n"),
 		ExitCode: 128,
 	}
-	out, err := f.Relaxed(context.Background(), in2)
-	if err != nil {
-		t.Fatalf("Relaxed() error = %v", err)
-	}
-	if !strings.Contains(string(out.Body), "fatal: bad revision") {
-		t.Errorf("body missing fatal error: %q", out.Body)
+	if _, err := f.Relaxed(context.Background(), in2); err != format.ErrTierInapplicable {
+		t.Errorf("Relaxed() error = %v, want ErrTierInapplicable", err)
 	}
 }

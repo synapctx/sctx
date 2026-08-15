@@ -50,6 +50,13 @@ func TestKeyNeverLeaksArguments(t *testing.T) {
 	}
 }
 
+func TestFromArgvGitGlobals(t *testing.T) {
+	got := FromArgv([]string{"/usr/bin/git", "--no-pager", "-C", "/private/repo", "-c", "color.ui=false", "status", "--short"})
+	if got != "git status" {
+		t.Fatalf("FromArgv() = %q, want git status", got)
+	}
+}
+
 // TestKeyKeepsRealSubcommands — the fix must not flatten everything. The subcommand is what
 // makes the meter actionable: `terraform plan` is output-heavy where `terraform apply` is
 // not, and a formatter is written for one and not the other.

@@ -9,7 +9,6 @@ import (
 	"context"
 	"io"
 	"os"
-	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -78,8 +77,14 @@ func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
 		return outcome.ExitCode, err
 	}
 
-	formatter, matched := s.registry.ResolveByArgv(argv)
-	if !matched && s.sniff != nil {
+	formatter, resolved := s.registry.ResolveByArgv(argv)
+	formatterMatched := resolved
+	if resolved {
+		if classifier, ok := formatter.(interface{ Dedicated([]string) bool }); ok {
+			formatterMatched = classifier.Dedicated(argv)
+		}
+	}
+	if !resolved && s.sniff != nil {
 		// EVERY unmatched command gets the generic formatter, not just the ones
 		// whose output starts with `{`. The JSON-only gate that used to stand here
 		// is why the unmatched path saved exactly zero tokens across 179 runs and
@@ -92,7 +97,7 @@ func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
 		// happens today.
 		formatter = s.sniff
 
-		// matched stays FALSE. The generic formatter is a safety net, not
+		// formatterMatched stays FALSE. The generic formatter is a safety net, not
 		// coverage, and telemetry must keep telling the two apart or the
 		// coverage-gap meter goes blind: the old JSON sniffer reported itself as
 		// matched, which counted a sniffed command as a covered one.
@@ -119,7 +124,7 @@ func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
 		emittedStderr = len(rawStderr)
 	}
 
-	s.account(ctx, argv, formatter, matched, outcome, result, int64(len(raw)+len(rawStderr)), int64(len(result.Body)+emittedStderr))
+	s.account(ctx, argv, formatter, formatterMatched, outcome, result, int64(len(raw)+len(rawStderr)), int64(len(result.Body)+emittedStderr))
 	return outcome.ExitCode, nil
 }
 
@@ -139,7 +144,9 @@ func (s *Service) account(ctx context.Context, argv []string, formatter format.F
 	}
 	now := time.Now().UTC()
 	formatterName := "verbatim"
-	if formatter != nil {
+	if !formatterMatched && formatter != nil {
+		formatterName = "(generic)"
+	} else if formatter != nil {
 		formatterName = formatter.Descriptor().Command
 	}
 
@@ -206,19 +213,11 @@ func readAll(s domexec.Spill) ([]byte, error) {
 }
 
 // deriveProgram returns the stable aggregation key used by telemetry: the
-// program's basename plus its first non-flag argument (e.g. "go test",
-// "terraform plan"). Mechanical by design — unlike CommandKey it doesn't
-// consult a per-program subcommand table, so it stays cheap to compute for
-// every command including ones sctx doesn't format.
+// program's basename plus its operation (e.g. "go test", "git status").
+// Git's global options are scanned before selecting that operation so paths
+// passed through -C/--git-dir never enter telemetry keys.
 func deriveProgram(argv []string) string {
-	if len(argv) == 0 {
-		return ""
-	}
-	var next string
-	if len(argv) > 1 {
-		next = argv[1]
-	}
-	return progkey.Key(filepath.Base(argv[0]), next)
+	return progkey.FromArgv(argv)
 }
 
 // looksLikeJSON is deliberately GONE. It gated the fallback on stdout starting

@@ -95,6 +95,11 @@ func filterWriteNoise(lines []string) []string {
 // rejected/error content) and drops transfer progress and advice/hints.
 // Stderr is filtered the same way and folded into Body.
 func aggressiveWrite(sub string, in format.Input) (format.Rendered, error) {
+	// On failure, authentication messages, hooks, remote diagnostics and Git's
+	// own hints are all actionable. Preserve the native streams verbatim.
+	if in.ExitCode != 0 {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	rawStdout := readAll(in.Stdout)
 	rawStderr := readAll(in.Stderr)
 

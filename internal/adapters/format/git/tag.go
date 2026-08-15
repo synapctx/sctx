@@ -12,7 +12,10 @@ const tagCap = 40
 
 // aggressiveTag caps `git tag` (one tag name, or "<name> <annotation>" for
 // `git tag -n`, per line) to the first tagCap entries.
-func aggressiveTag(in format.Input) (format.Rendered, error) {
+func aggressiveTag(in format.Input, args []string) (format.Rendered, error) {
+	if hasCustomLineFormat(args) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	raw := readAll(in.Stdout)
 	lines := nonEmptyLines(splitLines(raw))
 	if len(lines) == 0 {

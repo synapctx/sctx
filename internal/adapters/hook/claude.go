@@ -156,11 +156,11 @@ func deriveProgram(cmd string) string {
 	if idx >= len(tokens) {
 		return ""
 	}
-	var next string
-	if idx+1 < len(tokens) {
-		next = tokens[idx+1].text
+	argv := make([]string, 0, len(tokens)-idx)
+	for _, token := range tokens[idx:] {
+		argv = append(argv, token.text)
 	}
-	return progkey.Key(tokens[idx].text, next)
+	return progkey.FromArgv(argv)
 }
 
 func writeRewrite(out io.Writer, rewritten string) {

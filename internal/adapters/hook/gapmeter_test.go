@@ -88,10 +88,9 @@ func TestRealCoverageGapsAreStillReported(t *testing.T) {
 		{"vault read secret/db", "vault read"},
 		{"vault write secret/db x=1", "vault write"},
 		{"mix test --release", "mix test"},
-		// A covered program with an UNCOVERED subcommand is real signal: it says which
-		// subcommand to add, not which program.
+		// An enumerated formatter surface still reports uncovered subcommands. Git is
+		// deliberately absent: all finite verbs now reach fallback coverage.
 		{"go env GOPATH", "go env"},
-		{"git bisect start", "git bisect"},
 	}
 	for _, tt := range cases {
 		seg, ok := gapSegment(tt.cmd)

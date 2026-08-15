@@ -20,7 +20,10 @@ const (
 // aggressiveLsFiles groups `git ls-files` output (one tracked path per
 // line, repo-root relative) by directory, capping both the number of names
 // shown per directory and the number of directories shown.
-func aggressiveLsFiles(in format.Input) (format.Rendered, error) {
+func aggressiveLsFiles(in format.Input, args []string) (format.Rendered, error) {
+	if hasCustomLineFormat(args) || hasAnyArg(args, "--stage", "-s", "--debug", "--eol", "--unmerged", "-u") {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	raw := readAll(in.Stdout)
 	paths := nonEmptyLines(splitLines(raw))
 	if len(paths) == 0 {

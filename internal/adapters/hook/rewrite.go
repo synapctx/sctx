@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/synapctx/sctx/internal/platform/dockerargv"
+	"github.com/synapctx/sctx/internal/platform/gitargv"
 	"github.com/synapctx/sctx/internal/platform/kubectlargv"
 )
 
@@ -117,8 +118,12 @@ func alreadyWrapped(head string) bool {
 // should be rewritten. A nil slice means "always rewrite" regardless of
 // subcommand.
 var subcommandTable = map[string][]string{
-	"go":            {"test", "build", "vet", "mod", "list", "run", "generate", "get"},
-	"git":           {"status", "log", "diff", "show", "add", "commit", "push", "pull", "fetch", "branch", "stash", "blame", "reflog", "tag", "remote", "shortlog", "ls-files", "worktree"},
+	"go": {"test", "build", "vet", "mod", "list", "run", "generate", "get"},
+	// Git's finite porcelain surface is intentionally not enumerated. The
+	// shared argv parser finds the command after global flags and rejects the
+	// interactive/streaming protocol verbs; unknown finite verbs then receive
+	// relaxed/generic/verbatim fallback without being mislabeled structured.
+	"git":           nil,
 	"grep":          nil,
 	"rg":            nil,
 	"ls":            nil,
@@ -232,6 +237,7 @@ var subcommandTable = map[string][]string{
 // `journalctl` and `df` (flags), `mvn`/`gradle` (a goal is close, but a bare
 // `mvn -f pom.xml` puts a path there and the cost of being wrong is a leak).
 var argvOneIsOperation = map[string]bool{
+	"git": true,
 	"aws": true, "gcloud": true, "az": true,
 	"terraform": true, "tofu": true, "terragrunt": true, "pulumi": true, "helm": true,
 }
@@ -780,17 +786,30 @@ func matchSegment(text string) (int, bool) {
 		return 0, false
 	}
 	program := tokens[idx].text
+	lookupProgram := program
+	if i := strings.LastIndexAny(lookupProgram, `/\`); i >= 0 && lookupProgram[i+1:] == "git" {
+		lookupProgram = "git"
+	}
 
-	if reservedNames[program] {
+	if reservedNames[lookupProgram] {
 		return 0, false
 	}
 
-	subs, known := subcommandTable[program]
+	subs, known := subcommandTable[lookupProgram]
 	if !known {
 		return 0, false
 	}
-	if len(subs) > 0 {
-		switch program {
+	if lookupProgram == "git" {
+		argv := make([]string, 0, len(tokens)-idx)
+		for _, token := range tokens[idx:] {
+			argv = append(argv, token.text)
+		}
+		inv, ok := gitargv.Parse(argv)
+		if !ok || !gitargv.SafeToBuffer(inv) {
+			return 0, false
+		}
+	} else if len(subs) > 0 {
+		switch lookupProgram {
 		case "kubectl":
 			argv := make([]string, 0, len(tokens)-idx)
 			for _, token := range tokens[idx:] {
@@ -825,7 +844,7 @@ func matchSegment(text string) (int, bool) {
 	for _, t := range tokens[idx+1:] {
 		args = append(args, t.text)
 	}
-	if streamsForever(program, args) {
+	if streamsForever(lookupProgram, args) {
 		return 0, false
 	}
 
@@ -868,6 +887,9 @@ func gapSegment(cmd string) (string, bool) {
 		if !wrappable(segs, i) {
 			return "", false
 		}
+		if deliberatelyUnbuffered(seg.text) {
+			return "", false
+		}
 		if _, covered := matchSegment(seg.text); covered {
 			return "", false
 		}
@@ -875,6 +897,34 @@ func gapSegment(cmd string) (string, bool) {
 	}
 
 	return "", false
+}
+
+// deliberatelyUnbuffered distinguishes intentional safety exclusions from
+// coverage gaps. Interactive/protocol Git invocations cannot acquire a useful
+// formatter while sctx buffers to EOF, so reporting them would pollute the
+// roadmap with work we must not implement.
+func deliberatelyUnbuffered(text string) bool {
+	tokens := tokenize(text)
+	idx := 0
+	for idx < len(tokens) && isAssignment(tokens[idx].text) {
+		idx++
+	}
+	if idx >= len(tokens) {
+		return false
+	}
+	program := tokens[idx].text
+	if i := strings.LastIndexAny(program, `/\`); i >= 0 {
+		program = program[i+1:]
+	}
+	if program != "git" {
+		return false
+	}
+	argv := []string{"git"}
+	for _, token := range tokens[idx+1:] {
+		argv = append(argv, token.text)
+	}
+	inv, ok := gitargv.Parse(argv)
+	return ok && !gitargv.SafeToBuffer(inv)
 }
 
 // tokenize splits s on runs of spaces/tabs, recording each token's byte

@@ -14,7 +14,10 @@ const shortlogCap = 20
 // aggressiveShortlog caps `git shortlog -sn` (one "<count>  <author>" entry
 // per line, already sorted by commit count) to the top shortlogCap
 // contributors.
-func aggressiveShortlog(in format.Input) (format.Rendered, error) {
+func aggressiveShortlog(in format.Input, args []string) (format.Rendered, error) {
+	if hasCustomLineFormat(args) || !shortlogSummary(args) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	raw := readAll(in.Stdout)
 	lines := nonEmptyLines(splitLines(raw))
 	if len(lines) == 0 {
@@ -34,4 +37,16 @@ func aggressiveShortlog(in format.Input) (format.Rendered, error) {
 		Body: []byte(body),
 		Note: fmt.Sprintf("%d contributors (%d shown)", len(lines), shortlogCap),
 	}, nil
+}
+
+func shortlogSummary(args []string) bool {
+	for _, arg := range args {
+		if arg == "--summary" {
+			return true
+		}
+		if strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && strings.ContainsRune(arg[1:], 's') {
+			return true
+		}
+	}
+	return false
 }

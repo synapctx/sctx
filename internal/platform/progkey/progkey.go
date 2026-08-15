@@ -22,7 +22,11 @@
 // keys, `ls` across three, so every one of them ranked lower than its real usage.
 package progkey
 
-import "strings"
+import (
+	"strings"
+
+	"github.com/synapctx/sctx/internal/platform/gitargv"
+)
 
 // subcommandBearing lists programs whose FIRST ARGUMENT names an operation from a bounded
 // vocabulary defined by the tool itself — `git status`, `cargo build`, `terraform plan`.
@@ -81,6 +85,27 @@ func Key(program, next string) string {
 		return program
 	}
 	return program + " " + next
+}
+
+// FromArgv derives a key from a full argv. Git is special because global
+// options may precede its command; it uses the same parser as the hook and
+// formatter so `git -C repo status` is still attributed to `git status`.
+func FromArgv(argv []string) string {
+	if len(argv) == 0 {
+		return ""
+	}
+	program := basename(argv[0])
+	if program == "git" {
+		if inv, ok := gitargv.Parse(append([]string{"git"}, argv[1:]...)); ok {
+			return Key(program, inv.Command)
+		}
+		return program
+	}
+	var next string
+	if len(argv) > 1 {
+		next = argv[1]
+	}
+	return Key(program, next)
 }
 
 // basename strips the directory from an invoked program, so a program key is a

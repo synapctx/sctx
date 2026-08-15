@@ -18,6 +18,9 @@ func aggressiveWorktree(in format.Input, args []string) (format.Rendered, error)
 	if len(args) == 0 || args[0] != "list" {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
+	if hasAnyArg(args[1:], "--porcelain", "-z") {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 
 	raw := readAll(in.Stdout)
 	lines := nonEmptyLines(splitLines(raw))

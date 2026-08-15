@@ -22,7 +22,10 @@ const diffStatFileCap = 30
 // context lines. A trailing "N files changed" note is appended. When the
 // output is a `--stat` summary instead (no unified-diff headers at all),
 // the per-file stat lines are capped and the summary line is always kept.
-func aggressiveDiff(in format.Input) (format.Rendered, error) {
+func aggressiveDiff(in format.Input, args []string) (format.Rendered, error) {
+	if diffArgsUnsafeToParse(args) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	raw := readAll(in.Stdout)
 	lines := splitLines(raw)
 	if len(lines) == 0 {
@@ -46,9 +49,17 @@ func aggressiveDiff(in format.Input) (format.Rendered, error) {
 		case strings.HasPrefix(line, "index "),
 			strings.HasPrefix(line, "new file mode"),
 			strings.HasPrefix(line, "deleted file mode"),
+			strings.HasPrefix(line, "old mode"),
+			strings.HasPrefix(line, "new mode"),
 			strings.HasPrefix(line, "similarity index"),
+			strings.HasPrefix(line, "dissimilarity index"),
+			strings.HasPrefix(line, "copy from"),
+			strings.HasPrefix(line, "copy to"),
 			strings.HasPrefix(line, "rename from"),
 			strings.HasPrefix(line, "rename to"),
+			strings.HasPrefix(line, "Binary files "),
+			strings.HasPrefix(line, "Submodule "),
+			strings.HasPrefix(line, "\\ No newline at end of file"),
 			strings.HasPrefix(line, "+++"),
 			strings.HasPrefix(line, "---"),
 			strings.HasPrefix(line, "@@"):
@@ -82,6 +93,18 @@ func aggressiveDiff(in format.Input) (format.Rendered, error) {
 		Body: []byte(strings.Join(kept, "\n")),
 		Note: note,
 	}, nil
+}
+
+func diffArgsUnsafeToParse(args []string) bool {
+	for _, a := range args {
+		switch {
+		case a == "--binary", a == "--raw", a == "--numstat", a == "--shortstat",
+			a == "--name-only", a == "--name-status", a == "--check", a == "--cc",
+			a == "-c", a == "--combined-all-paths", strings.HasPrefix(a, "--word-diff"):
+			return true
+		}
+	}
+	return false
 }
 
 // aggressiveDiffStat caps a `git diff --stat` summary (per-file " path |

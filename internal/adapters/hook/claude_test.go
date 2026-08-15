@@ -301,6 +301,7 @@ func TestDeriveProgram(t *testing.T) {
 		{"ls -la", "ls"},
 		{"terraform plan -out x", "terraform plan"},
 		{"mix test 2>&1", "mix test"},
+		{"git --no-pager -C repo -c color.ui=false status --short", "git status"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.cmd, func(t *testing.T) {

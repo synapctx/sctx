@@ -111,28 +111,15 @@ func TestAggressiveWrite(t *testing.T) {
 		}
 	})
 
-	t.Run("rejected push keeps error content and drops hints", func(t *testing.T) {
+	t.Run("rejected push declines to preserve every native diagnostic", func(t *testing.T) {
 		in := format.Input{
 			Argv:     []string{"git", "push"},
 			Stdout:   strings.NewReader(""),
 			Stderr:   strings.NewReader(pushRejected),
 			ExitCode: 1,
 		}
-		out, err := f.Aggressive(context.Background(), in)
-		if err != nil {
-			t.Fatalf("Aggressive() error = %v", err)
-		}
-		body := string(out.Body)
-		for _, want := range []string{"rejected", "error: failed to push"} {
-			if !strings.Contains(body, want) {
-				t.Errorf("body missing %q, got: %q", want, body)
-			}
-		}
-		if strings.Contains(body, "hint:") {
-			t.Errorf("body still contains hint lines: %q", body)
-		}
-		if len(out.Body) == 0 {
-			t.Error("body is empty for non-empty raw input")
+		if _, err := f.Aggressive(context.Background(), in); err != format.ErrTierInapplicable {
+			t.Fatalf("Aggressive() error = %v, want ErrTierInapplicable", err)
 		}
 	})
 

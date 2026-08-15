@@ -12,7 +12,10 @@ const reflogCap = 30
 
 // aggressiveReflog caps `git reflog` (one "<hash> HEAD@{N}: <action>: <msg>"
 // entry per line, newest first) to the most recent reflogCap entries.
-func aggressiveReflog(in format.Input) (format.Rendered, error) {
+func aggressiveReflog(in format.Input, args []string) (format.Rendered, error) {
+	if hasCustomLineFormat(args) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	raw := readAll(in.Stdout)
 	lines := nonEmptyLines(splitLines(raw))
 	if len(lines) == 0 {

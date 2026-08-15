@@ -10,7 +10,9 @@ import (
 	"io"
 	"strings"
 
+	"github.com/synapctx/sctx/internal/adapters/format/generic"
 	"github.com/synapctx/sctx/internal/domain/format"
+	"github.com/synapctx/sctx/internal/platform/gitargv"
 )
 
 // Formatter renders git command output.
@@ -27,43 +29,28 @@ func (f *Formatter) Descriptor() format.Match {
 	return format.Match{Command: "git"}
 }
 
-// gitGlobalFlagsWithValue are git's own global options that consume the next
-// argv slot, so they must not be mistaken for the subcommand.
-var gitGlobalFlagsWithValue = map[string]bool{
-	"-C":           true,
-	"-c":           true,
-	"--git-dir":    true,
-	"--work-tree":  true,
-	"--namespace":  true,
-	"--exec-path":  true,
-	"--config-env": true,
+// Dedicated reports whether argv selects one of Git's purpose-built renderers.
+// Finite unknown verbs still pass through this formatter for the generic safety
+// net, but accounting must not call that dedicated command coverage.
+func (f *Formatter) Dedicated(argv []string) bool {
+	sub, _ := subcommand(argv)
+	switch sub {
+	case "add", "commit", "push", "pull", "fetch", "status", "log", "diff", "show",
+		"branch", "stash", "blame", "reflog", "tag", "remote", "shortlog", "ls-files", "worktree":
+		return true
+	default:
+		return false
+	}
 }
 
 // subcommand returns the git subcommand (e.g. "status") and the arguments
-// that follow it, skipping argv[0] and any global flags (and their values).
+// that follow it, using the same global-option grammar as the hook.
 func subcommand(argv []string) (sub string, rest []string) {
-	if len(argv) <= 1 {
+	inv, ok := gitargv.Parse(argv)
+	if !ok {
 		return "", nil
 	}
-	args := argv[1:]
-	for i := 0; i < len(args); i++ {
-		a := args[i]
-		if a == "--" {
-			continue
-		}
-		if strings.HasPrefix(a, "-") {
-			// Flags of the form --key=value never consume the next slot.
-			if strings.Contains(a, "=") {
-				continue
-			}
-			if gitGlobalFlagsWithValue[a] {
-				i++
-			}
-			continue
-		}
-		return a, args[i+1:]
-	}
-	return "", nil
+	return inv.Command, inv.Args
 }
 
 // Aggressive dispatches to a per-subcommand structured renderer.
@@ -77,34 +64,34 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 
 	// For read-only/reporting subcommands, a non-zero exit almost always
 	// means an error message on stderr that these structured parsers don't
-	// understand; degrade to relaxed line filtering, which preserves it.
+	// understand; both tiers decline so the chain preserves it verbatim.
 	if in.ExitCode != 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
 	switch sub {
 	case "status":
-		return aggressiveStatus(in)
+		return aggressiveStatus(in, args)
 	case "log":
 		return aggressiveLog(in, args)
 	case "diff", "show":
-		return aggressiveDiff(in)
+		return aggressiveDiff(in, args)
 	case "branch":
-		return aggressiveBranch(in)
+		return aggressiveBranch(in, args)
 	case "stash":
 		return aggressiveStash(in, args)
 	case "blame":
 		return aggressiveBlame(in)
 	case "reflog":
-		return aggressiveReflog(in)
+		return aggressiveReflog(in, args)
 	case "tag":
-		return aggressiveTag(in)
+		return aggressiveTag(in, args)
 	case "remote":
 		return aggressiveRemote(in, args)
 	case "shortlog":
-		return aggressiveShortlog(in)
+		return aggressiveShortlog(in, args)
 	case "ls-files":
-		return aggressiveLsFiles(in)
+		return aggressiveLsFiles(in, args)
 	case "worktree":
 		return aggressiveWorktree(in, args)
 	default:
@@ -112,9 +99,78 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 	}
 }
 
-// Relaxed applies heuristic line-level filtering to any git subcommand.
+// Relaxed applies Git-specific filtering to dedicated human output and the
+// shape-only generic safety net to unknown finite commands.
 func (f *Formatter) Relaxed(ctx context.Context, in format.Input) (format.Rendered, error) {
+	if in.ExitCode != 0 || machineReadableInvocation(in.Argv) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	sub, args := subcommand(in.Argv)
+	if opaqueOutputInvocation(sub, args) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	if !dedicatedHumanOutput(sub, args) {
+		// Unknown finite Git verbs still get the shape-only generic safety net:
+		// valid JSON compaction and provable repeated-line collapsing. No output
+		// grammar is guessed, so this is reachability rather than dedicated coverage.
+		return generic.New().Relaxed(ctx, in)
+	}
 	return relaxedFilter(in)
+}
+
+func opaqueOutputInvocation(sub string, args []string) bool {
+	switch sub {
+	case "cat-file", "archive", "config", "notes":
+		return true
+	case "show":
+		for _, arg := range args {
+			if !strings.HasPrefix(arg, "-") && strings.Contains(arg, ":") {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func dedicatedHumanOutput(sub string, args []string) bool {
+	switch sub {
+	case "add", "commit", "push", "pull", "fetch", "status", "log", "diff",
+		"branch", "stash", "blame", "reflog", "tag", "remote", "shortlog",
+		"ls-files", "worktree":
+		return true
+	case "show":
+		// `git show REV:path` is arbitrary blob content, not Git presentation.
+		for _, arg := range args {
+			if !strings.HasPrefix(arg, "-") && strings.Contains(arg, ":") {
+				return false
+			}
+		}
+		return true
+	default:
+		return false
+	}
+}
+
+// machineReadableInvocation keeps explicit record separators and user-defined
+// formats byte-authoritative. Their contents have no stable line grammar.
+func machineReadableInvocation(argv []string) bool {
+	sub, args := subcommand(argv)
+	if gitargv.HasFlag(args, "-z", "--null") {
+		return true
+	}
+	if gitargv.HasOptionPrefix(args, "--format", "--pretty", "--output", "--template") {
+		return true
+	}
+	switch sub {
+	case "blame":
+		return hasAnyArg(args, "--porcelain", "--line-porcelain", "--incremental")
+	case "ls-files":
+		return hasAnyArg(args, "--stage", "-s", "--debug", "--eol", "--unmerged", "-u")
+	case "worktree":
+		return len(args) > 0 && args[0] == "list" && hasAnyArg(args[1:], "--porcelain")
+	default:
+		return false
+	}
 }
 
 // readAll drains a possibly-nil io.Reader.

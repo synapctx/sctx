@@ -1,6 +1,7 @@
 package git
 
 import (
+	"bytes"
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
@@ -51,6 +52,9 @@ func filterRelaxedLines(lines []string) []string {
 func relaxedFilter(in format.Input) (format.Rendered, error) {
 	rawStdout := readAll(in.Stdout)
 	rawStderr := readAll(in.Stderr)
+	if bytes.IndexByte(rawStdout, 0) >= 0 || bytes.IndexByte(rawStderr, 0) >= 0 {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 
 	stdoutLines := filterRelaxedLines(splitLines(rawStdout))
 	stderrLines := filterRelaxedLines(splitLines(rawStderr))

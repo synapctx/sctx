@@ -15,7 +15,10 @@ const branchCap = 30
 // (one branch name per line, current branch marked with a leading "*") to
 // branchCap entries, always keeping the current branch regardless of its
 // position in the list.
-func aggressiveBranch(in format.Input) (format.Rendered, error) {
+func aggressiveBranch(in format.Input, args []string) (format.Rendered, error) {
+	if hasCustomLineFormat(args) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	raw := readAll(in.Stdout)
 	lines := nonEmptyLines(splitLines(raw))
 	if len(lines) == 0 {

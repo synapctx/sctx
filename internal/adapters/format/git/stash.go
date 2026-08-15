@@ -18,6 +18,9 @@ func aggressiveStash(in format.Input, args []string) (format.Rendered, error) {
 	if len(args) == 0 || args[0] != "list" {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
+	if hasCustomLineFormat(args[1:]) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 
 	raw := readAll(in.Stdout)
 	lines := nonEmptyLines(splitLines(raw))

@@ -45,7 +45,7 @@ no changes added to commit
 		}
 	})
 
-	t.Run("keeps fatal/error/warning/conflict/rejected lines verbatim", func(t *testing.T) {
+	t.Run("failure declines so native diagnostics remain verbatim", func(t *testing.T) {
 		raw := `fatal: not a git repository
 error: something went wrong
 warning: be careful
@@ -57,15 +57,8 @@ CONFLICT (content): Merge conflict in a.txt
 			Stdout:   strings.NewReader(raw),
 			ExitCode: 1,
 		}
-		out, err := f.Relaxed(context.Background(), in)
-		if err != nil {
-			t.Fatalf("Relaxed() error = %v", err)
-		}
-		body := string(out.Body)
-		for _, want := range []string{"fatal: not a git repository", "error: something went wrong", "warning: be careful", "CONFLICT", "rejected"} {
-			if !strings.Contains(body, want) {
-				t.Errorf("body missing %q, got: %q", want, body)
-			}
+		if _, err := f.Relaxed(context.Background(), in); err != format.ErrTierInapplicable {
+			t.Fatalf("Relaxed() error = %v, want ErrTierInapplicable", err)
 		}
 	})
 

@@ -42,24 +42,30 @@ func isPorcelainStatusLine(line string) bool {
 // aggressiveStatus parses `git status` output into a compact branch/section
 // summary. It handles both the default human-readable form and
 // --short/-s/--porcelain output.
-func aggressiveStatus(in format.Input) (format.Rendered, error) {
+func aggressiveStatus(in format.Input, args []string) (format.Rendered, error) {
+	if hasAnyArg(args, "-z", "--null") {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	raw := readAll(in.Stdout)
 	lines := splitLines(raw)
 	if len(lines) == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
-	if !strings.HasPrefix(strings.TrimSpace(lines[0]), "On branch") &&
-		!strings.HasPrefix(strings.TrimSpace(lines[0]), "HEAD detached") &&
-		isPorcelainStatusLine(lines[0]) {
+	if statusPorcelainV2(args) {
+		return aggressiveStatusPorcelainV2(raw, lines)
+	}
+	if statusShort(args) || isPorcelainStatusLine(lines[0]) || strings.HasPrefix(lines[0], "## ") {
 		return aggressiveStatusShort(raw, lines)
 	}
 
 	branch := "HEAD"
 	ahead, behind := 0, 0
 
-	var staged, modified, untracked []string
+	var staged, modified, untracked, ignored, conflicted []string
+	var operation string
 	section := ""
+	sawHeader := false
 
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
@@ -67,9 +73,21 @@ func aggressiveStatus(in format.Input) (format.Rendered, error) {
 		switch {
 		case strings.HasPrefix(trimmed, "On branch "):
 			branch = strings.TrimPrefix(trimmed, "On branch ")
+			sawHeader = true
 			continue
 		case strings.HasPrefix(trimmed, "HEAD detached"):
 			branch = trimmed
+			sawHeader = true
+			continue
+		case trimmed == "Not currently on any branch.":
+			branch = "HEAD detached"
+			sawHeader = true
+			continue
+		case isOperationStatusLine(trimmed):
+			if operation == "" {
+				operation = trimmed
+			}
+			sawHeader = true
 			continue
 		case strings.HasPrefix(trimmed, "Changes to be committed"):
 			section = "staged"
@@ -79,6 +97,9 @@ func aggressiveStatus(in format.Input) (format.Rendered, error) {
 			continue
 		case strings.HasPrefix(trimmed, "Untracked files"):
 			section = "untracked"
+			continue
+		case strings.HasPrefix(trimmed, "Ignored files"):
+			section = "ignored"
 			continue
 		case strings.HasPrefix(trimmed, "Unmerged paths"):
 			section = "modified"
@@ -108,6 +129,10 @@ func aggressiveStatus(in format.Input) (format.Rendered, error) {
 
 		if section != "" && strings.HasPrefix(line, "\t") {
 			file := statusFile(trimmed)
+			if section == "modified" && isConflictStatusWord(trimmed) {
+				conflicted = append(conflicted, file)
+				continue
+			}
 			switch section {
 			case "staged":
 				staged = append(staged, file)
@@ -115,8 +140,13 @@ func aggressiveStatus(in format.Input) (format.Rendered, error) {
 				modified = append(modified, file)
 			case "untracked":
 				untracked = append(untracked, file)
+			case "ignored":
+				ignored = append(ignored, file)
 			}
 		}
+	}
+	if !sawHeader {
+		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
 	head := branch
@@ -129,23 +159,79 @@ func aggressiveStatus(in format.Input) (format.Rendered, error) {
 		head += fmt.Sprintf(" (behind %d)", behind)
 	}
 
-	if len(staged) == 0 && len(modified) == 0 && len(untracked) == 0 {
+	if operation == "" && len(staged) == 0 && len(modified) == 0 && len(untracked) == 0 && len(ignored) == 0 && len(conflicted) == 0 {
 		return format.Rendered{Body: []byte(head + ": clean")}, nil
 	}
 
 	var b strings.Builder
 	b.WriteString(head)
+	if operation != "" {
+		b.WriteString("\noperation: ")
+		b.WriteString(operation)
+	}
 	if len(staged) > 0 {
-		fmt.Fprintf(&b, "\nstaged (%d): %s", len(staged), strings.Join(staged, ", "))
+		b.WriteByte('\n')
+		b.WriteString(statusGroup("staged", staged))
 	}
 	if len(modified) > 0 {
-		fmt.Fprintf(&b, "\nmodified (%d): %s", len(modified), strings.Join(modified, ", "))
+		b.WriteByte('\n')
+		b.WriteString(statusGroup("modified", modified))
+	}
+	if len(conflicted) > 0 {
+		b.WriteByte('\n')
+		b.WriteString(statusGroup("conflicted", conflicted))
 	}
 	if len(untracked) > 0 {
-		fmt.Fprintf(&b, "\nuntracked (%d): %s", len(untracked), strings.Join(untracked, ", "))
+		b.WriteByte('\n')
+		b.WriteString(statusGroup("untracked", untracked))
+	}
+	if len(ignored) > 0 {
+		b.WriteByte('\n')
+		b.WriteString(statusGroup("ignored", ignored))
 	}
 
 	return format.Rendered{Body: []byte(b.String())}, nil
+}
+
+func isOperationStatusLine(line string) bool {
+	lower := strings.ToLower(line)
+	return strings.Contains(lower, "rebase in progress") ||
+		strings.HasPrefix(lower, "you are currently rebasing") ||
+		strings.HasPrefix(lower, "you are currently cherry-picking") ||
+		strings.HasPrefix(lower, "you are currently reverting") ||
+		strings.HasPrefix(lower, "all conflicts fixed but you are still merging") ||
+		strings.HasPrefix(lower, "you are in the middle of a bisect session")
+}
+
+func statusGroup(name string, files []string) string {
+	shown := files
+	extra := 0
+	if len(files) > statusShortEntryCap {
+		extra = len(files) - statusShortEntryCap
+		shown = files[:statusShortEntryCap]
+	}
+	s := fmt.Sprintf("%s (%d): %s", name, len(files), strings.Join(shown, ", "))
+	if extra > 0 {
+		s += fmt.Sprintf(", …+%d", extra)
+	}
+	return s
+}
+
+func isConflictStatusWord(line string) bool {
+	for _, prefix := range []string{"both modified:", "both added:", "added by us:", "added by them:", "deleted by us:", "deleted by them:", "both deleted:"} {
+		if strings.HasPrefix(line, prefix) {
+			return true
+		}
+	}
+	return false
+}
+
+func statusShort(args []string) bool {
+	return hasAnyArg(args, "-s", "--short", "--porcelain", "--porcelain=v1", "--porcelain=1")
+}
+
+func statusPorcelainV2(args []string) bool {
+	return hasAnyArg(args, "--porcelain=v2", "--porcelain=2")
 }
 
 // statusFile extracts the file path from a status entry line such as
@@ -163,9 +249,14 @@ func statusFile(trimmed string) string {
 // entries into staged/modified/untracked buckets by their XY status code,
 // capping each bucket at statusShortEntryCap paths.
 func aggressiveStatusShort(raw []byte, lines []string) (format.Rendered, error) {
-	var staged, modified, untracked []string
+	var branch string
+	var staged, modified, untracked, ignored, conflicted []string
 
 	for _, line := range lines {
+		if strings.HasPrefix(line, "## ") {
+			branch = strings.TrimPrefix(line, "## ")
+			continue
+		}
 		if !isPorcelainStatusLine(line) {
 			continue
 		}
@@ -174,6 +265,10 @@ func aggressiveStatusShort(raw []byte, lines []string) (format.Rendered, error) 
 		switch {
 		case x == '?' && y == '?':
 			untracked = append(untracked, path)
+		case x == '!' && y == '!':
+			ignored = append(ignored, path)
+		case isConflictCode(x, y):
+			conflicted = append(conflicted, path)
 		default:
 			if x != ' ' {
 				staged = append(staged, path)
@@ -184,32 +279,20 @@ func aggressiveStatusShort(raw []byte, lines []string) (format.Rendered, error) 
 		}
 	}
 
-	if len(staged) == 0 && len(modified) == 0 && len(untracked) == 0 {
+	if branch == "" && len(staged) == 0 && len(modified) == 0 && len(untracked) == 0 && len(ignored) == 0 && len(conflicted) == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
-	group := func(name string, files []string) string {
-		if len(files) == 0 {
-			return ""
-		}
-		shown := files
-		extra := 0
-		if len(files) > statusShortEntryCap {
-			extra = len(files) - statusShortEntryCap
-			shown = files[:statusShortEntryCap]
-		}
-		s := fmt.Sprintf("%s (%d): %s", name, len(files), strings.Join(shown, ", "))
-		if extra > 0 {
-			s += fmt.Sprintf(", …+%d", extra)
-		}
-		return s
-	}
-
 	var parts []string
+	if branch != "" {
+		parts = append(parts, branch)
+	}
 	for _, g := range []string{
-		group("staged", staged),
-		group("modified", modified),
-		group("untracked", untracked),
+		statusGroupIfAny("staged", staged),
+		statusGroupIfAny("modified", modified),
+		statusGroupIfAny("conflicted", conflicted),
+		statusGroupIfAny("untracked", untracked),
+		statusGroupIfAny("ignored", ignored),
 	} {
 		if g != "" {
 			parts = append(parts, g)
@@ -221,4 +304,47 @@ func aggressiveStatusShort(raw []byte, lines []string) (format.Rendered, error) 
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 	return format.Rendered{Body: []byte(body)}, nil
+}
+
+func statusGroupIfAny(name string, files []string) string {
+	if len(files) == 0 {
+		return ""
+	}
+	return statusGroup(name, files)
+}
+
+func isConflictCode(x, y byte) bool {
+	switch string([]byte{x, y}) {
+	case "DD", "AU", "UD", "UA", "DU", "AA", "UU":
+		return true
+	default:
+		return false
+	}
+}
+
+// Porcelain v2 is already compact and stable. For unusually large results,
+// preserve its records verbatim and only cap the record count; headers remain.
+func aggressiveStatusPorcelainV2(raw []byte, lines []string) (format.Rendered, error) {
+	var headers, records []string
+	for _, line := range lines {
+		if strings.HasPrefix(line, "# ") {
+			headers = append(headers, line)
+			continue
+		}
+		if strings.HasPrefix(line, "1 ") || strings.HasPrefix(line, "2 ") || strings.HasPrefix(line, "u ") || strings.HasPrefix(line, "? ") || strings.HasPrefix(line, "! ") {
+			records = append(records, line)
+			continue
+		}
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	if len(records) <= statusShortEntryCap {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	out := append(append([]string{}, headers...), records[:statusShortEntryCap]...)
+	out = append(out, fmt.Sprintf("…+%d more status records", len(records)-statusShortEntryCap))
+	body := strings.Join(out, "\n")
+	if len(body) >= len(raw) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	return format.Rendered{Body: []byte(body), Note: fmt.Sprintf("%d status records (%d shown)", len(records), statusShortEntryCap)}, nil
 }
