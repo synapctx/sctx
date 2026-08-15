@@ -15,7 +15,8 @@
 // pointed at output it has never seen drops columns and no one notices. Nothing
 // here assumes a shape. Both tiers DETECT and then decline:
 //
-//   - aggressive compacts only what parses as JSON (encoding/json says so);
+//   - aggressive compacts only what parses as JSON, or bounds a stream whose
+//     every nonblank line independently parses as JSON;
 //   - relaxed collapses only runs of lines that are byte-identical, or identical
 //     once a narrow leading-timestamp pattern is stripped, and always prints the
 //     count it collapsed.
@@ -35,6 +36,7 @@ import (
 
 	"github.com/synapctx/sctx/internal/adapters/format/collapse"
 	"github.com/synapctx/sctx/internal/adapters/format/jsoncompact"
+	"github.com/synapctx/sctx/internal/adapters/format/jsonlines"
 	"github.com/synapctx/sctx/internal/domain/format"
 )
 
@@ -59,9 +61,29 @@ func (f *Formatter) Descriptor() format.Match {
 	return format.Match{Command: "(generic)"}
 }
 
-// Aggressive compacts JSON stdout, and declines everything else.
+// Aggressive compacts a single JSON document or bounds a valid JSONL/NDJSON
+// stream. Failed commands keep their complete record stream so diagnostics are
+// never discarded merely because each line happens to be valid JSON.
 func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Rendered, error) {
-	return f.json.Aggressive(ctx, in)
+	raw, err := readAll(in.Stdout)
+	if err != nil {
+		return format.Rendered{}, fmt.Errorf("generic: reading stdout: %w", err)
+	}
+
+	jsonIn := in
+	jsonIn.Stdout = bytes.NewReader(raw)
+	if rendered, err := f.json.Aggressive(ctx, jsonIn); err == nil {
+		return rendered, nil
+	} else if err != format.ErrTierInapplicable {
+		return format.Rendered{}, err
+	}
+
+	if in.ExitCode == 0 {
+		if rendered, ok := jsonlines.Render(raw); ok {
+			return rendered, nil
+		}
+	}
+	return format.Rendered{}, format.ErrTierInapplicable
 }
 
 // Relaxed compacts JSON that survived the aggressive tier's own guards, and
@@ -86,6 +108,12 @@ func (f *Formatter) Relaxed(ctx context.Context, in format.Input) (format.Render
 		return format.Rendered{}, err
 	}
 
+	classification := jsonlines.Classify(raw)
+	if classification == jsonlines.MixedJSONLines ||
+		(classification == jsonlines.ValidJSONLines && in.ExitCode != 0) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+
 	if len(raw) == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
@@ -98,4 +126,11 @@ func (f *Formatter) Relaxed(ctx context.Context, in format.Input) (format.Render
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 	return format.Rendered{Body: []byte(body)}, nil
+}
+
+func readAll(r io.Reader) ([]byte, error) {
+	if r == nil {
+		return nil, nil
+	}
+	return io.ReadAll(r)
 }

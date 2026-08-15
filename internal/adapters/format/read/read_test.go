@@ -79,10 +79,10 @@ func TestAggressive(t *testing.T) {
 			t.Fatalf("Aggressive() error = %v", err)
 		}
 		body := string(out.Body)
-		if !strings.Contains(body, "…+7 more JSON lines") {
+		if !strings.Contains(body, "…+7 more JSON records") {
 			t.Errorf("body missing JSONL marker, got: %q", body)
 		}
-		kept := strings.Split(strings.TrimSuffix(body, "\n…+7 more JSON lines"), "\n")
+		kept := strings.Split(strings.TrimSuffix(body, "\n…+7 more JSON records"), "\n")
 		if len(kept) != keepJSONLLines {
 			t.Fatalf("kept %d lines, want %d: %q", len(kept), keepJSONLLines, body)
 		}

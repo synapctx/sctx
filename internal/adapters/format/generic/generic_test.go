@@ -2,17 +2,27 @@ package generic
 
 import (
 	"context"
+	"fmt"
+	"net/url"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/synapctx/sctx/internal/domain/format"
+	"github.com/synapctx/sctx/internal/platform/tokenizer"
 )
 
 func render(t *testing.T, stdout string) (body string, tier string) {
+	return renderInput(t, stdout, 0)
+}
+
+func renderInput(t *testing.T, stdout string, exitCode int) (body string, tier string) {
 	t.Helper()
 	f := New()
 	in := func() format.Input {
-		return format.Input{Stdout: strings.NewReader(stdout)}
+		return format.Input{Stdout: strings.NewReader(stdout), ExitCode: exitCode}
 	}
 	if r, err := f.Aggressive(context.Background(), in()); err == nil {
 		return string(r.Body), "aggressive"
@@ -76,6 +86,92 @@ func TestJSONStillCompacts(t *testing.T) {
 	if strings.Contains(body, "\n  ") {
 		t.Errorf("JSON was not compacted: %q", body)
 	}
+}
+
+func TestJSONLinesFromAnUncoveredCommandAreBounded(t *testing.T) {
+	var records []string
+	for i := 0; i < 12; i++ {
+		records = append(records, fmt.Sprintf(`{ "seq": %d, "message": "event" }`, i))
+	}
+	raw := strings.Join(records, "\r\n") + "\r\n"
+	body, tier := render(t, raw)
+	if tier != "aggressive" {
+		t.Fatalf("tier = %s, want aggressive", tier)
+	}
+	if !strings.Contains(body, "…+7 more JSON records") {
+		t.Fatalf("body lacks exact record marker: %q", body)
+	}
+	if strings.Contains(body, `{ "seq"`) {
+		t.Errorf("kept JSON records were not compacted: %q", body)
+	}
+}
+
+func TestMixedJSONLinesRemainVerbatimEvenWhenInvalidLinesRepeat(t *testing.T) {
+	raw := "{\"n\":1}\nnot-json\nnot-json\nnot-json\n{\"n\":5}\n{\"n\":6}\n{\"n\":7}\n{\"n\":8}\n"
+	body, tier := render(t, raw)
+	if tier != "verbatim" || body != raw {
+		t.Fatalf("mixed stream changed: tier=%s\n got %q\nwant %q", tier, body, raw)
+	}
+}
+
+func TestFailedJSONLinesCommandRemainsVerbatim(t *testing.T) {
+	var records []string
+	for i := 0; i < 12; i++ {
+		records = append(records, fmt.Sprintf(`{"error":"failure %d"}`, i))
+	}
+	raw := strings.Join(records, "\n") + "\n"
+	body, tier := renderInput(t, raw, 1)
+	if tier != "verbatim" || body != raw {
+		t.Fatalf("failed stream changed: tier=%s\n got %q\nwant %q", tier, body, raw)
+	}
+}
+
+// This uses the installed binaries instead of an imagined fixture. jq emits
+// exactly the compact record stream requested by the caller; curl then returns
+// those bytes from a local file URL. The denominator is therefore each native
+// command's real stdout, with no verbosity added by sctx.
+func TestNativeJSONLinesMeasurements(t *testing.T) {
+	if _, err := exec.LookPath("jq"); err != nil {
+		t.Skip("jq not installed")
+	}
+	filter := `range(0;100) | {seq:.,level:"info",message:"resource ready",resource:("pod-"+(.|tostring))}`
+	raw, err := exec.Command("jq", "-nc", filter).Output()
+	if err != nil {
+		t.Fatalf("native jq JSONL command: %v", err)
+	}
+	assertMeasuredJSONLinesGain(t, "jq", raw)
+
+	t.Run("curl local NDJSON response", func(t *testing.T) {
+		if _, err := exec.LookPath("curl"); err != nil {
+			t.Skip("curl not installed")
+		}
+		path := filepath.Join(t.TempDir(), "events.ndjson")
+		if err := os.WriteFile(path, raw, 0o600); err != nil {
+			t.Fatal(err)
+		}
+		resource := (&url.URL{Scheme: "file", Path: path}).String()
+		curlRaw, err := exec.Command("curl", "--silent", "--show-error", resource).Output()
+		if err != nil {
+			t.Fatalf("native curl local NDJSON command: %v", err)
+		}
+		assertMeasuredJSONLinesGain(t, "curl", curlRaw)
+	})
+}
+
+func assertMeasuredJSONLinesGain(t *testing.T, command string, raw []byte) {
+	t.Helper()
+	body, tier := render(t, string(raw))
+	if tier != "aggressive" || !strings.Contains(body, "…+95 more JSON records") {
+		t.Fatalf("%s native stream: tier=%s body=%q", command, tier, body)
+	}
+	rawTokens := tokenizer.Estimate(int64(len(raw)))
+	outTokens := tokenizer.Estimate(int64(len(body)))
+	if outTokens >= rawTokens {
+		t.Fatalf("%s native stream did not save tokens: %d >= %d", command, outTokens, rawTokens)
+	}
+	t.Logf("%s native JSONL: %d -> %d estimated tokens (%d saved, %.1f%%)", command,
+		rawTokens, outTokens, rawTokens-outTokens,
+		100*float64(rawTokens-outTokens)/float64(rawTokens))
 }
 
 // The property that makes it safe to point this at commands nobody has captured
