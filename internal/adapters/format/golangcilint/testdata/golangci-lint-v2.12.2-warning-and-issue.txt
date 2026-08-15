@@ -1,0 +1,6 @@
+level=warning msg="[runner] Can't process results by diff processor: can't prepare diff by revgrep: no version control repository found"
+main.go:6:10: Error return value of `os.Chdir` is not checked (errcheck)
+	os.Chdir("missing")
+	        ^
+1 issues:
+* errcheck: 1

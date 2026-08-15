@@ -1,0 +1,2 @@
+Error: unknown linters: 'definitely-not-a-real-linter', run 'golangci-lint help linters' to see the list of supported linters
+The command is terminated due to an error: unknown linters: 'definitely-not-a-real-linter', run 'golangci-lint help linters' to see the list of supported linters

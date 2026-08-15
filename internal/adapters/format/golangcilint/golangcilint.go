@@ -14,6 +14,10 @@ import (
 	"github.com/synapctx/sctx/internal/domain/format"
 )
 
+var globalFlagsWithValue = map[string]bool{
+	"--color": true,
+}
+
 // Formatter renders golangci-lint command output.
 type Formatter struct{}
 
@@ -34,8 +38,16 @@ func subcommand(argv []string) string {
 	if len(argv) <= 1 {
 		return ""
 	}
-	for _, a := range argv[1:] {
+	for i := 1; i < len(argv); i++ {
+		a := argv[i]
 		if strings.HasPrefix(a, "-") {
+			name := a
+			if before, _, ok := strings.Cut(a, "="); ok {
+				name = before
+			}
+			if globalFlagsWithValue[name] && !strings.Contains(a, "=") && i+1 < len(argv) {
+				i++
+			}
 			continue
 		}
 		return a
@@ -45,15 +57,15 @@ func subcommand(argv []string) string {
 
 // Aggressive parses `golangci-lint run` output into a grouped issue listing.
 //
-// golangci-lint exits 1 when issues are found: that is the normal case for
-// `run`, not an error to degrade on. Only exit codes above 1 indicate a real
-// failure (bad config, panic, etc.), which must degrade to preserve the
-// error signal.
+// golangci-lint normally exits 1 when issues are found, but users can change
+// that value with --issues-exit-code. Output recognition, rather than the exit
+// code, therefore decides whether this tier applies. Configuration and runtime
+// failures do not contain a valid issue listing and degrade naturally.
 func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Rendered, error) {
 	if subcommand(in.Argv) != "run" {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
-	if in.ExitCode > 1 {
+	if requestsMachineOutputOnCapturedStream(in.Argv) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 	return aggressiveRun(in)
@@ -62,6 +74,9 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 // Relaxed applies heuristic line-level filtering to any golangci-lint
 // invocation.
 func (f *Formatter) Relaxed(ctx context.Context, in format.Input) (format.Rendered, error) {
+	if requestsMachineOutputOnCapturedStream(in.Argv) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	return relaxedFilter(in)
 }
 

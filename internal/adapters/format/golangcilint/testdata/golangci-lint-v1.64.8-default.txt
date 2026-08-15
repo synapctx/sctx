@@ -1,0 +1,15 @@
+internal/adapters/format/git/status.go:89:14: Error return value of `fmt.Sscanf` is not checked (errcheck)
+			fmt.Sscanf(m[1], "%d", &ahead)
+			          ^
+internal/adapters/format/git/status.go:90:14: Error return value of `fmt.Sscanf` is not checked (errcheck)
+			fmt.Sscanf(m[2], "%d", &behind)
+			          ^
+internal/adapters/format/git/status.go:94:14: Error return value of `fmt.Sscanf` is not checked (errcheck)
+			fmt.Sscanf(m[1], "%d", &ahead)
+			          ^
+internal/adapters/telemetry/spool/purpose_test.go:34:10: Error return value of `w.Write` is not checked (errcheck)
+		w.Write([]byte(`{"accepted":1}`))
+		       ^
+internal/application/report/color.go:41:18: func `palette.yellow` is unused (unused)
+func (p palette) yellow(s string) string { return p.wrap(s, ansiYellow) }
+                 ^

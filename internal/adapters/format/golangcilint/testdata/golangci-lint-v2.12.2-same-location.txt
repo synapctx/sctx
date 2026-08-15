@@ -1,0 +1,12 @@
+main.go:6:14: string-format: fmt.Sprintf can be replaced with just using the string (perfsprint)
+	fmt.Println(fmt.Sprintf("%s", "value"))
+	            ^
+main.go:6:2: S1038: should use fmt.Printf instead of fmt.Println(fmt.Sprintf(...)) (but don't forget the newline) (staticcheck)
+	fmt.Println(fmt.Sprintf("%s", "value"))
+	^
+main.go:6:14: S1025: the argument is already a string, there's no need to use fmt.Sprintf (staticcheck)
+	fmt.Println(fmt.Sprintf("%s", "value"))
+	            ^
+3 issues:
+* perfsprint: 1
+* staticcheck: 2

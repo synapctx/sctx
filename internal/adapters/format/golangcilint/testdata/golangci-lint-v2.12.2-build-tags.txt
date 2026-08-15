@@ -1,0 +1,9 @@
+tagged.go:8:10: Error return value of `os.Chdir` is not checked (errcheck)
+	os.Chdir("missing")
+	        ^
+tagged.go:7:6: func taggedFinding is unused (unused)
+func taggedFinding() {
+     ^
+2 issues:
+* errcheck: 1
+* unused: 1

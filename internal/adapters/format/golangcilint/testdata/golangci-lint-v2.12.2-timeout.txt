@@ -1,0 +1,3 @@
+level=warning msg="Failed to discover go env: command \"go env -json GOCACHE GOROOT\": context deadline exceeded: "
+level=error msg="Running error: context loading failed: failed to load packages: failed to load packages: failed to load with go/packages: context deadline exceeded"
+level=error msg="Timeout exceeded: try increasing it by passing --timeout option"

@@ -1,0 +1,43 @@
+cmd/web/main.go:95:27: Error return value of `controlClient.Close` is not checked (errcheck)
+	defer controlClient.Close()
+	                         ^
+internal/adapters/monitoring/monitor.go:151:23: Error return value of `resp.Body.Close` is not checked (errcheck)
+	defer resp.Body.Close()
+	                     ^
+internal/adapters/monitoring/monitor.go:179:23: Error return value of `resp.Body.Close` is not checked (errcheck)
+	defer resp.Body.Close()
+	                     ^
+internal/adapters/monitoring/monitor.go:345:9: Error return value of `io.Copy` is not checked (errcheck)
+	io.Copy(io.Discard, resp.Body)
+	       ^
+internal/adapters/search/elasticsearch/graph_test.go:19:11: Error return value of `w.Write` is not checked (errcheck)
+			w.Write([]byte(edgesJSON))
+			       ^
+internal/adapters/search/elasticsearch/graph_test.go:21:11: Error return value of `w.Write` is not checked (errcheck)
+			w.Write([]byte(nodesJSON))
+			       ^
+internal/adapters/search/elasticsearch/graph_test.go:98:10: Error return value of `w.Write` is not checked (errcheck)
+		w.Write([]byte(`{"error":{"type":"index_not_found_exception"}}`))
+		       ^
+internal/adapters/search/elasticsearch/repository.go:1060:23: Error return value of `resp.Body.Close` is not checked (errcheck)
+	defer resp.Body.Close()
+	                     ^
+internal/adapters/monitoring/monitor_test.go:192:3: QF1002: could use tagged switch on r.URL.Path (staticcheck)
+		switch {
+		^
+internal/adapters/web/portal/handler_verification_test.go:578:5: QF1001: could apply De Morgan's law (staticcheck)
+	if !(activeIdx < firstIdx && firstIdx < secondIdx) {
+	   ^
+internal/adapters/web/shared/authn/jwks_test.go:31:49: QF1008: could remove embedded field "PublicKey" from selector (staticcheck)
+		N:   base64.RawURLEncoding.EncodeToString(key.PublicKey.N.Bytes()),
+		                                              ^
+internal/adapters/web/shared/authn/jwks_test.go:32:55: QF1008: could remove embedded field "PublicKey" from selector (staticcheck)
+		E:   base64.RawURLEncoding.EncodeToString(big64(key.PublicKey.E)),
+		                                                    ^
+internal/adapters/web/shared/authpages/signup.go:308:6: func signInURL is unused (unused)
+func signInURL(returnTo string) string {
+     ^
+13 issues:
+* errcheck: 8
+* staticcheck: 4
+* unused: 1

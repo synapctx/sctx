@@ -1,0 +1,5 @@
+main.go:1: : # example.com/typecheck
+./main.go:4:2: undefined: missingSymbol (typecheck)
+package main
+1 issues:
+* typecheck: 1
