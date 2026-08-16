@@ -67,7 +67,7 @@ func TestAggressive(t *testing.T) {
 		}
 	})
 
-	t.Run("JSONL log keeps first lines and elides the rest with a marker", func(t *testing.T) {
+	t.Run("JSONL log keeps both ends and elides the middle with a marker", func(t *testing.T) {
 		var lines []string
 		for i := 0; i < 12; i++ {
 			lines = append(lines, fmt.Sprintf(`{"seq":%d,"level":"info","msg":"event %d"}`, i, i))
@@ -79,12 +79,19 @@ func TestAggressive(t *testing.T) {
 			t.Fatalf("Aggressive() error = %v", err)
 		}
 		body := string(out.Body)
-		if !strings.Contains(body, "…+7 more JSON records") {
+		marker := "…+5 more JSON records"
+		if !strings.Contains(body, marker) {
 			t.Errorf("body missing JSONL marker, got: %q", body)
 		}
-		kept := strings.Split(strings.TrimSuffix(body, "\n…+7 more JSON records"), "\n")
-		if len(kept) != keepJSONLLines {
-			t.Fatalf("kept %d lines, want %d: %q", len(kept), keepJSONLLines, body)
+		head, tail, _ := strings.Cut(body, "\n"+marker+"\n")
+		kept := append(strings.Split(head, "\n"), strings.Split(tail, "\n")...)
+		if len(kept) != keepJSONLLines+tailJSONLLines {
+			t.Fatalf("kept %d lines, want %d: %q", len(kept), keepJSONLLines+tailJSONLLines, body)
+		}
+		// The last record of the stream must be one of them: a truncated log
+		// whose ending is missing is the shape that hides the failure.
+		if kept[len(kept)-1] != fmt.Sprintf(`{"seq":%d,"level":"info","msg":"event %d"}`, 11, 11) {
+			t.Errorf("the final record was dropped: %q", body)
 		}
 		for i, line := range kept {
 			if !json.Valid([]byte(line)) {

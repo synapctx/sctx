@@ -98,8 +98,13 @@ func TestJSONLinesFromAnUncoveredCommandAreBounded(t *testing.T) {
 	if tier != "aggressive" {
 		t.Fatalf("tier = %s, want aggressive", tier)
 	}
-	if !strings.Contains(body, "…+7 more JSON records") {
+	if !strings.Contains(body, "…+5 more JSON records") {
 		t.Fatalf("body lacks exact record marker: %q", body)
+	}
+	// The head and the TAIL survive: the end of an NDJSON stream is where a log
+	// puts its failure and its summary.
+	if !strings.HasPrefix(body, `{"seq":0,`) || !strings.HasSuffix(body, `{"seq":11,"message":"event"}`) {
+		t.Errorf("the bounded stream lost an end: %q", body)
 	}
 	if strings.Contains(body, `{ "seq"`) {
 		t.Errorf("kept JSON records were not compacted: %q", body)
@@ -192,7 +197,7 @@ func TestNativeSQLiteGenericCoverage(t *testing.T) {
 func assertMeasuredJSONLinesGain(t *testing.T, command string, raw []byte) {
 	t.Helper()
 	body, tier := render(t, string(raw))
-	if tier != "aggressive" || !strings.Contains(body, "…+95 more JSON records") {
+	if tier != "aggressive" || !strings.Contains(body, "…+93 more JSON records") {
 		t.Fatalf("%s native stream: tier=%s body=%q", command, tier, body)
 	}
 	rawTokens := tokenizer.Estimate(int64(len(raw)))

@@ -14,6 +14,7 @@ import (
 const (
 	MinRecords  = 8
 	KeepRecords = 5
+	TailRecords = 2
 )
 
 type Classification uint8
@@ -58,8 +59,15 @@ func isStructuredRecord(record string) bool {
 	return strings.HasPrefix(record, "{") || strings.HasPrefix(record, "[")
 }
 
-// Render compacts the first KeepRecords records without altering their JSON
-// values and replaces the remainder with one exact record-count marker.
+// Render compacts the kept records without altering their JSON values and
+// replaces the remainder with one exact record-count marker.
+//
+// HEAD AND TAIL, not head alone. An NDJSON stream is most often a log, and a log
+// puts the thing that went wrong at the END — the summary line, the failure, the
+// final state. Keeping only the opening records answered "how does this stream
+// start", which is rarely the question, and did it while printing a count that
+// made the omission look accounted for. The tail costs two records and is the
+// half a reader usually needs.
 func Render(raw []byte) (format.Rendered, bool) {
 	if Classify(raw) != ValidJSONLines {
 		return format.Rendered{}, false
@@ -72,21 +80,35 @@ func Render(raw []byte) (format.Rendered, bool) {
 		}
 	}
 
-	keep := KeepRecords
-	if keep > len(jsonRecords) {
-		keep = len(jsonRecords)
+	// Eliding a single record to print a marker in its place trades data for
+	// nothing, so the elision has to be worth its own line before it happens.
+	head, tail := KeepRecords, TailRecords
+	if len(jsonRecords)-(head+tail) < 2 {
+		head, tail = len(jsonRecords), 0
 	}
 	var buf bytes.Buffer
-	for i := 0; i < keep; i++ {
+	compactInto := func(record string) bool {
 		var compact bytes.Buffer
-		if err := json.Compact(&compact, []byte(jsonRecords[i])); err != nil {
-			return format.Rendered{}, false
+		if err := json.Compact(&compact, []byte(record)); err != nil {
+			return false
 		}
 		buf.Write(compact.Bytes())
 		buf.WriteByte('\n')
+		return true
 	}
+	for i := 0; i < head; i++ {
+		if !compactInto(jsonRecords[i]) {
+			return format.Rendered{}, false
+		}
+	}
+	keep := head + tail
 	if rest := len(jsonRecords) - keep; rest > 0 {
 		fmt.Fprintf(&buf, "…+%d more JSON records\n", rest)
+	}
+	for i := len(jsonRecords) - tail; i < len(jsonRecords); i++ {
+		if !compactInto(jsonRecords[i]) {
+			return format.Rendered{}, false
+		}
 	}
 	body := bytes.TrimRight(buf.Bytes(), "\n")
 	if len(body) == 0 || len(body) >= len(raw) {

@@ -16,11 +16,43 @@ func TestRenderValidStreamWithExactCount(t *testing.T) {
 	if !ok {
 		t.Fatal("Render() declined valid JSONL")
 	}
-	if got := string(out.Body); !strings.Contains(got, "…+7 more JSON records") || strings.Contains(got, `{ "seq"`) {
+	got := string(out.Body)
+	if !strings.Contains(got, "…+5 more JSON records") || strings.Contains(got, `{ "seq"`) {
 		t.Fatalf("Render() = %q", got)
 	}
-	if out.Note != "jsonl: kept 5 of 12 records" {
+	if out.Note != "jsonl: kept 7 of 12 records" {
 		t.Fatalf("Note = %q", out.Note)
+	}
+	// The LAST records survive: an NDJSON stream is usually a log, and the end
+	// is where the failure and the summary are.
+	if !strings.HasSuffix(got, `{"seq":11,"message":"event"}`) {
+		t.Errorf("the tail of the stream was dropped: %q", got)
+	}
+	if !strings.HasPrefix(got, `{"seq":0,"message":"event"}`) {
+		t.Errorf("the head of the stream was dropped: %q", got)
+	}
+}
+
+// The boundary: a stream small enough that head and tail would overlap keeps
+// every record rather than printing a marker for nothing.
+func TestAStreamThatFitsIsNotElided(t *testing.T) {
+	var records []string
+	for i := 0; i < MinRecords; i++ {
+		records = append(records, fmt.Sprintf(`{ "seq": %d }`, i))
+	}
+	out, ok := Render([]byte(strings.Join(records, "\n") + "\n"))
+	if !ok {
+		t.Fatal("Render() declined valid JSONL")
+	}
+	body := string(out.Body)
+	if strings.Contains(body, "more JSON records") {
+		t.Errorf("a marker was printed for records that were not omitted: %q", body)
+	}
+	if out.Elided {
+		t.Error("Elided is set although nothing was omitted")
+	}
+	if n := strings.Count(body, "\n") + 1; n != MinRecords {
+		t.Errorf("kept %d records, want all %d", n, MinRecords)
 	}
 }
 
