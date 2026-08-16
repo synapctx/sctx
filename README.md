@@ -260,6 +260,15 @@ already established its own, so nothing appears for a tool you do not use. And
 it never overwrites content you have edited - a customised instruction file is
 left as you wrote it, and only a missing reference is repaired.
 
+Each document it writes begins with a provenance comment recording the sctx that
+wrote it and a hash of the body, which is what lets an upgrade bring an untouched
+document current while leaving an edited one alone. If you load a document
+through your own include - `@~/.claude/SCTX.md` in `CLAUDE.md`, for instance -
+that path is followed and kept current there. Includes resolving outside your
+home directory, or into a directory that does not exist, are reported and never
+written to. A document sctx cannot prove it wrote is reported too, with the
+one-time `sctx setup --install --force` that adopts it.
+
 Codex MCP entries live in a clearly marked block in `~/.codex/config.toml`.
 Everything outside that block is preserved, the file is kept mode `0600`, and a
 same-named registration outside the block is reported as a conflict rather than
@@ -301,8 +310,10 @@ Generic shape detection, not dedicated command parsers:
 `systemctl` / `journalctl` &nbsp;·&nbsp; `df`
 
 These are wrapped so the generic formatter can compact valid JSON/NDJSON and
-collapse provably repeated lines. Unique or unrecognised output remains
-verbatim. They are reported as `(generic)`, never as dedicated coverage.
+collapse provably repeated lines. A long NDJSON stream keeps its opening and its
+closing records with an exact count of what was left out between them - the end
+of a stream is where a log puts the failure. Unique or unrecognised output
+remains verbatim. They are reported as `(generic)`, never as dedicated coverage.
 
 `ssh` is a special case worth knowing about. Its output is whatever ran on the
 far end, so `sctx` reads the remote command from the invocation and applies that

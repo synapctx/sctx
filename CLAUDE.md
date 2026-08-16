@@ -147,17 +147,29 @@ load-bearing.
   with no close counts as NOT installed. Never overwrite content a user edited;
   only repair a missing include.
 - **Sidecar documents carry a provenance STAMP** (`agentdoc.Stamp`, first line, a
-  short hash of the body). It is what makes "ours and untouched" decidable, and
-  without it a correctness fix reached no machine that had already installed:
+  short hash of the body, optionally preceded by the sctx version that wrote it).
+  It is what makes "ours and untouched" decidable, and without it a correctness
+  fix reached no machine that had already installed:
   `Install` refused to touch any existing sidecar because it could not tell
   customised from a-release-behind, and `Inspect` never read sidecars at all, so
   nothing even reported the drift. Now: stale-but-unedited updates on a plain
   `--install`; edited and pre-stamp files are left alone and REPORTED, since
-  neither has a remedy `--install` can apply and a nag without one gets muted. A
-  document the developer includes themselves is never managed — their include may
-  point anywhere, and writing one beside the instruction file would leave a second
-  copy nothing loads. **The website must serve `StampedBody` too**, or every
-  hand-installed file is permanently unverifiable.
+  neither has a remedy `--install` can apply and a nag without one gets muted.
+  **The HASH decides and the VERSION only reports** — versions repeat on `dev`
+  builds, go backwards on a downgrade, and are absent from anything the website
+  renders, so the hash is the last field and a version-less stamp stays fully
+  valid. **The website must serve `StampedBody` too**, or every hand-installed
+  file is permanently unverifiable.
+- **A document the developer includes THEMSELVES is followed to where their
+  include points, and managed there.** It used to be skipped entirely, which left
+  the most common real configuration — a hand-written `@~/.claude/SCTX.md` naming
+  the exact path we would have used — invisible: never inspected, never updated,
+  reported `[ok]` while two releases stale. `agentdoc.IncludeTarget` returns the
+  path; `resolveInclude` decides whether we may write there. Two bounds, both
+  because the path comes from a file we do not own: it must resolve INSIDE the
+  home directory, and its parent directory must already exist. Anything else is
+  reported as unverifiable, never created — and a second copy beside the
+  instruction file, which nothing would load, is still never written.
 - **The instruction files must not restate what the MCP tool descriptions say.**
   Both are sent at the start of every session, and ~55-60% of SYNAPCTX.md was
   duplicated there — the customer paying twice for one sentence. The placement

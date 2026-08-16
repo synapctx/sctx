@@ -305,6 +305,12 @@ func TestAHandConfiguredMachineReportsTaught(t *testing.T) {
 	home := t.TempDir()
 	a := configure(t, home, "claude")
 	write(t, filepath.Join(home, a.Root), "@~/.claude/SCTX.md\n@~/.claude/SYNAPCTX.md\n")
+	// The documents the includes NAME, current and stamped. Wiring an include is
+	// half a configuration; until the file exists the agent loads nothing, and
+	// calling that taught is the blind spot this suite now guards.
+	for _, d := range []agentdoc.Doc{agentdoc.SctxDoc, agentdoc.SynapctxDoc} {
+		write(t, filepath.Join(home, ".claude", d.Name), agentdoc.StampedBody(d.Body([]string{"acme"})))
+	}
 
 	st, err := Inspect(home, []string{"acme"})
 	if err != nil {

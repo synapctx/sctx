@@ -47,10 +47,26 @@ import (
 // same bytes for people who install by hand. A manifest would make the manual
 // path permanently unverifiable — the exact divergence the marker round-trip
 // rules already exist to prevent.
+//
+// THE VERSION IS REPORTING, THE HASH IS THE DECISION. A stamp written by the CLI
+// also records the sctx that wrote it, so `sctx setup` can say "from v0.4.2"
+// instead of "from an older sctx" — but nothing branches on it. Versions can
+// repeat (a `dev` build), regress (a downgrade) and be absent (the website
+// renders these documents without one), while the hash answers "is this ours and
+// untouched" in every one of those cases. A stamp carrying only a hash therefore
+// remains fully valid, which is what keeps files installed before this change —
+// and the ones the website serves today — updating on a plain `--install`.
 const (
 	stampPrefix = "<!-- sctx-doc "
 	stampSuffix = " -->"
 )
+
+// StampInfo is the provenance recorded in a document's first line. Version is
+// empty for a stamp written without one; that is expected, not damage.
+type StampInfo struct {
+	Version string
+	Hash    string
+}
 
 // SidecarState classifies an existing sidecar document. It is what decides
 // whether a fix may be delivered without asking.
@@ -97,27 +113,67 @@ func bodyHash(body string) string {
 	return hex.EncodeToString(sum[:])[:12]
 }
 
-// Stamp returns the provenance line for a document body.
-func Stamp(body string) string { return stampPrefix + bodyHash(body) + stampSuffix }
+// Stamp returns the provenance line for a document body, with no version. It is
+// what a renderer that does not know which sctx it corresponds to should write —
+// synapctx.com today — and it stays valid forever.
+func Stamp(body string) string { return StampFor("", body) }
+
+// StampFor returns the provenance line recording both the writing sctx version
+// and the body hash.
+//
+// A version that is not a single token — empty, whitespace, or something that
+// would close the comment early — degrades to the version-less Stamp rather than
+// being escaped or truncated. The stamp's job is to be read back byte-for-byte;
+// writing one the parser has to guess at would trade a missing nicety for a
+// document nothing can verify.
+func StampFor(version, body string) string {
+	fields := strings.Fields(version)
+	if len(fields) != 1 || strings.Contains(fields[0], "-->") {
+		return stampPrefix + bodyHash(body) + stampSuffix
+	}
+	return stampPrefix + fields[0] + " " + bodyHash(body) + stampSuffix
+}
 
 // StampedBody returns the exact bytes to WRITE for a sidecar: the stamp, then the
-// document. Both the installer and the website must use this, or a hand-installed
-// file is permanently unverifiable.
-func StampedBody(body string) string { return Stamp(body) + "\n" + body }
+// document. Both the installer and the website must use this (or StampedBodyFor),
+// or a hand-installed file is permanently unverifiable.
+func StampedBody(body string) string { return StampedBodyFor("", body) }
+
+// StampedBodyFor is StampedBody with the writing sctx version recorded.
+func StampedBodyFor(version, body string) string { return StampFor(version, body) + "\n" + body }
 
 // ParseStamp splits a stamped file into its recorded hash and the body beneath.
 // ok is false when the first line is not one of our stamps, which means the file
 // predates stamping — never that it is malformed.
 func ParseStamp(file string) (hash, rest string, ok bool) {
+	info, rest, ok := ParseStampInfo(file)
+	return info.Hash, rest, ok
+}
+
+// ParseStampInfo splits a stamped file into its provenance and the body beneath.
+//
+// The HASH IS THE LAST FIELD, not the first, which is what lets a versioned stamp
+// and a version-less one be read by the same parser: everything before it is
+// provenance a future release may add to, and a reader that does not understand
+// the extra fields still recovers the one value that decides anything.
+func ParseStampInfo(file string) (StampInfo, string, bool) {
 	line, rest, found := strings.Cut(file, "\n")
 	if !found {
-		return "", file, false
+		return StampInfo{}, file, false
 	}
 	line = strings.TrimSpace(line)
 	if !strings.HasPrefix(line, stampPrefix) || !strings.HasSuffix(line, stampSuffix) {
-		return "", file, false
+		return StampInfo{}, file, false
 	}
-	return strings.TrimSuffix(strings.TrimPrefix(line, stampPrefix), stampSuffix), rest, true
+	fields := strings.Fields(strings.TrimSuffix(strings.TrimPrefix(line, stampPrefix), stampSuffix))
+	if len(fields) == 0 {
+		return StampInfo{}, file, false
+	}
+	info := StampInfo{Hash: fields[len(fields)-1]}
+	if len(fields) > 1 {
+		info.Version = fields[len(fields)-2]
+	}
+	return info, rest, true
 }
 
 // ClassifySidecar decides what may be done with an existing sidecar. Pass the
@@ -263,16 +319,20 @@ func WithoutBlock(s string) string {
 // speculatively.
 func ReferencesDoc(existing, name string) bool { return referencesDoc(existing, name) }
 
-// referencesDoc reports whether the file already loads a document by this name,
-// in any form an include can take: `@SCTX.md`, `@~/.claude/SCTX.md`,
-// `@./docs/SCTX.md`. Only the final path segment is compared, because that is
-// what identifies the document; the prefix is the developer's filing choice.
+// IncludeTarget returns the path a developer's own include points at, exactly as
+// they wrote it (`~/.claude/SCTX.md`, `./docs/SCTX.md`, `SCTX.md`).
 //
-// Our OWN block is excluded from the scan. Reading the include we wrote as if
-// the developer had written it would drop it from the block on the next
-// install, emptying the block and silently UNTEACHING the agent — the same
-// shape as keying detection on a file we write.
-func referencesDoc(existing, name string) bool {
+// WHY THE PATH AND NOT JUST THE FACT. Knowing only that a document is referenced
+// forced the installer to leave it alone entirely, and the common case is an
+// include pointing at the very file `sctx setup` would have written — a
+// hand-written `@~/.claude/SCTX.md` beside CLAUDE.md. That file was then never
+// inspected, never updated, and reported as `[ok]` while carrying a template two
+// releases old: the agent read stale coverage claims forever and nothing said so.
+// Returning the path lets the caller resolve it, decide whether it is somewhere
+// it may write, and apply the same provenance rules it applies to its own
+// sidecars. The decision about WHERE to write stays with the caller, which is the
+// only side that can see the filesystem.
+func IncludeTarget(existing, name string) (string, bool) {
 	for _, line := range strings.Split(WithoutBlock(existing), "\n") {
 		line = strings.TrimSpace(line)
 		if !strings.HasPrefix(line, "@") {
@@ -285,8 +345,22 @@ func referencesDoc(existing, name string) bool {
 		// Includes are written with forward slashes on every platform, so path
 		// (not filepath) is correct here even on Windows.
 		if path.Base(fields[0]) == name {
-			return true
+			return fields[0], true
 		}
 	}
-	return false
+	return "", false
+}
+
+// referencesDoc reports whether the file already loads a document by this name,
+// in any form an include can take: `@SCTX.md`, `@~/.claude/SCTX.md`,
+// `@./docs/SCTX.md`. Only the final path segment is compared, because that is
+// what identifies the document; the prefix is the developer's filing choice.
+//
+// Our OWN block is excluded from the scan. Reading the include we wrote as if
+// the developer had written it would drop it from the block on the next
+// install, emptying the block and silently UNTEACHING the agent — the same
+// shape as keying detection on a file we write.
+func referencesDoc(existing, name string) bool {
+	_, ok := IncludeTarget(existing, name)
+	return ok
 }

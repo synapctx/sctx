@@ -53,6 +53,15 @@ type SidecarStatus struct {
 	Name  string // e.g. "SYNAPCTX.md"
 	Path  string // absolute
 	State agentdoc.SidecarState
+	// Developer is true when this document is loaded by an include the DEVELOPER
+	// wrote, rather than by the include in our managed block. The file is still
+	// managed under the same provenance rules — that is the whole point — but the
+	// distinction is worth reporting, because the path is theirs and a remedy
+	// that names the wrong file sends someone to the wrong place.
+	Developer bool
+	// Version is the sctx recorded in the existing file's stamp, empty when it
+	// carries no stamp or a version-less one. Reporting only; the hash decides.
+	Version string
 }
 
 // Target is one detected agent and what we found for it.
@@ -211,33 +220,51 @@ func Inspect(home string, orgs []string, docs ...Doc) (Status, error) {
 			// installing an empty block to prove it.
 			t.Installed = true
 		}
-		t.Sidecars = inspectSidecars(t, string(body), orgs, docs)
+		t.Sidecars = inspectSidecars(home, t, string(body), orgs, docs)
 		st.Targets = append(st.Targets, t)
 	}
 	return st, nil
 }
 
-// inspectSidecars classifies each document written beside an include-capable
+// inspectSidecars classifies each document loaded beside an include-capable
 // agent's instruction file. Non-include agents get nil: their documents live
 // inside the managed block, where the block comparison already sees drift.
+//
+// A document the developer includes THEMSELVES is followed to where their
+// include points, and managed there under the same provenance rules. This used
+// to be skipped outright, on the reasoning that their include may point anywhere
+// and writing beside the instruction file would leave a second copy nothing
+// loads. That reasoning is right about the WRITE and wrong about the SKIP: it
+// left the most common real configuration — a hand-written `@~/.claude/SCTX.md`
+// naming the exact path we would have used — permanently invisible, so a
+// template fix never reached it and `sctx setup` printed `[ok]` over a document
+// two releases stale. Resolving the include keeps the guarantee (we still write
+// only where the include actually points) without the blind spot.
 //
 // A read error other than not-exist is reported as unverifiable rather than
 // returned: an unreadable sidecar must not fail the whole inspection, and it is
 // exactly the case where we must not write.
-func inspectSidecars(t Target, rootBody string, orgs []string, docs []Doc) []SidecarStatus {
+func inspectSidecars(home string, t Target, rootBody string, orgs []string, docs []Doc) []SidecarStatus {
 	if !t.Includes {
 		return nil
 	}
 	dir := filepath.Dir(t.RootPath)
 	out := make([]SidecarStatus, 0, len(docs))
 	for _, d := range docs {
-		// Not ours to manage. The developer's own include may point anywhere —
-		// `@~/docs/SCTX.md` — so looking beside the instruction file would report
-		// a phantom "missing" and then write a SECOND copy that nothing loads.
-		if agentdoc.ReferencesDoc(rootBody, d.Name) {
-			continue
-		}
 		s := SidecarStatus{Name: d.Name, Path: filepath.Join(dir, d.Name)}
+		if raw, ok := agentdoc.IncludeTarget(rootBody, d.Name); ok {
+			resolved, manageable := resolveInclude(home, dir, t.RootPath, raw)
+			s.Developer = true
+			s.Path = resolved
+			if !manageable {
+				// Somewhere we will not write: outside the home directory, or in a
+				// directory that does not exist. Reported so it is visible, never
+				// silently assumed fine, and never created speculatively.
+				s.State = agentdoc.SidecarUnverifiable
+				out = append(out, s)
+				continue
+			}
+		}
 		content, err := os.ReadFile(s.Path)
 		switch {
 		case os.IsNotExist(err):
@@ -246,10 +273,50 @@ func inspectSidecars(t Target, rootBody string, orgs []string, docs []Doc) []Sid
 			s.State = agentdoc.SidecarUnverifiable
 		default:
 			s.State = agentdoc.ClassifySidecar(string(content), d.Body(orgs))
+			if info, _, ok := agentdoc.ParseStampInfo(string(content)); ok {
+				s.Version = info.Version
+			}
 		}
 		out = append(out, s)
 	}
 	return out
+}
+
+// resolveInclude turns an include as the developer wrote it into an absolute
+// path, and reports whether this package may write there.
+//
+// Two bounds, and both exist because the path comes from a file we do not own.
+// It must resolve INSIDE the home directory, so a stray `@/etc/sctx/SCTX.md`
+// cannot turn `sctx setup --install` into a system-wide write. And its parent
+// directory must already exist: creating `~/notes/` because an include mentioned
+// it would violate the rule that nothing here is created speculatively, and an
+// include pointing at a directory the developer has not made is far more likely
+// a typo than an instruction.
+//
+// The instruction file itself is refused for the obvious reason — writing a
+// document over CLAUDE.md would destroy the file that loads it.
+func resolveInclude(home, dir, rootPath, raw string) (string, bool) {
+	p := filepath.FromSlash(raw)
+	switch {
+	case p == "~":
+		return "", false
+	case strings.HasPrefix(p, "~"+string(filepath.Separator)):
+		p = filepath.Join(home, p[2:])
+	case !filepath.IsAbs(p):
+		p = filepath.Join(dir, p)
+	}
+	p = filepath.Clean(p)
+	if p == filepath.Clean(rootPath) {
+		return p, false
+	}
+	rel, err := filepath.Rel(filepath.Clean(home), p)
+	if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) {
+		return p, false
+	}
+	if info, err := os.Stat(filepath.Dir(p)); err != nil || !info.IsDir() {
+		return p, false
+	}
+	return p, true
 }
 
 // configured reports whether an agent has left its own configuration here. Only
@@ -275,7 +342,20 @@ func configured(home string, a Agent) bool {
 // Existing sidecar documents are never rewritten — see the doc comment above.
 // InstallForce is the explicit opt-out.
 func Install(home string, orgs []string, docs ...Doc) ([]string, error) {
-	return install(home, orgs, false, docs...)
+	return install(home, orgs, "", false, docs...)
+}
+
+// InstallVersion is Install, recording version in the provenance stamp of every
+// document it writes. Callers that know which sctx they are should use it: the
+// stamp is the only place a machine records where its instructions came from,
+// and "from an older sctx" is a worse thing to read than "from v0.4.2".
+func InstallVersion(home string, orgs []string, version string, docs ...Doc) ([]string, error) {
+	return install(home, orgs, version, false, docs...)
+}
+
+// InstallForceVersion is InstallForce with the writing version recorded.
+func InstallForceVersion(home string, orgs []string, version string, docs ...Doc) ([]string, error) {
+	return install(home, orgs, version, true, docs...)
 }
 
 // InstallForce rewrites sidecar documents that already exist, taking a
@@ -283,10 +363,10 @@ func Install(home string, orgs []string, docs ...Doc) ([]string, error) {
 // explicit `--force`: the whole reason Install refuses is that a customised file
 // was customised on purpose.
 func InstallForce(home string, orgs []string, docs ...Doc) ([]string, error) {
-	return install(home, orgs, true, docs...)
+	return install(home, orgs, "", true, docs...)
 }
 
-func install(home string, orgs []string, force bool, docs ...Doc) ([]string, error) {
+func install(home string, orgs []string, version string, force bool, docs ...Doc) ([]string, error) {
 	st, err := Inspect(home, orgs, docs...)
 	if err != nil {
 		return nil, err
@@ -318,7 +398,7 @@ func install(home string, orgs []string, force bool, docs ...Doc) ([]string, err
 				// unconditionally, including on --force, so a forced overwrite
 				// leaves a file we can reason about instead of another
 				// unverifiable one.
-				if err := os.WriteFile(s.Path, []byte(agentdoc.StampedBody(d.Body(orgs))), 0o644); err != nil {
+				if err := os.WriteFile(s.Path, []byte(agentdoc.StampedBodyFor(version, d.Body(orgs))), 0o644); err != nil {
 					return changed, fmt.Errorf("writing %s: %w", s.Path, err)
 				}
 				changed = append(changed, verb+" "+s.Path)

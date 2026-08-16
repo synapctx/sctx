@@ -102,11 +102,11 @@ func runSetup(cfg config.Config, args []string) int {
 	orgTokens := codexOrgTokens(cfg)
 	changedAny := false
 	if install {
-		installFn := agentsetup.Install
+		installFn := agentsetup.InstallVersion
 		if force {
-			installFn = agentsetup.InstallForce
+			installFn = agentsetup.InstallForceVersion
 		}
-		changed, err := installFn(home, orgs, docsFor(cfg)...)
+		changed, err := installFn(home, orgs, version, docsFor(cfg)...)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "sctx: setup: %v\n", err)
 			return 1
@@ -244,11 +244,30 @@ func printSetupStatus(w io.Writer, st agentsetup.Status, cfg config.Config, afte
 		// neither has a remedy a plain --install can apply, so nagging would be a
 		// warning with no action, which is how warnings get muted.
 		for _, s := range t.Attention() {
+			// The PATH, not just the name. A document loaded by the developer's own
+			// include can live anywhere they filed it, and a remedy that names only
+			// "SCTX.md" sends someone to the copy beside CLAUDE.md — which may not
+			// be the file their agent actually reads.
 			switch s.State {
 			case agentdoc.SidecarEdited:
-				fmt.Fprintf(w, "            %-13s edited here — left as is (--install --force to reset)\n", s.Name)
+				fmt.Fprintf(w, "            %-13s edited here — left as is (--install --force to reset) — %s\n", s.Name, s.Path)
 			case agentdoc.SidecarUnverifiable:
-				fmt.Fprintf(w, "            %-13s predates provenance stamping — run --install --force once\n", s.Name)
+				fmt.Fprintf(w, "            %-13s cannot be verified as ours — run --install --force once — %s\n", s.Name, s.Path)
+			}
+		}
+		// Documents that ARE managed but out of date. The target line above says an
+		// agent needs updating; this says which document and, when its stamp
+		// records one, which sctx wrote it.
+		for _, s := range t.Sidecars {
+			switch s.State {
+			case agentdoc.SidecarStale:
+				from := "an older sctx"
+				if s.Version != "" {
+					from = s.Version
+				}
+				fmt.Fprintf(w, "            %-13s from %s — updates on --install — %s\n", s.Name, from, s.Path)
+			case agentdoc.SidecarMissing:
+				fmt.Fprintf(w, "            %-13s not written yet — installs on --install — %s\n", s.Name, s.Path)
 			}
 		}
 	}
