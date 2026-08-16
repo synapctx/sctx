@@ -43,9 +43,12 @@ Wrapped today: ` + "`go`" + `, ` + "`git`" + `, ` + "`grep`/`rg`" + `, ` + "`ls`
 ` + "`npm`/`pnpm`/`yarn`" + `, ` + "`cargo`" + `, ` + "`dotnet`" + `, ` + "`mvn`/`gradle`" + `,
 ` + "`composer`" + `, ` + "`bundle`" + `, ` + "`tsc`/`eslint`" + `, ` + "`brew`" + `,
 ` + "`systemctl`/`journalctl`" + `, ` + "`mongosh`/`sqlite3`/`dig`/`psql`" + `, ` + "`rsync`" + `, ` + "`jq`/`curl`" + `,
-` + "`ssh`" + ` (delegates to the remote command's formatter).
+` + "`ssh`" + `, ` + "`docker exec`" + ` and ` + "`kubectl exec`" + ` delegate to the inner
+command's own formatter, so ` + "`docker exec web go test ./...`" + ` is rendered as
+` + "`go test`" + `. Interactive ones (` + "`-it`" + `) are left alone.
 
-Generic-only: cloud/IaC/build rows and ` + "`jq`/`curl`/`sqlite3`" + `; unknown shapes stay raw.
+Generic-only: cloud/IaC/build rows, ` + "`systemctl`/`journalctl`" + `, ` + "`df`" + ` and
+` + "`jq`/`curl`/`sqlite3`" + `; unknown shapes stay raw.
 
 Coverage is per (program, subcommand). Uncovered plumbing such as
 ` + "`git rev-parse`" + ` and ` + "`go env`" + ` stays raw. Path/host-first commands
@@ -60,8 +63,9 @@ The hook declines when wrapping could change the conclusion:
 
 ## When to type it yourself
 
-**When an unlisted command may be long**, use ` + "`sctx <cmd>`" + `: JSON is compacted
-and repeated lines collapse. Unrecognized output stays raw.
+**When an unlisted command may be long**, use ` + "`sctx <cmd>`" + `: JSON is compacted,
+repeated lines collapse, and a JSONL/NDJSON stream keeps both ends with a counted
+marker between them. Unrecognized output stays raw.
 
 ` + "`sctx -- <cmd>`" + ` forces verbatim passthrough when you genuinely need every
 byte.
@@ -81,7 +85,8 @@ taught agents—not command coverage.
 ` + "`stdout`/`stderr`" + `; read only if an omitted detail is needed.
 
 Trusted ` + "`.sctx/filters.json`" + ` rules need external digest approval.
-` + "`sctx filters verify`" + ` is safe; never run ` + "`sctx filters trust`" + ` for the developer.
+` + "`sctx filters verify`" + ` and ` + "`sctx filters status`" + ` are safe to run and say
+whether the rules are active; never run ` + "`sctx filters trust`" + ` for the developer.
 
 ## Reporting
 

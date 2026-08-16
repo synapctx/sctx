@@ -647,6 +647,7 @@ func runDoctor(cfg config.Config) int {
 		fmt.Println("raw recovery:   disabled (opt in with SCT__RAW_CACHE_ENABLED=true)")
 	}
 	fmt.Printf("config file:    %s\n", cfg.ConfigFilePath)
+	printProjectFilters()
 	fmt.Printf("telemetry:      enabled=%t mode=%s\n", cfg.TelemetryEnabled, telemetryMode(cfg))
 	fmt.Printf("endpoint:       %s\n", cfg.TelemetryEndpoint)
 	if host := endpointHost(cfg.TelemetryEndpoint); host != "" {

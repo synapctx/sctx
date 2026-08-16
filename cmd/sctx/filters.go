@@ -10,6 +10,43 @@ import (
 
 const filtersUsage = `usage: sctx filters verify | status | trust --yes`
 
+// printProjectFilters is the doctor's line about this checkout's own rules.
+//
+// It exists because a project filter that is present but NOT trusted is
+// invisible: nothing is applied, nothing is printed, and the only symptom is
+// output that looks exactly like a command sctx does not cover. Anyone
+// debugging that reaches for `sctx doctor` first, so the state belongs here —
+// including the approval command, which is the one remedy and must be run by a
+// human who has read the file.
+func printProjectFilters() {
+	wd, err := os.Getwd()
+	if err != nil {
+		return
+	}
+	loaded, found, err := projectfilter.LoadFrom(wd)
+	switch {
+	case err != nil:
+		fmt.Printf("project filters: invalid — %v\n", err)
+		return
+	case !found:
+		return
+	}
+	trustPath, err := projectfilter.DefaultTrustPath()
+	if err != nil {
+		return
+	}
+	trusted, err := loaded.Trusted(trustPath)
+	if err != nil {
+		fmt.Printf("project filters: %s (trust unreadable: %v)\n", loaded.Path, err)
+		return
+	}
+	state := "NOT trusted — run: sctx filters trust --yes"
+	if trusted {
+		state = "trusted"
+	}
+	fmt.Printf("project filters: %d in %s (%s)\n", len(loaded.Config.Filters), loaded.Path, state)
+}
+
 func runFilters(args []string) int {
 	if len(args) == 0 || len(args) > 2 {
 		fmt.Fprintln(os.Stderr, filtersUsage)
