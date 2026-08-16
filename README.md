@@ -309,6 +309,12 @@ Generic shape detection, not dedicated command parsers:
 `uv` / `poetry` &nbsp;·&nbsp; `tsc` / `eslint` &nbsp;·&nbsp;
 `systemctl` / `journalctl` &nbsp;·&nbsp; `df`
 
+A covered command whose formatter finds a shape it does not recognise is not
+left at full size either: its output still reaches a lossless JSON compaction
+pass before falling back to verbatim. That pass changes whitespace only, so the
+document every parser sees is identical - `git show HEAD:swagger.json` went from
+46,164 to 21,846 bytes with the JSON provably unchanged.
+
 These are wrapped so the generic formatter can compact valid JSON/NDJSON and
 collapse provably repeated lines. A long NDJSON stream keeps its opening and its
 closing records with an exact count of what was left out between them - the end

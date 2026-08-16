@@ -17,13 +17,38 @@ type RenderResult struct {
 	Elided     bool
 	Note       string
 	Anomaly    string
+	// Fallback reports that the LOSSLESS fallback produced this render, not the
+	// command's own formatter. The caller must account for it as generic
+	// coverage: a dedicated formatter that declined did not cover the command,
+	// and recording it as though it had is how the coverage meter goes blind.
+	Fallback bool
 }
 
 // renderChain sequences tiers with one hard guarantee: an inapplicable tier,
 // error, panic, or anomalous render degrades to the next tier and ultimately
 // to verbatim — output is never suppressed. raw is the full captured stdout,
 // used both as the verbatim fallback and for the anomaly guard.
-func renderChain(ctx context.Context, f format.Formatter, in format.Input, raw, rawStderr []byte, forceTier string) RenderResult {
+//
+// lossless is tried LAST, and only for a command whose own formatter produced
+// nothing. Until this existed a dedicated formatter's decline was a DEAD END:
+// the generic fallback was substituted only when NO formatter matched
+// (service.Execute), so `mongosh` printing a JSON document, a `psql` shape the
+// table parser does not recognise, or any of the 300-plus deliberate declines
+// across the formatters went out at full size while an unmatched command
+// printing the very same bytes was compacted. Measured on one developer's
+// 30-day history: 27 of 31 mongosh runs verbatim at zero saved, and the same
+// pattern on ssh, ls and git diff.
+//
+// WHY THE FALLBACK IS LOSSLESS-ONLY AND NOT THE GENERIC FORMATTER. Most of those
+// declines are deliberate: a formatter steps aside so user-selected machine
+// output — YAML, JSONPath, NUL-delimited records, --template — reaches the
+// caller byte-authoritative. We have not enumerated which of the 338 decline
+// sites mean "not my shape" and which mean "hands off", so the fallback must be
+// safe without knowing. Whitespace-compacting a JSON document is: every consumer
+// that parses it sees identical values. Collapsing repeated LINES is not — it
+// rewrites a text stream a parser of an unknown format cannot survive — so the
+// generic line collapser deliberately stays on the unmatched path only.
+func renderChain(ctx context.Context, f format.Formatter, in format.Input, raw, rawStderr []byte, forceTier string, lossless format.Formatter) RenderResult {
 	verbatim := RenderResult{Body: raw, Tier: format.TierVerbatim}
 
 	if forceTier == string(format.TierVerbatim) || forceTier == "off" || f == nil {
@@ -84,6 +109,28 @@ func renderChain(ctx context.Context, f format.Formatter, in format.Input, raw, 
 			Elided:     rendered.Elided,
 			Note:       rendered.Note,
 			Anomaly:    anomaly,
+		}
+	}
+
+	// The formatter that owns this command produced nothing usable. Before
+	// falling all the way to verbatim, offer the bytes to the lossless
+	// compactor; it detects and declines like every other tier, so the worst
+	// case is exactly the verbatim that would have happened anyway.
+	if lossless != nil {
+		attempt := in
+		attempt.Stdout = bytes.NewReader(raw)
+		attempt.Stderr = bytes.NewReader(rawStderr)
+		rendered, err := safeRender(ctx, lossless.Relaxed, attempt)
+		if err == nil && anomalous(rendered, in, raw) == "" {
+			return RenderResult{
+				Body:       ensureTrailingNewline(rendered.Body),
+				Tier:       format.TierRelaxed,
+				FoldStderr: rendered.FoldStderr,
+				Elided:     rendered.Elided,
+				Note:       rendered.Note,
+				Anomaly:    anomaly,
+				Fallback:   true,
+			}
 		}
 	}
 

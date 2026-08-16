@@ -27,7 +27,7 @@ func TestDeliberateDeclineIsRecordedAsSuch(t *testing.T) {
 	in := format.Input{Argv: []string{"go", "test", "-list", "X"}, Command: "go test",
 		Stdout: strings.NewReader("TestA\nTestB\n")}
 
-	got := renderChain(context.Background(), decliningFormatter{}, in, []byte("TestA\nTestB\n"), nil, "")
+	got := renderChain(context.Background(), decliningFormatter{}, in, []byte("TestA\nTestB\n"), nil, "", nil)
 
 	if got.Tier != format.TierVerbatim {
 		t.Fatalf("a fully-declining formatter must fall through to verbatim, got %s", got.Tier)

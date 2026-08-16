@@ -31,6 +31,11 @@ type Options struct {
 	Version   string
 	ForceTier string
 	RawCache  *rawcache.Cache
+	// LosslessFallback is offered the output of a command whose OWN formatter
+	// declined every tier, immediately before verbatim. Only its Relaxed tier is
+	// used and it must be information-preserving — see renderChain for why the
+	// generic formatter is deliberately not used here. Nil disables it.
+	LosslessFallback format.Formatter
 }
 
 type Service struct {
@@ -114,7 +119,20 @@ func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
 		ExitCode: outcome.ExitCode,
 		Duration: outcome.Duration,
 	}
-	result := renderChain(ctx, formatter, in, raw, rawStderr, s.opts.ForceTier)
+	// The lossless compactor is offered only to a command that HAS a formatter.
+	// An unmatched one already has the generic formatter above, which is
+	// strictly more capable.
+	var lossless format.Formatter
+	if resolved {
+		lossless = s.opts.LosslessFallback
+	}
+	result := renderChain(ctx, formatter, in, raw, rawStderr, s.opts.ForceTier, lossless)
+	if result.Fallback {
+		// Its own formatter declined; the bytes were saved by the generic
+		// compactor. That is NOT dedicated coverage, and the meter has to keep
+		// telling the two apart.
+		formatterMatched = false
+	}
 
 	if _, err := s.stdout.Write(result.Body); err != nil {
 		return outcome.ExitCode, err

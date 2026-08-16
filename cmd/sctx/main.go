@@ -40,6 +40,7 @@ import (
 	"github.com/synapctx/sctx/internal/adapters/format/golangcilint"
 	"github.com/synapctx/sctx/internal/adapters/format/gotest"
 	grepfmt "github.com/synapctx/sctx/internal/adapters/format/grep"
+	"github.com/synapctx/sctx/internal/adapters/format/jsoncompact"
 	kubectlfmt "github.com/synapctx/sctx/internal/adapters/format/kubectl"
 	"github.com/synapctx/sctx/internal/adapters/format/makefmt"
 	"github.com/synapctx/sctx/internal/adapters/format/mongosh"
@@ -204,7 +205,14 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string) int {
 	svc := run.NewService(registry, osproc.NewRunner(cfg.MaxOutputBytes),
 		statsStore, emitter, generic.New(),
 		os.Stdout, os.Stderr,
-		run.Options{Version: version, ForceTier: cfg.ForceTier, RawCache: recovery})
+		run.Options{
+			Version: version, ForceTier: cfg.ForceTier, RawCache: recovery,
+			// A dedicated formatter's decline used to end at verbatim. This is the
+			// one transform that is safe to apply without knowing whether the
+			// decline meant "not my shape" or "leave the caller's machine output
+			// exactly as it is": the same JSON document, minus whitespace.
+			LosslessFallback: jsoncompact.New(),
+		})
 
 	code, err := svc.Execute(ctx, argv)
 	if err != nil {

@@ -74,6 +74,19 @@ make install   # ~/.local/bin/sctx
   fresh Input per tier — the tier passes alone and fails only in composition, so
   the guard (`TestEveryTierGetsItsOwnReaders`) drives `renderChain`, not a
   formatter.
+- **A dedicated formatter's DECLINE is not a dead end.** After every tier of the
+  command's own formatter declines, `renderChain` offers the bytes to
+  `Options.LosslessFallback` (`jsoncompact`, relaxed tier only) before verbatim.
+  Without it, `mongosh` printing a JSON document went out at full size while an
+  unmatched command printing the identical bytes was compacted. It is
+  LOSSLESS-ONLY on purpose: most of the ~338 declines are deliberate — a
+  formatter stepping aside so user-selected machine output stays authoritative —
+  and nobody has enumerated which mean "not my shape" and which mean "hands
+  off", so the fallback must be safe without knowing. Whitespace-compacting a
+  JSON document is (same values to every parser); collapsing repeated LINES is
+  not, which is why the generic line collapser stays on the unmatched path.
+  A fallback render is accounted as `(generic)` with `FormatterKind=generic` —
+  it is a saving, not coverage.
 - **The generic fallback (`adapters/format/generic`) applies to EVERY unmatched
   command**, not just JSON. It compacts what parses as JSON and collapses runs of
   identical (or identical-after-a-leading-timestamp) lines, sharing

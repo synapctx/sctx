@@ -55,7 +55,7 @@ func TestEveryTierGetsItsOwnReaders(t *testing.T) {
 	f := &readingFormatter{relaxedBody: "ok"}
 
 	in := format.Input{Stdout: bytes.NewReader(raw), Stderr: bytes.NewReader(stderr)}
-	got := renderChain(context.Background(), f, in, raw, stderr, "")
+	got := renderChain(context.Background(), f, in, raw, stderr, "", nil)
 
 	if f.relaxedSaw != len(raw) {
 		t.Errorf("relaxed tier saw %d of %d stdout bytes; the aggressive tier consumed the reader",

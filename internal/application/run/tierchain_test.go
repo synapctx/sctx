@@ -108,7 +108,7 @@ func TestRenderChain(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := renderChain(context.Background(), tt.f, format.Input{ExitCode: 0}, raw, nil, tt.forceTier)
+			got := renderChain(context.Background(), tt.f, format.Input{ExitCode: 0}, raw, nil, tt.forceTier, nil)
 			if got.Tier != tt.wantTier {
 				t.Fatalf("tier = %q, want %q (anomaly: %q)", got.Tier, tt.wantTier, got.Anomaly)
 			}
@@ -135,7 +135,7 @@ func TestRenderChainPreservesElisionSignal(t *testing.T) {
 			return format.Rendered{}, format.ErrTierInapplicable
 		},
 	}
-	result := renderChain(context.Background(), f, format.Input{}, raw, nil, "")
+	result := renderChain(context.Background(), f, format.Input{}, raw, nil, "", nil)
 	if !result.Elided {
 		t.Fatal("tier chain dropped formatter elision signal")
 	}
