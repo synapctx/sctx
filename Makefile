@@ -16,8 +16,10 @@ vet:
 fmt:
 	gofmt -w .
 
+# Not `|| true`: the configured set is small enough to keep at zero, and CI
+# fails on it. A target that always succeeds teaches everyone to ignore it.
 lint:
-	golangci-lint run || true
+	golangci-lint run
 
 install: build
 	install -m 0755 bin/$(BINARY) $(HOME)/.local/bin/$(BINARY)

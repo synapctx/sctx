@@ -1,0 +1,19 @@
+# Lint configuration for CI.
+#
+# WHY THIS IS A SHORT LIST RATHER THAN THE DEFAULT SET. A gate is only worth
+# having if it is green, and a green gate is the only kind anyone believes. The
+# default linters report ~50 findings here — almost all `errcheck` on deferred
+# Close calls we deliberately ignore — so turning them all on would produce a
+# permanently red job that everybody learns to skip.
+#
+# `unused` earns its place on evidence: two functions (`containsToken`,
+# `isSeparatorLine`) lost their last caller during the v0.4.3 argv-grammar
+# rewrite and shipped as dead code. `go vet` cannot see that — it checks unused
+# LOCALS, not package-level functions — and CI ran no linter, so nothing did.
+# Everything else stays out until it catches something real.
+version: "2"
+
+linters:
+  default: none
+  enable:
+    - unused

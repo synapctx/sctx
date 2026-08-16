@@ -42,6 +42,15 @@ jobs:
       - name: Vet
         run: go vet ./...
 
+      # `go vet` reports unused LOCALS; it says nothing about a package-level
+      # function whose last caller was deleted. Two of those shipped in v0.4.3
+      # because nothing here looked. The configured set is deliberately tiny —
+      # see .golangci.yml for why a green gate was worth more than a full one.
+      - name: Lint
+        uses: golangci/golangci-lint-action@v9
+        with:
+          version: v2.12.2
+
       - name: Test
         run: go test -race ./...
 

@@ -34,11 +34,10 @@ func (p palette) wrap(s string, codes ...string) string {
 	return "\x1b[" + seq + "m" + s + ansiReset
 }
 
-func (p palette) bold(s string) string   { return p.wrap(s, ansiBold) }
-func (p palette) dim(s string) string    { return p.wrap(s, ansiDim) }
-func (p palette) green(s string) string  { return p.wrap(s, ansiGreen) }
-func (p palette) cyan(s string) string   { return p.wrap(s, ansiCyan) }
-func (p palette) yellow(s string) string { return p.wrap(s, ansiYellow) }
+func (p palette) bold(s string) string  { return p.wrap(s, ansiBold) }
+func (p palette) dim(s string) string   { return p.wrap(s, ansiDim) }
+func (p palette) green(s string) string { return p.wrap(s, ansiGreen) }
+func (p palette) cyan(s string) string  { return p.wrap(s, ansiCyan) }
 
 func (p palette) boldGreen(s string) string { return p.wrap(s, ansiBold, ansiGreen) }
 func (p palette) boldCyan(s string) string  { return p.wrap(s, ansiBold, ansiCyan) }
