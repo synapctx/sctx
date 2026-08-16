@@ -133,10 +133,10 @@ That one record shape serves two purposes, and only the second is a question.
    audit safety choices. THAT is why it is a question rather than a term in a
    contract.
 
-   sctx is built by people whose code is mostly Go, and it shows: the formatters
-   cover what we run. If your work is Rust, Python or Java, these are the only
-   signal that tells us so — without them we keep improving the parts that
-   already work for us.
+   Coverage follows what people actually run. A command sctx has never seen is
+   one nobody knows to build for — whatever language, toolchain, database or
+   platform it belongs to — and these records are what decide which formatter
+   is written next.
 
 See exactly what is queued with 'sctx telemetry --preview', and change your mind
 with 'sctx telemetry --enable' / '--disable'.`
