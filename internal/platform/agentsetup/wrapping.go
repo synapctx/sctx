@@ -1,0 +1,150 @@
+package agentsetup
+
+// One view over the three ways a command comes to be wrapped, so `sctx setup`
+// can answer the only question that matters — "will this agent's commands
+// actually go through sctx?" — without the caller knowing which mechanism each
+// client happens to offer.
+//
+// The mechanisms are not interchangeable and cannot be made so: Claude Code and
+// Gemini CLI intercept via a hook process, Kilo Code and OpenCode via an
+// in-process plugin, and Codex, Windsurf and Crush offer nothing to intercept
+// with, so their agents must type `sctx` themselves. What IS uniform is the
+// reporting: an agent is wrapped, or it is manual and its instructions say so.
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/synapctx/sctx/pkg/agentdoc"
+)
+
+// WrapState is the auto-wrap state of one detected agent.
+type WrapState struct {
+	AgentID   string
+	AgentName string
+	Mode      agentdoc.WrapMode
+	// Where the wiring lives — a settings file or a plugin path. Empty for a
+	// manual agent, which has none by definition.
+	Path string
+	// OK reports whether commands are being wrapped right now. Always false for
+	// a manual agent: nothing is wrong, but nothing is wrapping either, and
+	// calling that "ok" is how the manual case stops being visible.
+	OK     bool
+	Detail string
+}
+
+// InspectWrapping reports auto-wrap for every detected agent.
+func InspectWrapping(home, binary string, docs ...Doc) ([]WrapState, error) {
+	st, err := Inspect(home, nil, docs...)
+	if err != nil {
+		return nil, err
+	}
+	out := make([]WrapState, 0, len(st.Targets))
+	for _, t := range st.Targets {
+		out = append(out, wrapStateFor(home, t.Agent, binary))
+	}
+	return out, nil
+}
+
+func wrapStateFor(home string, a Agent, binary string) WrapState {
+	ws := WrapState{AgentID: a.ID, AgentName: a.Name, Mode: a.Wrapping}
+	switch a.Wrapping {
+	case agentdoc.WrapHook:
+		// Codex keeps its hooks in TOML beside its MCP registrations, and adds a
+		// trust step no other client has. Same mechanism, different file format
+		// and one more thing to say.
+		if a.ID == "codex" {
+			cs, err := InspectCodexHooks(home, binary)
+			ws.Path = cs.ConfigPath
+			switch {
+			case err != nil:
+				ws.Detail = err.Error()
+			case len(cs.Conflicts) > 0:
+				ws.Detail = strings.Join(cs.Conflicts, ", ")
+			case !cs.Installed:
+				ws.Detail = "hook not wired"
+			case cs.Stale:
+				ws.Detail = "hook points at a different sctx binary"
+			default:
+				ws.OK = true
+				ws.Detail = "rewrites covered commands — run /hooks in Codex once to trust it"
+			}
+			return ws
+		}
+		path, states, err := InspectAgentHooks(home, a, binary)
+		ws.Path = path
+		if err != nil {
+			ws.Detail = err.Error()
+			return ws
+		}
+		missing := 0
+		for _, hs := range states {
+			if !hs.Installed {
+				missing++
+			}
+		}
+		ws.OK = missing == 0 && len(states) > 0
+		ws.Detail = "rewrites covered commands before they run"
+		if missing > 0 {
+			ws.Detail = fmt.Sprintf("%d hook(s) not wired", missing)
+		}
+	case agentdoc.WrapPlugin:
+		ps, err := InspectPlugin(home, a, binary)
+		ws.Path = ps.Path
+		if err != nil {
+			ws.Detail = err.Error()
+			return ws
+		}
+		switch {
+		case ps.Foreign:
+			ws.Detail = "a file of this name exists that sctx did not write"
+		case !ps.Installed:
+			ws.Detail = "plugin not installed"
+		case ps.Stale:
+			ws.Detail = "plugin points at a different sctx binary"
+		default:
+			ws.OK = true
+			ws.Detail = "rewrites covered commands before they run"
+		}
+	default:
+		ws.Detail = "no interception point in this client — its instructions tell it to type `sctx` itself"
+	}
+	return ws
+}
+
+// InstallWrapping wires auto-wrap for every detected agent that supports it.
+//
+// Errors come back alongside the successes rather than aborting: one agent with
+// a settings file we cannot parse must not cost every other agent its wrapping.
+func InstallWrapping(home, binary string, docs ...Doc) ([]string, []error) {
+	st, err := Inspect(home, nil, docs...)
+	if err != nil {
+		return nil, []error{err}
+	}
+	var changed []string
+	var problems []error
+	for _, t := range st.Targets {
+		var (
+			c []string
+			e error
+		)
+		switch t.Wrapping {
+		case agentdoc.WrapHook:
+			if t.ID == "codex" {
+				c, e = InstallCodexHooks(home, binary)
+				break
+			}
+			c, e = InstallAgentHooks(home, t.Agent, binary)
+		case agentdoc.WrapPlugin:
+			c, e = InstallPlugin(home, t.Agent, binary)
+		default:
+			continue
+		}
+		if e != nil {
+			problems = append(problems, fmt.Errorf("%s: %w", t.Name, e))
+			continue
+		}
+		changed = append(changed, c...)
+	}
+	return changed, problems
+}

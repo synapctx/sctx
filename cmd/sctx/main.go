@@ -473,7 +473,13 @@ func runInit(ctx context.Context, cfg config.Config, args []string) int {
 		defaultOrg = org
 	}
 
-	if err := writeConfigFile(cfg.ConfigFilePath, endpoint, defaultOrg, orgTokens, cfg.Consent); err != nil {
+	// An operator who pointed sctx at their own MCP host keeps it: this function
+	// rewrites the config file wholesale, so a value not threaded through here is
+	// ERASED — the same trap the consent record carries a comment about. The
+	// hosted default is deliberately NOT written: it lives in code, so a machine
+	// that never chose a host follows the product rather than a line frozen into
+	// a file on the day it was installed.
+	if err := writeConfigFile(cfg.ConfigFilePath, endpoint, configuredWorkspaceProxy(cfg), defaultOrg, orgTokens, cfg.Consent); err != nil {
 		fmt.Fprintf(os.Stderr, "sctx: init: writing config: %v\n", err)
 		return 1
 	}
@@ -577,18 +583,38 @@ func validateTelemetryToken(ctx context.Context, endpoint, token string) (string
 	return org, nil
 }
 
+// configuredWorkspaceProxy is the MCP host to persist when the config file is
+// rewritten: a host somebody CHOSE, and nothing otherwise.
+//
+// Writing the shipped default would freeze it. The endpoint is ours and may
+// move; a machine that never chose one should follow the binary, not a copy of
+// today's value left in a TOML file by an install two years ago.
+func configuredWorkspaceProxy(cfg config.Config) string {
+	proxy := strings.TrimSpace(cfg.WorkspaceProxyURL)
+	if proxy == config.DefaultWorkspaceProxy {
+		return ""
+	}
+	return proxy
+}
+
 // writeConfigFile persists endpoint, defaultOrg, and one [org.<slug>] section
 // per orgTokens entry to path in the strict key = "value" format config.Load
 // parses, mode 0600 (the keys are secrets), creating the parent directory
 // 0700 if needed. Orgs are written in sorted slug order for deterministic
 // output; defaultOrg is omitted from the file when empty.
-func writeConfigFile(path, endpoint, defaultOrg string, orgTokens map[string]string, consent config.ConsentRecord) error {
+func writeConfigFile(path, endpoint, workspaceProxy, defaultOrg string, orgTokens map[string]string, consent config.ConsentRecord) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return fmt.Errorf("creating config directory: %w", err)
 	}
 
 	var b strings.Builder
 	fmt.Fprintf(&b, "telemetry_endpoint = %q\n", endpoint)
+	// The MCP host every agent's registrations point at. Omitted when unknown
+	// rather than written as the local dev default, so `sctx setup` can tell
+	// "not configured" from "configured to something".
+	if workspaceProxy != "" {
+		fmt.Fprintf(&b, "workspace_proxy_url = %q\n", workspaceProxy)
+	}
 	if defaultOrg != "" {
 		fmt.Fprintf(&b, "default_org = %q\n", defaultOrg)
 	}
@@ -619,12 +645,25 @@ func writeConfigFile(path, endpoint, defaultOrg string, orgTokens map[string]str
 
 func runHook(args []string) int {
 	if len(args) == 0 {
-		fmt.Fprintln(os.Stderr, "usage: sctx hook claude | sctx hook claude-post-tool")
+		fmt.Fprintln(os.Stderr, "usage: sctx hook claude | sctx hook claude-post-tool | sctx hook codex | sctx hook gemini | sctx hook rewrite <command>")
 		return 2
 	}
 	switch args[0] {
 	case "claude":
 		return hook.RunClaude(args[1:], os.Stdin, os.Stdout, version)
+	case "codex":
+		// Codex CLI's PreToolUse contract is byte-identical to Claude Code's —
+		// same `tool_name`, same `hookSpecificOutput.updatedInput.command`. It
+		// gets its own verb anyway: hook detection matches on the subcommand, so
+		// one name for two clients would make an installed Codex hook look like
+		// an installed Claude hook and vice versa.
+		return hook.RunClaude(args[1:], os.Stdin, os.Stdout, version)
+	case "rewrite":
+		// Plain-text rewrite for callers that speak no hook protocol: the JS
+		// plugin sctx installs into Kilo Code and OpenCode.
+		return hook.RunRewrite(args[1:], os.Stdout, version)
+	case "gemini":
+		return hook.RunGemini(args[1:], os.Stdin, os.Stdout, version)
 	case "claude-post-tool":
 		// Memory surfacing. Config is loaded HERE rather than in realMain's
 		// pre-hook branch because this hook needs an API key and the Bash hook
@@ -636,7 +675,7 @@ func runHook(args []string) int {
 		}
 		return hook.RunClaudePostTool(os.Stdin, os.Stdout, cfg)
 	default:
-		fmt.Fprintln(os.Stderr, "usage: sctx hook claude | sctx hook claude-post-tool")
+		fmt.Fprintln(os.Stderr, "usage: sctx hook claude | sctx hook claude-post-tool | sctx hook codex | sctx hook gemini | sctx hook rewrite <command>")
 		return 2
 	}
 }

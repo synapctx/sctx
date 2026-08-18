@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"sort"
@@ -116,34 +117,31 @@ func runSetup(cfg config.Config, args []string) int {
 		}
 		changedAny = len(changed) > 0
 
-		instructionState, inspectErr := agentsetup.Inspect(home, orgs, docsFor(cfg)...)
-		if inspectErr != nil {
-			fmt.Fprintf(os.Stderr, "sctx: setup: %v\n", inspectErr)
-			return 1
-		}
-		if hasAgent(instructionState, "codex") && len(orgTokens) > 0 {
-			mcpChanges, mcpErr := agentsetup.InstallCodexMCP(home, cfg.WorkspaceProxyURL, orgTokens)
-			if mcpErr != nil {
-				fmt.Fprintf(os.Stderr, "sctx: setup: Codex MCP servers not installed: %v\n", mcpErr)
-			} else {
-				for _, c := range mcpChanges {
-					fmt.Println(c)
-				}
-				changedAny = changedAny || len(mcpChanges) > 0
+		if len(orgTokens) > 0 {
+			// Every agent whose registry we manage, not only Codex. Before
+			// 2026-08-18 this was Codex alone, so Kilo Code and OpenCode were
+			// handed a document about tools that were never registered anywhere.
+			mcpChanges, mcpErrs := agentsetup.InstallMCP(home, orgTokens, cfg.WorkspaceProxyURL, docsFor(cfg)...)
+			for _, mcpErr := range mcpErrs {
+				fmt.Fprintf(os.Stderr, "sctx: setup: MCP servers not installed: %v\n", mcpErr)
 			}
-		}
-		if hasAgent(instructionState, "claude") {
-			hookChanges, hookErr := agentsetup.InstallHooks(home, binary)
-			if hookErr != nil {
-				// A settings file we could not parse is one we must not write.
-				fmt.Fprintf(os.Stderr, "sctx: setup: hooks not installed: %v\n", hookErr)
-			} else {
-				for _, c := range hookChanges {
-					fmt.Println(c)
-				}
-				changedAny = changedAny || len(hookChanges) > 0
+			for _, c := range mcpChanges {
+				fmt.Println(c)
 			}
+			changedAny = changedAny || len(mcpChanges) > 0
 		}
+		// Auto-wrap for every client that offers an interception point: a hook
+		// process (Claude Code, Gemini CLI) or an in-process plugin (Kilo Code,
+		// OpenCode). Without it the instructions still work — the agent types
+		// `sctx` itself — but nothing is automatic.
+		wrapChanges, wrapErrs := agentsetup.InstallWrapping(home, binary, docsFor(cfg)...)
+		for _, wrapErr := range wrapErrs {
+			fmt.Fprintf(os.Stderr, "sctx: setup: auto-wrap not installed: %v\n", wrapErr)
+		}
+		for _, c := range wrapChanges {
+			fmt.Println(c)
+		}
+		changedAny = changedAny || len(wrapChanges) > 0
 		if !changedAny {
 			fmt.Println("already set up; nothing to change")
 		} else {
@@ -157,17 +155,133 @@ func runSetup(cfg config.Config, args []string) int {
 		return 1
 	}
 	printSetupStatus(os.Stdout, st, cfg, install)
+	endpointOK := printMCPEndpointStatus(os.Stdout, st, cfg)
 	hooksOK := true
 	if hasAgent(st, "claude") {
 		hooksOK = printHookStatus(os.Stdout, home, binary)
 	}
-	if st.Complete() && hooksOK {
+	if st.Complete() && hooksOK && endpointOK {
 		return 0
 	}
 	if !install {
 		fmt.Println("\nFix with: sctx setup --install")
 	}
 	return 1
+}
+
+// probeMCPEndpoint reports whether the MCP host the registrations point at
+// answers at all. Replaceable so tests never touch the network.
+var probeMCPEndpoint = httpProbeMCPEndpoint
+
+// httpProbeMCPEndpoint asks the endpoint for anything and reports whether a
+// server was there.
+//
+// ANY HTTP response counts as reachable, 401 included: we are not testing the
+// credential — the registrations carry per-org keys and a 401 to an
+// unauthenticated probe is the CORRECT answer from a healthy server. What this
+// catches is the other failure, which had no symptom anywhere in setup: a
+// registration pointing at a host that is not listening. Until the MCP host was
+// persisted at all (see defaultInitWorkspaceProxy), that was every authenticated
+// machine, and `sctx setup` called it "[ok] registered" because the text was in
+// the file.
+func httpProbeMCPEndpoint(endpoint string) (bool, string) {
+	endpoint = strings.TrimSpace(endpoint)
+	if endpoint == "" {
+		return false, "no MCP host configured"
+	}
+	client := &http.Client{Timeout: 2 * time.Second}
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return false, err.Error()
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return false, transportReason(err)
+	}
+	defer resp.Body.Close()
+	return true, resp.Status
+}
+
+// transportReason strips the URL out of a transport error. It is already on the
+// line above, and repeating it turns a one-line diagnosis into three.
+func transportReason(err error) string {
+	msg := err.Error()
+	if i := strings.LastIndex(msg, ": "); i >= 0 {
+		return msg[i+2:]
+	}
+	return msg
+}
+
+// printMCPEndpointStatus says whether the host every registration points at is
+// actually up.
+func printMCPEndpointStatus(w io.Writer, st agentsetup.Status, cfg config.Config) bool {
+	managed := false
+	for _, t := range st.Targets {
+		if t.CodexMCP != nil || t.RemoteMCP != nil {
+			managed = true
+		}
+	}
+	if !managed {
+		return true
+	}
+	endpoint := strings.TrimRight(strings.TrimSpace(cfg.WorkspaceProxyURL), "/")
+	if !strings.HasSuffix(endpoint, "/mcp") {
+		endpoint += "/mcp"
+	}
+	fmt.Fprintf(w, "\nMCP host every registration points at\n  %s\n", endpoint)
+	ok, detail := probeMCPEndpoint(endpoint)
+	if ok {
+		fmt.Fprintf(w, "  [ok]      responding (%s)\n", detail)
+		return true
+	}
+	fmt.Fprintf(w, "  [unreachable] %s\n", detail)
+	fmt.Fprintln(w, "  the servers are registered but nothing is listening — every SynapCTX tool call will fail.")
+	fmt.Fprintln(w, "  set workspace_proxy_url in ~/.config/sctx/config.toml, or re-run sctx init.")
+	return false
+}
+
+// printWrappingStatus says, per agent, whether its commands are actually being
+// wrapped — and by what.
+//
+// This is the half of setup that produces the savings, and it is the half that
+// was invisible: setup reported instruction files and MCP servers, so a machine
+// where nothing ever wrapped a command looked identical to one where everything
+// did. The three mechanisms are named rather than abstracted away because the
+// remedy differs — a hook lives in the client's settings, a plugin is a file,
+// and a manual client has neither and never will.
+func printWrappingStatus(w io.Writer, st agentsetup.Status, cfg config.Config) {
+	binary, err := os.Executable()
+	if err != nil || binary == "" {
+		binary = "sctx"
+	}
+	states, err := agentsetup.InspectWrapping(st.Home, binary, docsFor(cfg)...)
+	if err != nil || len(states) == 0 {
+		return
+	}
+	fmt.Fprintln(w, "\ncommand wrapping (this is what produces the savings)")
+	for _, ws := range states {
+		label := "manual"
+		switch ws.Mode {
+		case agentdoc.WrapHook:
+			label = "hook"
+		case agentdoc.WrapPlugin:
+			label = "plugin"
+		}
+		state := "[ok]     "
+		switch {
+		case ws.Mode == agentdoc.WrapManual:
+			// Not a failure: the client offers nothing to hook. Reported every
+			// time anyway, because an agent that is not being wrapped has to be
+			// typing `sctx` itself, and that is worth seeing.
+			state = "[manual] "
+		case !ws.OK:
+			state = "[missing]"
+		}
+		fmt.Fprintf(w, "  %s %-16s %-7s %s\n", state, ws.AgentName, label, ws.Detail)
+		if ws.Path != "" && !ws.OK {
+			fmt.Fprintf(w, "            %s\n", ws.Path)
+		}
+	}
 }
 
 // printHookStatus reports the hooks and returns whether they are all wired.
@@ -290,6 +404,49 @@ func printSetupStatus(w io.Writer, st agentsetup.Status, cfg config.Config, afte
 			fmt.Fprintf(w, "  [%-8s] %-24s %s\n", state, server, detail)
 		}
 	}
+	for _, t := range st.Targets {
+		if t.RemoteMCP == nil {
+			continue
+		}
+		fmt.Fprintf(w, "\n%s MCP servers (%s)\n", t.Name, t.RemoteMCP.ConfigPath)
+		if t.RemoteMCP.Unreadable {
+			fmt.Fprintf(w, "  [error   ] %-24s not valid JSON — left unchanged\n", filepath.Base(t.RemoteMCP.ConfigPath))
+			continue
+		}
+		conflicting := map[string]bool{}
+		for _, c := range t.RemoteMCP.Conflicts {
+			conflicting[strings.SplitN(c, " ", 2)[0]] = true
+		}
+		for _, server := range t.RemoteMCP.Servers {
+			state, detail := "ok", "registered"
+			switch {
+			case conflicting[server]:
+				state, detail = "conflict", "a registration with this name already exists elsewhere"
+			case !t.RemoteMCP.Installed:
+				state, detail = "missing", "not registered"
+			case t.RemoteMCP.Stale:
+				state, detail = "stale", "endpoint, organizations or credentials changed"
+			}
+			fmt.Fprintf(w, "  [%-8s] %-24s %s\n", state, server, detail)
+		}
+	}
+	// Agents we teach but whose MCP registry we do not write. Said out loud
+	// because the instruction document we just installed describes those tools:
+	// silence here reads as "registered", and the customer would only find out
+	// when the agent called a tool that does not exist.
+	if len(orgSlugs(cfg)) > 0 {
+		var unmanaged []string
+		for _, t := range st.Targets {
+			if t.CodexMCP == nil && t.RemoteMCP == nil {
+				unmanaged = append(unmanaged, t.Name)
+			}
+		}
+		if len(unmanaged) > 0 {
+			fmt.Fprintf(w, "\nMCP servers sctx does not manage: %s\n", strings.Join(unmanaged, ", "))
+			fmt.Fprintln(w, "  register the SynapCTX servers in that client yourself — sctx cannot verify they exist")
+		}
+	}
+	printWrappingStatus(w, st, cfg)
 	fmt.Fprintln(w, "\ninstruction documents")
 	fmt.Fprintln(w, "  written as sidecar files where includes are supported; otherwise inlined into the agent's root instructions")
 	for _, d := range st.Docs {

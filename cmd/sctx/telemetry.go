@@ -220,7 +220,7 @@ func counted(m map[string]int) string {
 // consent record that were not threaded through it would be silently erased by
 // the next `sctx init`.
 func recordConsent(cfg config.Config, decision string) error {
-	return writeConfigFile(cfg.ConfigFilePath, cfg.TelemetryEndpoint, cfg.DefaultOrg,
+	return writeConfigFile(cfg.ConfigFilePath, cfg.TelemetryEndpoint, configuredWorkspaceProxy(cfg), cfg.DefaultOrg,
 		cfg.OrgTokens, config.NewConsent(decision, time.Now()))
 }
 

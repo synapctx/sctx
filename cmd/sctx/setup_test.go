@@ -174,6 +174,7 @@ func TestStatusForAnUndetectedMachineSaysWhatItLookedFor(t *testing.T) {
 // write current Codex instructions, return success, and leave `codex mcp list`
 // empty. Exercise the command boundary, not only the config writer.
 func TestSetupInstallGivesCodexInstructionsAndMCPAbilityTogether(t *testing.T) {
+	stubMCPProbe(t)
 	home := t.TempDir()
 	t.Setenv("HOME", home)
 	if err := os.MkdirAll(filepath.Join(home, ".codex"), 0o755); err != nil {
@@ -242,5 +243,195 @@ func TestJoinAnd(t *testing.T) {
 		if got := joinAnd(tc.in); got != tc.want {
 			t.Errorf("joinAnd(%v) = %q, want %q", tc.in, got, tc.want)
 		}
+	}
+}
+
+// The same regression as the Codex one above, for the agents that were still
+// missing it: Kilo Code and OpenCode were taught a document whose whole subject
+// is a set of MCP tools, while nothing ever registered a server for them. And
+// for the clients whose registry sctx does NOT write, setup has to say so out
+// loud — silence there reads as "registered", and the customer finds out when
+// the agent calls a tool that does not exist.
+func TestSetupInstallRegistersMCPForKiloAndSaysWhichClientsItCannot(t *testing.T) {
+	stubMCPProbe(t)
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	for _, dir := range []string{".config/kilo", ".gemini"} {
+		if err := os.MkdirAll(filepath.Join(home, filepath.FromSlash(dir)), 0o755); err != nil {
+			t.Fatal(err)
+		}
+	}
+	cfg := config.Config{
+		OrgTokens:         map[string]string{"acme": "sctx_live_acme"},
+		DefaultOrg:        "acme",
+		WorkspaceProxyURL: "https://mcp.synapctx.com",
+		SpoolDir:          filepath.Join(home, ".config", "sctx", "spool"),
+	}
+	if code := runSetup(cfg, []string{"--install"}); code != 0 {
+		t.Fatalf("setup exit = %d, want 0", code)
+	}
+
+	raw, err := os.ReadFile(filepath.Join(home, ".config", "kilo", "kilo.json"))
+	if err != nil {
+		t.Fatalf("Kilo was taught but never registered: %v", err)
+	}
+	if !strings.Contains(string(raw), "synapctx-acme") {
+		t.Errorf("no SynapCTX server in Kilo's config:\n%s", raw)
+	}
+	if _, err := os.Stat(filepath.Join(home, ".config", "kilo", "AGENTS.md")); err != nil {
+		t.Errorf("Kilo instructions not written where 7.4+ reads them: %v", err)
+	}
+
+	st, err := agentsetup.InspectWithMCP(home, codexOrgTokens(cfg), cfg.WorkspaceProxyURL, docsFor(cfg)...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var buf bytes.Buffer
+	printSetupStatus(&buf, st, cfg, true)
+	out := buf.String()
+	if !strings.Contains(out, "Kilo Code MCP servers") || !strings.Contains(out, "[ok      ] synapctx-acme") {
+		t.Errorf("Kilo's registration was not reported:\n%s", out)
+	}
+	// Gemini is registered too, in ITS spelling, and gets its own hook.
+	gemini, err := os.ReadFile(filepath.Join(home, ".gemini", "settings.json"))
+	if err != nil {
+		t.Fatalf("Gemini was detected but never registered: %v", err)
+	}
+	if !strings.Contains(string(gemini), `"httpUrl"`) || !strings.Contains(string(gemini), "synapctx-acme") {
+		t.Errorf("Gemini's registration is missing or in the wrong dialect:\n%s", gemini)
+	}
+	if !strings.Contains(string(gemini), "hook gemini") {
+		t.Errorf("Gemini's auto-wrap hook was not wired:\n%s", gemini)
+	}
+	// And Kilo gets the plugin, since it has no hook system.
+	plugin := filepath.Join(home, ".config", "kilo", "plugin", "sctx.js")
+	if _, err := os.Stat(plugin); err != nil {
+		t.Errorf("Kilo's auto-wrap plugin was not installed: %v", err)
+	}
+	if !strings.Contains(out, "command wrapping") {
+		t.Errorf("the wrapping section is missing:\n%s", out)
+	}
+	for _, want := range []string{"Kilo Code", "plugin", "Gemini CLI", "hook"} {
+		if !strings.Contains(out, want) {
+			t.Errorf("wrapping status does not mention %q:\n%s", want, out)
+		}
+	}
+}
+
+// stubMCPProbe keeps setup's reachability check off the network. A test that
+// dials a real host fails on an aeroplane and passes in CI for reasons that have
+// nothing to do with the code.
+func stubMCPProbe(t *testing.T) {
+	t.Helper()
+	original := probeMCPEndpoint
+	probeMCPEndpoint = func(string) (bool, string) { return true, "200 OK" }
+	t.Cleanup(func() { probeMCPEndpoint = original })
+}
+
+// A REGISTRATION POINTING AT A HOST THAT IS NOT LISTENING MUST NOT REPORT OK.
+//
+// This is the failure the whole endpoint probe exists for: until `sctx init`
+// persisted an MCP host, config.Load fell back to the local dev proxy, so an
+// authenticated machine registered every agent against http://127.0.0.1:6220 —
+// and setup called it "[ok] registered", because the text was in the file. The
+// agent then showed every SynapCTX tool as failing to connect, with nothing in
+// sctx admitting anything was wrong.
+func TestSetupFailsWhenTheMCPHostIsNotListening(t *testing.T) {
+	original := probeMCPEndpoint
+	probeMCPEndpoint = func(string) (bool, string) { return false, "connection refused" }
+	t.Cleanup(func() { probeMCPEndpoint = original })
+
+	home := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(home, ".codex"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	cfg := config.Config{
+		OrgTokens:         map[string]string{"acme": "sctx_live_acme"},
+		WorkspaceProxyURL: "http://127.0.0.1:6220",
+	}
+	if _, err := agentsetup.Install(home, []string{"acme"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := agentsetup.InstallCodexMCP(home, cfg.WorkspaceProxyURL, cfg.OrgTokens); err != nil {
+		t.Fatal(err)
+	}
+	st, err := agentsetup.InspectWithMCP(home, cfg.OrgTokens, cfg.WorkspaceProxyURL, docsFor(cfg)...)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var buf bytes.Buffer
+	if printMCPEndpointStatus(&buf, st, cfg) {
+		t.Error("a dead MCP host was reported as fine")
+	}
+	out := buf.String()
+	if !strings.Contains(out, "[unreachable]") || !strings.Contains(out, "connection refused") {
+		t.Errorf("the reason was not reported:\n%s", out)
+	}
+	if !strings.Contains(out, "workspace_proxy_url") {
+		t.Errorf("no remedy was offered:\n%s", out)
+	}
+}
+
+// An operator who chose their own MCP host must keep it: writeConfigFile
+// rewrites the file wholesale, so a value not threaded through is erased — and
+// the erasure only shows up later, as agents quietly pointing somewhere else.
+func TestConfigRewritePreservesAChosenMCPHost(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "config.toml")
+	if err := writeConfigFile(path, defaultInitEndpoint, "https://mcp.internal.example", "acme",
+		map[string]string{"acme": "sctx_live_acme"}, config.ConsentRecord{}); err != nil {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(raw), `workspace_proxy_url = "https://mcp.internal.example"`) {
+		t.Fatalf("the MCP host was not persisted:\n%s", raw)
+	}
+	loaded := config.Config{WorkspaceProxyURL: "https://mcp.internal.example"}
+	if got := configuredWorkspaceProxy(loaded); got != "https://mcp.internal.example" {
+		t.Errorf("a rewrite would drop it: %q", got)
+	}
+	// The shipped default is not a choice anyone made, so it must NOT be frozen
+	// into the file: the endpoint is ours and may move, and a machine that never
+	// chose a host has to follow the binary rather than a copy of today's value.
+	if got := configuredWorkspaceProxy(config.Config{WorkspaceProxyURL: config.DefaultWorkspaceProxy}); got != "" {
+		t.Errorf("the shipped default would be frozen into the config file: %q", got)
+	}
+}
+
+// A CUSTOMER WHO INSTALLS SCTX AND PASTES A KEY MUST REACH OUR MCP HOST WITH NO
+// FURTHER CONFIGURATION.
+//
+// The default was the local dev proxy, and `sctx init` never wrote a host, so
+// every customer's agents were registered against a port on their own laptop.
+// Nobody outside this repository has any way to know that endpoint exists.
+func TestTheHostedMCPHostIsTheDefaultWithNoConfigFile(t *testing.T) {
+	dir := t.TempDir()
+	t.Setenv("HOME", dir)
+	t.Setenv("XDG_CONFIG_HOME", filepath.Join(dir, ".config"))
+	// Unset, not empty: an explicitly empty override is itself a choice, and
+	// this test is about the machine that made none.
+	if original, ok := os.LookupEnv("SCT__WORKSPACE_PROXY_URL"); ok {
+		os.Unsetenv("SCT__WORKSPACE_PROXY_URL")
+		t.Cleanup(func() { os.Setenv("SCT__WORKSPACE_PROXY_URL", original) })
+	}
+
+	cfg, err := config.Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.WorkspaceProxyURL != "https://mcp.synapctx.com" {
+		t.Errorf("a fresh install points at %q, want the hosted MCP host", cfg.WorkspaceProxyURL)
+	}
+	// And a private deployment still wins, or self-hosting is impossible.
+	t.Setenv("SCT__WORKSPACE_PROXY_URL", "https://mcp.internal.example")
+	cfg, err = config.Load()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.WorkspaceProxyURL != "https://mcp.internal.example" {
+		t.Errorf("an operator override was ignored: %q", cfg.WorkspaceProxyURL)
 	}
 }

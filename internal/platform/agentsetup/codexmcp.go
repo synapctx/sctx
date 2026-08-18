@@ -164,6 +164,13 @@ func tomlBasicString(value string) string {
 // Partial or repeated markers are refused: guessing at their extent risks
 // deleting user configuration or leaving duplicate tables.
 func splitCodexMCPBlock(in string) (prefix, body, suffix string, found bool, err error) {
+	return splitManagedBlock(in, codexMCPBegin, codexMCPEnd)
+}
+
+// splitManagedBlock is the same operation for any pair of markers in this file:
+// the MCP registrations and, since 2026-08-18, the auto-wrap hook.
+func splitManagedBlock(in, beginMarker, endMarker string) (prefix, body, suffix string, found bool, err error) {
+	codexMCPBegin, codexMCPEnd := beginMarker, endMarker
 	starts := strings.Count(in, codexMCPBegin)
 	ends := strings.Count(in, codexMCPEnd)
 	if starts == 0 && ends == 0 {

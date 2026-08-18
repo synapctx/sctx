@@ -193,6 +193,60 @@ load-bearing.
   token cost) because only the private side can see both budgets.
 - **An include is recognised in any path form**, comparing the final path segment
   only, or the same document gets loaded twice for every session.
+- **A row may claim only what was VERIFIED against that agent's shipped binary or
+  docs.** The 2026-08-18 audit found the Kilo row pointing at `.kilocode/rules/`,
+  a path 7.4.22 treats as legacy while loading global instructions from
+  `AGENTS.md` in `KILO_CONFIG_DIR ?? ~/.config/kilo` — and detecting only
+  `~/.kilocode`, which a current install never creates. Kilo was installed, in
+  daily use, and invisible. Unverified capabilities stay at their zero value,
+  which reports as "sctx does not do this here" rather than being assumed.
+- **The instruction document must not promise a hook to an agent that has none.**
+  `InstallHooks` wires Claude Code only, yet SCTX.md told all seven agents "a
+  PreToolUse hook rewrites covered commands; do not prefix `sctx` yourself" — so
+  five of them were instructed never to type the one thing they had to type. The
+  symptom is invisible: commands run fine, they are simply never wrapped.
+- **MCP registration is per-agent and per-format.** Codex is TOML with ownership
+  markers (codexmcp.go); Kilo Code and OpenCode share one JSON `mcp` schema
+  (remotemcp.go), verified against the configuration reference embedded in the
+  Kilo 7.4.22 binary. JSON cannot carry an ownership comment, so an entry is ours
+  when it is remote AND (points at the configured endpoint OR carries an
+  `sctx_live_` bearer token). **The token half is load-bearing**: judging by the
+  endpoint alone means sctx disowns its own entries the moment the endpoint
+  moves, which is exactly when the rewrite is needed. Everything else in the file
+  survives byte-for-byte, an unparseable config is never written to, and a
+  sibling `.jsonc` naming one of our servers is reported (it wins the deep merge
+  and we cannot rewrite it without stripping its comments).
+- **Auto-wrap is per-client and there are three mechanisms.** A hook process in
+  JSON settings (Claude Code, Gemini CLI), a hook in TOML with a trust step
+  (Codex), and an in-process plugin (Kilo Code, OpenCode) — all reporting through
+  one `WrapState`, because the question a customer has is "are my commands being
+  wrapped", not "which mechanism". Windsurf and Crush expose no interception
+  point and are reported `[manual]`, never `[ok]`.
+  - The plugin is a plain file in the agent's own `plugin/` directory: verified
+    on Kilo 7.4.22 that a module there loads with NO config entry and NO package
+    install. It calls `sctx hook rewrite`, so the rules stay in the binary and an
+    older plugin still makes current decisions.
+  - **Codex will not run a hook until a human trusts it** (`/hooks`), and trust is
+    keyed to the hook definition's hash. Setup says so on the same line it
+    reports the hook, because an untrusted hook is silently skipped.
+  - Gemini's `BeforeTool` returns `hookSpecificOutput.tool_input`, which MERGES
+    over the model's arguments — send only `command`. Codex's PreToolUse contract
+    is byte-identical to Claude's `updatedInput`, but keeps its own subcommand so
+    hook detection can tell the two installs apart.
+- **The default MCP host is the hosted one, in code** (`config.DefaultWorkspaceProxy`).
+  It was the local dev proxy, and `sctx init` never wrote a host, so every
+  customer registered their agents against a port on their own laptop. Nothing
+  persists the default into config.toml: the endpoint may move, and a machine
+  that never chose a host must follow the binary rather than a value frozen at
+  install time. An operator's own host is preserved through every rewrite.
+- **"Registered" must mean reachable.** `sctx init` never persisted an MCP host,
+  so config.Load fell back to the local dev proxy and every authenticated machine
+  registered its agents against `http://127.0.0.1:6220` — reported `[ok]`, with
+  every tool call failing to connect. init now writes `workspace_proxy_url` for a
+  hosted install, every config rewrite threads an operator's own choice through
+  (writeConfigFile rewrites wholesale, so an untracked value is erased), and
+  setup probes the host and fails when nothing answers. Any HTTP status counts as reachable: a 401 to an
+  unauthenticated probe is the correct answer from a healthy server.
 - **Codex instructions and Codex MCP ability are separate setup states.** A
   current `~/.codex/AGENTS.md` with an empty `codex mcp list` is broken, never
   green. SynapCTX registrations live between owned markers in

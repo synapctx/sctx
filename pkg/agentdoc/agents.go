@@ -19,12 +19,14 @@ package agentdoc
 //     Anything we are not certain about gets the inline block, which works
 //     everywhere because it is just text in the file the agent already reads.
 //
-// Absent from this table on purpose, and tracked in business-docs rather than
-// guessed at here: project-scoped rule directories (Cursor's `.cursor/rules`,
-// Cline's `.clinerules`, Roo's `.roo/rules`), which are per-repository rather
-// than per-machine and so belong to a different command; and IDE assistants
-// whose "global rules" live in application settings rather than on disk, where
-// there is nothing for us to write.
+// A fourth rule was added on 2026-08-18, after the first end-to-end audit of the
+// non-Claude rows: **a row states only capabilities that were VERIFIED against
+// the agent's own shipped binary or documentation.** The audit found the Kilo
+// row pointing at a path that release had deprecated, and every agent being told
+// a hook would rewrite its commands when only Claude Code has one — so five of
+// seven agents were instructed never to type the thing they had to type. A
+// capability we have not verified is left at its zero value, which means "sctx
+// does not do this here" and is reported as such, rather than being assumed.
 type Agent struct {
 	ID   string // stable identifier, also the --agent flag value and the ?agent= value
 	Name string // for humans
@@ -42,7 +44,78 @@ type Agent struct {
 	// them, which keeps the developer's own instruction file short. When false
 	// the documents are inlined into the block.
 	Includes bool
+
+	// Wrapping is how commands come to be wrapped in this agent: by something
+	// sctx installs, or by the agent typing `sctx` itself. It exists because the
+	// instruction document has to tell the truth about which, and the two
+	// instructions are opposites.
+	Wrapping WrapMode
+
+	// MCP is the shape of this agent's MCP registry, and MCPConfig is the file
+	// holding it, relative to home. Zero value means sctx does not register
+	// servers for this agent — either it has no documented file registry, or we
+	// have not verified one — and `sctx setup` says so rather than implying the
+	// SynapCTX tools are callable.
+	MCP       MCPStyle
+	MCPConfig string
+
+	// The JSON dialect, for MCPRemoteJSON agents. Five clients express the same
+	// three facts — where the server is, what to send with the request, whether
+	// it is on — with four different spellings, and each of these fields is one
+	// of them. They are data rather than four near-identical writers because the
+	// difference between clients is genuinely only these strings.
+	//
+	//	kilocode/opencode  "mcp"         url        type "remote"  enabled
+	//	gemini             "mcpServers"  httpUrl    -              -
+	//	windsurf           "mcpServers"  serverUrl  -              -
+	//	crush              "mcp"         url        type "http"    -
+	MCPKey      string // object holding the servers
+	MCPURLField string // member naming the endpoint
+	MCPType     string // transport discriminator; empty when the client has none
+	MCPEnabled  bool   // whether the client understands an `enabled` member
+
+	// PluginPath is a JS plugin file, relative to home, that this agent loads
+	// from its config directory with no registration. It is how the Kilo/OpenCode
+	// family gets the command rewriting that Claude and Gemini get from a hook.
+	PluginPath string
 }
+
+// WrapMode is how a covered command comes to be run through sctx.
+type WrapMode int
+
+const (
+	// WrapManual: nothing intercepts the agent's commands, so the agent must
+	// write `sctx <cmd>` itself. This is the DEFAULT because it is what happens
+	// when we install nothing, and an agent told otherwise silently stops using
+	// sctx entirely.
+	WrapManual WrapMode = iota
+	// WrapHook: `sctx setup --install` wires a pre-tool hook that rewrites
+	// covered commands, so the agent writes them naturally.
+	WrapHook
+	// WrapPlugin: the agent has no hook system but loads plugins, and sctx
+	// installs one that rewrites the bash tool's arguments in process. Same
+	// result as WrapHook from the agent's point of view.
+	WrapPlugin
+)
+
+// Wrapped reports whether sctx installs something that wraps this agent's
+// commands, so the agent does not have to type `sctx` itself.
+func (a Agent) Wrapped() bool { return a.Wrapping == WrapHook || a.Wrapping == WrapPlugin }
+
+// MCPStyle is the format of an agent's MCP server registry.
+type MCPStyle int
+
+const (
+	// MCPUnmanaged: sctx does not write this agent's MCP registration.
+	MCPUnmanaged MCPStyle = iota
+	// MCPCodexTOML: `mcp_servers.<name>` tables in ~/.codex/config.toml.
+	MCPCodexTOML
+	// MCPRemoteJSON: an `mcp` object of `{"type":"remote","url":…,"headers":…}`
+	// entries in a JSON config file. Verified against the shipped Kilo 7.4.22
+	// binary's own configuration reference; OpenCode is the same engine and the
+	// same schema, which is why one style covers both.
+	MCPRemoteJSON
+)
 
 // KnownAgents is ordered by how likely we are to be right about the convention,
 // which is also roughly market share. Order matters only for display.
@@ -53,47 +126,123 @@ var KnownAgents = []Agent{
 		Root:     ".claude/CLAUDE.md",
 		Detect:   []string{".claude", ".claude.json"},
 		Includes: true,
+		Wrapping: WrapHook,
+		// Claude Code's MCP registry is managed by `claude mcp` and its own
+		// settings, which merge project, user and enterprise scopes. We do not
+		// write it: unlike a Codex TOML table, a wrong edit here can disable
+		// servers the customer configured elsewhere.
 	},
 	{
 		// Codex reads AGENTS.md — the cross-vendor convention several tools have
 		// converged on. No documented include mechanism, so the content is inlined.
-		ID:     "codex",
-		Name:   "OpenAI Codex CLI",
-		Root:   ".codex/AGENTS.md",
-		Detect: []string{".codex"},
+		// Codex grew PreToolUse hooks with the same `updatedInput` contract as
+		// Claude Code, so it is wrapped too — with one caveat nothing else in
+		// this table has: Codex requires a human to TRUST a hook definition
+		// (`/hooks`) before it will run it, and until they do the hook is silently
+		// skipped. `sctx setup` says so rather than reporting a hook that is
+		// installed but inert.
+		ID:        "codex",
+		Name:      "OpenAI Codex CLI",
+		Root:      ".codex/AGENTS.md",
+		Detect:    []string{".codex"},
+		Wrapping:  WrapHook,
+		MCP:       MCPCodexTOML,
+		MCPConfig: ".codex/config.toml",
 	},
 	{
-		ID:     "gemini",
-		Name:   "Gemini CLI",
-		Root:   ".gemini/GEMINI.md",
-		Detect: []string{".gemini"},
-		// Gemini CLI is believed to support @-imports, but "believed" is not a
-		// basis for writing a line that loads nothing when wrong. Inline is
-		// correct either way; revisit with a verified version.
+		// Gemini CLI has both halves, verified against its documentation on
+		// 2026-08-18: `mcpServers` entries keyed by `httpUrl` with `headers`, and
+		// a `BeforeTool` hook whose `hookSpecificOutput.tool_input` MERGES over
+		// the model's arguments — which is exactly the rewrite Claude's
+		// PreToolUse hook performs, under a different name.
+		//
+		// Includes stays off: @-imports are reported to work here, but a wrong
+		// guess writes a line that silently loads nothing, and inlining is
+		// correct either way.
+		ID:          "gemini",
+		Name:        "Gemini CLI",
+		Root:        ".gemini/GEMINI.md",
+		Detect:      []string{".gemini"},
+		Wrapping:    WrapHook,
+		MCP:         MCPRemoteJSON,
+		MCPConfig:   ".gemini/settings.json",
+		MCPKey:      "mcpServers",
+		MCPURLField: "httpUrl",
 	},
 	{
-		ID:     "opencode",
-		Name:   "OpenCode",
-		Root:   ".config/opencode/AGENTS.md",
-		Detect: []string{".config/opencode"},
+		// OpenCode and Kilo Code are the same engine: Kilo's own binary still
+		// logs `opencode`, reads `opencode.json` as a legacy config name, and
+		// ships the identical `mcp` schema. Verified 2026-08-18.
+		ID:          "opencode",
+		Name:        "OpenCode",
+		Root:        ".config/opencode/AGENTS.md",
+		Detect:      []string{".config/opencode"},
+		Wrapping:    WrapPlugin,
+		PluginPath:  ".config/opencode/plugin/sctx.js",
+		MCP:         MCPRemoteJSON,
+		MCPConfig:   ".config/opencode/opencode.json",
+		MCPKey:      "mcp",
+		MCPURLField: "url",
+		MCPType:     "remote",
+		MCPEnabled:  true,
 	},
 	{
-		ID:     "kilocode",
-		Name:   "Kilo Code",
-		Root:   ".kilocode/rules/synapctx.md",
-		Detect: []string{".kilocode"},
+		// Kilo Code. The path here was `.kilocode/rules/synapctx.md` until
+		// 2026-08-18, which the shipped 7.4.22 binary treats as LEGACY: it warns
+		// "consider migrating to .kilo/rules/", and the file it actually loads
+		// for global instructions is AGENTS.md in the config directory
+		// (`KILO_CONFIG_DIR ?? ~/.config/kilo`). The old row also detected only
+		// `~/.kilocode`, a directory a current install never creates — so Kilo
+		// was installed, actively used, and invisible to `sctx setup`.
+		//
+		// All three roots are detected because they are all still read; the one
+		// we WRITE is the modern one, which every version in support loads.
+		// The plugin directory is loaded with no config entry and no package
+		// install — verified by running 7.4.22 against a sandbox home on
+		// 2026-08-18, which is what makes auto-wrap installable here at all.
+		ID:          "kilocode",
+		Name:        "Kilo Code",
+		Root:        ".config/kilo/AGENTS.md",
+		Detect:      []string{".config/kilo", ".kilo", ".kilocode"},
+		Wrapping:    WrapPlugin,
+		PluginPath:  ".config/kilo/plugin/sctx.js",
+		MCP:         MCPRemoteJSON,
+		MCPConfig:   ".config/kilo/kilo.json",
+		MCPKey:      "mcp",
+		MCPURLField: "url",
+		MCPType:     "remote",
+		MCPEnabled:  true,
 	},
 	{
-		ID:     "windsurf",
-		Name:   "Windsurf",
-		Root:   ".codeium/windsurf/memories/global_rules.md",
-		Detect: []string{".codeium/windsurf"},
+		// Windsurf's MCP file and its `serverUrl` spelling are from its own
+		// documentation (2026-08-18). It is an IDE extension with no documented
+		// pre-tool interception point, so commands stay manual here and the
+		// instructions say so.
+		ID:          "windsurf",
+		Name:        "Windsurf",
+		Root:        ".codeium/windsurf/memories/global_rules.md",
+		Detect:      []string{".codeium/windsurf"},
+		MCP:         MCPRemoteJSON,
+		MCPConfig:   ".codeium/windsurf/mcp_config.json",
+		MCPKey:      "mcpServers",
+		MCPURLField: "serverUrl",
 	},
 	{
-		ID:     "crush",
-		Name:   "Crush",
-		Root:   ".config/crush/AGENTS.md",
-		Detect: []string{".config/crush"},
+		// Crush's `mcp` block with `type: "http"` is from its README and its own
+		// config skill (2026-08-18). NOTE for anyone extending this row: Crush
+		// SHELL-EXPANDS header values, so a credential containing `$` would be
+		// mangled — sctx keys are `sctx_live_` + alphanumerics, which is why
+		// writing the token literally is safe here and would not be in general.
+		// No documented pre-tool hook, so wrapping stays manual.
+		ID:          "crush",
+		Name:        "Crush",
+		Root:        ".config/crush/AGENTS.md",
+		Detect:      []string{".config/crush"},
+		MCP:         MCPRemoteJSON,
+		MCPConfig:   ".config/crush/crush.json",
+		MCPKey:      "mcp",
+		MCPURLField: "url",
+		MCPType:     "http",
 	},
 }
 

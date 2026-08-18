@@ -30,12 +30,26 @@ func sctxBody([]string) string {
 - Elisions are marked ` + "`…+N`" + ` or ` + "`×N`" + `; no marker means nothing was dropped.
 - Parse failure falls back aggressive → relaxed → verbatim; output is never suppressed.
 
-## You do not need to type it
+## Whether you have to type it depends on your agent
 
-A PreToolUse hook rewrites covered commands. **Write them naturally**, including
-pipelines and ` + "`&&`" + `; do not prefix ` + "`sctx`" + ` yourself.
+` + "`sctx setup --install`" + ` wraps commands automatically wherever the client gives it
+somewhere to intervene:
 
-Wrapped today: ` + "`go`" + `, ` + "`git`" + `, ` + "`grep`/`rg`" + `, ` + "`ls`/`find`/`tree`" + `,
+- **Claude Code**, **Codex** (PreToolUse hook) and **Gemini CLI** (BeforeTool hook)
+- **Kilo Code** and **OpenCode** (a plugin on ` + "`tool.execute.before`" + `)
+
+In those five, write commands naturally — including pipelines and ` + "`&&`" + ` — and do
+not prefix ` + "`sctx`" + ` yourself. Codex is the exception worth knowing: it will not
+run a hook until a human trusts it once with ` + "`/hooks`" + `, so until then nothing is
+wrapped there and prefixing is worth it.
+
+**No interception point exists in Windsurf or Crush**, so nothing rewrites
+anything there: prefix the covered commands yourself (` + "`sctx go test ./...`" + `,
+` + "`sctx git status`" + `). Prefixing when something already wrapped it is harmless —
+an already-wrapped command is detected and never wrapped twice — so when in
+doubt, prefix.
+
+Worth prefixing (and what is wrapped for you where that is automatic): ` + "`go`" + `, ` + "`git`" + `, ` + "`grep`/`rg`" + `, ` + "`ls`/`find`/`tree`" + `,
 ` + "`cat`/`head`/`tail`" + `, ` + "`diff`" + `, ` + "`ps`" + `, ` + "`du`" + `, ` + "`df`" + `,
 ` + "`make`" + `, ` + "`golangci-lint`" + `, ` + "`gh`" + `, ` + "`docker`" + `, ` + "`kubectl`" + `,
 ` + "`helm`" + `, ` + "`aws`/`gcloud`/`az`" + `, ` + "`terraform`/`tofu`/`pulumi`" + `,
@@ -54,7 +68,8 @@ Coverage is per (program, subcommand). Uncovered plumbing such as
 ` + "`git rev-parse`" + ` and ` + "`go env`" + ` stays raw. Path/host-first commands
 (` + "`grep`" + `, ` + "`ls`" + `, ` + "`cat`" + `, ` + "`curl`" + `, ` + "`ssh`" + `) are always wrapped.
 
-The hook declines when wrapping could change the conclusion:
+Wrapping is refused — and you should not add it by hand either — when it could
+change the conclusion:
 
 - downstream ` + "`grep`/`sed`/`awk`/`wc`/`jq`" + ` (an elided match could look absent);
 - file redirects (` + "`> out.txt`" + `), command substitution (` + "`$(…)`" + `), subshells.
@@ -79,7 +94,9 @@ It is foreground and per-developer; suggest it for substantial edits, but ask
 before starting it.
 
 ` + "`sctx doctor`" + ` shows configuration, masked key prefixes, default org and
-taught agents—not command coverage.
+taught agents—not command coverage. ` + "`sctx setup`" + ` reports, per agent on this
+machine, whether the instructions, the MCP servers and the rewrite hook are
+actually in place.
 
 ` + "`sctx: raw output: PATH (TTL)`" + ` points to expiring, byte-exact local
 ` + "`stdout`/`stderr`" + `; read only if an omitted detail is needed.

@@ -74,6 +74,9 @@ type Target struct {
 	// it nil in Inspect preserves that function's instruction-only contract for
 	// callers and tests that do not hold credentials.
 	CodexMCP *CodexMCPStatus
+	// RemoteMCP is the same half for an agent whose servers live in a JSON
+	// config (Kilo Code, OpenCode). Populated by InspectWithMCP.
+	RemoteMCP *RemoteMCPStatus
 	// Sidecars is populated for include-capable agents only. For the others the
 	// documents are inlined INTO the block, so Stale already covers them.
 	Sidecars []SidecarStatus
@@ -97,6 +100,9 @@ func (t Target) OK() bool {
 	if t.CodexMCP != nil && !t.CodexMCP.Complete() {
 		return false
 	}
+	if t.RemoteMCP != nil && !t.RemoteMCP.Complete() {
+		return false
+	}
 	return true
 }
 
@@ -115,10 +121,13 @@ func (t Target) InstructionsOK() bool {
 	return true
 }
 
-// InspectWithCodexMCP adds the capability half of setup to the ordinary
-// instruction inspection. Only Codex consumes ~/.codex/config.toml; other
-// agents remain unchanged.
-func InspectWithCodexMCP(home string, orgTokens map[string]string, endpoint string, docs ...Doc) (Status, error) {
+// InspectWithMCP adds the capability half of setup to the ordinary instruction
+// inspection, for every detected agent whose registry format we have verified.
+//
+// Which agents those are is a property of the table, not of this function: an
+// agent with MCPUnmanaged gets no MCP status and is reported as unmanaged, which
+// is the honest answer for a client whose registry we have never read.
+func InspectWithMCP(home string, orgTokens map[string]string, endpoint string, docs ...Doc) (Status, error) {
 	orgs := make([]string, 0, len(orgTokens))
 	for org := range orgTokens {
 		orgs = append(orgs, org)
@@ -128,17 +137,68 @@ func InspectWithCodexMCP(home string, orgTokens map[string]string, endpoint stri
 	if err != nil {
 		return Status{}, err
 	}
+	if len(orgTokens) == 0 {
+		return st, nil
+	}
 	for i := range st.Targets {
-		if st.Targets[i].ID != "codex" || len(orgTokens) == 0 {
-			continue
+		switch st.Targets[i].MCP {
+		case agentdoc.MCPCodexTOML:
+			mcp, err := InspectCodexMCP(home, endpoint, orgTokens)
+			if err != nil {
+				return Status{}, err
+			}
+			st.Targets[i].CodexMCP = &mcp
+		case agentdoc.MCPRemoteJSON:
+			mcp, err := InspectRemoteMCP(home, st.Targets[i].Agent, endpoint, orgTokens)
+			if err != nil {
+				return Status{}, err
+			}
+			st.Targets[i].RemoteMCP = &mcp
 		}
-		mcp, err := InspectCodexMCP(home, endpoint, orgTokens)
-		if err != nil {
-			return Status{}, err
-		}
-		st.Targets[i].CodexMCP = &mcp
 	}
 	return st, nil
+}
+
+// InspectWithCodexMCP is InspectWithMCP under its original name, kept because
+// the Codex registrations were the first capability sctx managed and callers
+// name it.
+func InspectWithCodexMCP(home string, orgTokens map[string]string, endpoint string, docs ...Doc) (Status, error) {
+	return InspectWithMCP(home, orgTokens, endpoint, docs...)
+}
+
+// InstallMCP registers the SynapCTX servers for every detected agent whose
+// registry sctx manages, and returns what it changed plus the errors it hit.
+//
+// Errors are RETURNED ALONGSIDE the changes rather than aborting: one agent
+// holding an unmanaged name collision must not stop the others from being
+// wired, or a single stale entry leaves the whole machine without tools.
+func InstallMCP(home string, orgTokens map[string]string, endpoint string, docs ...Doc) ([]string, []error) {
+	st, err := InspectWithMCP(home, orgTokens, endpoint, docs...)
+	if err != nil {
+		return nil, []error{err}
+	}
+	var changed []string
+	var problems []error
+	for _, t := range st.Targets {
+		var (
+			c []string
+			e error
+		)
+		switch t.MCP {
+		case agentdoc.MCPCodexTOML:
+			c, e = InstallCodexMCP(home, endpoint, orgTokens)
+		case agentdoc.MCPRemoteJSON:
+			c, e = InstallRemoteMCP(home, t.Agent, endpoint, orgTokens)
+		default:
+			continue
+		}
+		if e != nil {
+			problems = append(problems, fmt.Errorf("%s: %w", t.Name, e))
+			continue
+		}
+		changed = append(changed, c...)
+	}
+	return changed, problems
 }
 
 // Attention returns the sidecars a human has to decide about: ours-but-edited,

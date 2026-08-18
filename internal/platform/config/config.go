@@ -30,10 +30,25 @@ import (
 // never arrived and the only symptom was a `sctx gain` that stayed at zero.
 const defaultLocalEndpoint = "http://127.0.0.1:6221/v1/telemetry/exec"
 
-// defaultWorkspaceProxy is where the workspace daemon pushes before anything is
-// configured: the local dev proxy, matching defaultLocalEndpoint. `sctx init`
-// writes the real host, so a developer who has authenticated never sees this.
-const defaultWorkspaceProxy = "http://127.0.0.1:6220"
+// DefaultWorkspaceProxy is the SynapCTX MCP host: where the workspace daemon
+// pushes, and the URL every agent's MCP registration is written against.
+//
+// IT IS THE HOSTED HOST, IN CODE, AND THAT IS THE WHOLE POINT. It was the local
+// dev proxy (http://127.0.0.1:6220) until 2026-08-18, on the reasoning that
+// `sctx init` would write the real one — which it never did. So every customer
+// who installed sctx and pasted an API key had their agents registered against
+// a port on their own laptop that nothing was listening on. Setup reported
+// "[ok] registered"; the agent reported every SynapCTX tool as failing to
+// connect; nothing connected the two. A customer cannot be expected to know this
+// endpoint exists, let alone type it into a TOML file.
+//
+// A developer running the local stack, or anyone self-hosting, overrides it —
+// `SCT__WORKSPACE_PROXY_URL`, or `workspace_proxy_url` in the config file. That
+// is the direction the burden belongs: the person running a private proxy knows
+// they are, and the person who just installed sctx does not.
+const DefaultWorkspaceProxy = "https://mcp.synapctx.com"
+
+const defaultWorkspaceProxy = DefaultWorkspaceProxy
 
 type Config struct {
 	ApplicationName        string

@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/synapctx/sctx/pkg/agentdoc"
 )
 
 // Hook wiring for Claude Code.
@@ -47,6 +49,59 @@ type HookSpec struct {
 	Subcommand string
 	// Command is what we write when the hook is absent.
 	Command string
+	// Name and Timeout are written when the client documents them. Gemini CLI
+	// does (a friendly identifier and a millisecond limit); Claude Code does not,
+	// and writing fields a client has never heard of into its settings is how a
+	// validated config file starts rejecting the whole entry.
+	Name    string
+	Timeout int
+}
+
+// GeminiHooks is the auto-wrap hook for Gemini CLI.
+//
+// `BeforeTool` is Gemini's PreToolUse: its `hookSpecificOutput.tool_input`
+// merges over the model's arguments before the tool runs, which is the same
+// rewrite Claude's `updatedInput` performs. The matcher names the shell tool
+// specifically — a `*` matcher would run sctx before every file read the agent
+// performs, to decline each time.
+//
+// There is no Gemini equivalent of the memory hook here: PostToolUse surfacing
+// is a separate feature and is not implemented for this client.
+func GeminiHooks(binary string) []HookSpec {
+	return []HookSpec{
+		{
+			Event:      "BeforeTool",
+			Matcher:    "run_shell_command",
+			Purpose:    "rewrites covered commands to sctx — this is what produces the savings",
+			Subcommand: "gemini",
+			Command:    binary + " hook gemini",
+			Name:       "sctx",
+			Timeout:    5000,
+		},
+	}
+}
+
+// hooksFor is the hook set for one agent, empty when sctx installs none.
+func hooksFor(a Agent, binary string) []HookSpec {
+	switch a.ID {
+	case "claude":
+		return ClaudeHooks(binary)
+	case "gemini":
+		return GeminiHooks(binary)
+	}
+	return nil
+}
+
+// hookSettingsPath is where that agent keeps them. Both clients happen to use
+// `settings.json`; nothing depends on that staying true.
+func hookSettingsPath(home string, a Agent) string {
+	switch a.ID {
+	case "claude":
+		return filepath.Join(home, ".claude", "settings.json")
+	case "gemini":
+		return filepath.Join(home, ".gemini", "settings.json")
+	}
+	return ""
 }
 
 // ClaudeHooks are the hooks `sctx setup` installs for Claude Code.
@@ -76,8 +131,29 @@ type HookState struct {
 }
 
 // InspectHooks reports which of our hooks are wired into Claude Code's settings.
+// Kept under its original name because callers and tests use it.
 func InspectHooks(home, binary string) (settingsPath string, states []HookState, err error) {
-	settingsPath = filepath.Join(home, ".claude", "settings.json")
+	return InspectAgentHooks(home, claudeAgent(), binary)
+}
+
+// InstallHooks adds any missing Claude Code hook entry.
+func InstallHooks(home, binary string) ([]string, error) {
+	return InstallAgentHooks(home, claudeAgent(), binary)
+}
+
+func claudeAgent() Agent {
+	a, _ := agentdoc.AgentByID("claude")
+	return a
+}
+
+// InspectAgentHooks reports which of our hooks are wired into one agent's
+// settings. An agent sctx installs no hooks for returns nothing, not an error.
+func InspectAgentHooks(home string, a Agent, binary string) (settingsPath string, states []HookState, err error) {
+	specs := hooksFor(a, binary)
+	settingsPath = hookSettingsPath(home, a)
+	if len(specs) == 0 || settingsPath == "" {
+		return settingsPath, nil, nil
+	}
 	raw, readErr := os.ReadFile(settingsPath)
 	if readErr != nil && !os.IsNotExist(readErr) {
 		return settingsPath, nil, fmt.Errorf("reading %s: %w", settingsPath, readErr)
@@ -92,17 +168,20 @@ func InspectHooks(home, binary string) (settingsPath string, states []HookState,
 			return settingsPath, nil, fmt.Errorf("parsing %s: %w", settingsPath, jsonErr)
 		}
 	}
-	for _, spec := range ClaudeHooks(binary) {
+	for _, spec := range specs {
 		states = append(states, HookState{HookSpec: spec, Installed: hookPresent(doc, spec)})
 	}
 	return settingsPath, states, nil
 }
 
-// InstallHooks adds any missing hook entry, preserving everything else.
-func InstallHooks(home, binary string) ([]string, error) {
-	settingsPath, states, err := InspectHooks(home, binary)
+// InstallAgentHooks adds any missing hook entry, preserving everything else.
+func InstallAgentHooks(home string, a Agent, binary string) ([]string, error) {
+	settingsPath, states, err := InspectAgentHooks(home, a, binary)
 	if err != nil {
 		return nil, err
+	}
+	if settingsPath == "" || len(states) == 0 {
+		return nil, nil
 	}
 	missing := make([]HookSpec, 0, len(states))
 	for _, st := range states {
@@ -218,6 +297,12 @@ func addHook(doc map[string]any, spec HookSpec) {
 	}
 	groups, _ := hooks[spec.Event].([]any)
 	entry := map[string]any{"type": "command", "command": spec.Command}
+	if spec.Name != "" {
+		entry["name"] = spec.Name
+	}
+	if spec.Timeout > 0 {
+		entry["timeout"] = spec.Timeout
+	}
 
 	for _, g := range groups {
 		group, _ := g.(map[string]any)
