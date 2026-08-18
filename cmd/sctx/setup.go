@@ -169,37 +169,82 @@ func runSetup(cfg config.Config, args []string) int {
 	return 1
 }
 
-// probeMCPEndpoint reports whether the MCP host the registrations point at
-// answers at all. Replaceable so tests never touch the network.
+// probeResult is what the MCP host said when asked.
+type probeResult int
+
+const (
+	// probeReachable: the host answered. With a credential to offer, it also
+	// ACCEPTED it — the strong form.
+	probeReachable probeResult = iota
+	// probeRejected: the host is up and refused the key. A different failure
+	// with a different fix, and the two must never print the same line.
+	probeRejected
+	probeUnreachable
+)
+
+// probeMCPEndpoint reports what the MCP host every registration points at says
+// when asked. Replaceable so tests never touch the network.
 var probeMCPEndpoint = httpProbeMCPEndpoint
 
-// httpProbeMCPEndpoint asks the endpoint for anything and reports whether a
-// server was there.
+// httpProbeMCPEndpoint asks the endpoint whether it is there and, when a
+// credential is available, whether that credential works.
 //
-// ANY HTTP response counts as reachable, 401 included: we are not testing the
-// credential — the registrations carry per-org keys and a 401 to an
-// unauthenticated probe is the CORRECT answer from a healthy server. What this
-// catches is the other failure, which had no symptom anywhere in setup: a
-// registration pointing at a host that is not listening. Until the MCP host was
-// persisted at all (see defaultInitWorkspaceProxy), that was every authenticated
-// machine, and `sctx setup` called it "[ok] registered" because the text was in
-// the file.
-func httpProbeMCPEndpoint(endpoint string) (bool, string) {
+// It used to send a bare GET and treat ANY response as healthy, including the
+// 401 that answer always was — so setup printed "[ok] responding (401
+// Unauthorized)", which reads to a customer as "my key is broken" while actually
+// meaning "the probe brought no key". Both halves were wrong to leave: the line
+// alarmed people about a working install, and it could not have detected a
+// revoked key if there had been one.
+//
+// Now it speaks the protocol: an MCP `initialize` over POST with the same
+// Authorization header the registrations carry. 200 means the tools really are
+// callable — the strongest statement setup can make without pretending to be an
+// agent. 401/403 means the host is fine and the key is not, which is the one
+// case that needs a human. Any other status still counts as reachable: this is
+// not a conformance test, and a server that answers is a server that is there.
+func httpProbeMCPEndpoint(endpoint, token string) (probeResult, string) {
 	endpoint = strings.TrimSpace(endpoint)
 	if endpoint == "" {
-		return false, "no MCP host configured"
+		return probeUnreachable, "no MCP host configured"
 	}
-	client := &http.Client{Timeout: 2 * time.Second}
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	client := &http.Client{Timeout: 4 * time.Second}
+
+	if token == "" {
+		// Nothing to authenticate with yet. The only question left is whether
+		// anything is listening, and any answer at all settles it.
+		resp, err := client.Get(endpoint)
+		if err != nil {
+			return probeUnreachable, transportReason(err)
+		}
+		defer resp.Body.Close()
+		return probeReachable, "responding (no API key configured yet — run `sctx init`)"
+	}
+
+	body := strings.NewReader(`{"jsonrpc":"2.0","id":1,"method":"initialize","params":` +
+		`{"protocolVersion":"2025-06-18","capabilities":{},"clientInfo":{"name":"sctx-setup","version":"1"}}}`)
+	req, err := http.NewRequest(http.MethodPost, endpoint, body)
 	if err != nil {
-		return false, err.Error()
+		return probeUnreachable, err.Error()
 	}
+	req.Header.Set("Content-Type", "application/json")
+	// Streamable HTTP servers may answer either way; asking for both keeps a
+	// content-negotiation 406 from being mistaken for a rejected credential.
+	req.Header.Set("Accept", "application/json, text/event-stream")
+	req.Header.Set("Authorization", "Bearer "+token)
+
 	resp, err := client.Do(req)
 	if err != nil {
-		return false, transportReason(err)
+		return probeUnreachable, transportReason(err)
 	}
 	defer resp.Body.Close()
-	return true, resp.Status
+	switch resp.StatusCode {
+	case http.StatusOK:
+		return probeReachable, "responding, and your API key was accepted"
+	case http.StatusUnauthorized, http.StatusForbidden:
+		return probeRejected, resp.Status
+	default:
+		return probeReachable, "responding (" + resp.Status + ")"
+	}
 }
 
 // transportReason strips the URL out of a transport error. It is already on the
@@ -213,7 +258,7 @@ func transportReason(err error) string {
 }
 
 // printMCPEndpointStatus says whether the host every registration points at is
-// actually up.
+// actually up, and whether it accepts this machine's credentials.
 func printMCPEndpointStatus(w io.Writer, st agentsetup.Status, cfg config.Config) bool {
 	managed := false
 	for _, t := range st.Targets {
@@ -228,16 +273,49 @@ func printMCPEndpointStatus(w io.Writer, st agentsetup.Status, cfg config.Config
 	if !strings.HasSuffix(endpoint, "/mcp") {
 		endpoint += "/mcp"
 	}
+	org, token := probeCredential(cfg)
 	fmt.Fprintf(w, "\nMCP host every registration points at\n  %s\n", endpoint)
-	ok, detail := probeMCPEndpoint(endpoint)
-	if ok {
-		fmt.Fprintf(w, "  [ok]      responding (%s)\n", detail)
+
+	result, detail := probeMCPEndpoint(endpoint, token)
+	switch result {
+	case probeReachable:
+		if org != "" {
+			fmt.Fprintf(w, "  [ok]      %s (checked with the %s key)\n", detail, org)
+			return true
+		}
+		fmt.Fprintf(w, "  [ok]      %s\n", detail)
 		return true
+	case probeRejected:
+		fmt.Fprintf(w, "  [rejected] the host is up and refused the %s key — %s\n", org, detail)
+		fmt.Fprintln(w, "  the servers are registered, but every SynapCTX tool call will fail to authenticate.")
+		fmt.Fprintf(w, "  re-authenticate that organization: sctx init --key <sctx_live_...>\n")
+		return false
+	default:
+		fmt.Fprintf(w, "  [unreachable] %s\n", detail)
+		fmt.Fprintln(w, "  the servers are registered but nothing is listening — every SynapCTX tool call will fail.")
+		fmt.Fprintln(w, "  set workspace_proxy_url in ~/.config/sctx/config.toml, or re-run sctx init.")
+		return false
 	}
-	fmt.Fprintf(w, "  [unreachable] %s\n", detail)
-	fmt.Fprintln(w, "  the servers are registered but nothing is listening — every SynapCTX tool call will fail.")
-	fmt.Fprintln(w, "  set workspace_proxy_url in ~/.config/sctx/config.toml, or re-run sctx init.")
-	return false
+}
+
+// probeCredential picks the key to test with: the default organization's, or
+// the first configured. One key is enough — the question is whether this
+// machine's credentials are accepted by that host, and a per-org check would
+// send four requests to answer it four times.
+func probeCredential(cfg config.Config) (org, token string) {
+	tokens := codexOrgTokens(cfg)
+	if len(tokens) == 0 {
+		return "", ""
+	}
+	if t, ok := tokens[cfg.DefaultOrg]; ok && strings.TrimSpace(t) != "" {
+		return cfg.DefaultOrg, t
+	}
+	slugs := make([]string, 0, len(tokens))
+	for slug := range tokens {
+		slugs = append(slugs, slug)
+	}
+	sort.Strings(slugs)
+	return slugs[0], tokens[slugs[0]]
 }
 
 // printWrappingStatus says, per agent, whether its commands are actually being

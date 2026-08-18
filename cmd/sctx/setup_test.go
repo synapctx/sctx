@@ -324,7 +324,9 @@ func TestSetupInstallRegistersMCPForKiloAndSaysWhichClientsItCannot(t *testing.T
 func stubMCPProbe(t *testing.T) {
 	t.Helper()
 	original := probeMCPEndpoint
-	probeMCPEndpoint = func(string) (bool, string) { return true, "200 OK" }
+	probeMCPEndpoint = func(string, string) (probeResult, string) {
+		return probeReachable, "responding, and your API key was accepted"
+	}
 	t.Cleanup(func() { probeMCPEndpoint = original })
 }
 
@@ -338,7 +340,7 @@ func stubMCPProbe(t *testing.T) {
 // sctx admitting anything was wrong.
 func TestSetupFailsWhenTheMCPHostIsNotListening(t *testing.T) {
 	original := probeMCPEndpoint
-	probeMCPEndpoint = func(string) (bool, string) { return false, "connection refused" }
+	probeMCPEndpoint = func(string, string) (probeResult, string) { return probeUnreachable, "connection refused" }
 	t.Cleanup(func() { probeMCPEndpoint = original })
 
 	home := t.TempDir()
@@ -433,5 +435,70 @@ func TestTheHostedMCPHostIsTheDefaultWithNoConfigFile(t *testing.T) {
 	}
 	if cfg.WorkspaceProxyURL != "https://mcp.internal.example" {
 		t.Errorf("an operator override was ignored: %q", cfg.WorkspaceProxyURL)
+	}
+}
+
+// A HOST THAT IS UP AND A KEY THAT IS ACCEPTED ARE TWO DIFFERENT CLAIMS.
+//
+// The probe used to send no credential, so the host's correct 401 was printed as
+// "[ok] responding (401 Unauthorized)" — alarming on a working install, and
+// blind to the one thing it should have caught: a revoked key against a healthy
+// host. Those two states must never print the same line again.
+func TestSetupDistinguishesAHealthyHostFromARejectedKey(t *testing.T) {
+	home := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(home, ".codex"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	cfg := config.Config{
+		OrgTokens:         map[string]string{"acme": "sctx_live_acme"},
+		DefaultOrg:        "acme",
+		WorkspaceProxyURL: "https://mcp.synapctx.com",
+	}
+	if _, err := agentsetup.Install(home, []string{"acme"}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := agentsetup.InstallCodexMCP(home, cfg.WorkspaceProxyURL, cfg.OrgTokens); err != nil {
+		t.Fatal(err)
+	}
+	st, err := agentsetup.InspectWithMCP(home, cfg.OrgTokens, cfg.WorkspaceProxyURL, docsFor(cfg)...)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// The credential the probe offers has to be a real configured one, or it
+	// proves nothing about this machine.
+	org, token := probeCredential(cfg)
+	if org != "acme" || token != "sctx_live_acme" {
+		t.Errorf("probe would authenticate as %q/%q, want the configured key", org, token)
+	}
+
+	original := probeMCPEndpoint
+	t.Cleanup(func() { probeMCPEndpoint = original })
+
+	probeMCPEndpoint = func(_, tok string) (probeResult, string) {
+		if tok == "" {
+			t.Error("the probe sent no credential, so a 401 would be its own fault")
+		}
+		return probeReachable, "responding, and your API key was accepted"
+	}
+	var ok bytes.Buffer
+	if !printMCPEndpointStatus(&ok, st, cfg) {
+		t.Error("an accepted key was not reported as healthy")
+	}
+	if strings.Contains(ok.String(), "401") || !strings.Contains(ok.String(), "accepted") {
+		t.Errorf("a working install still reads like a failure:\n%s", ok.String())
+	}
+
+	probeMCPEndpoint = func(string, string) (probeResult, string) { return probeRejected, "401 Unauthorized" }
+	var rejected bytes.Buffer
+	if printMCPEndpointStatus(&rejected, st, cfg) {
+		t.Error("a rejected key was reported as fine")
+	}
+	out := rejected.String()
+	if !strings.Contains(out, "refused the acme key") {
+		t.Errorf("the rejection does not say whose key:\n%s", out)
+	}
+	if !strings.Contains(out, "sctx init") {
+		t.Errorf("no remedy was offered:\n%s", out)
 	}
 }
