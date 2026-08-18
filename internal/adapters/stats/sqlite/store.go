@@ -44,10 +44,26 @@ func NewStore(path string) (*Store, error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
 		return nil, fmt.Errorf("creating stats directory: %w", err)
 	}
-	db, err := sql.Open("sqlite", path+"?_pragma=journal_mode(WAL)&_pragma=busy_timeout(2000)")
+	db, err := sql.Open("sqlite", path+"?_pragma=journal_mode(WAL)&_pragma=busy_timeout(5000)")
 	if err != nil {
 		return nil, fmt.Errorf("opening stats db: %w", err)
 	}
+	// ONE CONNECTION, because SQLite allows one writer and database/sql will
+	// happily open several.
+	//
+	// WAL and busy_timeout make CONCURRENT PROCESSES safe — the case this store
+	// was built for, several sctx invocations recording at once — but they do not
+	// help a single process competing with itself: goroutines here take separate
+	// pooled connections, and the loser gets SQLITE_BUSY rather than waiting its
+	// turn in the same connection's queue. Seen as an intermittent
+	// "database is locked (5)" under CI load on 2026-08-18, on a test that had
+	// passed on every previous run and passes locally.
+	//
+	// The cost is that in-process writes serialise, which is what SQLite does
+	// anyway. The alternative — a longer timeout — makes the window smaller
+	// without closing it. The timeout above still matters for the cross-process
+	// case, and is raised to match a loaded machine.
+	db.SetMaxOpenConns(1)
 	if _, err := db.Exec(schema); err != nil {
 		db.Close()
 		return nil, fmt.Errorf("initializing stats schema: %w", err)
