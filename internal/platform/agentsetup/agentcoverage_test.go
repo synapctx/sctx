@@ -109,10 +109,10 @@ func TestEveryAgentClaimingAutoWrapActuallyGetsIt(t *testing.T) {
 			if err := os.MkdirAll(filepath.Join(home, filepath.FromSlash(a.Detect[0])), 0o755); err != nil {
 				t.Fatal(err)
 			}
-			if _, errs := InstallWrapping(home, "/usr/local/bin/sctx", agentdoc.SctxDoc); len(errs) > 0 {
+			if _, errs := InstallWrapping(home, fakeBinary(t), agentdoc.SctxDoc); len(errs) > 0 {
 				t.Fatalf("install: %v", errs)
 			}
-			states, err := InspectWrapping(home, "/usr/local/bin/sctx", agentdoc.SctxDoc)
+			states, err := InspectWrapping(home, fakeBinary(t), agentdoc.SctxDoc)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -138,7 +138,7 @@ func TestEveryAgentClaimingAutoWrapActuallyGetsIt(t *testing.T) {
 			if a.Wrapped() && err != nil {
 				t.Fatalf("reading %s: %v", found.Path, err)
 			}
-			if _, errs := InstallWrapping(home, "/usr/local/bin/sctx", agentdoc.SctxDoc); len(errs) > 0 {
+			if _, errs := InstallWrapping(home, fakeBinary(t), agentdoc.SctxDoc); len(errs) > 0 {
 				t.Fatalf("second install: %v", errs)
 			}
 			if a.Wrapped() {
@@ -172,4 +172,137 @@ func mentionsAgent(section string, a agentdoc.Agent) bool {
 		}
 	}
 	return false
+}
+
+// A STEP ONLY A HUMAN CAN TAKE IS NEVER REPORTED AS DONE.
+//
+// Codex installs like every other hook and then does nothing until someone
+// reviews and trusts it in the client. sctx cannot see that trust record, so the
+// honest report is "installed, and waiting on you" — not [ok]. Reporting green
+// here would repeat the exact failure this whole area exists to prevent: setup
+// satisfied by what it wrote rather than by what the customer has.
+func TestCodexAdmitsItsHookIsInertUntilTrusted(t *testing.T) {
+	home := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(home, ".codex"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if _, errs := InstallWrapping(home, fakeBinary(t), agentdoc.SctxDoc); len(errs) > 0 {
+		t.Fatal(errs)
+	}
+	states, err := InspectWrapping(home, fakeBinary(t), agentdoc.SctxDoc)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, ws := range states {
+		if ws.AgentID != "codex" {
+			continue
+		}
+		if !ws.OK {
+			t.Fatalf("the hook was not installed: %s", ws.Detail)
+		}
+		if !ws.NeedsTrust {
+			t.Error("Codex's hook is reported as active, but nothing has trusted it")
+		}
+		if !strings.Contains(ws.Detail, "/hooks") {
+			t.Errorf("the report does not name the step that finishes it: %q", ws.Detail)
+		}
+		return
+	}
+	t.Fatal("codex was not detected")
+}
+
+// Every other client's wiring must NOT claim a pending human step, or the
+// distinction stops meaning anything and people learn to ignore it.
+func TestOnlyCodexClaimsAPendingTrustStep(t *testing.T) {
+	for _, a := range agentdoc.KnownAgents {
+		if !a.Wrapped() || a.ID == "codex" {
+			continue
+		}
+		home := t.TempDir()
+		if err := os.MkdirAll(filepath.Join(home, filepath.FromSlash(a.Detect[0])), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if _, errs := InstallWrapping(home, fakeBinary(t), agentdoc.SctxDoc); len(errs) > 0 {
+			t.Fatal(errs)
+		}
+		states, err := InspectWrapping(home, fakeBinary(t), agentdoc.SctxDoc)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, ws := range states {
+			if ws.AgentID == a.ID && ws.NeedsTrust {
+				t.Errorf("%s reports a trust step it does not have", a.ID)
+			}
+		}
+	}
+}
+
+// fakeBinary is a stand-in sctx that EXISTS on disk. Wiring is only healthy if
+// the binary it names is still there, so a test using an imaginary path is
+// testing the broken case by accident.
+func fakeBinary(t *testing.T) string {
+	t.Helper()
+	path := filepath.Join(t.TempDir(), "sctx")
+	if err := os.WriteFile(path, []byte("#!/bin/sh\nexit 0\n"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	return path
+}
+
+// WIRING THAT NAMES ANOTHER COPY OF SCTX IS WORKING WIRING.
+//
+// The plugin and the Codex hook embed the absolute path of whichever sctx
+// installed them. Running a second copy — a dev build beside the Homebrew one —
+// made setup report a perfectly functional install as [missing], and
+// reinstalling only flipped the report for the other binary. What actually
+// breaks wrapping is the named binary going away, and that is what must be
+// reported.
+func TestWiringIsJudgedByWhetherItsBinaryExists(t *testing.T) {
+	for _, id := range []string{"kilocode", "codex"} {
+		t.Run(id, func(t *testing.T) {
+			a, _ := agentdoc.AgentByID(id)
+			home := t.TempDir()
+			if err := os.MkdirAll(filepath.Join(home, filepath.FromSlash(a.Detect[0])), 0o755); err != nil {
+				t.Fatal(err)
+			}
+			installer := fakeBinary(t)
+			if _, errs := InstallWrapping(home, installer, agentdoc.SctxDoc); len(errs) > 0 {
+				t.Fatal(errs)
+			}
+
+			// Inspected by a DIFFERENT sctx that also exists: still healthy, and
+			// no reinstall is needed to make it so.
+			other := fakeBinary(t)
+			states, err := InspectWrapping(home, other, agentdoc.SctxDoc)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, ws := range states {
+				if ws.AgentID == id && !ws.OK {
+					t.Errorf("wiring installed by another copy of sctx was called broken: %s", ws.Detail)
+				}
+			}
+
+			// The binary it names goes away: now it really is broken, and the
+			// report has to name the path so the remedy is obvious.
+			if err := os.Remove(installer); err != nil {
+				t.Fatal(err)
+			}
+			states, err = InspectWrapping(home, other, agentdoc.SctxDoc)
+			if err != nil {
+				t.Fatal(err)
+			}
+			for _, ws := range states {
+				if ws.AgentID != id {
+					continue
+				}
+				if ws.OK {
+					t.Error("wiring calling a binary that no longer exists was reported as working")
+				}
+				if !strings.Contains(ws.Detail, installer) {
+					t.Errorf("the missing binary is not named: %q", ws.Detail)
+				}
+			}
+		})
+	}
 }

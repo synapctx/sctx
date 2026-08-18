@@ -26,11 +26,20 @@ type WrapState struct {
 	// Where the wiring lives — a settings file or a plugin path. Empty for a
 	// manual agent, which has none by definition.
 	Path string
-	// OK reports whether commands are being wrapped right now. Always false for
-	// a manual agent: nothing is wrong, but nothing is wrapping either, and
-	// calling that "ok" is how the manual case stops being visible.
-	OK     bool
-	Detail string
+	// OK reports whether the wiring sctx owns is in place and current. Always
+	// false for a manual agent: nothing is wrong, but nothing is wrapping
+	// either, and calling that "ok" is how the manual case stops being visible.
+	OK bool
+	// NeedsTrust marks the one state sctx installs correctly and cannot finish:
+	// Codex will not run a hook until a human reviews and trusts it (`/hooks`),
+	// and that trust record is Codex's own — nothing on disk lets us confirm it.
+	//
+	// It is reported as its own state rather than folded into OK. An [ok] beside
+	// something that still needs a human is the same lie as a registered MCP
+	// server pointing at a host nothing is listening on: true about what we
+	// wrote, false about what the customer has.
+	NeedsTrust bool
+	Detail     string
 }
 
 // InspectWrapping reports auto-wrap for every detected agent.
@@ -63,11 +72,14 @@ func wrapStateFor(home string, a Agent, binary string) WrapState {
 				ws.Detail = strings.Join(cs.Conflicts, ", ")
 			case !cs.Installed:
 				ws.Detail = "hook not wired"
+			case cs.Missing != "":
+				ws.Detail = "the sctx it calls is gone: " + cs.Missing
 			case cs.Stale:
-				ws.Detail = "hook points at a different sctx binary"
+				ws.Detail = "hook is out of date"
 			default:
 				ws.OK = true
-				ws.Detail = "rewrites covered commands — run /hooks in Codex once to trust it"
+				ws.NeedsTrust = true
+				ws.Detail = "installed — Codex runs it only after you trust it once: /hooks"
 			}
 			return ws
 		}
@@ -100,8 +112,10 @@ func wrapStateFor(home string, a Agent, binary string) WrapState {
 			ws.Detail = "a file of this name exists that sctx did not write"
 		case !ps.Installed:
 			ws.Detail = "plugin not installed"
+		case ps.Missing != "":
+			ws.Detail = "the sctx it calls is gone: " + ps.Missing
 		case ps.Stale:
-			ws.Detail = "plugin points at a different sctx binary"
+			ws.Detail = "plugin is out of date"
 		default:
 			ws.OK = true
 			ws.Detail = "rewrites covered commands before they run"

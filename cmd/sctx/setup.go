@@ -347,6 +347,10 @@ func printWrappingStatus(w io.Writer, st agentsetup.Status, cfg config.Config) {
 		}
 		state := "[ok]     "
 		switch {
+		case ws.OK && ws.NeedsTrust:
+			// Wired, and inert until a human acts. Never [ok]: this is the state
+			// a customer must actually do something about.
+			state = "[trust]  "
 		case ws.Mode == agentdoc.WrapManual:
 			// Not a failure: the client offers nothing to hook. Reported every
 			// time anyway, because an agent that is not being wrapped has to be
@@ -356,7 +360,7 @@ func printWrappingStatus(w io.Writer, st agentsetup.Status, cfg config.Config) {
 			state = "[missing]"
 		}
 		fmt.Fprintf(w, "  %s %-16s %-7s %s\n", state, ws.AgentName, label, ws.Detail)
-		if ws.Path != "" && !ws.OK {
+		if ws.Path != "" && (!ws.OK || ws.NeedsTrust) {
 			fmt.Fprintf(w, "            %s\n", ws.Path)
 		}
 	}

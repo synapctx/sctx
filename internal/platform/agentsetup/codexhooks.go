@@ -32,6 +32,10 @@ type CodexHookStatus struct {
 	ConfigPath string
 	Installed  bool
 	Stale      bool
+	// WiredTo is the sctx binary the installed hook calls; Missing is set when
+	// that binary no longer exists.
+	WiredTo string
+	Missing string
 	// Conflicts names a PreToolUse hook OUTSIDE our block that already invokes
 	// sctx. Installing a second one would wrap every command twice.
 	Conflicts []string
@@ -69,7 +73,17 @@ func InspectCodexHooks(home, binary string) (CodexHookStatus, error) {
 	}
 	st.Installed = found
 	if found {
-		st.Stale = strings.TrimSpace(body) != strings.TrimSpace(codexHookBody(binary))
+		// Same rule as the plugin: the hook names whichever sctx installed it,
+		// and naming another copy is not a fault. Only a hook we would not have
+		// written, or one calling a binary that is gone, is stale.
+		st.WiredTo = wiredBinary(body, `command = "`, ` hook codex"`)
+		st.Stale = strings.TrimSpace(body) != strings.TrimSpace(codexHookBody(st.WiredTo))
+		if !st.Stale && st.WiredTo != "" {
+			if _, err := os.Stat(st.WiredTo); err != nil {
+				st.Stale = true
+				st.Missing = st.WiredTo
+			}
+		}
 	}
 	if outside := prefix + "\n" + suffix; strings.Contains(outside, "hooks.PreToolUse") && strings.Contains(outside, "hook codex") {
 		st.Conflicts = append(st.Conflicts, "a PreToolUse hook outside our block already runs sctx")

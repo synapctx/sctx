@@ -42,6 +42,11 @@ type PluginStatus struct {
 	// Foreign is set when a file of that name exists without our marker. We
 	// report it and change nothing.
 	Foreign bool
+	// WiredTo is the sctx binary the installed file calls, which is not
+	// necessarily the one running now, and Missing is set when that binary is
+	// gone — the case where wrapping really has stopped.
+	WiredTo string
+	Missing string
 }
 
 // OK reports whether this agent's commands are actually being wrapped.
@@ -133,8 +138,39 @@ func InspectPlugin(home string, a Agent, binary string) (PluginStatus, error) {
 		return st, nil
 	}
 	st.Installed = true
-	st.Stale = strings.TrimSpace(string(raw)) != strings.TrimSpace(SctxPluginSource(binary))
+	st.WiredTo = wiredBinary(string(raw), `SCTX_BINARY = "`, `"`)
+	// STALE MEANS "WOULD NOT WORK", NOT "NAMES A DIFFERENT PATH".
+	//
+	// The plugin embeds the absolute path of whichever sctx installed it, so
+	// running a second copy — a dev build beside a Homebrew one — made setup
+	// report a perfectly functional plugin as missing, and reinstalling it would
+	// only flip the report for the other binary. What matters is whether the file
+	// is ours, current for the binary it names, and whether that binary is still
+	// there.
+	st.Stale = strings.TrimSpace(string(raw)) != strings.TrimSpace(SctxPluginSource(st.WiredTo))
+	if !st.Stale && st.WiredTo != "" {
+		if _, err := os.Stat(st.WiredTo); err != nil {
+			st.Stale = true
+			st.Missing = st.WiredTo
+		}
+	}
 	return st, nil
+}
+
+// wiredBinary pulls the sctx path out of something we generated. An empty
+// result means we could not read it, which the caller treats as stale — the
+// safe direction, since a rewrite restores a known-good file.
+func wiredBinary(body, prefix, suffix string) string {
+	i := strings.Index(body, prefix)
+	if i < 0 {
+		return ""
+	}
+	rest := body[i+len(prefix):]
+	j := strings.Index(rest, suffix)
+	if j < 0 {
+		return ""
+	}
+	return strings.NewReplacer(`\\`, `\`, `\"`, `"`).Replace(rest[:j])
 }
 
 // InstallPlugin writes or refreshes the plugin, and never touches a file that is
