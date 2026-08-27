@@ -49,7 +49,7 @@ func TestAggressiveViewCurrentNativeShape(t *testing.T) {
 func TestAggressiveReleaseViewCountsAssets(t *testing.T) {
 	var raw strings.Builder
 	raw.WriteString("title:\tGitHub CLI 2.97.0\ntag:\tv2.97.0\ndraft:\tfalse\nprerelease:\tfalse\n")
-	for i := 0; i < 15; i++ {
+	for i := range 15 {
 		fmt.Fprintf(&raw, "asset:\tgh_2.97.0_%02d.tar.gz\n", i)
 	}
 	raw.WriteString("--\nRelease notes.\n")

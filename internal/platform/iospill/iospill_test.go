@@ -35,7 +35,7 @@ func TestSpillsPastThreshold(t *testing.T) {
 
 	var want bytes.Buffer
 	chunk := []byte("0123456789abcdef") // 16 bytes
-	for i := 0; i < 10; i++ {           // 160 bytes total
+	for i := range 10 {                 // 160 bytes total
 		if _, err := b.Write(chunk); err != nil {
 			t.Fatalf("Write %d: %v", i, err)
 		}
@@ -48,7 +48,7 @@ func TestSpillsPastThreshold(t *testing.T) {
 	if b.Len() != int64(want.Len()) {
 		t.Fatalf("Len = %d, want %d", b.Len(), want.Len())
 	}
-	for pass := 0; pass < 2; pass++ { // Bytes must be re-readable
+	for pass := range 2 { // Bytes must be re-readable
 		r, err := b.Bytes()
 		if err != nil {
 			t.Fatalf("Bytes pass %d: %v", pass, err)

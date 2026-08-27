@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"maps"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -174,9 +175,7 @@ func InstallRemoteMCP(home string, a Agent, endpoint string, orgTokens map[strin
 	if err != nil {
 		return nil, fmt.Errorf("reading %s: %w", st.ConfigPath, err)
 	}
-	for name, entry := range desiredRemoteEntries(a, endpoint, orgTokens) {
-		existing[name] = entry
-	}
+	maps.Copy(existing, desiredRemoteEntries(a, endpoint, orgTokens))
 	merged, err := json.Marshal(orderedJSONObject(existing))
 	if err != nil {
 		return nil, fmt.Errorf("encoding %s: %w", st.ConfigPath, err)

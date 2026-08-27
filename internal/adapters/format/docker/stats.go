@@ -2,6 +2,7 @@ package docker
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
@@ -16,13 +17,7 @@ const maxStatsRows = 20
 // screen-clearing snapshots rather than a single table, so that case is
 // left to Relaxed.
 func aggressiveStats(in format.Input) (format.Rendered, error) {
-	hasNoStream := false
-	for _, a := range in.Argv {
-		if a == "--no-stream" {
-			hasNoStream = true
-			break
-		}
-	}
+	hasNoStream := slices.Contains(in.Argv, "--no-stream")
 	if !hasNoStream {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}

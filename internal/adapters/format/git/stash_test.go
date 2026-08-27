@@ -14,7 +14,7 @@ func TestAggressiveStash(t *testing.T) {
 
 	t.Run("caps long stash list", func(t *testing.T) {
 		var lines []string
-		for i := 0; i < 30; i++ {
+		for i := range 30 {
 			lines = append(lines, fmt.Sprintf("stash@{%d}: WIP on main: 850a312 change %d", i, i))
 		}
 		raw := strings.Join(lines, "\n") + "\n"

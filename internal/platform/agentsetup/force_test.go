@@ -54,7 +54,7 @@ func TestNoEmptyBlockIsLeftBehind(t *testing.T) {
 	claude := filepath.Join(home, a.Root)
 	write(t, claude, "# Mine\n\n@~/.claude/SCTX.md\n@~/.claude/SYNAPCTX.md\n")
 
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		if _, err := InstallForce(home, []string{"acme"}); err != nil {
 			t.Fatalf("install --force %d: %v", i, err)
 		}

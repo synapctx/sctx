@@ -13,7 +13,7 @@ func TestStatusPorcelainVariants(t *testing.T) {
 	f := New()
 	var short strings.Builder
 	short.WriteString("## main...origin/main [ahead 2, behind 1]\n")
-	for i := 0; i < statusShortEntryCap+5; i++ {
+	for i := range statusShortEntryCap + 5 {
 		fmt.Fprintf(&short, "M  staged-%02d.go\n M modified-%02d.go\nUU conflict-%02d.go\n?? new-file-%02d.go\n!! ignored-%02d.bin\n", i, i, i, i, i)
 	}
 	out, err := f.Aggressive(context.Background(), format.Input{Argv: []string{"git", "status", "--short", "--branch", "--ignored"}, Stdout: strings.NewReader(short.String())})
@@ -29,7 +29,7 @@ func TestStatusPorcelainVariants(t *testing.T) {
 
 	var v2 strings.Builder
 	v2.WriteString("# branch.oid abcdef\n# branch.head main\n")
-	for i := 0; i < statusShortEntryCap+5; i++ {
+	for i := range statusShortEntryCap + 5 {
 		fmt.Fprintf(&v2, "? path-%02d.txt\n", i)
 	}
 	out, err = f.Aggressive(context.Background(), format.Input{Argv: []string{"git", "status", "--porcelain=v2", "--branch"}, Stdout: strings.NewReader(v2.String())})
@@ -45,7 +45,7 @@ func TestStatusOperationAndLargeDefault(t *testing.T) {
 	f := New()
 	var raw strings.Builder
 	raw.WriteString("interactive rebase in progress; onto abcdef0\nOn branch main\nChanges not staged for commit:\n")
-	for i := 0; i < statusShortEntryCap+4; i++ {
+	for i := range statusShortEntryCap + 4 {
 		fmt.Fprintf(&raw, "\tmodified:   file-%02d.go\n", i)
 	}
 	raw.WriteString("Ignored files:\n\tignored.tmp\n")

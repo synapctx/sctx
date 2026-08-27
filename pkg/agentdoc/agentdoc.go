@@ -282,33 +282,33 @@ func Wrap(block string) string {
 
 // BlockOf returns the text between our markers.
 func BlockOf(s string) (string, bool) {
-	i := strings.Index(s, BeginMarker)
-	if i < 0 {
+	_, after, ok := strings.Cut(s, BeginMarker)
+	if !ok {
 		return "", false
 	}
-	rest := s[i+len(BeginMarker):]
-	j := strings.Index(rest, EndMarker)
-	if j < 0 {
+	rest := after
+	before0, _, ok0 := strings.Cut(rest, EndMarker)
+	if !ok0 {
 		// An opening marker with no close means a truncated or hand-edited file.
 		// Treated as not installed so a reinstall appends a well-formed block,
 		// rather than as a parse error the user cannot act on.
 		return "", false
 	}
-	return rest[:j], true
+	return before0, true
 }
 
 // WithoutBlock returns the file with our delimited block removed.
 func WithoutBlock(s string) string {
-	i := strings.Index(s, BeginMarker)
-	if i < 0 {
+	before, after, ok := strings.Cut(s, BeginMarker)
+	if !ok {
 		return s
 	}
-	rest := s[i+len(BeginMarker):]
-	j := strings.Index(rest, EndMarker)
-	if j < 0 {
-		return s[:i]
+	rest := after
+	_, after0, ok0 := strings.Cut(rest, EndMarker)
+	if !ok0 {
+		return before
 	}
-	return s[:i] + rest[j+len(EndMarker):]
+	return before + after0
 }
 
 // ReferencesDoc reports whether the developer already loads this document
@@ -333,7 +333,7 @@ func ReferencesDoc(existing, name string) bool { return referencesDoc(existing, 
 // sidecars. The decision about WHERE to write stays with the caller, which is the
 // only side that can see the filesystem.
 func IncludeTarget(existing, name string) (string, bool) {
-	for _, line := range strings.Split(WithoutBlock(existing), "\n") {
+	for line := range strings.SplitSeq(WithoutBlock(existing), "\n") {
 		line = strings.TrimSpace(line)
 		if !strings.HasPrefix(line, "@") {
 			continue

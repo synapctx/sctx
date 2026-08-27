@@ -146,8 +146,8 @@ func OptionValue(args []string, names ...string) (string, bool) {
 				}
 				return "", false
 			}
-			if strings.HasPrefix(arg, name+"=") {
-				return strings.TrimPrefix(arg, name+"="), true
+			if after, ok := strings.CutPrefix(arg, name+"="); ok {
+				return after, true
 			}
 			if len(name) == 2 && strings.HasPrefix(name, "-") && !strings.HasPrefix(arg, "--") && strings.HasPrefix(arg, name) && len(arg) > 2 {
 				return strings.TrimPrefix(arg, name), true
@@ -168,8 +168,8 @@ func HasFlag(args []string, names ...string) bool {
 			if arg == name {
 				return true
 			}
-			if strings.HasPrefix(arg, name+"=") {
-				return !strings.EqualFold(strings.TrimPrefix(arg, name+"="), "false")
+			if after, ok := strings.CutPrefix(arg, name+"="); ok {
+				return !strings.EqualFold(after, "false")
 			}
 			if len(name) == 2 && strings.HasPrefix(name, "-") && strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && len(arg) > 2 && strings.ContainsRune(arg[1:], rune(name[1])) {
 				return true
@@ -268,8 +268,8 @@ func optionEnabledByDefault(args []string, name string) bool {
 		if arg == name {
 			return true
 		}
-		if strings.HasPrefix(arg, name+"=") {
-			return !strings.EqualFold(strings.TrimPrefix(arg, name+"="), "false")
+		if after, ok := strings.CutPrefix(arg, name+"="); ok {
+			return !strings.EqualFold(after, "false")
 		}
 	}
 	return true

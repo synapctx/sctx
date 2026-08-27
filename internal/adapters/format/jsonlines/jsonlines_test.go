@@ -8,7 +8,7 @@ import (
 
 func TestRenderValidStreamWithExactCount(t *testing.T) {
 	var records []string
-	for i := 0; i < 12; i++ {
+	for i := range 12 {
 		records = append(records, fmt.Sprintf(`{ "seq": %d, "message": "event" }`, i))
 	}
 	raw := []byte(strings.Join(records, "\n") + "\n")
@@ -37,7 +37,7 @@ func TestRenderValidStreamWithExactCount(t *testing.T) {
 // every record rather than printing a marker for nothing.
 func TestAStreamThatFitsIsNotElided(t *testing.T) {
 	var records []string
-	for i := 0; i < MinRecords; i++ {
+	for i := range MinRecords {
 		records = append(records, fmt.Sprintf(`{ "seq": %d }`, i))
 	}
 	out, ok := Render([]byte(strings.Join(records, "\n") + "\n"))

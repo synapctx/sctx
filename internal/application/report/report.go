@@ -150,8 +150,8 @@ func renderReportText(w io.Writer, rep stats.Report, opts Options) error {
 type jsonReport struct {
 	Scope       string                `json:"scope"` // "global" | "project"
 	Repository  string                `json:"repository,omitempty"`
-	Since       *time.Time            `json:"since,omitempty"`        // --since cutoff, if scoped
-	EarliestRun *time.Time            `json:"earliest_run,omitempty"` // earliest run in the (scoped) data
+	Since       *time.Time            `json:"since,omitzero"`        // --since cutoff, if scoped
+	EarliestRun *time.Time            `json:"earliest_run,omitzero"` // earliest run in the (scoped) data
 	Global      stats.Totals          `json:"global"`
 	ByCommand   []stats.CommandTotals `json:"by_command"`
 	TotalExecMS int64                 `json:"total_exec_ms"`

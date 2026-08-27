@@ -69,7 +69,7 @@ func TestAggressive(t *testing.T) {
 
 	t.Run("JSONL log keeps both ends and elides the middle with a marker", func(t *testing.T) {
 		var lines []string
-		for i := 0; i < 12; i++ {
+		for i := range 12 {
 			lines = append(lines, fmt.Sprintf(`{"seq":%d,"level":"info","msg":"event %d"}`, i, i))
 		}
 		raw := strings.Join(lines, "\n") + "\n"

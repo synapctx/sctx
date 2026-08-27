@@ -1,6 +1,6 @@
 module github.com/synapctx/sctx
 
-go 1.26.4
+go 1.27.0
 
 require (
 	github.com/cloudresty/go-env v1.0.1

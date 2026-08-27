@@ -16,6 +16,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"maps"
 	"net/http"
 	"net/url"
 	"os"
@@ -347,8 +348,8 @@ func parseGainArgs(args []string) (report.Options, error) {
 // parseSince parses an --since duration: a plain number followed by "d"
 // (days), or anything time.ParseDuration accepts ("24h", "90m", ...).
 func parseSince(s string) (time.Duration, error) {
-	if strings.HasSuffix(s, "d") {
-		days, err := strconv.ParseFloat(strings.TrimSuffix(s, "d"), 64)
+	if before, ok := strings.CutSuffix(s, "d"); ok {
+		days, err := strconv.ParseFloat(before, 64)
 		if err != nil {
 			return 0, fmt.Errorf("invalid --since duration %q: %w", s, err)
 		}
@@ -464,9 +465,7 @@ func runInit(ctx context.Context, cfg config.Config, args []string) int {
 	}
 
 	orgTokens := make(map[string]string, len(cfg.OrgTokens)+1)
-	for slug, t := range cfg.OrgTokens {
-		orgTokens[slug] = t
-	}
+	maps.Copy(orgTokens, cfg.OrgTokens)
 	orgTokens[org] = token
 	defaultOrg := cfg.DefaultOrg
 	if defaultOrg == "" || makeDefault {

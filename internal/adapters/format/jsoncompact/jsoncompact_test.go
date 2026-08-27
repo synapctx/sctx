@@ -152,7 +152,7 @@ func TestFormatter_Aggressive(t *testing.T) {
 
 	t.Run("homogeneous object array keeps 3 plus same-shape marker", func(t *testing.T) {
 		var items []string
-		for i := 0; i < 500; i++ {
+		for i := range 500 {
 			items = append(items, fmt.Sprintf(`{"id":%d,"status":"ok"}`, i))
 		}
 		raw := fmt.Sprintf(`{"results":[%s]}`, strings.Join(items, ","))

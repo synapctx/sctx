@@ -238,8 +238,8 @@ func statusPorcelainV2(args []string) bool {
 // "modified:   a.txt" or a bare untracked path like "d.txt".
 func statusFile(trimmed string) string {
 	for _, prefix := range statusWordPrefixes {
-		if strings.HasPrefix(trimmed, prefix) {
-			return strings.TrimSpace(strings.TrimPrefix(trimmed, prefix))
+		if after, ok := strings.CutPrefix(trimmed, prefix); ok {
+			return strings.TrimSpace(after)
 		}
 	}
 	return trimmed
@@ -253,8 +253,8 @@ func aggressiveStatusShort(raw []byte, lines []string) (format.Rendered, error) 
 	var staged, modified, untracked, ignored, conflicted []string
 
 	for _, line := range lines {
-		if strings.HasPrefix(line, "## ") {
-			branch = strings.TrimPrefix(line, "## ")
+		if after, ok := strings.CutPrefix(line, "## "); ok {
+			branch = after
 			continue
 		}
 		if !isPorcelainStatusLine(line) {

@@ -27,7 +27,7 @@ const modVerifyErrorStdout = "example.com/foo v1.2.3: checksum mismatch\n" +
 
 func modGraphFixture(edges int) string {
 	var b strings.Builder
-	for i := 0; i < edges; i++ {
+	for range edges {
 		b.WriteString("example.com/root example.com/dep")
 		b.WriteByte('\n')
 	}

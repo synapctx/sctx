@@ -25,11 +25,11 @@ func TestAggressiveLogs(t *testing.T) {
 
 	t.Run("exact repeats collapse but a unique middle error remains", func(t *testing.T) {
 		var lines []string
-		for i := 0; i < 30; i++ {
+		for range 30 {
 			lines = append(lines, "steady-state")
 		}
 		lines = append(lines, "UNIQUE_ERROR_SENTINEL")
-		for i := 0; i < 30; i++ {
+		for range 30 {
 			lines = append(lines, "steady-state")
 		}
 		raw := strings.Join(lines, "\n")

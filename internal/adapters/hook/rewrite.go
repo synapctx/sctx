@@ -5,6 +5,7 @@
 package hook
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/synapctx/sctx/internal/adapters/format/projectfilter"
@@ -329,10 +330,8 @@ func streamsForever(program string, args []string) bool {
 		return false
 	}
 	for _, a := range args {
-		for _, f := range followFlags {
-			if a == f {
-				return true
-			}
+		if slices.Contains(followFlags, a) {
+			return true
 		}
 	}
 	return false
@@ -506,10 +505,7 @@ func splitSegments(cmd string) ([]segment, bool) {
 				// `end` is the offset OF the newline closing the terminator line, or
 				// len(cmd) when the terminator is the final line. Clamped because
 				// end+1 past the end panicked on exactly that case.
-				next := end + 1
-				if next > n {
-					next = n
-				}
+				next := min(end+1, n)
 				emit(i, next, sepSemi)
 				lineEnded = true
 				i = next - 1
@@ -720,8 +716,8 @@ func rewriteWithProject(cmd, root string, matchers []projectfilter.Matcher) (str
 		return cmd, false
 	}
 	out := cmd
-	for i := len(positions) - 1; i >= 0; i-- {
-		pos := positions[i]
+	for _, pos := range slices.Backward(positions) {
+
 		out = out[:pos] + "sctx " + out[pos:]
 	}
 	return out, true
@@ -1229,10 +1225,5 @@ func isAssignment(field string) bool {
 }
 
 func contains(items []string, s string) bool {
-	for _, it := range items {
-		if it == s {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(items, s)
 }

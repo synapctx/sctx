@@ -197,7 +197,7 @@ func conflictingCodexMCPServers(outside string, desired []string) []string {
 		wanted[name] = true
 	}
 	seen := map[string]bool{}
-	for _, line := range strings.Split(outside, "\n") {
+	for line := range strings.SplitSeq(outside, "\n") {
 		name, ok := codexMCPTableServer(strings.TrimSpace(line))
 		if ok && wanted[name] {
 			seen[name] = true

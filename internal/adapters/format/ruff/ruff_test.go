@@ -124,7 +124,7 @@ func TestAggressiveFormatReformattedSummary(t *testing.T) {
 func TestAggressiveFormatCapsLongFileList(t *testing.T) {
 	f := New()
 	var sb strings.Builder
-	for i := 0; i < 15; i++ {
+	for i := range 15 {
 		fmt.Fprintf(&sb, "Would reformat: file%d.py\n", i)
 	}
 	sb.WriteString("15 files would be reformatted, 0 files already formatted\n")

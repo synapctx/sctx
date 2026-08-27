@@ -11,7 +11,7 @@ import (
 
 func TestAggressivePRDiffNameOnlyCapsFiles(t *testing.T) {
 	var raw strings.Builder
-	for i := 0; i < diffNameCap+7; i++ {
+	for i := range diffNameCap + 7 {
 		fmt.Fprintf(&raw, "pkg/feature/file-%03d.go\n", i)
 	}
 	out, err := New().Aggressive(context.Background(), format.Input{

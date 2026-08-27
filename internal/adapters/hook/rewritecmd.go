@@ -50,8 +50,8 @@ func RunRewrite(args []string, out io.Writer, version string) int {
 // tool name and the shell command matter, and an unknown field must never make
 // this fail.
 type geminiToolCall struct {
-	ToolName  string                 `json:"tool_name"`
-	ToolInput map[string]interface{} `json:"tool_input"`
+	ToolName  string         `json:"tool_name"`
+	ToolInput map[string]any `json:"tool_input"`
 }
 
 // RunGemini implements `sctx hook gemini`, the BeforeTool hook for Gemini CLI's

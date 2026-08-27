@@ -89,7 +89,7 @@ func TestAggressive(t *testing.T) {
 	t.Run("caps at 40 rows with explicit marker", func(t *testing.T) {
 		var b strings.Builder
 		b.WriteString("USER               PID  %CPU %MEM      VSZ    RSS   TT  STAT STARTED      TIME COMMAND\n")
-		for i := 0; i < 50; i++ {
+		for i := range 50 {
 			fmt.Fprintf(&b, "user%02d          %5d  %4.1f  0.1 400000000  10000   ??  S    Fri10p.m.   0:00.00 /usr/bin/worker-%d --unique-arg\n", i, 10100+i, float64(50-i)/10, i)
 		}
 		in := format.Input{Argv: []string{"ps", "aux"}, Stdout: strings.NewReader(b.String())}
@@ -124,18 +124,4 @@ func TestAggressive(t *testing.T) {
 			t.Errorf("err = %v, want ErrTierInapplicable", err)
 		}
 	})
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
 }

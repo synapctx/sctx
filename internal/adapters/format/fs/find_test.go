@@ -57,8 +57,8 @@ func TestFindFormatterAggressive(t *testing.T) {
 
 	t.Run("caps directories at 60 with a remaining-dirs marker", func(t *testing.T) {
 		var b strings.Builder
-		for i := 0; i < 70; i++ {
-			for j := 0; j < 3; j++ {
+		for i := range 70 {
+			for j := range 3 {
 				fmt.Fprintf(&b, "./dir%02d/file%d.go\n", i, j)
 			}
 		}
@@ -110,8 +110,8 @@ func TestFindFormatterAggressiveTable(t *testing.T) {
 
 	t.Run("large default find output is grouped and capped", func(t *testing.T) {
 		var b strings.Builder
-		for i := 0; i < 5; i++ {
-			for j := 0; j < 40; j++ {
+		for i := range 5 {
+			for j := range 40 {
 				fmt.Fprintf(&b, "./pkg%02d/file%d.go\n", i, j)
 			}
 		}

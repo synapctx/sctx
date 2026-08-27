@@ -40,7 +40,7 @@ func TestAggressiveStats(t *testing.T) {
 	t.Run("caps rows with elision marker", func(t *testing.T) {
 		var b strings.Builder
 		b.WriteString("CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT     MEM %     NET I/O    BLOCK I/O   PIDS\n")
-		for i := 0; i < 25; i++ {
+		for i := range 25 {
 			fmt.Fprintf(&b, "%012d   c%d       0.10%%     10MiB / 1GiB          1.00%%     0B / 0B    0B / 0B     1\n", i, i)
 		}
 		in := format.Input{Argv: []string{"docker", "stats", "--no-stream"}, Stdout: strings.NewReader(b.String())}

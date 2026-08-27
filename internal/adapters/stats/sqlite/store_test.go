@@ -66,7 +66,7 @@ func TestConcurrentRecords(t *testing.T) {
 
 	ctx := context.Background()
 	done := make(chan error, 20)
-	for i := 0; i < 20; i++ {
+	for i := range 20 {
 		go func(i int) {
 			done <- store.Record(ctx, stats.Run{
 				ID: string(rune('A'+i)) + "-run", At: time.Now().UTC(),
@@ -74,7 +74,7 @@ func TestConcurrentRecords(t *testing.T) {
 			})
 		}(i)
 	}
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		if err := <-done; err != nil {
 			t.Fatalf("concurrent Record: %v", err)
 		}

@@ -2,6 +2,7 @@ package gotest
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
@@ -95,10 +96,8 @@ func isModNoise(l string) bool {
 // isModGraph reports whether the invocation is `go mod graph`, whose stdout
 // is a flat "module dependency" edge list that grows with module count.
 func isModGraph(in format.Input) bool {
-	for _, a := range in.Argv {
-		if a == "graph" {
-			return true
-		}
+	if slices.Contains(in.Argv, "graph") {
+		return true
 	}
 	return strings.Contains(in.Command, "mod graph")
 }

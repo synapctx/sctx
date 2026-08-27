@@ -162,10 +162,7 @@ func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
 func (s *Service) account(ctx context.Context, argv []string, formatter format.Formatter, formatterMatched bool, outcome domexec.Outcome, result RenderResult, rawBytes, outBytes int64) {
 	rawTokens := tokenizer.Estimate(rawBytes)
 	outTokens := tokenizer.Estimate(outBytes)
-	saved := rawTokens - outTokens
-	if saved < 0 {
-		saved = 0
-	}
+	saved := max(rawTokens-outTokens, 0)
 	formatterKind := telemetry.FormatterKindNone
 	if formatterMatched {
 		formatterKind = telemetry.FormatterKindDedicated

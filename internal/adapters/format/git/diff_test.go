@@ -95,7 +95,7 @@ func TestAggressiveDiff(t *testing.T) {
 
 	t.Run("--stat caps the per-file list and always keeps the summary", func(t *testing.T) {
 		var lines []string
-		for i := 0; i < 40; i++ {
+		for i := range 40 {
 			lines = append(lines, fmt.Sprintf(" file%02d.go | 3 ++-", i))
 		}
 		lines = append(lines, "40 files changed, 80 insertions(+), 40 deletions(-)")

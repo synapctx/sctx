@@ -24,7 +24,7 @@ func readSpoolEvents(t *testing.T, dir string) []telemetry.Event {
 		t.Fatalf("reading spool: %v", err)
 	}
 	var events []telemetry.Event
-	for _, line := range bytes.Split(bytes.TrimSpace(data), []byte{'\n'}) {
+	for line := range bytes.SplitSeq(bytes.TrimSpace(data), []byte{'\n'}) {
 		if len(line) == 0 {
 			continue
 		}
@@ -263,7 +263,7 @@ func TestDeliberateHookDeclinesAreClassifiedWithoutArguments(t *testing.T) {
 		t.Run(tt.reason, func(t *testing.T) {
 			spoolDir := t.TempDir()
 			t.Setenv("SCT__SPOOL_DIR", spoolDir)
-			stdinBytes, err := json.Marshal(toolCall{ToolName: "Bash", ToolInput: map[string]interface{}{"command": tt.command}})
+			stdinBytes, err := json.Marshal(toolCall{ToolName: "Bash", ToolInput: map[string]any{"command": tt.command}})
 			if err != nil {
 				t.Fatal(err)
 			}

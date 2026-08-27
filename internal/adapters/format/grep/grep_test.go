@@ -41,11 +41,11 @@ func TestAggressive(t *testing.T) {
 
 	t.Run("grep -rn many files with duplicates", func(t *testing.T) {
 		var b strings.Builder
-		for i := 0; i < 12; i++ {
+		for range 12 {
 			b.WriteString("pkg/a/a.go:1:duplicate line here\n")
 		}
 		b.WriteString("pkg/a/a.go:50:unique other line\n")
-		for i := 0; i < 3; i++ {
+		for range 3 {
 			b.WriteString("pkg/b/b.go:7:some other match\n")
 		}
 		raw := b.String()
@@ -115,8 +115,8 @@ func TestAggressive(t *testing.T) {
 		var b strings.Builder
 		const nFiles = 50
 		const nMatchesPerFile = 20
-		for i := 0; i < nFiles; i++ {
-			for j := 0; j < nMatchesPerFile; j++ {
+		for i := range nFiles {
+			for j := range nMatchesPerFile {
 				b.WriteString("pkg/f")
 				b.WriteString(itoa(i))
 				b.WriteString(".go:")
@@ -191,7 +191,7 @@ func TestRelaxed(t *testing.T) {
 
 	t.Run("caps total lines", func(t *testing.T) {
 		var b strings.Builder
-		for i := 0; i < 400; i++ {
+		for i := range 400 {
 			b.WriteString("line ")
 			b.WriteString(itoa(i))
 			b.WriteByte('\n')

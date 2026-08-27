@@ -288,7 +288,7 @@ func discardSpool(cfg config.Config) (int, error) {
 		return 0, err
 	}
 	n := 0
-	for _, line := range strings.Split(strings.TrimSpace(string(data)), "\n") {
+	for line := range strings.SplitSeq(strings.TrimSpace(string(data)), "\n") {
 		if strings.TrimSpace(line) != "" {
 			n++
 		}

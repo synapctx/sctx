@@ -318,12 +318,12 @@ func loadConfigFile(path string) fileValues {
 // config file format: bare keys, double-quoted string values, no nesting,
 // no multi-line values. Anything else is malformed.
 func parseConfigLine(line string) (key, value string, ok bool) {
-	idx := strings.Index(line, "=")
-	if idx < 0 {
+	before, after, ok := strings.Cut(line, "=")
+	if !ok {
 		return "", "", false
 	}
-	key = strings.TrimSpace(line[:idx])
-	rawValue := strings.TrimSpace(line[idx+1:])
+	key = strings.TrimSpace(before)
+	rawValue := strings.TrimSpace(after)
 	if key == "" || len(rawValue) < 2 || rawValue[0] != '"' || rawValue[len(rawValue)-1] != '"' {
 		return "", "", false
 	}

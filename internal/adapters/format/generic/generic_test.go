@@ -42,7 +42,7 @@ func renderInput(t *testing.T, stdout string, exitCode int) (body string, tier s
 // saved nothing at all because it only looked at output starting with `{`.
 func TestRepetitiveTextFromAnUncoveredCommandIsCollapsed(t *testing.T) {
 	var b strings.Builder
-	for i := 0; i < 40; i++ {
+	for range 40 {
 		b.WriteString("Waiting for resource to become ready...\n")
 	}
 	body, tier := render(t, b.String())
@@ -62,7 +62,7 @@ func TestRepetitiveTextFromAnUncoveredCommandIsCollapsed(t *testing.T) {
 // savings, on the platform least likely to be tested.
 func TestCRLFOutputStillCollapses(t *testing.T) {
 	var b strings.Builder
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		b.WriteString("Copying file to destination\r\n")
 	}
 	body, tier := render(t, b.String())
@@ -90,7 +90,7 @@ func TestJSONStillCompacts(t *testing.T) {
 
 func TestJSONLinesFromAnUncoveredCommandAreBounded(t *testing.T) {
 	var records []string
-	for i := 0; i < 12; i++ {
+	for i := range 12 {
 		records = append(records, fmt.Sprintf(`{ "seq": %d, "message": "event" }`, i))
 	}
 	raw := strings.Join(records, "\r\n") + "\r\n"
@@ -121,7 +121,7 @@ func TestMixedJSONLinesRemainVerbatimEvenWhenInvalidLinesRepeat(t *testing.T) {
 
 func TestFailedJSONLinesCommandRemainsVerbatim(t *testing.T) {
 	var records []string
-	for i := 0; i < 12; i++ {
+	for i := range 12 {
 		records = append(records, fmt.Sprintf(`{"error":"failure %d"}`, i))
 	}
 	raw := strings.Join(records, "\n") + "\n"

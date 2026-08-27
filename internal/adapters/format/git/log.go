@@ -165,10 +165,7 @@ func logArgsUnsafeToParse(args []string) bool {
 // relativeTime renders a coarse human-relative duration from t to now,
 // matching git's own "N units ago" style closely enough for a compact log.
 func relativeTime(t time.Time) string {
-	d := time.Since(t)
-	if d < 0 {
-		d = 0
-	}
+	d := max(time.Since(t), 0)
 	switch {
 	case d < time.Minute:
 		return "just now"
