@@ -14,7 +14,7 @@ func TestAggressiveWorktree(t *testing.T) {
 
 	t.Run("caps long worktree list", func(t *testing.T) {
 		var lines []string
-		for i := 0; i < 30; i++ {
+		for i := range 30 {
 			lines = append(lines, fmt.Sprintf("/repo/wt-%d  850a312 [branch-%d]", i, i))
 		}
 		raw := strings.Join(lines, "\n") + "\n"

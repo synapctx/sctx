@@ -243,7 +243,7 @@ func TestErrorsSurviveVerbatimOnFailure(t *testing.T) {
 	if !strings.Contains(got, "0 transferred") {
 		t.Errorf("a failed run reported files as transferred; a diagnostic was probably parsed as a path\ngot:\n%s", got)
 	}
-	for _, line := range strings.Split(got, "\n") {
+	for line := range strings.SplitSeq(got, "\n") {
 		if strings.HasPrefix(strings.TrimSpace(line), "+ ") && strings.Contains(line, "rsync error") {
 			t.Errorf("a diagnostic was listed as a transferred path: %q\ngot:\n%s", line, got)
 		}
@@ -401,7 +401,7 @@ func TestUnrecognisedLinesAreNeverSilentlyDropped(t *testing.T) {
 func TestElisionsAreAlwaysDisclosed(t *testing.T) {
 	var b strings.Builder
 	b.WriteString("sending incremental file list\n")
-	for i := 0; i < 40; i++ {
+	for i := range 40 {
 		fmt.Fprintf(&b, "app/file%02d.txt\n", i)
 	}
 	b.WriteString("\nsent 12,345 bytes  received 678 bytes  1,000.00 bytes/sec\n")

@@ -33,8 +33,8 @@ import (
 // toolCall is decoded leniently: unknown/extra fields are ignored, and
 // tool_input is left as a map so we only need the "command" key.
 type toolCall struct {
-	ToolName  string                 `json:"tool_name"`
-	ToolInput map[string]interface{} `json:"tool_input"`
+	ToolName  string         `json:"tool_name"`
+	ToolInput map[string]any `json:"tool_input"`
 }
 
 // RunClaude implements `sctx hook claude`. args is everything after "claude" on

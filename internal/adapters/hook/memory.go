@@ -53,9 +53,9 @@ const (
 )
 
 type postToolCall struct {
-	ToolName  string                 `json:"tool_name"`
-	ToolInput map[string]interface{} `json:"tool_input"`
-	CWD       string                 `json:"cwd"`
+	ToolName  string         `json:"tool_name"`
+	ToolInput map[string]any `json:"tool_input"`
+	CWD       string         `json:"cwd"`
 }
 
 type forFileResponse struct {

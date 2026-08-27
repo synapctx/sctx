@@ -162,7 +162,7 @@ func mentionsAgent(section string, a agentdoc.Agent) bool {
 	if strings.Contains(section, a.Name) {
 		return true
 	}
-	for _, word := range strings.Fields(a.Name) {
+	for word := range strings.FieldsSeq(a.Name) {
 		switch word {
 		case "CLI", "Code", "OpenAI":
 			continue

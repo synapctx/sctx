@@ -52,7 +52,7 @@ func TestAggressive_Get(t *testing.T) {
 
 	t.Run("version-change list over the cap collapses to a count", func(t *testing.T) {
 		var b strings.Builder
-		for i := 0; i < maxGetChanges+5; i++ {
+		for range maxGetChanges + 5 {
 			b.WriteString("go: upgraded example.com/dep v1.0.0 => v1.0.1\n")
 		}
 		in := newInput([]string{"go", "get", "-u", "./..."}, "go get", "", b.String(), 0, 0)

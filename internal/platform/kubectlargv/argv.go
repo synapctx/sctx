@@ -112,7 +112,7 @@ func isKnownBooleanGlobal(name string) bool {
 // OptionValue finds a command-local option before a `--` command separator.
 // Both --long=value and separate-value forms are supported.
 func OptionValue(args []string, names ...string) (string, bool) {
-	for i := 0; i < len(args); i++ {
+	for i := range args {
 		if args[i] == "--" {
 			break
 		}
@@ -123,8 +123,8 @@ func OptionValue(args []string, names ...string) (string, bool) {
 				}
 				return "", false
 			}
-			if strings.HasPrefix(args[i], name+"=") {
-				return strings.TrimPrefix(args[i], name+"="), true
+			if after, ok := strings.CutPrefix(args[i], name+"="); ok {
+				return after, true
 			}
 			if len(name) == 2 && strings.HasPrefix(name, "-") && !strings.HasPrefix(args[i], "--") && strings.HasPrefix(args[i], name) && len(args[i]) > 2 {
 				return strings.TrimPrefix(args[i], name), true
@@ -146,8 +146,8 @@ func HasFlag(args []string, names ...string) bool {
 			if arg == name {
 				return true
 			}
-			if strings.HasPrefix(arg, name+"=") {
-				return !strings.EqualFold(strings.TrimPrefix(arg, name+"="), "false")
+			if after, ok := strings.CutPrefix(arg, name+"="); ok {
+				return !strings.EqualFold(after, "false")
 			}
 			if len(name) == 2 && strings.HasPrefix(name, "-") && strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && len(arg) > 2 && strings.ContainsRune(arg[1:], rune(name[1])) {
 				return true

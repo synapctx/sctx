@@ -95,8 +95,8 @@ func HasFlag(args []string, names ...string) bool {
 			if arg == name {
 				return true
 			}
-			if strings.HasPrefix(arg, name+"=") {
-				return !strings.EqualFold(strings.TrimPrefix(arg, name+"="), "false")
+			if after, ok := strings.CutPrefix(arg, name+"="); ok {
+				return !strings.EqualFold(after, "false")
 			}
 		}
 	}
@@ -180,8 +180,8 @@ func optionValue(args []string, names ...string) (string, bool) {
 				}
 				return "", true
 			}
-			if strings.HasPrefix(arg, name+"=") {
-				return strings.TrimPrefix(arg, name+"="), true
+			if after, ok := strings.CutPrefix(arg, name+"="); ok {
+				return after, true
 			}
 			if len(name) == 2 && name[0] == '-' && name[1] != '-' && strings.HasPrefix(arg, name) && len(arg) > len(name) {
 				return strings.TrimPrefix(arg, name), true
@@ -217,8 +217,8 @@ func optionIsStdin(args []string, name string) bool {
 		if arg == name {
 			return i+1 < len(args) && args[i+1] == "-"
 		}
-		if strings.HasPrefix(arg, name+"=") {
-			return strings.TrimPrefix(arg, name+"=") == "-"
+		if after, ok := strings.CutPrefix(arg, name+"="); ok {
+			return after == "-"
 		}
 	}
 	return false

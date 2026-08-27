@@ -82,7 +82,7 @@ func TestAggressiveGet(t *testing.T) {
 	t.Run("many ready rows cap the listed names", func(t *testing.T) {
 		var b strings.Builder
 		b.WriteString("NAME       READY   STATUS    RESTARTS   AGE\n")
-		for i := 0; i < 12; i++ {
+		for i := range 12 {
 			b.WriteString("pod-" + string(rune('a'+i)) + "         1/1     Running   0          1d\n")
 		}
 		in := format.Input{Argv: []string{"kubectl", "get", "pods"}, Stdout: strings.NewReader(b.String())}

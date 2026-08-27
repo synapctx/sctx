@@ -65,7 +65,7 @@ func TestAggressiveWorkflowAndCacheLists(t *testing.T) {
 
 func TestLargeGistAndProjectOutputsUseCountedCaps(t *testing.T) {
 	var gist strings.Builder
-	for i := 0; i < 205; i++ {
+	for i := range 205 {
 		fmt.Fprintf(&gist, "gist content line %03d with enough text to matter\n", i)
 	}
 	out, err := New().Aggressive(context.Background(), format.Input{Argv: []string{"gh", "gist", "view", "abc"}, Stdout: strings.NewReader(gist.String())})
@@ -74,7 +74,7 @@ func TestLargeGistAndProjectOutputsUseCountedCaps(t *testing.T) {
 	}
 
 	var project strings.Builder
-	for i := 0; i < 35; i++ {
+	for i := range 35 {
 		fmt.Fprintf(&project, "Issue\tTitle %d\t%d\towner/repo\tPVTI_%d\n", i, i, i)
 	}
 	out, err = New().Aggressive(context.Background(), format.Input{Argv: []string{"gh", "project", "item-list", "1"}, Stdout: strings.NewReader(project.String())})

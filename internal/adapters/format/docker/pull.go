@@ -29,7 +29,7 @@ func aggressivePullPush(in format.Input) (format.Rendered, error) {
 	layerIDs := map[string]bool{}
 	for _, line := range lines {
 		if layerLineRe.MatchString(line) {
-			id := strings.SplitN(line, ":", 2)[0]
+			id, _, _ := strings.Cut(line, ":")
 			layerIDs[id] = true
 			continue
 		}

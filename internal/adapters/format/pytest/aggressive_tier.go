@@ -3,6 +3,7 @@ package pytest
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
@@ -67,8 +68,8 @@ func looksLikePytest(lines []string, stderr string) bool {
 // (pytest's final result line, e.g. "==== 5 failed, 2 passed in 1.23s
 // ====") and its index in lines, or ("", -1) if none is present.
 func finalSummary(lines []string) (string, int) {
-	for i := len(lines) - 1; i >= 0; i-- {
-		l := strings.TrimSpace(lines[i])
+	for i, line := range slices.Backward(lines) {
+		l := strings.TrimSpace(line)
 		if bannerRE.MatchString(l) && durationRE.MatchString(l) {
 			return l, i
 		}

@@ -38,7 +38,7 @@ func TestAggressiveGetOutputModes(t *testing.T) {
 	t.Run("-o wide caps rows and keeps header", func(t *testing.T) {
 		var b strings.Builder
 		b.WriteString("NAME    READY   STATUS    RESTARTS   AGE   IP           NODE\n")
-		for i := 0; i < 40; i++ {
+		for i := range 40 {
 			b.WriteString("pod-" + string(rune('a'+(i%26))) + "     1/1     Running   0          1d    10.0.0.1     node-1\n")
 		}
 		in := format.Input{Argv: []string{"kubectl", "get", "pods", "-o", "wide"}, Stdout: strings.NewReader(b.String())}
@@ -89,7 +89,7 @@ func TestAggressiveTopCapsRows(t *testing.T) {
 	f := New()
 	var b strings.Builder
 	b.WriteString("NAME       CPU(cores)   MEMORY(bytes)\n")
-	for i := 0; i < 30; i++ {
+	for i := range 30 {
 		b.WriteString("node-" + string(rune('a'+(i%26))) + "    " + "10m          100Mi\n")
 	}
 	in := format.Input{Argv: []string{"kubectl", "top", "nodes"}, Stdout: strings.NewReader(b.String())}
@@ -203,7 +203,7 @@ func TestAggressiveAPIResources(t *testing.T) {
 	f := New()
 	var b strings.Builder
 	b.WriteString("NAME          SHORTNAMES   APIVERSION   NAMESPACED   KIND\n")
-	for i := 0; i < 60; i++ {
+	for i := range 60 {
 		b.WriteString("resource" + string(rune('a'+(i%26))) + "   r" + string(rune('a'+(i%26))) + "           v1           true         Resource\n")
 	}
 	in := format.Input{Argv: []string{"kubectl", "api-resources"}, Stdout: strings.NewReader(b.String())}

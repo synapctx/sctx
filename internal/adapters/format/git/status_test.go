@@ -103,7 +103,7 @@ func TestAggressiveStatus(t *testing.T) {
 		lines = append(lines, "M  staged.go")
 		lines = append(lines, " M worktree.go")
 		lines = append(lines, "R  old.go -> new.go")
-		for i := 0; i < 35; i++ {
+		for i := range 35 {
 			lines = append(lines, "?? untracked"+strings.Repeat("x", i%3)+".txt")
 		}
 		raw := strings.Join(lines, "\n") + "\n"

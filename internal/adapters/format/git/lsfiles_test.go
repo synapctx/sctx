@@ -14,7 +14,7 @@ func TestAggressiveLsFiles(t *testing.T) {
 
 	t.Run("groups by directory and caps names per dir", func(t *testing.T) {
 		var lines []string
-		for i := 0; i < 20; i++ {
+		for i := range 20 {
 			lines = append(lines, fmt.Sprintf("internal/pkg/file%02d.go", i))
 		}
 		lines = append(lines, "main.go", "go.mod")

@@ -41,7 +41,7 @@ func TestFormatter_Aggressive(t *testing.T) {
 				b.WriteString("50K\t./small\n")
 				b.WriteString("1.2G\t./huge\n")
 				b.WriteString("900M\t./big\n")
-				for i := 0; i < 45; i++ {
+				for i := range 45 {
 					b.WriteString("4.0K\t./filler" + strings.Repeat("x", i%3) + "\n")
 				}
 				return b.String()
@@ -153,7 +153,7 @@ func TestFormatter_Aggressive_UnitSortOrder(t *testing.T) {
 
 func TestFormatter_Aggressive_CapsWithMarker(t *testing.T) {
 	var b strings.Builder
-	for i := 0; i < 60; i++ {
+	for i := range 60 {
 		b.WriteString("4.0K\t./file")
 		b.WriteString(strings.Repeat("a", i%5+1))
 		b.WriteByte('\n')

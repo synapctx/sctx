@@ -2,6 +2,8 @@
 // that cannot safely be buffered by sctx.
 package gitargv
 
+import "slices"
+
 import "strings"
 
 // Invocation identifies Git's command and the arguments after it.
@@ -91,8 +93,8 @@ func HasFlag(args []string, names ...string) bool {
 			if arg == name {
 				return true
 			}
-			if strings.HasPrefix(arg, name+"=") {
-				return !strings.EqualFold(strings.TrimPrefix(arg, name+"="), "false")
+			if after, ok := strings.CutPrefix(arg, name+"="); ok {
+				return !strings.EqualFold(after, "false")
 			}
 			if len(name) == 2 && strings.HasPrefix(name, "-") && strings.HasPrefix(arg, "-") && !strings.HasPrefix(arg, "--") && len(arg) > 2 && strings.ContainsRune(arg[1:], rune(name[1])) {
 				return true
@@ -165,10 +167,5 @@ func SafeToBuffer(inv Invocation) bool {
 }
 
 func containsArg(args []string, want string) bool {
-	for _, arg := range args {
-		if arg == want {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(args, want)
 }

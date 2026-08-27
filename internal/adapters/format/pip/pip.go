@@ -10,6 +10,7 @@ import (
 	"bytes"
 	"context"
 	"io"
+	"slices"
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
@@ -80,12 +81,7 @@ func subcommand(argv []string) (sub string, rest []string) {
 // output format, which renders as bare "pkg==version" lines rather than a
 // two-column table.
 func isFreezeFormat(rest []string) bool {
-	for _, a := range rest {
-		if a == "--format=freeze" {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(rest, "--format=freeze")
 }
 
 // Aggressive dispatches to a per-subcommand structured renderer. Unlike most

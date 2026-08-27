@@ -79,7 +79,7 @@ func TestNativeGitFixtures(t *testing.T) {
 	mustNativeGit(t, repo, "add", "tracked file.txt")
 	mustNativeGit(t, repo, "-c", "commit.gpgsign=false", "commit", "-m", "base")
 
-	for i := 0; i < statusShortEntryCap+5; i++ {
+	for i := range statusShortEntryCap + 5 {
 		name := filepath.Join(repo, fmt.Sprintf("untracked %02d.txt", i))
 		if err := os.WriteFile(name, []byte("new\n"), 0o644); err != nil {
 			t.Fatal(err)
@@ -92,7 +92,7 @@ func TestNativeGitFixtures(t *testing.T) {
 		t.Fatalf("native porcelain v2 render = %q, err %v", out.Body, err)
 	}
 
-	for i := 0; i < statusShortEntryCap+5; i++ {
+	for i := range statusShortEntryCap + 5 {
 		if err := os.Remove(filepath.Join(repo, fmt.Sprintf("untracked %02d.txt", i))); err != nil {
 			t.Fatal(err)
 		}

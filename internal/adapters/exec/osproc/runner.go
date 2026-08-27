@@ -92,8 +92,7 @@ func (r *Runner) Run(ctx context.Context, c exec.Command) (exec.Outcome, error) 
 		return out, nil
 	}
 
-	var exitErr *osexec.ExitError
-	if errors.As(waitErr, &exitErr) {
+	if exitErr, ok := errors.AsType[*osexec.ExitError](waitErr); ok {
 		if status, ok := exitErr.Sys().(syscall.WaitStatus); ok && status.Signaled() {
 			out.Signaled = true
 			out.ExitCode = 128 + int(status.Signal())

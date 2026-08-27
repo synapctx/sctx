@@ -84,7 +84,7 @@ func parseOriginURL(configPath string) string {
 		return ""
 	}
 	inOrigin := false
-	for _, line := range strings.Split(string(data), "\n") {
+	for line := range strings.SplitSeq(string(data), "\n") {
 		trimmed := strings.TrimSpace(line)
 		if trimmed == "" || strings.HasPrefix(trimmed, "#") || strings.HasPrefix(trimmed, ";") {
 			continue
@@ -121,11 +121,11 @@ func isOriginHeader(line string) bool {
 
 // splitKV splits a "key = value" config line.
 func splitKV(line string) (string, string, bool) {
-	idx := strings.Index(line, "=")
-	if idx < 0 {
+	before, after, ok := strings.Cut(line, "=")
+	if !ok {
 		return "", "", false
 	}
-	return strings.TrimSpace(line[:idx]), strings.TrimSpace(line[idx+1:]), true
+	return strings.TrimSpace(before), strings.TrimSpace(after), true
 }
 
 // normalizeURL reduces a git remote URL (https, ssh scp-like, or ssh://) to

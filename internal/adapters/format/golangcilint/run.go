@@ -59,8 +59,8 @@ func optionValue(argv []string, name string) (string, bool) {
 		if argv[i] == name && i+1 < len(argv) {
 			return argv[i+1], true
 		}
-		if strings.HasPrefix(argv[i], name+"=") {
-			return strings.TrimPrefix(argv[i], name+"="), true
+		if after, ok := strings.CutPrefix(argv[i], name+"="); ok {
+			return after, true
 		}
 	}
 	return "", false

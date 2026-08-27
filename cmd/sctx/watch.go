@@ -109,8 +109,7 @@ func runWatch(ctx context.Context, cfg config.Config, args []string) int {
 	cmd.Stderr = os.Stderr
 
 	if err := cmd.Run(); err != nil && ctx.Err() == nil {
-		var exitErr *exec.ExitError
-		if errors.As(err, &exitErr) {
+		if exitErr, ok := errors.AsType[*exec.ExitError](err); ok {
 			// The helper already explained itself on stderr; do not editorialise.
 			return exitErr.ExitCode()
 		}

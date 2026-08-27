@@ -73,9 +73,9 @@ type Event struct {
 	DurationMS  int64  `json:"durationMs"`
 	// FormatterMatched is retained for older servers and means a dedicated
 	// formatter was selected. It never meant that output was reduced.
-	FormatterMatched bool      `json:"formatterMatched,omitempty"`
+	FormatterMatched bool      `json:"formatterMatched,omitzero"`
 	FormatterKind    string    `json:"formatterKind,omitempty"`
-	OutputReduced    bool      `json:"outputReduced,omitempty"`
+	OutputReduced    bool      `json:"outputReduced,omitzero"`
 	DeclineReason    string    `json:"declineReason,omitempty"`
 	At               time.Time `json:"at"`
 }

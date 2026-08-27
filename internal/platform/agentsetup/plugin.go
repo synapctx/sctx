@@ -161,16 +161,16 @@ func InspectPlugin(home string, a Agent, binary string) (PluginStatus, error) {
 // result means we could not read it, which the caller treats as stale — the
 // safe direction, since a rewrite restores a known-good file.
 func wiredBinary(body, prefix, suffix string) string {
-	i := strings.Index(body, prefix)
-	if i < 0 {
+	_, after, ok := strings.Cut(body, prefix)
+	if !ok {
 		return ""
 	}
-	rest := body[i+len(prefix):]
-	j := strings.Index(rest, suffix)
-	if j < 0 {
+	rest := after
+	before0, _, ok0 := strings.Cut(rest, suffix)
+	if !ok0 {
 		return ""
 	}
-	return strings.NewReplacer(`\\`, `\`, `\"`, `"`).Replace(rest[:j])
+	return strings.NewReplacer(`\\`, `\`, `\"`, `"`).Replace(before0)
 }
 
 // InstallPlugin writes or refreshes the plugin, and never touches a file that is

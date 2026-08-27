@@ -14,7 +14,7 @@ func TestAggressiveTag(t *testing.T) {
 
 	t.Run("caps long tag list", func(t *testing.T) {
 		var lines []string
-		for i := 0; i < 60; i++ {
+		for i := range 60 {
 			lines = append(lines, fmt.Sprintf("v1.%d.0", i))
 		}
 		raw := strings.Join(lines, "\n") + "\n"

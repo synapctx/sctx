@@ -14,7 +14,7 @@ func TestAggressiveReflog(t *testing.T) {
 
 	t.Run("caps long reflog", func(t *testing.T) {
 		var lines []string
-		for i := 0; i < 50; i++ {
+		for i := range 50 {
 			lines = append(lines, fmt.Sprintf("850a312 HEAD@{%d}: commit: change %d", i, i))
 		}
 		raw := strings.Join(lines, "\n") + "\n"

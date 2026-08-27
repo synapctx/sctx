@@ -80,7 +80,7 @@ func TestAggressive(t *testing.T) {
 			argv: []string{"pip", "list"},
 			stdout: func() string {
 				lines := []string{"Package    Version", "---------- -------"}
-				for i := 0; i < 70; i++ {
+				for i := range 70 {
 					lines = append(lines, "pkg"+padInt(i)+"      1.0."+padInt(i))
 				}
 				return strings.Join(lines, "\n")

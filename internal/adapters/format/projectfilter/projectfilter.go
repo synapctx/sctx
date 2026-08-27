@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/synapctx/sctx/internal/adapters/format/collapse"
@@ -38,10 +39,10 @@ type Rule struct {
 	Command          string    `json:"command"`
 	ArgsPrefix       []string  `json:"args_prefix,omitempty"`
 	Finite           bool      `json:"finite"`
-	OverrideBuiltin  bool      `json:"override_builtin,omitempty"`
+	OverrideBuiltin  bool      `json:"override_builtin,omitzero"`
 	DropExactLines   []string  `json:"drop_exact_lines,omitempty"`
 	DropLinePrefixes []string  `json:"drop_line_prefixes,omitempty"`
-	CollapseRepeats  bool      `json:"collapse_repeats,omitempty"`
+	CollapseRepeats  bool      `json:"collapse_repeats,omitzero"`
 	Fixtures         []Fixture `json:"fixtures"`
 }
 
@@ -50,7 +51,7 @@ type Fixture struct {
 	Argv           []string `json:"argv,omitempty"`
 	Stdout         string   `json:"stdout"`
 	Stderr         string   `json:"stderr,omitempty"`
-	ExitCode       int      `json:"exit_code,omitempty"`
+	ExitCode       int      `json:"exit_code,omitzero"`
 	Applied        bool     `json:"applied"`
 	ExpectedStdout string   `json:"expected_stdout"`
 }
@@ -347,10 +348,8 @@ func splitLines(raw []byte) []string {
 }
 
 func drops(rule Rule, line string) bool {
-	for _, exact := range rule.DropExactLines {
-		if line == exact {
-			return true
-		}
+	if slices.Contains(rule.DropExactLines, line) {
+		return true
 	}
 	for _, prefix := range rule.DropLinePrefixes {
 		if strings.HasPrefix(line, prefix) {

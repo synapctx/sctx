@@ -23,7 +23,7 @@ func filterRelaxedLines(lines []string) []string {
 		if count >= 3 {
 			out = append(out, fmt.Sprintf("%s ×%d", line, count))
 		} else {
-			for k := 0; k < count; k++ {
+			for range count {
 				out = append(out, line)
 			}
 		}

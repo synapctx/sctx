@@ -15,7 +15,7 @@ func TestAggressiveBranch(t *testing.T) {
 	t.Run("caps long list, always keeps current branch", func(t *testing.T) {
 		var lines []string
 		lines = append(lines, "* main")
-		for i := 0; i < 40; i++ {
+		for i := range 40 {
 			lines = append(lines, fmt.Sprintf("  feature-%02d", i))
 		}
 		raw := strings.Join(lines, "\n") + "\n"

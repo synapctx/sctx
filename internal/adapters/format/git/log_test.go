@@ -76,7 +76,7 @@ func TestAggressiveLog(t *testing.T) {
 
 	t.Run("--oneline over the cap keeps the most recent commits and elides the rest", func(t *testing.T) {
 		var lines []string
-		for i := 0; i < 50; i++ {
+		for i := range 50 {
 			lines = append(lines, fmt.Sprintf("%07x commit number %d", i, i))
 		}
 		raw := strings.Join(lines, "\n") + "\n"

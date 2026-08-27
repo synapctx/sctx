@@ -205,7 +205,7 @@ func TestAggressive(t *testing.T) {
 			argv:      []string{"npm", "ls"},
 			stdout: func() string {
 				var lines []string
-				for i := 0; i < 60; i++ {
+				for i := range 60 {
 					lines = append(lines, "├── pkg"+padInt(i)+"@1.0.0")
 				}
 				return strings.Join(lines, "\n")

@@ -52,7 +52,7 @@ func TestAggressiveNativeLists(t *testing.T) {
 func TestAggressiveReleaseListCapsLargeResult(t *testing.T) {
 	f := New()
 	var raw strings.Builder
-	for i := 0; i < listCap+5; i++ {
+	for i := range listCap + 5 {
 		fmt.Fprintf(&raw, "Release %d\t\tv2.%d.0\t2026-07-%02dT02:04:00Z\n", i, i, i%28+1)
 	}
 	out, err := f.Aggressive(context.Background(), format.Input{Argv: []string{"gh", "release", "list", "--limit", "35"}, Stdout: strings.NewReader(raw.String())})

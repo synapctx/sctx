@@ -532,11 +532,11 @@ func sidecarAction(state agentdoc.SidecarState, force bool) (verb string, write 
 // nothing — nor accumulate blank lines across repeated runs.
 func upsertBlock(existing, block string) string {
 	wrapped := agentdoc.Wrap(block)
-	if i := strings.Index(existing, agentdoc.BeginMarker); i >= 0 {
-		rest := existing[i+len(agentdoc.BeginMarker):]
-		if j := strings.Index(rest, agentdoc.EndMarker); j >= 0 {
-			tail := rest[j+len(agentdoc.EndMarker):]
-			return existing[:i] + strings.TrimSuffix(wrapped, "\n") + tail
+	if before, after, ok := strings.Cut(existing, agentdoc.BeginMarker); ok {
+		rest := after
+		if _, after, ok := strings.Cut(rest, agentdoc.EndMarker); ok {
+			tail := after
+			return before + strings.TrimSuffix(wrapped, "\n") + tail
 		}
 	}
 	out := strings.TrimRight(existing, "\n")

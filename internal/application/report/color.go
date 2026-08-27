@@ -1,5 +1,7 @@
 package report
 
+import "strings"
+
 import "fmt"
 
 // palette renders the `sctx gain` report with ANSI color when enabled, and
@@ -27,11 +29,12 @@ func (p palette) wrap(s string, codes ...string) string {
 	if !p.on || len(codes) == 0 {
 		return s
 	}
-	seq := codes[0]
+	var seq strings.Builder
+	seq.WriteString(codes[0])
 	for _, c := range codes[1:] {
-		seq += ";" + c
+		seq.WriteString(";" + c)
 	}
-	return "\x1b[" + seq + "m" + s + ansiReset
+	return "\x1b[" + seq.String() + "m" + s + ansiReset
 }
 
 func (p palette) bold(s string) string  { return p.wrap(s, ansiBold) }
@@ -83,11 +86,11 @@ func (p palette) wrapAnomaly(raw, cell string) string {
 
 // rule returns a dim horizontal rule of the given width using r.
 func (p palette) rule(r string, width int) string {
-	line := ""
-	for i := 0; i < width; i++ {
-		line += r
+	var line strings.Builder
+	for range width {
+		line.WriteString(r)
 	}
-	return p.dim(line)
+	return p.dim(line.String())
 }
 
 // meterBar renders a fixed-width progress bar: filled cells in green, empty

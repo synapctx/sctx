@@ -45,9 +45,9 @@ var disclosedFields = map[string]string{
 // remembered — which is exactly the set already disclosed — and stays green for
 // the one that gets added next.
 func TestEveryTelemetryFieldIsDisclosedOrExplicitlyExempt(t *testing.T) {
-	typ := reflect.TypeOf(telemetry.Event{})
-	for i := 0; i < typ.NumField(); i++ {
-		name := jsonName(typ.Field(i).Tag.Get("json"))
+	typ := reflect.TypeFor[telemetry.Event]()
+	for field := range typ.Fields() {
+		name := jsonName(field.Tag.Get("json"))
 		if name == "" || name == "-" {
 			continue
 		}
@@ -56,7 +56,7 @@ func TestEveryTelemetryFieldIsDisclosedOrExplicitlyExempt(t *testing.T) {
 			t.Errorf("telemetry.Event.%s (json %q) is sent but not accounted for.\n"+
 				"  Add it to ConsentDisclosure and to disclosedFields, then BUMP CurrentDisclosure\n"+
 				"  so everyone who already consented is asked again about the larger payload.",
-				typ.Field(i).Name, name)
+				field.Name, name)
 			continue
 		}
 		if phrase != "" && !strings.Contains(ConsentDisclosure, phrase) {
@@ -84,8 +84,8 @@ func jsonName(tag string) string {
 	if tag == "" {
 		return ""
 	}
-	if i := strings.Index(tag, ","); i >= 0 {
-		return tag[:i]
+	if before, _, ok := strings.Cut(tag, ","); ok {
+		return before
 	}
 	return tag
 }

@@ -330,7 +330,7 @@ func TestOurOwnIncludeDoesNotSuppressTheBlock(t *testing.T) {
 	claude := filepath.Join(home, a.Root)
 	write(t, claude, "# Mine\n")
 
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		if _, err := Install(home, []string{"acme"}); err != nil {
 			t.Fatalf("install %d: %v", i, err)
 		}
