@@ -2,7 +2,8 @@ package jsoncompact
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"errors"
 	"fmt"
 	"strconv"
@@ -41,7 +42,7 @@ func TestFormatter_Relaxed(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Relaxed() error = %v", err)
 		}
-		if !json.Valid(out.Body) {
+		if !jsontext.Value(out.Body).IsValid() {
 			t.Fatalf("Relaxed() body is not valid JSON: %s", out.Body)
 		}
 		if len(out.Body) >= len(raw) {
@@ -90,7 +91,7 @@ func TestFormatter_Aggressive(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Aggressive() error = %v", err)
 		}
-		if !json.Valid(out.Body) {
+		if !jsontext.Value(out.Body).IsValid() {
 			t.Fatalf("Aggressive() body is not valid JSON: %s", out.Body)
 		}
 		var doc map[string]string
@@ -130,10 +131,10 @@ func TestFormatter_Aggressive(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Aggressive() error = %v", err)
 		}
-		if !json.Valid(out.Body) {
+		if !jsontext.Value(out.Body).IsValid() {
 			t.Fatalf("Aggressive() body is not valid JSON: %s", out.Body)
 		}
-		var doc map[string]json.RawMessage
+		var doc map[string]jsontext.Value
 		if err := json.Unmarshal(out.Body, &doc); err != nil {
 			t.Fatalf("unmarshal result: %v", err)
 		}
@@ -161,10 +162,10 @@ func TestFormatter_Aggressive(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Aggressive() error = %v", err)
 		}
-		if !json.Valid(out.Body) {
+		if !jsontext.Value(out.Body).IsValid() {
 			t.Fatalf("Aggressive() body is not valid JSON: %s", out.Body)
 		}
-		var doc map[string]json.RawMessage
+		var doc map[string]jsontext.Value
 		if err := json.Unmarshal(out.Body, &doc); err != nil {
 			t.Fatalf("unmarshal result: %v", err)
 		}

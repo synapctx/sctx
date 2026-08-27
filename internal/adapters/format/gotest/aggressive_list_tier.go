@@ -3,7 +3,7 @@ package gotest
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"strings"
 
@@ -33,7 +33,7 @@ func aggressiveList(ctx context.Context, in format.Input) (format.Rendered, erro
 	}
 
 	trimmed := bytes.TrimSpace(stdout)
-	if len(trimmed) > 0 && json.Valid(trimmed) {
+	if len(trimmed) > 0 && jsontext.Value(trimmed).IsValid() {
 		jc := jsoncompact.New()
 		rendered, err := jc.Aggressive(ctx, format.Input{Stdout: bytes.NewReader(stdout)})
 		if err == nil {

@@ -4,7 +4,8 @@ package report
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"io"
 	"strings"
@@ -176,9 +177,8 @@ func renderReportJSON(w io.Writer, rep stats.Report, opts Options) error {
 		earliest := rep.Since
 		out.EarliestRun = &earliest
 	}
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
-	return enc.Encode(out)
+	enc := jsontext.NewEncoder(w, jsontext.WithIndent("  "))
+	return json.MarshalEncode(enc, out)
 }
 
 // renderFailures renders the degradation log: runs sctx couldn't compress
@@ -325,9 +325,8 @@ func renderFailuresJSON(w io.Writer, rows []stats.FailedRun, opts Options) error
 		}
 		out.Failures = append(out.Failures, jsonFailedRun{Command: cmd, Tier: r.Tier, Anomaly: r.Anomaly, At: r.At})
 	}
-	enc := json.NewEncoder(w)
-	enc.SetIndent("", "  ")
-	return enc.Encode(out)
+	enc := jsontext.NewEncoder(w, jsontext.WithIndent("  "))
+	return json.MarshalEncode(enc, out)
 }
 
 func humanTokens(n int64) string {

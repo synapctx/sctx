@@ -9,7 +9,7 @@ package mongosh
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"io"
 
@@ -59,7 +59,7 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
-	if json.Valid(trimmed) {
+	if jsontext.Value(trimmed).IsValid() {
 		jsonIn := format.Input{
 			Argv:     in.Argv,
 			Command:  in.Command,

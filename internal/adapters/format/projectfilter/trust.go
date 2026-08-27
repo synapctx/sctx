@@ -2,7 +2,8 @@ package projectfilter
 
 import (
 	"bytes"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"errors"
 	"fmt"
 	"io"
@@ -65,12 +66,11 @@ func loadTrust(path string) (trustFile, error) {
 		return trustFile{}, err
 	}
 	var store trustFile
-	dec := json.NewDecoder(bytes.NewReader(raw))
-	dec.DisallowUnknownFields()
-	if err := dec.Decode(&store); err != nil {
+	dec := jsontext.NewDecoder(bytes.NewReader(raw))
+	if err := json.UnmarshalDecode(dec, &store, json.RejectUnknownMembers(true)); err != nil {
 		return trustFile{}, fmt.Errorf("decoding project filter trust: %w", err)
 	}
-	if dec.Decode(&struct{}{}) != io.EOF || store.Version != 1 || store.Projects == nil {
+	if json.UnmarshalDecode(dec, &struct{}{}) != io.EOF || store.Version != 1 || store.Projects == nil {
 		return trustFile{}, errors.New("invalid project filter trust file")
 	}
 	return store, nil
@@ -87,7 +87,7 @@ func saveTrust(path string, store trustFile) error {
 	if err := os.Chmod(dir, 0o700); err != nil {
 		return err
 	}
-	raw, err := json.MarshalIndent(store, "", "  ")
+	raw, err := json.Marshal(store, jsontext.WithIndent("  "))
 	if err != nil {
 		return err
 	}

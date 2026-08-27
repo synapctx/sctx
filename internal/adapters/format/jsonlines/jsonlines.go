@@ -3,7 +3,7 @@ package jsonlines
 
 import (
 	"bytes"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"strings"
 
@@ -40,7 +40,7 @@ func Classify(raw []byte) Classification {
 		// `1`, `2`, `3` as a record stream would make generic coverage eat
 		// ordinary command output. NDJSON emitted by developer tools uses
 		// structured object/array records, so require that safer signature.
-		if isStructuredRecord(trimmed) && json.Valid([]byte(trimmed)) {
+		if isStructuredRecord(trimmed) && jsontext.Value([]byte(trimmed)).IsValid() {
 			valid++
 		} else {
 			invalid++
@@ -88,11 +88,13 @@ func Render(raw []byte) (format.Rendered, bool) {
 	}
 	var buf bytes.Buffer
 	compactInto := func(record string) bool {
-		var compact bytes.Buffer
-		if err := json.Compact(&compact, []byte(record)); err != nil {
+		// v2 spells Compact as an in-place method on the value rather than a
+		// dst/src function.
+		compact := jsontext.Value(record)
+		if err := compact.Compact(); err != nil {
 			return false
 		}
-		buf.Write(compact.Bytes())
+		buf.Write(compact)
 		buf.WriteByte('\n')
 		return true
 	}

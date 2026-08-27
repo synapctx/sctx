@@ -14,8 +14,8 @@ package agentsetup
 // does not exist learns to distrust the file that named it.
 
 import (
-	"bytes"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"errors"
 	"fmt"
 	"maps"
@@ -214,8 +214,8 @@ func remoteMCPServerNames(orgTokens map[string]string) []string {
 	return names
 }
 
-func desiredRemoteEntries(a Agent, endpoint string, orgTokens map[string]string) map[string]json.RawMessage {
-	out := make(map[string]json.RawMessage, len(orgTokens))
+func desiredRemoteEntries(a Agent, endpoint string, orgTokens map[string]string) map[string]jsontext.Value {
+	out := make(map[string]jsontext.Value, len(orgTokens))
 	for org, token := range orgTokens {
 		org, token = strings.TrimSpace(org), strings.TrimSpace(token)
 		if org == "" || token == "" {
@@ -257,7 +257,7 @@ func normalizeMCPEndpoint(endpoint string) string {
 // minutes earlier were all reported as foreign. An `sctx_live_` credential is
 // something only this tool puts in a config file, and it survives the endpoint
 // moving.
-func ownedRemoteEntry(raw json.RawMessage, a Agent, endpoint string) bool {
+func ownedRemoteEntry(raw jsontext.Value, a Agent, endpoint string) bool {
 	var entry map[string]any
 	if err := json.Unmarshal(raw, &entry); err != nil {
 		return false
@@ -290,7 +290,7 @@ func sameHost(a, b string) bool {
 	return strings.EqualFold(ua.Host, ub.Host)
 }
 
-func sameJSON(a, b json.RawMessage) bool {
+func sameJSON(a, b jsontext.Value) bool {
 	var x, y any
 	if err := json.Unmarshal(a, &x); err != nil {
 		return false
@@ -329,9 +329,9 @@ func overridingSiblings(configPath string, servers []string) []string {
 
 // readRemoteMCPConfig returns the whole document and its `mcp` object, both as
 // raw members so every key we do not manage survives a rewrite byte-for-byte.
-func readRemoteMCPConfig(path, serversKey string) (map[string]json.RawMessage, map[string]json.RawMessage, error) {
-	top := map[string]json.RawMessage{}
-	servers := map[string]json.RawMessage{}
+func readRemoteMCPConfig(path, serversKey string) (map[string]jsontext.Value, map[string]jsontext.Value, error) {
+	top := map[string]jsontext.Value{}
+	servers := map[string]jsontext.Value{}
 
 	raw, err := os.ReadFile(path)
 	if os.IsNotExist(err) {
@@ -358,7 +358,7 @@ func readRemoteMCPConfig(path, serversKey string) (map[string]json.RawMessage, m
 // first, then the remaining keys in sorted order, two-space indented. Key order
 // is not semantic in JSON, and a stable order means a reinstall produces no
 // diff — the property that makes this safe to run repeatedly.
-func marshalRemoteMCPConfig(top map[string]json.RawMessage) ([]byte, error) {
+func marshalRemoteMCPConfig(top map[string]jsontext.Value) ([]byte, error) {
 	body, err := json.Marshal(orderedJSONObject(top))
 	if err != nil {
 		return nil, err
@@ -366,18 +366,18 @@ func marshalRemoteMCPConfig(top map[string]json.RawMessage) ([]byte, error) {
 	// Indented as a SECOND pass, not via MarshalIndent: the ordering above is a
 	// json.Marshaler, and encoding/json compacts a Marshaler's output rather
 	// than indenting it — which produced a valid but single-line config file.
-	var pretty bytes.Buffer
-	if err := json.Indent(&pretty, body, "", "  "); err != nil {
+	pretty := jsontext.Value(body).Clone()
+	if err := pretty.Indent(jsontext.WithIndent("  ")); err != nil {
 		return nil, err
 	}
-	return append(pretty.Bytes(), '\n'), nil
+	return append([]byte(pretty), '\n'), nil
 }
 
 // orderedJSONObject is a json.Marshaler over a raw-member map that emits keys in
 // a stable order. encoding/json sorts map keys itself, but it cannot keep
 // `$schema` first, and a config file whose schema line moves on every write
 // looks like sctx mangled it.
-type orderedJSONObject map[string]json.RawMessage
+type orderedJSONObject map[string]jsontext.Value
 
 func (o orderedJSONObject) MarshalJSON() ([]byte, error) {
 	keys := make([]string, 0, len(o))

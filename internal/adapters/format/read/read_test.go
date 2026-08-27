@@ -2,7 +2,7 @@ package read
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
 	"fmt"
 	"strings"
 	"testing"
@@ -37,7 +37,7 @@ func TestAggressive(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Aggressive() error = %v", err)
 		}
-		if !json.Valid(out.Body) {
+		if !jsontext.Value(out.Body).IsValid() {
 			t.Fatalf("body is not valid JSON: %s", out.Body)
 		}
 		if len(out.Body) >= len(jsonFixture) {
@@ -94,7 +94,7 @@ func TestAggressive(t *testing.T) {
 			t.Errorf("the final record was dropped: %q", body)
 		}
 		for i, line := range kept {
-			if !json.Valid([]byte(line)) {
+			if !jsontext.Value([]byte(line)).IsValid() {
 				t.Errorf("kept line %d not valid JSON: %q", i, line)
 			}
 		}

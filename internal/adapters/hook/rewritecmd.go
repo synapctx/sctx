@@ -18,7 +18,7 @@ package hook
 // rather than on ours.
 
 import (
-	"encoding/json"
+	json "encoding/json/v2"
 	"fmt"
 	"io"
 	"os"

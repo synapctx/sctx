@@ -3,7 +3,8 @@ package hook
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"fmt"
 	"io"
 	"net/http"
@@ -233,7 +234,7 @@ func postSurface(cfg config.Config, token, path string, payload map[string]strin
 	if resp.StatusCode != http.StatusOK {
 		return fmt.Errorf("surface: %s", resp.Status)
 	}
-	return json.NewDecoder(io.LimitReader(resp.Body, 64<<10)).Decode(into)
+	return json.UnmarshalDecode(jsontext.NewDecoder(io.LimitReader(resp.Body, 64<<10)), into)
 }
 
 // surfaceEndpoint derives the surface URL from the configured telemetry
@@ -289,5 +290,5 @@ func writeAdditionalContext(out io.Writer, body string) {
 	var o hookOutput
 	o.HookSpecificOutput.HookEventName = "PostToolUse"
 	o.HookSpecificOutput.AdditionalContext = body
-	_ = json.NewEncoder(out).Encode(o)
+	_ = json.MarshalEncode(jsontext.NewEncoder(out), o)
 }

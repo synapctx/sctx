@@ -2,7 +2,7 @@ package hook
 
 import (
 	"bytes"
-	"encoding/json"
+	json "encoding/json/v2"
 	"os"
 	"path/filepath"
 	"strconv"

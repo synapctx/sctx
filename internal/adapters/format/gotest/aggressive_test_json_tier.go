@@ -1,7 +1,8 @@
 package gotest
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"fmt"
 	"strings"
 
@@ -35,7 +36,7 @@ func isJSONTestOutput(raw []byte) bool {
 		if l == "" {
 			continue
 		}
-		if !json.Valid([]byte(l)) {
+		if !jsontext.Value([]byte(l)).IsValid() {
 			return false
 		}
 		seen++
