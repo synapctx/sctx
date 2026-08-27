@@ -7,7 +7,8 @@ package spool
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"fmt"
 	"net"
 	"net/http"
@@ -266,9 +267,9 @@ func (e *Emitter) flush(ctx context.Context, timeout time.Duration) error {
 			continue
 		}
 
-		events := make([]json.RawMessage, 0, len(groupLines))
+		events := make([]jsontext.Value, 0, len(groupLines))
 		for _, line := range groupLines {
-			events = append(events, json.RawMessage(line))
+			events = append(events, jsontext.Value(line))
 		}
 		// No tenantId: the server never read one. Both ingest handlers take the
 		// organization from the AUTHENTICATED KEY (or, on the local path, from

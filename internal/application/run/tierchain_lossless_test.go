@@ -3,7 +3,7 @@ package run
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	json "encoding/json/v2"
 	"strings"
 	"testing"
 
@@ -137,9 +137,16 @@ func TestAFallbackSavingIsAccountedAsGenericNotCoverage(t *testing.T) {
 	}
 }
 
+// mustMarshal renders a decoded document to a CANONICAL string for comparison.
+//
+// Deterministic is load-bearing: v is a map[string]any, and v2 marshals map
+// members in randomized order (v1 sorted them). Without it two identical
+// documents serialise differently and this helper reports "the document
+// changed" for a compactor that changed nothing -- which is the opposite of
+// what the test is for.
 func mustMarshal(t *testing.T, v any) string {
 	t.Helper()
-	b, err := json.Marshal(v)
+	b, err := json.Marshal(v, json.Deterministic(true))
 	if err != nil {
 		t.Fatal(err)
 	}

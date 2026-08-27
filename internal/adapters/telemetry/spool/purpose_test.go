@@ -2,7 +2,8 @@ package spool
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -29,7 +30,7 @@ func TestFlushSendsServiceDataAndDropsUnconsentedImprovementData(t *testing.T) {
 		var body struct {
 			Events []map[string]any `json:"events"`
 		}
-		_ = json.NewDecoder(r.Body).Decode(&body)
+		_ = json.UnmarshalDecode(jsontext.NewDecoder(r.Body), &body)
 		got = append(got, body.Events...)
 		w.Write([]byte(`{"accepted":1}`))
 	}))

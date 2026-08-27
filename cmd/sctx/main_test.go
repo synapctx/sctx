@@ -2,7 +2,8 @@ package main
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -65,7 +66,7 @@ func TestRunInitSuccessWritesConfigAndDrainsBacklog(t *testing.T) {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_ = json.NewEncoder(w).Encode(map[string]string{"organization": "acme"})
+		_ = json.MarshalEncode(jsontext.NewEncoder(w), map[string]string{"organization": "acme"})
 	}))
 	defer srv.Close()
 
@@ -139,7 +140,7 @@ func TestRunInitAcceptsTheKeyFlagWithoutReadingStdin(t *testing.T) {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_ = json.NewEncoder(w).Encode(map[string]string{"organization": "parlitrack"})
+		_ = json.MarshalEncode(jsontext.NewEncoder(w), map[string]string{"organization": "parlitrack"})
 	}))
 	defer srv.Close()
 
@@ -192,7 +193,7 @@ func TestRunInitStillAcceptsPipedStdin(t *testing.T) {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_ = json.NewEncoder(w).Encode(map[string]string{"organization": "cloudresty"})
+		_ = json.MarshalEncode(jsontext.NewEncoder(w), map[string]string{"organization": "cloudresty"})
 	}))
 	defer srv.Close()
 

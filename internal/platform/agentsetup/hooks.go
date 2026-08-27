@@ -1,7 +1,8 @@
 package agentsetup
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -213,7 +214,7 @@ func InstallAgentHooks(home string, a Agent, binary string) ([]string, error) {
 		changed = append(changed, fmt.Sprintf("removed %d stale --fallback flag(s) from existing sctx hooks", n))
 	}
 
-	out, err := json.MarshalIndent(doc, "", "  ")
+	out, err := json.Marshal(doc, jsontext.WithIndent("  "))
 	if err != nil {
 		return nil, err
 	}

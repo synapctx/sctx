@@ -2,7 +2,8 @@ package projectfilter
 
 import (
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"errors"
 	"os"
 	"path/filepath"
@@ -33,7 +34,7 @@ func writeProject(t *testing.T, cfg Config) (root, path string) {
 		t.Fatal(err)
 	}
 	path = filepath.Join(dir, "filters.json")
-	raw, err := json.MarshalIndent(cfg, "", "  ")
+	raw, err := json.Marshal(cfg, jsontext.WithIndent("  "))
 	if err != nil {
 		t.Fatal(err)
 	}

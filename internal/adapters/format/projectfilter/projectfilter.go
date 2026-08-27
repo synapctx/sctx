@@ -8,7 +8,8 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"errors"
 	"fmt"
 	"io"
@@ -171,12 +172,11 @@ func Load(root, path string) (Loaded, error) {
 		return Loaded{}, fmt.Errorf("project filter file exceeds %d bytes", maxFileBytes)
 	}
 	var cfg Config
-	dec := json.NewDecoder(bytes.NewReader(raw))
-	dec.DisallowUnknownFields()
-	if err := dec.Decode(&cfg); err != nil {
+	dec := jsontext.NewDecoder(bytes.NewReader(raw))
+	if err := json.UnmarshalDecode(dec, &cfg, json.RejectUnknownMembers(true)); err != nil {
 		return Loaded{}, fmt.Errorf("decoding project filters: %w", err)
 	}
-	if dec.Decode(&struct{}{}) != io.EOF {
+	if json.UnmarshalDecode(dec, &struct{}{}) != io.EOF {
 		return Loaded{}, errors.New("project filter file contains trailing JSON")
 	}
 	loaded := Loaded{Root: filepath.Clean(root), Path: path, Digest: digest(raw), Config: cfg}

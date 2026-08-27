@@ -1,7 +1,8 @@
 package agentsetup
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"os"
 	"path/filepath"
 	"strings"
@@ -46,9 +47,9 @@ func TestRemoteMCPInstallPreservesTheirServersAndIsIdempotent(t *testing.T) {
 	}
 
 	var doc struct {
-		Schema string                     `json:"$schema"`
-		Model  string                     `json:"model"`
-		MCP    map[string]json.RawMessage `json:"mcp"`
+		Schema string                    `json:"$schema"`
+		Model  string                    `json:"model"`
+		MCP    map[string]jsontext.Value `json:"mcp"`
 	}
 	raw, err := os.ReadFile(path)
 	if err != nil {

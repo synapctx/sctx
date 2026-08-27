@@ -3,7 +3,8 @@ package spool
 import (
 	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -56,8 +57,8 @@ func (m mapResolver) TokenForOrg(org string) (string, bool) {
 
 func TestEmitAndFlush(t *testing.T) {
 	var received struct {
-		TenantID string            `json:"tenantId"`
-		Events   []json.RawMessage `json:"events"`
+		TenantID string           `json:"tenantId"`
+		Events   []jsontext.Value `json:"events"`
 	}
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, _ := io.ReadAll(r.Body)

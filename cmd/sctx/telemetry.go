@@ -2,7 +2,7 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
+	json "encoding/json/v2"
 	"fmt"
 	"io"
 	"os"

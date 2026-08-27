@@ -5,9 +5,9 @@
 package jsoncompact
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
 	"fmt"
 	"io"
 	"reflect"
@@ -47,16 +47,24 @@ func (f *Formatter) Descriptor() format.Match {
 // strings and large arrays, always leaving an explicit "+N" marker so the
 // agent knows data was dropped.
 //
-// Note: transforming through map[string]any does not preserve object key
-// order (Go map iteration is randomized). This is an accepted tradeoff for
-// the size win; callers that need original key order should rely on the
-// relaxed tier instead.
+// Note: transforming through map[string]any does not preserve the INPUT key
+// order. That was always true, but it used to be invisible: encoding/json v1
+// sorted map keys on the way out, so the output was at least the same on every
+// run. v2 marshals a map in randomized order, which turned a documented
+// ordering caveat into output that CHANGES BETWEEN IDENTICAL RUNS -- the same
+// kubectl command rendering differently each time, defeating diffing and any
+// caching an agent does on the text.
+//
+// Deterministic(true) restores the sorted-key behaviour and with it the
+// property that actually matters here: the same input always renders the same
+// bytes. Callers that need the ORIGINAL key order should still use the relaxed
+// tier, which compacts in place and never round-trips through a map.
 func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Rendered, error) {
 	raw, err := io.ReadAll(in.Stdout)
 	if err != nil {
 		return format.Rendered{}, fmt.Errorf("jsoncompact: reading stdout: %w", err)
 	}
-	if !json.Valid(raw) {
+	if !jsontext.Value(raw).IsValid() {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
@@ -67,7 +75,7 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 
 	elided := elide(doc)
 
-	body, err := json.Marshal(elided)
+	body, err := json.Marshal(elided, json.Deterministic(true))
 	if err != nil {
 		return format.Rendered{}, fmt.Errorf("jsoncompact: marshaling elided doc: %w", err)
 	}
@@ -94,15 +102,15 @@ func (f *Formatter) Relaxed(ctx context.Context, in format.Input) (format.Render
 	if err != nil {
 		return format.Rendered{}, fmt.Errorf("jsoncompact: reading stdout: %w", err)
 	}
-	if !json.Valid(raw) {
+	if !jsontext.Value(raw).IsValid() {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
-	var buf bytes.Buffer
-	if err := json.Compact(&buf, raw); err != nil {
+	compact := jsontext.Value(raw).Clone()
+	if err := compact.Compact(); err != nil {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
-	body := buf.Bytes()
+	body := []byte(compact)
 
 	if len(body) == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
