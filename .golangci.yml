@@ -1,19 +1,50 @@
-# Lint configuration for CI.
+# Lint configuration. Kept deliberately narrow so the gate is GREEN and therefore
+# believed — a permanently red job is one everybody learns to skip.
 #
-# WHY THIS IS A SHORT LIST RATHER THAN THE DEFAULT SET. A gate is only worth
-# having if it is green, and a green gate is the only kind anyone believes. The
-# default linters report ~50 findings here — almost all `errcheck` on deferred
-# Close calls we deliberately ignore — so turning them all on would produce a
-# permanently red job that everybody learns to skip.
+# WHY THIS SET, measured across all 14 modules in this org rather than guessed:
 #
-# `unused` earns its place on evidence: two functions (`containsToken`,
-# `isSeparatorLine`) lost their last caller during the v0.4.3 argv-grammar
-# rewrite and shipped as dead code. `go vet` cannot see that — it checks unused
-# LOCALS, not package-level functions — and CI ran no linter, so nothing did.
-# Everything else stays out until it catches something real.
+#   errcheck    ~90 findings, overwhelmingly `defer x.Close()` we ignore on
+#               purpose. Enabling it would make the gate red on arrival and say
+#               nothing true. Excluded deliberately, not by oversight.
+#   staticcheck  the SA/S/ST checks find real defects here — an `||` with
+#               identical operands, an `append` whose result is discarded, a
+#               package imported twice. Those are worth a failed build.
+#   unused       earns its place on evidence: it caught dead code twice in this
+#               org, including helpers left behind by `go fix` inlining.
+#
+# The QF* ("quickfix") checks are excluded: they are editor-grade style hints
+# (apply De Morgan's law, prefer a tagged switch) and none of them describes a
+# defect. They are the difference between ~33 findings and ~19 real ones.
+#
+# Raise this over time. Adding a linter is cheap; a red gate is not.
+#
+# REPO-SPECIFIC EVIDENCE FOR `unused`, kept from this file's earlier version:
+# two functions (`containsToken`, `isSeparatorLine`) lost their last caller
+# during the v0.4.3 argv-grammar rewrite and shipped as dead code. `go vet`
+# cannot see that -- it checks unused LOCALS, not package-level functions -- and
+# CI ran no linter, so nothing did.
 version: "2"
 
 linters:
   default: none
   enable:
+    - staticcheck
     - unused
+  settings:
+    staticcheck:
+      # golangci-lint's DEFAULT staticcheck set (which already drops the noisy
+      # ST naming/comment checks) minus the QF quickfix hints. Spelled out
+      # rather than written as `all` because `all` re-enables the ST checks and
+      # takes this from ~19 real findings to ~81 mostly-cosmetic ones.
+      checks:
+        - all
+        - -ST1000 # at least one file in a package should have a package comment
+        - -ST1003 # poorly chosen identifier
+        - -ST1016 # methods on the same type should have the same receiver name
+        - -ST1020 # comment on exported function
+        - -ST1021 # comment on exported type
+        - -ST1022 # comment on exported var
+        - -QF1001 # could apply De Morgan's law
+        - -QF1002 # could use tagged switch
+        - -QF1008 # could remove embedded field from selector
+        - -QF1012 # Fprintf over WriteString(Sprintf(...))
