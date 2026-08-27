@@ -47,6 +47,12 @@ func aggressiveTest(in format.Input) (format.Rendered, error) {
 	}
 
 	if in.ExitCode == 0 {
+		// -v output survives its own tier: the passing renderer counts "ok"
+		// lines and drops the rest, which under -v is the per-test detail and
+		// the t.Log output the flag was typed to produce.
+		if verboseMode(in) {
+			return renderPassingVerboseTest(lines, stderr, in.Duration), nil
+		}
 		return renderPassingTest(lines, stderr, in.Duration), nil
 	}
 	return renderFailingTest(lines, stderr), nil

@@ -29,8 +29,8 @@ func (f *Formatter) Descriptor() format.Match {
 
 // Aggressive renders a structured, maximally compressed summary for `go
 // test`, and an error-focused summary for `go build`/`go vet`. It also
-// covers `go mod`, `go list`, `go run`, `go generate`, and `go get`. Any
-// other go subcommand is not handled at this tier.
+// covers `go mod`, `go list`, `go run`, `go generate`, `go get`, and `go fix`
+// (apply mode only). Any other go subcommand is not handled at this tier.
 func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Rendered, error) {
 	switch subcommand(in) {
 	case "test":
@@ -50,6 +50,12 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 		return aggressiveGenerate(in)
 	case "get":
 		return aggressiveGet(in)
+	case "fix":
+		// -diff emits a patch; see diffMode for why no tier may touch it.
+		if diffMode(in) {
+			return format.Rendered{}, format.ErrTierInapplicable
+		}
+		return aggressiveFix(in)
 	default:
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
@@ -60,6 +66,12 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 // signal.
 func (f *Formatter) Relaxed(ctx context.Context, in format.Input) (format.Rendered, error) {
 	if subcommand(in) == "test" && inspectionMode(in) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	// A `go fix -diff` patch must reach the caller byte-exact: relaxedFilter
+	// drops blank context lines and collapses repeated ones, both of which
+	// change what the patch says. Decline so it falls through to verbatim.
+	if subcommand(in) == "fix" && diffMode(in) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 	return relaxedRender(in)

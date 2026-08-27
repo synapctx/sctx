@@ -123,7 +123,7 @@ func alreadyWrapped(head string) bool {
 // should be rewritten. A nil slice means "always rewrite" regardless of
 // subcommand.
 var subcommandTable = map[string][]string{
-	"go": {"test", "build", "vet", "mod", "list", "run", "generate", "get"},
+	"go": {"test", "build", "vet", "mod", "list", "run", "generate", "get", "fix"},
 	// Git's finite porcelain surface is intentionally not enumerated. The
 	// shared argv parser finds the command after global flags and rejects the
 	// interactive/streaming protocol verbs; unknown finite verbs then receive
