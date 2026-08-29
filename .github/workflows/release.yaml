@@ -59,63 +59,52 @@ jobs:
       # valid one that was never granted the repository, and those have different
       # fixes. This asks the token what it can actually see and says so, so the
       # next person spends a minute rather than an afternoon.
-      - name: Verify Bot Access
+      - name: Mint a GitHub App token (read)
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ vars.SCT__GITHUB_CI_APP_ID }}
+          private-key: ${{ secrets.SCT__GITHUB_CI_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+
+      # WHY THIS STEP STILL EXISTS. A bare 404 from `checkout` cannot tell a
+      # missing credential from an App that is simply not installed on the
+      # repository being fetched, and those have different fixes. This asks the
+      # token what it can actually reach and says so.
+      #
+      # Rewritten for a GitHub App. The previous version called `gh api user` and
+      # read the X-OAuth-Scopes header: an INSTALLATION TOKEN HAS NEITHER -- it
+      # does not act as a user and carries no OAuth scopes, so both checks failed
+      # for a perfectly good token. /installation/repositories is the App
+      # equivalent and is strictly better: it returns exactly the repositories
+      # this token can reach, rather than being inferred from org membership.
+      - name: Verify App Access
         env:
-          GH_TOKEN: ${{ secrets.SCT__GITHUB_SYNAPCTX_BOT_PAT }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           if [ -z "${GH_TOKEN:-}" ]; then
-            echo "::error::SCT__GITHUB_SYNAPCTX_BOT_PAT is empty or not visible to this repository."
-            echo "  For an ORGANIZATION secret, add this repository to the secret's repository access."
+            echo "::error::No App token was minted. Check SCT__GITHUB_CI_APP_ID and"
+            echo "  SCT__GITHUB_CI_APP_PRIVATE_KEY are visible to this repository."
             exit 1
           fi
 
-          if ! who=$(gh api user -q .login 2>/dev/null); then
-            echo "::error::the token is not valid (GitHub rejected it). Check it has not expired."
+          if ! reachable=$(gh api /installation/repositories --paginate -q '.repositories[].name' 2>/dev/null); then
+            echo "::error::the App token was rejected by GitHub."
+            echo "  Most likely the private key does not match SCT__GITHUB_CI_APP_ID."
             exit 1
           fi
-          echo "token acts as: $who"
+          echo "repositories this installation can reach: $(echo $reachable | tr '\n' ' ')"
 
-          # Classic tokens report their scopes in a header; fine-grained ones do
-          # not, which is itself the useful signal about which kind is in play.
-          scopes=$(gh api -i user 2>/dev/null | tr -d '\r' | awk -F': ' '/^[Xx]-[Oo]auth-[Ss]copes:/{print $2}')
-          if [ -n "$scopes" ]; then
-            echo "classic token, scopes: $scopes"
-            echo "  note: a classic token needs the full 'repo' scope to read a private repository."
-          else
-            echo "fine-grained token (no OAuth scopes header)"
-          fi
-
-          # Probe the ORGANIZATION first, and only with PRIVATE repositories.
-          #
-          # A public repository proves nothing here: a fine-grained token can read
-          # any public repo whether or not it was granted it, so "can read the tap"
-          # is not evidence the token has any organization access at all. Listing
-          # PRIVATE org repositories returns exactly what the token was granted,
-          # which separates the three causes that all surface as one 404.
-          granted=$(gh api "orgs/synapctx/repos?type=private&per_page=100" -q '.[].name' 2>/dev/null | sort | tr '\n' ' ')
-          if [ -z "$granted" ]; then
-            echo "::error::$who can see NO private repository in the synapctx organization."
-            echo "  That is not a per-repository problem. Either:"
-            echo "    1. the token's Resource owner is the bot's personal account, not synapctx"
-            echo "       (a fine-grained token reaches exactly ONE owner, and collaborator"
-            echo "        access on the account does not extend it), or"
-            echo "    2. the organization has not approved the token yet - check"
-            echo "       Organization -> Settings -> Personal access tokens -> Pending requests."
-            exit 1
-          fi
-          echo "private repositories this token was granted: $granted"
-
-          # Every private repository the release needs, checked BEFORE the build.
-          # workspace-delta-daemon carries a relative `replace` to
-          # platform-contracts for the shared extractor, so a release needs both;
-          # discovering the second one during `go build` wastes a whole run.
+          # Both are needed BEFORE the build: workspace-delta-daemon carries a
+          # relative `replace` to platform-contracts, so discovering the second
+          # one during `go build` wastes a whole run.
           fail=0
           for repo in workspace-delta-daemon platform-contracts; do
-            if gh api "repos/synapctx/$repo" -q .full_name >/dev/null 2>&1; then
+            if printf '%s\n' "$reachable" | grep -qx "$repo"; then
               echo "  can read synapctx/$repo"
             else
-              echo "::error::the token has organization access but not to synapctx/$repo."
-              echo "  Add it under the token's Repository access, then re-approve if prompted."
+              echo "::error::the synapctx-ci App is not installed on synapctx/$repo."
+              echo "  Add it under the App's Repository access."
               fail=1
             fi
           done
@@ -125,7 +114,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: synapctx/workspace-delta-daemon
-          token: ${{ secrets.SCT__GITHUB_SYNAPCTX_BOT_PAT }}
+          token: ${{ steps.app-token.outputs.token }}
           path: .workspace-daemon
 
       # platform-contracts holds the SHARED Go extractor the daemon links, and the
@@ -138,7 +127,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           repository: synapctx/platform-contracts
-          token: ${{ secrets.SCT__GITHUB_SYNAPCTX_BOT_PAT }}
+          token: ${{ steps.app-token.outputs.token }}
           path: platform-contracts
 
       - name: Build Archives
@@ -217,11 +206,24 @@ jobs:
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "number=${tag#v}" >> "$GITHUB_OUTPUT"
 
+      # The RELEASE App, not the CI one. This job pushes a commit to
+      # synapctx/homebrew-tap, and that is the only write in the whole estate --
+      # which is why it is a separate App scoped to that one repository. The CI
+      # App is Contents:Read everywhere and could not do this even if used.
+      - name: Mint a GitHub App token (write, tap only)
+        id: app-token
+        uses: actions/create-github-app-token@v3
+        with:
+          app-id: ${{ vars.SCT__GITHUB_RELEASE_APP_ID }}
+          private-key: ${{ secrets.SCT__GITHUB_RELEASE_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: homebrew-tap
+
       - name: Checkout Tap
         uses: actions/checkout@v7
         with:
           repository: synapctx/homebrew-tap
-          token: ${{ secrets.SCT__GITHUB_SYNAPCTX_BOT_PAT }}
+          token: ${{ steps.app-token.outputs.token }}
           path: tap
 
       - name: Generate Formula
