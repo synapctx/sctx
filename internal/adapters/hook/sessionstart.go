@@ -36,7 +36,13 @@ import (
 // Fail open in every branch: no key, no repository, no network, a 500, a
 // malformed payload — print nothing, exit 0. A session that starts slowly or
 // noisily because of us is a hook the developer removes.
-const sessionStartBudget = 3000 * time.Millisecond
+// 4500ms, not 3000: the proxy answers the brief under its own 3000ms budget
+// and the first recall in a window can spend most of it on an embedding
+// attempt before falling back to keyword recall (measured 2026-09-03: 2.9s
+// with the embeddings provider's circuit open, ~0.3s otherwise). A hook budget
+// EQUAL to the server's cannot succeed on that path — it times out with the
+// answer already on the wire — so this leaves room for the round trip.
+const sessionStartBudget = 4500 * time.Millisecond
 
 // sessionStartPath is the per-repository brief: org memory bound to this
 // repository plus what the index currently holds for it.
