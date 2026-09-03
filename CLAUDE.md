@@ -216,6 +216,33 @@ load-bearing.
   survives byte-for-byte, an unparseable config is never written to, and a
   sibling `.jsonc` naming one of our servers is reported (it wins the deep merge
   and we cannot rewrite it without stripping its comments).
+- **Claude Code gets FOUR hooks, and they are four features.** `ClaudeHooks`
+  (agentsetup/hooks.go) installs `PreToolUse(Bash)` -> `hook claude` (the rewrite,
+  the only one that produces savings), `SessionStart(startup|resume|clear|compact)`
+  -> `hook claude-session-start` (the brief: org memory for this repository, index
+  freshness vs local HEAD, the tools to open with), `PreToolUse(Grep|Glob|Agent)`
+  -> `hook claude-first-search` (twice per session, then silent), and
+  `PostToolUse(Edit|Write|Bash)` -> `hook claude-post-tool` (memory for an edited
+  file, cross-repo call sites after a grep). Two of them share the `PreToolUse`
+  event, so detection and status are keyed on (event, matcher, SUBCOMMAND) —
+  keying on the event alone reports one as the other.
+  - **SessionStart takes plain stdout, not a hook envelope.** Every other hook
+    prints `hookSpecificOutput` JSON; SessionStart injects raw stdout as model
+    context, and an envelope printed there is shown to the model verbatim as
+    JSON. `writeAdditionalContext` therefore takes the event name — the host
+    silently discards an envelope whose `hookEventName` does not match.
+  - **`~/.claude.json` is READ, never written**, to name the MCP server for this
+    org. The match is on the CREDENTIAL (the entry whose `Authorization` header
+    is this org's bearer), not on a name pattern: on the owner's machine the
+    servers are `parlitrack` and `cloudresty` with no `synapctx-` prefix, so a
+    pattern match would fail exactly where this matters. Unresolved falls back to
+    prose, never to a guessed tool name.
+  - **The first-search counter lives in `<spoolDir>/sessions/<session_id>`**, the
+    same spool the Bash hook uses (`spoolDir()`, shared). Session ids are
+    client-supplied and become filenames, so they are sanitised to
+    `[A-Za-z0-9._-]` and a name of only dots is refused. Read-modify-write with
+    no lock is deliberate: one developer, one agent, and a lost update costs one
+    extra nudge.
 - **Auto-wrap is per-client and there are three mechanisms.** A hook process in
   JSON settings (Claude Code, Gemini CLI), a hook in TOML with a trust step
   (Codex), and an in-process plugin (Kilo Code, OpenCode) — all reporting through

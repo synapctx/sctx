@@ -30,17 +30,15 @@ func Detect(dir string) string {
 func RootAndName(dir string) (root, name string, ok bool) {
 	current := dir
 	for {
-		gitPath := filepath.Join(current, ".git")
-		if info, err := os.Stat(gitPath); err == nil {
-			gitDir := gitPath
-			if !info.IsDir() {
-				resolved, found := resolveGitFile(gitPath)
-				if !found {
-					return "", "", false
-				}
-				gitDir = resolved
+		if _, gitErr := os.Stat(filepath.Join(current, ".git")); gitErr == nil {
+			_, commonDir, found := GitDirs(current)
+			if !found {
+				return "", "", false
 			}
-			url := parseOriginURL(filepath.Join(gitDir, "config"))
+			// Read from the COMMON dir: a linked worktree's own git directory
+			// holds HEAD and little else — `config`, and therefore the origin
+			// remote, lives once in the directory shared by every worktree.
+			url := parseOriginURL(filepath.Join(commonDir, "config"))
 			if url == "" {
 				return "", "", false
 			}
@@ -52,6 +50,57 @@ func RootAndName(dir string) (root, name string, ok bool) {
 		}
 		current = parent
 	}
+}
+
+// GitDirs resolves the two directories a caller needs to read git state for a
+// working-tree root: the git directory FOR THIS TREE (which holds HEAD) and the
+// COMMON directory shared with every linked worktree (which holds config, refs
+// and packed-refs).
+//
+// They are the same path in the ordinary case and differ in exactly the two
+// layouts where `.git` is a FILE rather than a directory:
+//
+//   - a linked worktree, where `.git` names `<main>/.git/worktrees/<name>` and a
+//     `commondir` file beside HEAD points back at the shared directory;
+//   - a submodule, where `.git` names `<super>/.git/modules/<name>`, which is a
+//     complete git directory with no `commondir` at all.
+//
+// Exported because a caller that hard-codes `<root>/.git` silently reads nothing
+// in both layouts — and a worktree is precisely the checkout whose HEAD is least
+// likely to match what the index already holds.
+func GitDirs(root string) (gitDir, commonDir string, ok bool) {
+	gitPath := filepath.Join(root, ".git")
+	info, err := os.Stat(gitPath)
+	if err != nil {
+		return "", "", false
+	}
+	gitDir = gitPath
+	if !info.IsDir() {
+		resolved, found := resolveGitFile(gitPath)
+		if !found {
+			return "", "", false
+		}
+		gitDir = resolved
+	}
+	return gitDir, resolveCommonDir(gitDir), true
+}
+
+// resolveCommonDir reads the `commondir` file beside HEAD. Its contents are
+// usually the relative "../.." back to the shared git directory; an absolute
+// path is also legal. No file means this IS the common directory.
+func resolveCommonDir(gitDir string) string {
+	data, err := os.ReadFile(filepath.Join(gitDir, "commondir"))
+	if err != nil {
+		return gitDir
+	}
+	target := strings.TrimSpace(string(data))
+	if target == "" {
+		return gitDir
+	}
+	if !filepath.IsAbs(target) {
+		target = filepath.Join(gitDir, target)
+	}
+	return filepath.Clean(target)
 }
 
 // resolveGitFile reads a worktree ".git" file (contents: "gitdir: <path>")

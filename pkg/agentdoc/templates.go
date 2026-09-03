@@ -178,24 +178,54 @@ wording as a genuinely missing org, so it cannot enumerate them. **Read it as
 	// (measured: 7.6x more invocation when this file is referenced), the triggers
 	// for reaching for them, and the credential routing, which depends on this
 	// machine's configuration and so cannot live in a shipped description.
+	//
+	// ONE DELIBERATE EXCEPTION to the placement rule, 2026-09-03: the
+	// session-opening trigger ("Open every task with it") is carried BOTH here
+	// and in the MCP server's `instructions` field (developer-mcp-proxy). That is
+	// duplication and it was priced as such. It stays because `instructions` is
+	// advisory — not every client renders it, and a client that drops it drops
+	// the ONE sentence that decides whether the tools are reached for at all,
+	// with no symptom to notice. The owner ruled that completeness of this
+	// guidance outranks its token cost. Do not "fix" it by deleting either copy;
+	// if a future client survey shows every target renders `instructions`, delete
+	// THIS copy and record the survey.
 	return `# SynapCTX — the organization's code graph and memory
 
 SynapCTX indexes every repository in the organization and shared durable memory.
 
 ` + scope + `
-Some clients defer large tool catalogs. If a tool is hidden, search or list the
-client's deferred tools for that server before falling back.
+Some clients defer large tool catalogs, listing these tools as deferred names
+without schemas. A deferred tool is not unavailable: search or list the client's
+deferred tools for that server, load it, and call it.
 
-## When to reach for it
+## Open every task with it
 
-- **Before searching for a convention or unfamiliar design**: ` + "`retrieve_context`" + `.
+**When a task starts** — before the first grep, glob or file read, whether or
+not the code feels familiar — make two calls, once each:
+
+1. ` + "`recall_memory`" + ` with the task in your own words: the decisions, pitfalls and
+   open work about this code that no file records.
+2. ` + "`retrieve_context`" + ` with the same task: the whole organization's code graph,
+   every repository at once, checked out or not.
+
+Then use local tools for exact bytes. Familiarity is not a reason to skip this;
+the memory that matters most is the one you do not know you are missing.
+
+## Three memory systems, one of them shared
+
+Personal memory (an agent's own notes, a session-continuity plugin) is PUSHED
+into context. SynapCTX memory is the ORGANIZATION'S and is PULLED: personal
+notes arriving does not mean org memory was checked — only ` + "`recall_memory`" + ` does.
+A decision, convention, root cause or lesson goes to ` + "`store_memory`" + ` with its
+why; supersede rather than forget.
+
+## Also reach for it
+
 - **Before renaming, deleting or changing a shared signature** —
   ` + "`find_references`" + ` and ` + "`get_dependents`" + `; unlike ` + "`grep`" + `, they cross repositories.
 - **To verify a symbol or read an absent checkout**: ` + "`get_symbol_source`" + ` or ` + "`get_source`" + `.
 - **Before changing a service boundary**: ` + "`get_service_dependencies`" + `.
 - **When assessing removable routes**: ` + "`find_unused_endpoints`" + `; it is a shortlist.
-- **Before re-deciding or starting unfamiliar work**: ` + "`recall_memory`" + `.
-- **When a decision or convention is set**: ` + "`store_memory`" + ` with its why.
 - **When memory is outdated**: supersede it with ` + "`store_memory`" + `; use
   ` + "`forget_memory`" + ` only for secrets or test artifacts.
 

@@ -86,7 +86,10 @@ func TestAnExistingHookWithExtraFlagsIsNotDuplicated(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, c := range changed {
-		if strings.Contains(c, "PreToolUse") {
+		// Narrowed to the Bash group: sctx installs a SECOND PreToolUse hook
+		// (Grep|Glob|Agent) that this fixture does not have, so its legitimate
+		// installation must not read as a duplicate of the developer's own.
+		if strings.Contains(c, "PreToolUse(Bash)") {
 			t.Errorf("reinstalled a hook that was already present: %q", c)
 		}
 	}
@@ -118,8 +121,14 @@ func TestHookInstallIsIdempotent(t *testing.T) {
 		t.Errorf("second install changed %v", changed)
 	}
 	raw, _ := os.ReadFile(path)
-	if n := strings.Count(string(raw), "hook claude-post-tool"); n != 1 {
-		t.Errorf("post-tool hook appears %d times", n)
+	// Every verb, not just the post-tool one. Two hooks now share the PreToolUse
+	// event, and a matcher-group bug would duplicate the SECOND group while
+	// leaving the first — invisible to a check that only counts one subcommand.
+	for _, spec := range ClaudeHooks("sctx") {
+		if n := strings.Count(string(raw), "hook "+spec.Subcommand+"\""); n != 1 {
+			t.Errorf("%s(%s) appears %d times after a second install, want exactly 1:\n%s",
+				spec.Event, spec.Matcher, n, raw)
+		}
 	}
 }
 
@@ -172,14 +181,14 @@ func TestUnparseableSettingsAreRefusedNotRewritten(t *testing.T) {
 }
 
 // A machine with no settings.json at all is the fresh-install case.
-func TestAFreshMachineGetsBothHooks(t *testing.T) {
+func TestAFreshMachineGetsEveryHook(t *testing.T) {
 	home := t.TempDir()
 	changed, err := InstallHooks(home, "sctx")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(changed) != 2 {
-		t.Fatalf("want both hooks installed, got %v", changed)
+	if len(changed) != len(ClaudeHooks("sctx")) {
+		t.Fatalf("want every hook installed, got %v", changed)
 	}
 	_, states, err := InspectHooks(home, "sctx")
 	if err != nil {
@@ -192,27 +201,35 @@ func TestAFreshMachineGetsBothHooks(t *testing.T) {
 	}
 }
 
-// The Bash hook is the savings engine and the PostToolUse hook is the memory
-// delivery path. They fail independently, so status has to name both.
-func TestBothHooksAreTrackedSeparately(t *testing.T) {
+// The Bash hook is the savings engine, the PostToolUse hook is the memory
+// delivery path, and the SessionStart and search hooks are the orientation
+// path. They fail independently, so status has to name every one of them.
+//
+// Keyed on SUBCOMMAND rather than Event: two hooks now share the PreToolUse
+// event (Bash, and Grep|Glob|Agent), so an Event-keyed map would let one of
+// them overwrite the other's result and the assertion would depend on slice
+// order.
+func TestEveryHookIsTrackedSeparately(t *testing.T) {
 	home := t.TempDir()
 	settingsAt(t, home, theRealSettings)
 	_, states, err := InspectHooks(home, "/Users/x/.local/bin/sctx")
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(states) != 2 {
-		t.Fatalf("want 2 tracked hooks, got %d", len(states))
+	if len(states) != len(ClaudeHooks("sctx")) {
+		t.Fatalf("want every hook tracked, got %d", len(states))
 	}
-	byEvent := map[string]bool{}
+	bySub := map[string]bool{}
 	for _, st := range states {
-		byEvent[st.Event] = st.Installed
+		bySub[st.Subcommand] = st.Installed
 	}
-	if !byEvent["PreToolUse"] {
+	if !bySub["claude"] {
 		t.Error("the existing Bash hook was not detected")
 	}
-	if byEvent["PostToolUse"] {
-		t.Error("a hook that is absent was reported as installed")
+	for _, absent := range []string{"claude-post-tool", "claude-session-start", "claude-first-search"} {
+		if bySub[absent] {
+			t.Errorf("%s is absent from the fixture but was reported as installed", absent)
+		}
 	}
 }
 
@@ -231,7 +248,7 @@ func TestAHookInstalledFromADifferentBinaryPathIsRecognised(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, c := range changed {
-		if strings.Contains(c, "PreToolUse") {
+		if strings.Contains(c, "PreToolUse(Bash)") {
 			t.Errorf("installed a second Bash hook: %q", c)
 		}
 	}
@@ -271,6 +288,18 @@ func TestInvokesSctxHookIsWholeToken(t *testing.T) {
 		{"/x/sctx hook claude", "claude-post-tool", false},
 		{"/usr/bin/mysctx hook claude", "claude", false}, // suffix, not the program
 		{"/x/sctx gain", "claude", false},
+		// The new verbs, and the prefix pairs they create: "claude" is a prefix
+		// of all three of the others, and "claude-session-start" shares none of
+		// its tokens with them. A substring test would let any one satisfy any
+		// other and setup would then report a green install it never made.
+		{"sctx hook claude-session-start", "claude-session-start", true},
+		{"sctx hook claude-first-search", "claude-first-search", true},
+		{"/x/sctx hook claude-session-start", "claude", false},
+		{"/x/sctx hook claude-first-search", "claude", false},
+		{"/x/sctx hook claude", "claude-session-start", false},
+		{"/x/sctx hook claude", "claude-first-search", false},
+		{"/x/sctx hook claude-first-search", "claude-session-start", false},
+		{"/x/sctx hook claude-post-tool", "claude-first-search", false},
 		{"", "claude", false},
 	} {
 		if got := invokesSctxHook(tc.cmd, tc.sub); got != tc.want {

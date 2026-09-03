@@ -380,12 +380,17 @@ func printHookStatus(w io.Writer, home, binary string) bool {
 	fmt.Fprintf(w, "\nhooks (%s)\n", path)
 	ok := true
 	for _, st := range states {
+		// The matcher is printed, not just the event: sctx now installs TWO
+		// PreToolUse hooks (Bash and Grep|Glob|Agent), and a status listing that
+		// names only the event shows one as installed and one as missing with no
+		// way to tell which is which.
+		label := fmt.Sprintf("%s(%s)", st.Event, st.Matcher)
 		if st.Installed {
-			fmt.Fprintf(w, "  [ok]      %-12s %s\n", st.Event, st.Purpose)
+			fmt.Fprintf(w, "  [ok]      %-34s %s\n", label, st.Purpose)
 			continue
 		}
 		ok = false
-		fmt.Fprintf(w, "  [missing] %-12s %s\n", st.Event, st.Purpose)
+		fmt.Fprintf(w, "  [missing] %-34s %s\n", label, st.Purpose)
 	}
 	return ok
 }

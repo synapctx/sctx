@@ -255,6 +255,23 @@ sctx setup --list-agents   # every agent sctx knows how to configure
 sctx setup --agent <id>    # configure one explicitly
 ```
 
+For Claude Code specifically, `sctx setup --install` registers four hooks. They
+fail independently, so `sctx setup` reports each one separately:
+
+| Hook | Event (matcher) | What it does |
+| :--- | :--- | :--- |
+| `sctx hook claude` | `PreToolUse` (`Bash`) | rewrites covered commands to `sctx <cmd>` — this is what produces the savings |
+| `sctx hook claude-session-start` | `SessionStart` (`startup\|resume\|clear\|compact`) | briefs the agent before it reads anything: org memory bound to this repository, how fresh the index is against your local `HEAD`, and the tools to open with |
+| `sctx hook claude-first-search` | `PreToolUse` (`Grep\|Glob\|Agent`) | on the first two local searches of a session, points at the organization-wide graph and memory; then stays quiet |
+| `sctx hook claude-post-tool` | `PostToolUse` (`Edit\|Write\|Bash`) | surfaces org memory about a file you just edited, and the cross-repository call sites a grep could not see |
+
+The session-start and first-search hooks name the MCP tools in the namespace
+**this machine** uses. To learn it, `~/.claude.json` is READ — never written —
+and the server whose `Authorization` header carries this organization's key is
+the one named. If it cannot be identified, the tool names are phrased as prose
+rather than guessed, because a tool name an agent cannot call teaches it to
+distrust everything else the hook said. The API key is never printed or logged.
+
 Two rules govern what it writes. It only adds configuration where an agent has
 already established its own, so nothing appears for a tool you do not use. And
 it never overwrites content you have edited - a customised instruction file is

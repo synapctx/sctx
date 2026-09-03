@@ -64,6 +64,15 @@ func TestDetectionNeverKeysOnOurOwnFiles(t *testing.T) {
 // other vehicle, raise the number and record why; when it is DUPLICATED
 // elsewhere, delete it instead. SYNAPCTX.md was cut by 35% under the second half
 // of that rule on the same day.
+//
+// NOT raised on 2026-09-03, and that is the recorded decision. SYNAPCTX.md grew
+// from ~598 to ~803 tokens (multi-org, the worst case) when the session-opening
+// trigger and the three-memory-systems section landed — deliberate duplication
+// of the MCP server's `instructions`, priced and accepted in templates.go. The
+// ceiling still binds on SCTX.md at ~1010, so the growth fits with ~35% to
+// spare. The first half of the rule licenses raising the number when content has
+// no other vehicle; it does not license raising it BEFORE the number is reached,
+// which would spend the guard's whole value to buy nothing.
 const docTokenCeiling = 1150
 
 func estimatedTokens(body string) int { return len(body) / 4 }

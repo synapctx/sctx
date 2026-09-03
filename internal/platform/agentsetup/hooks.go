@@ -18,10 +18,19 @@ import (
 // `[warn] No hook installed` for exactly this reason and it is the right
 // instinct: the two halves fail independently and look identical from outside.
 //
-// Two hooks, earning their place differently:
+// Four hooks, earning their place differently:
 //
 //   - **PreToolUse on Bash** rewrites covered commands to `sctx <cmd>`. This is
 //     the savings engine; without it sctx compresses nothing.
+//   - **SessionStart** briefs the agent before it has read anything: the org
+//     memory bound to this repository, how fresh the index is against local
+//     HEAD, and the tools to open with — named in THIS machine's MCP namespace,
+//     which no shipped document can know.
+//   - **PreToolUse on Grep|Glob|Agent** catches the decay of that brief. An
+//     agent about to grep has just decided it has a "where is X" question, which
+//     is the question the org-wide graph answers better. It speaks twice per
+//     session and then stops; a nudge on every search is a tax on the tool the
+//     developer chose.
 //   - **PostToolUse on Edit/Write/Bash** delivers what nobody asked for: org
 //     memory about a file being edited, and — after a grep for an identifier —
 //     the call sites in OTHER repositories the search structurally could not
@@ -42,7 +51,7 @@ import (
 
 // HookSpec is one hook we manage.
 type HookSpec struct {
-	Event   string // "PreToolUse" | "PostToolUse"
+	Event   string // "PreToolUse" | "PostToolUse" | "SessionStart" (Gemini: "BeforeTool")
 	Matcher string // tool-name regex, e.g. "Bash" or "Edit|Write"
 	Purpose string
 	// Subcommand is the `sctx hook <x>` verb. Detection matches on THIS plus the
@@ -121,6 +130,28 @@ func ClaudeHooks(binary string) []HookSpec {
 			Purpose:    "surfaces org memory for files you edit, and cross-repo call sites grep cannot see",
 			Subcommand: "claude-post-tool",
 			Command:    binary + " hook claude-post-tool",
+		},
+		{
+			Event: "SessionStart",
+			// Every source, including `compact`: a compaction is the moment the
+			// startup brief was just dropped from context, so it is exactly when
+			// re-stating it is worth the two lines it costs.
+			Matcher:    "startup|resume|clear|compact",
+			Purpose:    "briefs the agent at session start: org memory bound to this repository, index freshness, the tools to open with",
+			Subcommand: "claude-session-start",
+			Command:    binary + " hook claude-session-start",
+		},
+		{
+			// A SECOND PreToolUse group, not an extension of the Bash matcher.
+			// They are different hooks with different failure modes: the Bash one
+			// rewrites a command and must never be slowed, this one only ever adds
+			// a sentence. Detection is per (event, matcher, subcommand), so the
+			// two groups coexist without either satisfying the other.
+			Event:      "PreToolUse",
+			Matcher:    "Grep|Glob|Agent",
+			Purpose:    "on the first local searches of a session, points at the org-wide graph and memory",
+			Subcommand: "claude-first-search",
+			Command:    binary + " hook claude-first-search",
 		},
 	}
 }

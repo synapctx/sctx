@@ -16,7 +16,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/synapctx/sctx/internal/adapters/format/projectfilter"
@@ -142,13 +141,11 @@ func spoolImprovementEvent(kind, segText, reason, version string) {
 	if err != nil {
 		return
 	}
-	dir := os.Getenv("SCT__SPOOL_DIR")
+	// Shared with the session-search counter (firstsearch.go) so everything sctx
+	// writes on a machine lives under one path the developer can delete.
+	dir := spoolDir()
 	if dir == "" {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return
-		}
-		dir = filepath.Join(home, ".config", "sctx", "spool")
+		return
 	}
 	var repoName string
 	if wd, err := os.Getwd(); err == nil {

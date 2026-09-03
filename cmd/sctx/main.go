@@ -644,7 +644,7 @@ func writeConfigFile(path, endpoint, workspaceProxy, defaultOrg string, orgToken
 
 func runHook(args []string) int {
 	if len(args) == 0 {
-		fmt.Fprintln(os.Stderr, "usage: sctx hook claude | sctx hook claude-post-tool | sctx hook codex | sctx hook gemini | sctx hook rewrite <command>")
+		fmt.Fprintln(os.Stderr, "usage: sctx hook claude | sctx hook claude-post-tool | sctx hook claude-session-start | sctx hook claude-first-search | sctx hook codex | sctx hook gemini | sctx hook rewrite <command>")
 		return 2
 	}
 	switch args[0] {
@@ -673,8 +673,23 @@ func runHook(args []string) int {
 			return 0 // fail open, exactly like every other hook path
 		}
 		return hook.RunClaudePostTool(os.Stdin, os.Stdout, cfg)
+	case "claude-session-start":
+		// The session brief. Config is loaded here for the same reason as
+		// claude-post-tool: it needs an API key, and the Bash hook must keep
+		// working on a machine where no configuration can be produced at all.
+		cfg, err := config.Load()
+		if err != nil {
+			return 0
+		}
+		return hook.RunClaudeSessionStart(os.Stdin, os.Stdout, cfg, version)
+	case "claude-first-search":
+		cfg, err := config.Load()
+		if err != nil {
+			return 0
+		}
+		return hook.RunClaudeFirstSearch(os.Stdin, os.Stdout, cfg)
 	default:
-		fmt.Fprintln(os.Stderr, "usage: sctx hook claude | sctx hook claude-post-tool | sctx hook codex | sctx hook gemini | sctx hook rewrite <command>")
+		fmt.Fprintln(os.Stderr, "usage: sctx hook claude | sctx hook claude-post-tool | sctx hook claude-session-start | sctx hook claude-first-search | sctx hook codex | sctx hook gemini | sctx hook rewrite <command>")
 		return 2
 	}
 }
@@ -774,7 +789,19 @@ func printUsage() {
 Usage:
   sctx <command> [args...]   run a command with token-optimized output
   sctx -- <command>          force passthrough for a reserved name
-  sctx hook claude           Claude Code PreToolUse Bash hook (fail-open)
+  sctx hook claude           Claude Code PreToolUse Bash hook: rewrites covered
+                              commands to "sctx <cmd>" (fail-open)
+  sctx hook claude-session-start
+                              Claude Code SessionStart hook: briefs the agent
+                              with org memory bound to this repository, index
+                              freshness and the tools to open with
+  sctx hook claude-first-search
+                              Claude Code PreToolUse Grep/Glob/Agent hook: on
+                              the first local searches of a session, points at
+                              the org-wide graph and memory
+  sctx hook claude-post-tool  Claude Code PostToolUse hook: surfaces org memory
+                              for files you edit, and the cross-repository call
+                              sites a grep cannot see
   sctx gain                  show token-savings report
     --project, -p              scope to the current repository
     --since <dur>               only runs newer than <dur> (e.g. 7d, 24h)

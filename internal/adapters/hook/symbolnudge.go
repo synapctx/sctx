@@ -18,11 +18,12 @@ import (
 // The precision rules live here, before any network call, because the cheapest
 // nudge is the one we decide not to make.
 //
-// NOT YET ENABLED. `sctx setup` registers this hook for Edit|Write only — see
-// agentsetup/hooks.go. Both sides of the path work; what does not work yet is
-// cheap resolution of a grep pattern to a symbol path, which today costs a
-// ~1.1s semantic retrieval. Everything here is exercised by tests and ready for
-// the day the engine can answer that by term lookup.
+// ENABLED since 2026-08-02: `sctx setup` registers the PostToolUse hook for
+// Edit|Write|Bash — see agentsetup/hooks.go. It was held back while resolving a
+// grep pattern to a symbol path cost a ~1.1s semantic retrieval and the graph
+// held no cross-repository call edges; both were fixed, and if either regresses
+// the fix is to take Bash back out of that matcher rather than to slow every
+// grep down.
 
 // grepSymbol extracts the identifier a command searched for, or "" when the
 // command is not a symbol search we can speak to.

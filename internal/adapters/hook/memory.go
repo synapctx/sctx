@@ -139,7 +139,7 @@ func RunClaudePostTool(in io.Reader, out io.Writer, cfg config.Config) int {
 	if body == "" {
 		return 0
 	}
-	writeAdditionalContext(out, body)
+	writeAdditionalContext(out, "PostToolUse", body)
 	return 0
 }
 
@@ -286,9 +286,13 @@ func symbolContext(symbol string, e elsewhereResult) string {
 	return b.String()
 }
 
-func writeAdditionalContext(out io.Writer, body string) {
+// event is a parameter rather than a constant because more than one Claude Code
+// event now carries additionalContext, and the host DISCARDS an envelope whose
+// hookEventName does not match the event it fired — silently, which is the worst
+// possible failure for a hook whose whole job is to add a line.
+func writeAdditionalContext(out io.Writer, event, body string) {
 	var o hookOutput
-	o.HookSpecificOutput.HookEventName = "PostToolUse"
+	o.HookSpecificOutput.HookEventName = event
 	o.HookSpecificOutput.AdditionalContext = body
 	_ = json.MarshalEncode(jsontext.NewEncoder(out), o)
 }
