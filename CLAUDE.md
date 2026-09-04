@@ -167,11 +167,11 @@ make install   # ~/.local/bin/sctx
   shrank and the same events were re-ingested on every retry. **`sctx`
   events carry an `id` (`telemetry.Event.ID`) that is NOT used as the
   Elasticsearch document id anywhere in graph-retrieval-engine's
-  `RecordUsage`** (plain `{"index": {"_index": index}}` bulk actions, ES
-  mints its own doc id) — so a re-sent chunk is a genuine duplicate
-  server-side, not a no-op upsert. Chunking removes the client-side cause;
-  de-duplicating server-side on `id` would additionally make a resend safe,
-  but is not implemented as of this note. The opportunistic post-command
+  `RecordUsage`** until graph-retrieval-engine v0.6.2 (2026-09-04), which now
+  sets the bulk `_id` from the event's own `id`, so a re-sent chunk is an
+  upsert of the same document rather than a duplicate. Chunking removes the
+  client-side cause; the engine's `_id` makes an accidental resend safe. The
+  ~3% of duplicates written before v0.6.2 remain in the index. The opportunistic post-command
   path (`Flush`, via `AutoFlush`) sends AT MOST ONE chunk and never loops, so
   it can never block a wrapped command on a large backlog; `sctx
   flush`/`sctx init` (`FlushWithTimeout`) loop chunk by chunk until the spool
