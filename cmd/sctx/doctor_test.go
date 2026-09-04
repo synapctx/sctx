@@ -7,9 +7,9 @@ import (
 	"testing"
 )
 
-// captureStdout redirects os.Stdout for the duration of fn and returns
+// captureDoctorStdout redirects os.Stdout for the duration of fn and returns
 // everything written to it.
-func captureStdout(t *testing.T, fn func()) string {
+func captureDoctorStdout(t *testing.T, fn func()) string {
 	t.Helper()
 	r, w, err := os.Pipe()
 	if err != nil {
@@ -31,14 +31,14 @@ func captureStdout(t *testing.T, fn func()) string {
 // change it, since it is opt-in this release and otherwise invisible.
 func TestDoctorReportsRedactionState(t *testing.T) {
 	off := testConfig(t)
-	out := captureStdout(t, func() { runDoctor(off) })
+	out := captureDoctorStdout(t, func() { runDoctor(off) })
 	if !strings.Contains(out, "redaction:      off (opt in with SCT__REDACT=true)") {
 		t.Errorf("doctor output missing off-state redaction line:\n%s", out)
 	}
 
 	on := testConfig(t)
 	on.Redact = true
-	out = captureStdout(t, func() { runDoctor(on) })
+	out = captureDoctorStdout(t, func() { runDoctor(on) })
 	if !strings.Contains(out, "redaction:      on") {
 		t.Errorf("doctor output missing on-state redaction line:\n%s", out)
 	}
