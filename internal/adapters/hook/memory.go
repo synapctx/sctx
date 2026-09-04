@@ -57,6 +57,11 @@ type postToolCall struct {
 	ToolName  string         `json:"tool_name"`
 	ToolInput map[string]any `json:"tool_input"`
 	CWD       string         `json:"cwd"`
+	// SessionID is the Claude Code session, forwarded to the proxy's for-file/
+	// for-symbol surface endpoints as sessionId so their usage events are
+	// attributable to a session instead of arriving with no tool and no
+	// session id at all (see developer-mcp-proxy's CallMeta stamping).
+	SessionID string `json:"session_id"`
 }
 
 type forFileResponse struct {
@@ -132,9 +137,9 @@ func RunClaudePostTool(in io.Reader, out io.Writer, cfg config.Config) int {
 	var body string
 	switch kind {
 	case kindFile:
-		body = memoryContext(subject, fetchNotes(cfg, token, repo, subject))
+		body = memoryContext(subject, fetchNotes(cfg, token, repo, subject, call.SessionID))
 	case kindSymbol:
-		body = symbolContext(subject, fetchElsewhere(cfg, token, repo, subject))
+		body = symbolContext(subject, fetchElsewhere(cfg, token, repo, subject, call.SessionID))
 	}
 	if body == "" {
 		return 0
@@ -177,10 +182,10 @@ func orgOf(repoFullName string) string {
 	return ""
 }
 
-func fetchNotes(cfg config.Config, token, repo, rel string) []string {
+func fetchNotes(cfg config.Config, token, repo, rel, sessionID string) []string {
 	var out forFileResponse
 	if err := postSurface(cfg, token, surfacePath,
-		map[string]string{"repositoryName": repo, "filePath": rel}, &out); err != nil {
+		map[string]string{"repositoryName": repo, "filePath": rel, "sessionId": sessionID}, &out); err != nil {
 		return nil
 	}
 	notes := make([]string, 0, len(out.Notes))
@@ -201,10 +206,10 @@ type elsewhereResult struct {
 }
 
 // fetchElsewhere asks for the call sites the developer's grep could not see.
-func fetchElsewhere(cfg config.Config, token, repo, symbol string) elsewhereResult {
+func fetchElsewhere(cfg config.Config, token, repo, symbol, sessionID string) elsewhereResult {
 	var out elsewhereResult
 	_ = postSurface(cfg, token, surfaceSymbolPath,
-		map[string]string{"repositoryName": repo, "symbol": symbol}, &out)
+		map[string]string{"repositoryName": repo, "symbol": symbol, "sessionId": sessionID}, &out)
 	return out
 }
 

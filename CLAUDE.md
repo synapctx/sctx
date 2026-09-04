@@ -276,6 +276,7 @@ load-bearing.
     servers are `parlitrack` and `cloudresty` with no `synapctx-` prefix, so a
     pattern match would fail exactly where this matters. Unresolved falls back to
     prose, never to a guessed tool name.
+  - **The PostToolUse hook now forwards its `session_id` to the proxy (2026-09-04)**, so lookups it fires on every Edit/Write/Bash are attributed instead of arriving with no tool and no session id at all — measured 2026-09-04 at ~30 such unattributable `for-file`/`for-symbol` lookups/minute across six coding agents, inflating a recall-vs-retrieve usage analysis 27x. `memory.go`'s `postToolCall.SessionID` (from the hook's own `session_id` field) is sent as `sessionId` on both surface calls; the proxy stamps `CallMeta{Tool: "post_tool_file"/"post_tool_symbol", Session: ...}` from it (see developer-mcp-proxy's CLAUDE.md) and the engine skips embedding the query entirely for a `for-file` lookup, since the file path is already an authored binding. `claude-first-search` makes NO network call at all (documented on `RunClaudeFirstSearch`) and has nothing to attribute.
   - **The first-search counter lives in `<spoolDir>/sessions/<session_id>`**, the
     same spool the Bash hook uses (`spoolDir()`, shared). Session ids are
     client-supplied and become filenames, so they are sanitised to
