@@ -177,6 +177,7 @@ func TestSetupInstallGivesCodexInstructionsAndMCPAbilityTogether(t *testing.T) {
 	stubMCPProbe(t)
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home) // windows: os.UserHomeDir reads USERPROFILE, not HOME
 	if err := os.MkdirAll(filepath.Join(home, ".codex"), 0o755); err != nil {
 		t.Fatal(err)
 	}
@@ -256,6 +257,7 @@ func TestSetupInstallRegistersMCPForKiloAndSaysWhichClientsItCannot(t *testing.T
 	stubMCPProbe(t)
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home) // windows: os.UserHomeDir reads USERPROFILE, not HOME
 	for _, dir := range []string{".config/kilo", ".gemini"} {
 		if err := os.MkdirAll(filepath.Join(home, filepath.FromSlash(dir)), 0o755); err != nil {
 			t.Fatal(err)
@@ -466,6 +468,7 @@ func TestConfigRewriteThreadsRedact(t *testing.T) {
 func TestTheHostedMCPHostIsTheDefaultWithNoConfigFile(t *testing.T) {
 	dir := t.TempDir()
 	t.Setenv("HOME", dir)
+	t.Setenv("USERPROFILE", dir) // windows: os.UserHomeDir reads USERPROFILE, not HOME
 	t.Setenv("XDG_CONFIG_HOME", filepath.Join(dir, ".config"))
 	// Unset, not empty: an explicitly empty override is itself a choice, and
 	// this test is about the machine that made none.

@@ -13,6 +13,7 @@ func TestRunFiltersVerifyAndExplicitTrust(t *testing.T) {
 	root := t.TempDir()
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home) // windows: os.UserHomeDir reads USERPROFILE, not HOME
 	if err := os.Mkdir(filepath.Join(root, ".git"), 0o700); err != nil {
 		t.Fatal(err)
 	}

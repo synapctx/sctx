@@ -60,9 +60,10 @@ func TestStartupCarriesEveryOrgKeyAndNeverArgv(t *testing.T) {
 	// A developer watches repositories across several organizations and holds one
 	// key EACH. Passing a single token would serve one org and silently do
 	// nothing for the rest.
+	configFilePath := filepath.Join(string(filepath.Separator), "home", "dev", ".config", "sctx", "config.toml")
 	cfg := config.Config{
 		WorkspaceProxyURL: "https://mcp.example.com/",
-		ConfigFilePath:    "/home/dev/.config/sctx/config.toml",
+		ConfigFilePath:    configFilePath,
 		DefaultOrg:        "acme",
 		OrgTokens: map[string]string{
 			"acme":  "sctx_live_acme",
@@ -96,8 +97,9 @@ func TestStartupCarriesEveryOrgKeyAndNeverArgv(t *testing.T) {
 	if got.ProxyURL != "https://mcp.example.com" {
 		t.Fatalf("proxyUrl %q, want it normalised", got.ProxyURL)
 	}
-	if got.StateDir != "/home/dev/.config/sctx/workspace" {
-		t.Fatalf("stateDir %q, want it beside the config file", got.StateDir)
+	wantStateDir := filepath.Join(filepath.Dir(configFilePath), "workspace")
+	if got.StateDir != wantStateDir {
+		t.Fatalf("stateDir %q, want it beside the config file (%q)", got.StateDir, wantStateDir)
 	}
 }
 

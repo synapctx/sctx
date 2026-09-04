@@ -57,7 +57,7 @@ func TestDetect(t *testing.T) {
 		},
 		{
 			name: "session id is truncated to 128 bytes",
-			vars: map[string]string{"SCT__CLIENT": "shell", "SCT__SESSION": string(make([]byte, 200, 200))},
+			vars: map[string]string{"SCT__CLIENT": "shell", "SCT__SESSION": string(make([]byte, 200))},
 			want: Identity{Client: "shell", SessionID: ""},
 		},
 	}

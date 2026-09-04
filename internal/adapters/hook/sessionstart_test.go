@@ -44,6 +44,7 @@ func fakeClaudeConfig(t *testing.T, token, server string) string {
 		t.Fatal(err)
 	}
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home) // windows: os.UserHomeDir reads USERPROFILE, not HOME
 	return home
 }
 

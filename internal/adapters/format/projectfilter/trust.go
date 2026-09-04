@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 )
 
 type trustFile struct {
@@ -58,7 +59,10 @@ func loadTrust(path string) (trustFile, error) {
 	if info.Mode()&os.ModeSymlink != 0 || !info.Mode().IsRegular() {
 		return trustFile{}, errors.New("project filter trust file must be a regular non-symlink file")
 	}
-	if info.Mode().Perm()&0o022 != 0 {
+	// Windows has no POSIX mode bits; os.FileMode there is synthesized from
+	// ACLs and does not reflect real group/world writability, so this check
+	// only applies on POSIX platforms.
+	if runtime.GOOS != "windows" && info.Mode().Perm()&0o022 != 0 {
 		return trustFile{}, errors.New("project filter trust file must not be group/world writable")
 	}
 	raw, err := os.ReadFile(path)
@@ -134,7 +138,9 @@ func validateTrustDirectory(dir string) error {
 	if info.Mode()&os.ModeSymlink != 0 || !info.IsDir() {
 		return errors.New("project filter trust directory must be a non-symlink directory")
 	}
-	if info.Mode().Perm()&0o022 != 0 {
+	// Windows ACLs are not visible through os.FileMode, so this check only
+	// applies on POSIX platforms; see loadTrust above.
+	if runtime.GOOS != "windows" && info.Mode().Perm()&0o022 != 0 {
 		return errors.New("project filter trust directory must not be group/world writable")
 	}
 	return nil

@@ -12,6 +12,7 @@ func withConfig(t *testing.T, body string) {
 	t.Helper()
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home) // windows: os.UserHomeDir reads USERPROFILE, not HOME
 	dir := filepath.Join(home, ".config", "sctx")
 	if err := os.MkdirAll(dir, 0o700); err != nil {
 		t.Fatal(err)

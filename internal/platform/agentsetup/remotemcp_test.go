@@ -5,6 +5,7 @@ import (
 	json "encoding/json/v2"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -86,7 +87,7 @@ func TestRemoteMCPInstallPreservesTheirServersAndIsIdempotent(t *testing.T) {
 	// It holds a live credential, exactly like the Codex TOML.
 	if info, err := os.Stat(path); err != nil {
 		t.Fatal(err)
-	} else if info.Mode().Perm() != 0o600 {
+	} else if runtime.GOOS != "windows" && info.Mode().Perm() != 0o600 {
 		t.Errorf("mode = %v, want 0600 for a file containing a token", info.Mode().Perm())
 	}
 

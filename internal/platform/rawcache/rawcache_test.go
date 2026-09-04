@@ -3,6 +3,7 @@ package rawcache
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -24,7 +25,9 @@ func TestStoreUsesPrivateFilesAndPreservesStreams(t *testing.T) {
 		if err != nil {
 			t.Fatalf("stat %s: %v", name, err)
 		}
-		if info.Mode().Perm() != 0o600 {
+		// Windows has no POSIX mode bits: os.FileMode there is synthesized
+		// from the read-only attribute, not real per-owner permissions.
+		if runtime.GOOS != "windows" && info.Mode().Perm() != 0o600 {
 			t.Fatalf("%s mode = %v", name, info.Mode().Perm())
 		}
 	}
@@ -32,7 +35,7 @@ func TestStoreUsesPrivateFilesAndPreservesStreams(t *testing.T) {
 	if err != nil {
 		t.Fatalf("stat cache: %v", err)
 	}
-	if info.Mode().Perm() != 0o700 {
+	if runtime.GOOS != "windows" && info.Mode().Perm() != 0o700 {
 		t.Fatalf("cache mode = %v", info.Mode().Perm())
 	}
 }

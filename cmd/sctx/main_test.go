@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -51,6 +52,7 @@ func testConfigAtHome(t *testing.T) config.Config {
 	t.Helper()
 	home := t.TempDir()
 	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home) // windows: os.UserHomeDir reads USERPROFILE, not HOME
 	dir := filepath.Join(home, ".config", "sctx")
 	return config.Config{
 		ConfigFilePath: filepath.Join(dir, "config.toml"),
@@ -90,8 +92,10 @@ func TestRunInitSuccessWritesConfigAndDrainsBacklog(t *testing.T) {
 	if err != nil {
 		t.Fatalf("config file not written: %v", err)
 	}
-	if perm := info.Mode().Perm(); perm != 0o600 {
-		t.Fatalf("config file mode = %o, want 0600", perm)
+	if runtime.GOOS != "windows" {
+		if perm := info.Mode().Perm(); perm != 0o600 {
+			t.Fatalf("config file mode = %o, want 0600", perm)
+		}
 	}
 	data, err := os.ReadFile(cfg.ConfigFilePath)
 	if err != nil {
