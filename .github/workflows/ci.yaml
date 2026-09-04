@@ -219,7 +219,12 @@ jobs:
           $kiloPluginPath = "$fixtureHome\.config\kilo\plugin\sctx.js"
           Assert (Test-Path $kiloPluginPath) "$kiloPluginPath was not written"
           $kiloRaw = Get-Content -Raw $kiloPluginPath
-          $escapedBin = $sctx -replace '\\', '\\\\'
+          # PowerShell single-quoted strings carry no escape syntax, so the
+          # literal replacement text below is exactly two backslash
+          # characters — matching jsString's single-backslash-to-double
+          # escaping. Four backslashes here would quadruple-escape and never
+          # match what sctx.exe actually wrote.
+          $escapedBin = $sctx -replace '\\', '\\'
           AssertLoud ($kiloRaw -match [regex]::Escape('SCTX_BINARY = "' + $escapedBin + '"')) `
             "Kilo plugin does not embed the backslash-escaped sctx.exe path" $kiloRaw
 
