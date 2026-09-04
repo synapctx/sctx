@@ -168,11 +168,76 @@ func TestRepeatedRunNudgeUnknownSessionIsSilent(t *testing.T) {
 	}
 }
 
+// TestRepeatedRunNudgeIsSegmentAware is the table test for the 2026-09-04
+// fix: the nudge used to compare the WHOLE raw Bash command against
+// stats.db, but the run pipeline only ever records the wrapped SEGMENT's
+// own argv — so a piped or chained command (what agents almost always
+// write) never matched anything. Each case seeds stats.db with the argv the
+// run pipeline would actually have recorded, then drives repeatedRunNudge
+// with the full raw command an agent's Bash tool call would carry.
+func TestRepeatedRunNudgeIsSegmentAware(t *testing.T) {
+	tests := []struct {
+		name       string
+		rawCommand string
+		seedArgv   string
+		wantHit    bool
+	}{
+		{
+			name:       "plain wrapped command",
+			rawCommand: "go test ./internal/platform/redact/",
+			seedArgv:   "go test ./internal/platform/redact/",
+			wantHit:    true,
+		},
+		{
+			name:       "wrapped segment followed by a line-narrowing pipe stage",
+			rawCommand: "go test ./internal/platform/redact/ 2>&1 | tail -1",
+			seedArgv:   "go test ./internal/platform/redact/",
+			wantHit:    true,
+		},
+		{
+			name:       "repeated segment inside a && chain",
+			rawCommand: "cd dir && go vet ./... && go test ./...",
+			seedArgv:   "go vet ./...",
+			wantHit:    true,
+		},
+		{
+			name:       "allowlisted head piped to a line-narrowing stage never nudges",
+			rawCommand: "git status | head -5",
+			seedArgv:   "git status",
+			wantHit:    false,
+		},
+		{
+			name:       "a quoted pipe is not mistaken for a segment separator",
+			rawCommand: `go test -run 'TestA|TestB' ./x`,
+			seedArgv:   `go test -run 'TestA|TestB' ./x`,
+			wantHit:    true,
+		},
+		{
+			name:       "an unparseable command stays silent, not an error",
+			rawCommand: "(cd dir && go test ./...)",
+			seedArgv:   "go test ./...",
+			wantHit:    false,
+		},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			cfg := testConfigWithStatsDB(t)
+			seedIdenticalRuns(t, cfg.StatsDBPath, "sess1", tc.seedArgv, 4321, repeatedRunThreshold+1)
+
+			got := repeatedRunNudge(cfg, "sess1", tc.rawCommand)
+			if hit := got != ""; hit != tc.wantHit {
+				t.Errorf("repeatedRunNudge(%q) = %q, wantHit=%v", tc.rawCommand, got, tc.wantHit)
+			}
+		})
+	}
+}
+
 func TestNormalizeSessionArgvStripsTheSctxRewritePrefix(t *testing.T) {
 	tests := []struct{ cmd, want string }{
 		{"go vet ./...", "go vet ./..."},
 		{"sctx go vet ./...", "go vet ./..."},
 		{"/Users/x/.local/bin/sctx go test ./...", "go test ./..."},
+		{"go test ./... 2>&1", "go test ./..."},
 		{"", ""},
 		{"   ", ""},
 	}

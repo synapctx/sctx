@@ -75,13 +75,16 @@ func basenameOf(token string) string {
 	return strings.TrimSuffix(strings.TrimSuffix(token, ".exe"), ".EXE")
 }
 
-// normalizeSessionArgv turns the raw Bash tool_input.command into the same
-// shape stats.Run.Argv is keyed on. The PreToolUse rewrite hook prefixes a
-// wrapped segment with "sctx " (see Rewrite), so PostToolUse sees "sctx go
-// vet ./..." for the very command stats.db recorded as "go vet ./..." — the
-// leading sctx token is stripped before comparing. Multi-segment commands
-// (&&, |, ;) are not reconstructed here; the comparison is best-effort,
-// matching the simple, single-command case this nudge is worth firing for.
+// normalizeSessionArgv turns ONE segment's raw text into the same shape
+// stats.Run.Argv is keyed on. The PreToolUse rewrite hook prefixes a wrapped
+// segment with "sctx " (see Rewrite), so PostToolUse sees "sctx go vet ./..."
+// for the very command stats.db recorded as "go vet ./..." — the leading
+// sctx token is stripped before comparing. Redirect tokens (`2>&1`, `>out`,
+// `<in`) are dropped too: they are consumed by the shell before argv ever
+// reaches the wrapped program, so they are never part of stats.db's argv
+// either, and leaving them in made every redirected command an automatic
+// non-match. Multi-segment commands (&&, |, ;) are handled by the caller,
+// sessionArgvCandidates, which splits first and calls this per segment.
 func normalizeSessionArgv(cmd string) string {
 	fields := strings.Fields(cmd)
 	if len(fields) == 0 {
@@ -90,10 +93,49 @@ func normalizeSessionArgv(cmd string) string {
 	if basenameOf(fields[0]) == "sctx" {
 		fields = fields[1:]
 	}
-	if len(fields) == 0 {
-		return ""
+	var kept []string
+	for _, f := range fields {
+		if strings.ContainsAny(f, "<>") {
+			continue
+		}
+		kept = append(kept, f)
 	}
-	return strings.Join(fields, " ")
+	return strings.Join(kept, " ")
+}
+
+// sessionArgvCandidates splits rawCommand into its `;`/`&&`/`||`/`|`-separated
+// segments (reusing splitSegments, the same quote- and escape-aware scanner
+// the PreToolUse rewrite hook itself uses — see rewrite.go) and returns the
+// normalized argv of every segment that hook would treat as a wrapping
+// candidate: a pipeline head, free of disallowed redirects, whose only
+// downstream pipe stages (if any) are line-narrowing (wrappable, also from
+// rewrite.go — the very check that lets `go test ./... 2>&1 | tail -50`
+// rewrite while `go test ./... | grep FAIL` does not). This is what makes the
+// nudge segment-aware: `go test ./x 2>&1 | tail -1` used to be compared to
+// stats.db as one literal string that never matched anything, because the
+// run pipeline only ever records the WRAPPED SEGMENT's own argv
+// ("go test ./x"), never the pipeline around it.
+//
+// Order is left-to-right, matching the command as written; the caller stops
+// at the first candidate that actually qualifies. Returns nil — no
+// candidates, so no nudge — for anything splitSegments cannot parse
+// confidently. Fail-open: a parse doubt costs a missed nudge, never a wrong
+// one.
+func sessionArgvCandidates(rawCommand string) []string {
+	segs, ok := splitSegments(rawCommand)
+	if !ok {
+		return nil
+	}
+	var out []string
+	for i, seg := range segs {
+		if !wrappable(segs, i) {
+			continue
+		}
+		if argv := normalizeSessionArgv(seg.text); argv != "" {
+			out = append(out, argv)
+		}
+	}
+	return out
 }
 
 // repeatNudgeState is the per-session record of which argv values this hook
@@ -159,29 +201,34 @@ func saveRepeatNudgeState(id string, st repeatNudgeState) {
 }
 
 // repeatedRunNudge implements item 4 of the 2026-09-04 roadmap: after a
-// wrapped Bash command runs, if its normalized argv has already produced
-// the exact same raw output size at least repeatedRunThreshold times in
-// this session, return one line asking the agent to stop re-running it
-// unchanged. Empty return means "say nothing", for any reason at all —
-// unknown session, allowlisted command, already nudged, per-session cap
+// wrapped Bash command runs, if any of its wrappable segments' normalized
+// argv (see sessionArgvCandidates) has already produced the exact same raw
+// output size at least repeatedRunThreshold times in this session, return
+// one line asking the agent to stop re-running it unchanged. Segments are
+// evaluated left to right and AT MOST ONE nudges per call — the first
+// qualifying segment wins, so `cd dir && go vet ./... && go test ./...`
+// nudges on whichever of go vet/go test actually repeated, never both at
+// once. Empty return means "say nothing", for any reason at all — unknown
+// session, nothing splitSegments could parse confidently, no wrappable
+// segment, every candidate allowlisted or already nudged, per-session cap
 // reached, no stats.db, or fewer than the threshold repeats.
 //
 // Local-only: the one dependency is this machine's own stats.db, opened
-// read-only in effect (two SELECTs) under repeatNudgeBudget. No network
-// call and no API key are needed, unlike the memory/symbol nudges this
-// shares a hook process with.
+// read-only in effect (two SELECTs per candidate) under repeatNudgeBudget
+// each. No network call and no API key are needed, unlike the
+// memory/symbol nudges this shares a hook process with.
 func repeatedRunNudge(cfg config.Config, sessionID, rawCommand string) string {
 	id := sanitizeSessionID(sessionID)
 	if id == "" {
 		return ""
 	}
-	argv := normalizeSessionArgv(rawCommand)
-	if argv == "" || isAllowlistedRepeat(argv) {
+	candidates := sessionArgvCandidates(rawCommand)
+	if len(candidates) == 0 {
 		return ""
 	}
 
 	state := loadRepeatNudgeState(id)
-	if len(state.Nudged) >= maxNudgesPerSession || state.alreadyNudged(argv) {
+	if len(state.Nudged) >= maxNudgesPerSession {
 		return ""
 	}
 
@@ -191,20 +238,41 @@ func repeatedRunNudge(cfg config.Config, sessionID, rawCommand string) string {
 	}
 	defer store.Close()
 
+	for _, argv := range candidates {
+		if isAllowlistedRepeat(argv) || state.alreadyNudged(argv) {
+			continue
+		}
+
+		count, ok := identicalRunCount(store, id, argv)
+		if !ok || count < repeatedRunThreshold {
+			continue
+		}
+
+		state.Nudged = append(state.Nudged, argv)
+		saveRepeatNudgeState(id, state)
+
+		return fmt.Sprintf("sctx: `%s` has produced identical output %d times this session; run it once per code change.", argv, count)
+	}
+	return ""
+}
+
+// identicalRunCount looks up how many times argv has already produced the
+// same raw output size in this session, each call under its own
+// repeatNudgeBudget deadline so one slow candidate in a long pipeline cannot
+// eat the budget meant for the next one. ok is false for any lookup failure
+// (no prior run recorded, or a query error) — the caller reads that as
+// "nothing to say about this candidate", not an error.
+func identicalRunCount(store *sqlite.Store, sessionID, argv string) (count int64, ok bool) {
 	ctx, cancel := context.WithTimeout(context.Background(), repeatNudgeBudget)
 	defer cancel()
 
-	rawBytes, ok, err := store.LatestRawBytes(ctx, id, argv)
-	if err != nil || !ok {
-		return ""
+	rawBytes, found, err := store.LatestRawBytes(ctx, sessionID, argv)
+	if err != nil || !found {
+		return 0, false
 	}
-	count, err := store.IdenticalRunCount(ctx, id, argv, rawBytes)
-	if err != nil || count < repeatedRunThreshold {
-		return ""
+	n, err := store.IdenticalRunCount(ctx, sessionID, argv, rawBytes)
+	if err != nil {
+		return 0, false
 	}
-
-	state.Nudged = append(state.Nudged, argv)
-	saveRepeatNudgeState(id, state)
-
-	return fmt.Sprintf("sctx: `%s` has produced identical output %d times this session; run it once per code change.", argv, count)
+	return n, true
 }
