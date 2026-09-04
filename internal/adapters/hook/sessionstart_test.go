@@ -57,6 +57,7 @@ const briefFixture = `{
       {"name": "develop", "role": "secondary", "indexedCommitSha": "999", "indexedAt": "2026-09-02T10:00:00Z"}
     ]
   },
+  "retrievalHint": "retrieve_context {query: \"acme/widgets entry points and service boundaries\", repository: \"acme/widgets\"}",
   "notes": [
     {"id": "n1", "kind": "decision", "createdAt": "2026-08-20T09:00:00Z",
      "text": "Widget ids are lowercase ULIDs; the uppercase constraint was dropped after every insert failed.",
@@ -125,6 +126,7 @@ func TestSessionBriefNamesTheRepoTheToolsAndTheMemory(t *testing.T) {
 		"uppercase constraint was dropped",
 		"Record what you decide here with store_memory",
 		"Local HEAD equals the indexed sha",
+		"Try first: retrieve_context {query: \"acme/widgets entry points and service boundaries\", repository: \"acme/widgets\"}",
 	} {
 		if !strings.Contains(got, want) {
 			t.Errorf("brief is missing %q:\n%s", want, got)
@@ -173,6 +175,11 @@ func TestSessionBriefInvitesTheFirstMemory(t *testing.T) {
 	// cannot support must be dropped, not printed with a placeholder.
 	if strings.Contains(got, "indexed ") {
 		t.Errorf("brief claimed an indexed sha it was never given:\n%s", got)
+	}
+	// The fixture carries no retrievalHint (an older proxy, or one that could
+	// not resolve the repository) — the line must be dropped, not printed empty.
+	if strings.Contains(got, "Try first:") {
+		t.Errorf("brief printed a retrieval hint line with nothing behind it:\n%s", got)
 	}
 }
 

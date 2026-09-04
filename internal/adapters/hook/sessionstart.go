@@ -78,7 +78,13 @@ type forRepoResponse struct {
 			IndexedAt        string `json:"indexedAt"`
 		} `json:"refs"`
 	} `json:"repository"`
-	Notes []struct {
+	// RetrievalHint is one concrete retrieve_context call the proxy already
+	// knows how to phrase for this repository — printed verbatim so a session
+	// that opens with recall_memory still sees the retrieval it is skipping.
+	// Empty when the repository did not resolve; older proxies simply omit
+	// the field, which decodes to the zero value here.
+	RetrievalHint string `json:"retrievalHint"`
+	Notes         []struct {
 		ID           string   `json:"id"`
 		Kind         string   `json:"kind"`
 		CreatedAt    string   `json:"createdAt"`
@@ -254,6 +260,12 @@ func renderSessionBrief(repo, server string, guessed bool, brief forRepoResponse
 
 	var b strings.Builder
 	b.WriteString(header + "\n")
+	// One concrete call, printed verbatim, right under the status line it
+	// belongs to — so a session that opens with recall_memory still sees the
+	// retrieval it is skipping instead of a bare name in a deferred catalog.
+	if brief.RetrievalHint != "" {
+		fmt.Fprintf(&b, "Try first: %s\n", brief.RetrievalHint)
+	}
 	// The tool line names the namespace because that is the one fact no shipped
 	// document can carry: it depends on what this developer called the server.
 	fmt.Fprintf(&b, "Tools for this organization: %s (whole-org code graph, every repository at once), %s, find_references, get_dependents, get_service_dependencies, store_memory. They may be listed as deferred names without schemas — deferred is not unavailable; search for the tool and call it.\n",

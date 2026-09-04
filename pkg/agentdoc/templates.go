@@ -229,7 +229,7 @@ thirty days. Check the live system, then re-confirm with
 
 - **Before renaming, deleting or changing a shared signature** —
   ` + "`find_references`" + ` and ` + "`get_dependents`" + `; unlike ` + "`grep`" + `, they cross repositories.
-- **To verify a symbol or read an absent checkout**: ` + "`get_symbol_source`" + ` or ` + "`get_source`" + `.
+- **To verify a symbol or read an absent checkout**: ` + "`get_symbol_source`" + ` (` + "`symbol_path`" + ` for structured detail, ` + "`path`" + ` for raw source).
 - **Before changing a service boundary**: ` + "`get_service_dependencies`" + `.
 - **When assessing removable routes**: ` + "`find_unused_endpoints`" + `; it is a shortlist.
 - **When memory is outdated**: supersede it with ` + "`store_memory`" + `; use

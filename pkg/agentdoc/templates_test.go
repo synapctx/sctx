@@ -185,7 +185,6 @@ func TestSynapctxTemplateHasATriggerForEveryTool(t *testing.T) {
 		"find_references",
 		"get_dependents",
 		"get_symbol_source",
-		"get_source",
 		"get_service_dependencies",
 		"find_unused_endpoints",
 		"recall_memory",
