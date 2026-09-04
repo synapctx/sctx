@@ -15,8 +15,32 @@ import (
 
 	"github.com/synapctx/sctx/internal/adapters/telemetry/spool"
 	"github.com/synapctx/sctx/internal/domain/telemetry"
+	"github.com/synapctx/sctx/internal/platform/agentenv"
 	"github.com/synapctx/sctx/internal/platform/config"
+	"github.com/synapctx/sctx/internal/platform/httpclient"
 )
+
+// TestValidateTelemetryTokenSendsSctxUserAgent covers `sctx init`'s
+// reachability/validation probe: the User-Agent must identify sctx traffic
+// rather than the default Go-http-client.
+func TestValidateTelemetryTokenSendsSctxUserAgent(t *testing.T) {
+	var gotUA string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotUA = r.Header.Get("User-Agent")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_ = json.MarshalEncode(jsontext.NewEncoder(w), map[string]string{"organization": "acme"})
+	}))
+	defer srv.Close()
+
+	if _, err := validateTelemetryToken(context.Background(), srv.URL, "sctx_live_tok"); err != nil {
+		t.Fatalf("validateTelemetryToken: %v", err)
+	}
+	want := httpclient.UserAgent(version, agentenv.Detect(os.Getenv).Client)
+	if gotUA != want {
+		t.Errorf("User-Agent = %q, want %q", gotUA, want)
+	}
+}
 
 // withPipedStdin replaces os.Stdin for the duration of the test with a pipe
 // pre-loaded with body, restoring the original afterward.
@@ -214,5 +238,37 @@ func TestRunInitStillAcceptsPipedStdin(t *testing.T) {
 	data, _ := os.ReadFile(cfg.ConfigFilePath)
 	if !strings.Contains(string(data), "[org.cloudresty]") {
 		t.Errorf("piped init did not write the org section:\n%s", string(data))
+	}
+}
+
+func TestParseGainArgsShare(t *testing.T) {
+	opts, err := parseGainArgs([]string{"--share"})
+	if err != nil {
+		t.Fatalf("parseGainArgs: %v", err)
+	}
+	if !opts.Share {
+		t.Fatal("expected Share to be true")
+	}
+}
+
+func TestParseGainArgsShareMarkdown(t *testing.T) {
+	opts, err := parseGainArgs([]string{"--share", "--format", "markdown"})
+	if err != nil {
+		t.Fatalf("parseGainArgs: %v", err)
+	}
+	if !opts.Share || opts.Format != "markdown" {
+		t.Fatalf("got %+v", opts)
+	}
+}
+
+func TestParseGainArgsMarkdownWithoutShareIsRejected(t *testing.T) {
+	if _, err := parseGainArgs([]string{"--format", "markdown"}); err == nil {
+		t.Fatal("expected an error: markdown is only valid with --share")
+	}
+}
+
+func TestParseGainArgsShareJSONIsRejected(t *testing.T) {
+	if _, err := parseGainArgs([]string{"--share", "--format", "json"}); err == nil {
+		t.Fatal("expected an error: --share does not support --format json")
 	}
 }

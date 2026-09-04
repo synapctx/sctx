@@ -2,15 +2,40 @@ package main
 
 import (
 	"bytes"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
+	"github.com/synapctx/sctx/internal/platform/agentenv"
 	"github.com/synapctx/sctx/internal/platform/agentsetup"
 	"github.com/synapctx/sctx/internal/platform/config"
+	"github.com/synapctx/sctx/internal/platform/httpclient"
 	"github.com/synapctx/sctx/pkg/agentdoc"
 )
+
+// TestHTTPProbeMCPEndpointSendsSctxUserAgent covers both the unauthenticated
+// GET (no token yet) and the authenticated MCP initialize POST — real
+// callers of httpProbeMCPEndpoint, not the test double most other tests
+// substitute for it.
+func TestHTTPProbeMCPEndpointSendsSctxUserAgent(t *testing.T) {
+	var gotUA string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotUA = r.Header.Get("User-Agent")
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer srv.Close()
+	want := httpclient.UserAgent(version, agentenv.Detect(os.Getenv).Client)
+
+	if _, _ = httpProbeMCPEndpoint(srv.URL, ""); gotUA != want {
+		t.Errorf("unauthenticated probe User-Agent = %q, want %q", gotUA, want)
+	}
+	if _, _ = httpProbeMCPEndpoint(srv.URL, "tok"); gotUA != want {
+		t.Errorf("authenticated probe User-Agent = %q, want %q", gotUA, want)
+	}
+}
 
 // withAgent makes a home where one agent is configured but untaught.
 func withAgent(t *testing.T) agentsetup.Status {

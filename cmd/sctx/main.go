@@ -71,6 +71,7 @@ import (
 	"github.com/synapctx/sctx/internal/platform/binaries"
 	"github.com/synapctx/sctx/internal/platform/config"
 	"github.com/synapctx/sctx/internal/platform/gitrepo"
+	"github.com/synapctx/sctx/internal/platform/httpclient"
 	"github.com/synapctx/sctx/internal/platform/rawcache"
 	"github.com/synapctx/sctx/pkg/agentdoc"
 )
@@ -118,6 +119,8 @@ func realMain(args []string) int {
 		return 0
 	case "gain":
 		return runGain(ctx, cfg, args[1:])
+	case "bench":
+		return runBench(ctx, cfg, args[1:])
 	case "filters":
 		return runFilters(args[1:])
 	case "flush":
@@ -149,7 +152,12 @@ func realMain(args []string) int {
 	return runWrapped(ctx, cfg, args, doubleDash)
 }
 
-func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDash bool) int {
+// buildRegistry assembles the full formatter registry sctx wraps commands
+// with: every built-in formatter, in the same order runWrapped has always
+// registered them, plus any project-local filters trusted for the current
+// directory. Shared with `sctx bench`, which renders through the identical
+// in-process pipeline rather than a second, drifting copy of it.
+func buildRegistry() *run.Registry {
 	registry := run.NewRegistry()
 	registry.Register(gotest.New())
 	registry.Register(dig.New())
@@ -194,6 +202,11 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDas
 		registry.Register(f)
 	}
 	registerProjectFilters(registry)
+	return registry
+}
+
+func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDash bool) int {
+	registry := buildRegistry()
 
 	// Stats and telemetry are auxiliary: a failure disables them with a
 	// warning, never the wrapped command. Assignment into the interface
@@ -210,7 +223,7 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDas
 	var emitter telemetry.Emitter
 	var spooler *spool.Emitter
 	if cfg.TelemetryEnabled {
-		spooler = spool.NewEmitter(cfg.SpoolDir, cfg.TelemetryEndpoint, cfg)
+		spooler = spool.NewEmitter(cfg.SpoolDir, cfg.TelemetryEndpoint, cfg, version, agentenv.Detect(os.Getenv).Client)
 		emitter = spooler
 	}
 
@@ -285,7 +298,7 @@ func registerProjectFilters(registry *run.Registry) {
 	}
 }
 
-const gainUsage = `usage: sctx gain [--project|-p] [--since <dur>] [--failures|-F] [--by-client] [--format text|json]`
+const gainUsage = `usage: sctx gain [--project|-p] [--since <dur>] [--failures|-F] [--by-client] [--share] [--format text|json|markdown]`
 
 func runGain(ctx context.Context, cfg config.Config, args []string) int {
 	opts, err := parseGainArgs(args)
@@ -294,6 +307,7 @@ func runGain(ctx context.Context, cfg config.Config, args []string) int {
 		fmt.Fprintln(os.Stderr, gainUsage)
 		return 2
 	}
+	opts.Version = version
 
 	store, err := sqlite.NewStore(cfg.StatsDBPath)
 	if err != nil {
@@ -303,7 +317,8 @@ func runGain(ctx context.Context, cfg config.Config, args []string) int {
 	defer store.Close()
 	// Color is a TTY affordance: on only for the text renderers writing to an
 	// interactive stdout, and suppressed when NO_COLOR is set (https://no-color.org).
-	if opts.Format != "json" {
+	// --share is copy-pasteable by design, so it never carries ANSI escapes.
+	if opts.Format != "json" && !opts.Share {
 		if _, noColor := os.LookupEnv("NO_COLOR"); !noColor {
 			opts.Color = term.IsTerminal(int(os.Stdout.Fd()))
 		}
@@ -317,9 +332,10 @@ func runGain(ctx context.Context, cfg config.Config, args []string) int {
 	// someone goes to decide whether this tool is earning its place. A savings
 	// report that omits "your agent was never told any of this exists" is not an
 	// honest one, so unlike the wrapped-path nudge this is neither rate-limited
-	// nor conditional on detection. Suppressed for --format json, which is
-	// machine-read, and written to stderr so it can never corrupt that contract.
-	if opts.Format != "json" {
+	// nor conditional on detection. Suppressed for --format json (machine-read)
+	// and --share (a card meant to be copied verbatim), written to stderr so it
+	// can never corrupt either contract.
+	if opts.Format != "json" && !opts.Share {
 		if home, err := os.UserHomeDir(); err == nil {
 			if st, err := agentsetup.InspectWithCodexMCP(home, codexOrgTokens(cfg), cfg.WorkspaceProxyURL, docsFor(cfg)...); err == nil {
 				if notice := gainNotice(st); notice != "" {
@@ -362,20 +378,28 @@ func parseGainArgs(args []string) (report.Options, error) {
 			opts.Failures = true
 		case "--by-client":
 			opts.ByClient = true
+		case "--share":
+			opts.Share = true
 		case "--format":
 			i++
 			if i >= len(args) {
-				return report.Options{}, fmt.Errorf("--format requires a value: text or json")
+				return report.Options{}, fmt.Errorf("--format requires a value: text, json or markdown")
 			}
 			switch args[i] {
-			case "text", "json":
+			case "text", "json", "markdown":
 				opts.Format = args[i]
 			default:
-				return report.Options{}, fmt.Errorf("--format: unsupported value %q (want text or json)", args[i])
+				return report.Options{}, fmt.Errorf("--format: unsupported value %q (want text, json or markdown)", args[i])
 			}
 		default:
 			return report.Options{}, fmt.Errorf("unknown flag %q", a)
 		}
+	}
+	if opts.Format == "markdown" && !opts.Share {
+		return report.Options{}, fmt.Errorf("--format markdown is only valid with --share")
+	}
+	if opts.Share && opts.Format == "json" {
+		return report.Options{}, fmt.Errorf("--share supports --format text or markdown, not json")
 	}
 	return opts, nil
 }
@@ -412,7 +436,7 @@ func runFlush(ctx context.Context, cfg config.Config) int {
 	}
 	// Partially-authorised flushes are normal now and must not look like an
 	// error: the spool is filtered by purpose inside FlushWithTimeout.
-	emitter := spool.NewEmitter(cfg.SpoolDir, cfg.TelemetryEndpoint, cfg)
+	emitter := spool.NewEmitter(cfg.SpoolDir, cfg.TelemetryEndpoint, cfg, version, agentenv.Detect(os.Getenv).Client)
 	if err := emitter.FlushWithTimeout(ctx, backlogFlushTimeout); err != nil {
 		fmt.Fprintf(os.Stderr, "sctx: flush: %v\n", err)
 		return 1
@@ -547,7 +571,7 @@ func runInit(ctx context.Context, cfg config.Config, args []string) int {
 		if loadErr != nil {
 			fmt.Fprintf(os.Stderr, "sctx: init: backlog drain: reloading config: %v\n", loadErr)
 		} else {
-			emitter := spool.NewEmitter(cfg.SpoolDir, endpoint, cfg2)
+			emitter := spool.NewEmitter(cfg.SpoolDir, endpoint, cfg2, version, agentenv.Detect(os.Getenv).Client)
 			if err := emitter.FlushWithTimeout(ctx, backlogFlushTimeout); err != nil {
 				fmt.Fprintf(os.Stderr, "sctx: init: backlog drain: %v\n", err)
 			} else {
@@ -596,6 +620,7 @@ func validateTelemetryToken(ctx context.Context, endpoint, token string) (string
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("User-Agent", httpclient.UserAgent(version, agentenv.Detect(os.Getenv).Client))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -731,7 +756,7 @@ func runHook(args []string) int {
 		if err != nil {
 			return 0 // fail open, exactly like every other hook path
 		}
-		return hook.RunClaudePostTool(os.Stdin, os.Stdout, cfg)
+		return hook.RunClaudePostTool(os.Stdin, os.Stdout, cfg, version)
 	case "claude-session-start":
 		// The session brief. Config is loaded here for the same reason as
 		// claude-post-tool: it needs an API key, and the Bash hook must keep
@@ -944,7 +969,15 @@ Usage:
     --project, -p              scope to the current repository
     --since <dur>               only runs newer than <dur> (e.g. 7d, 24h)
     --failures, -F              show the degradation log instead
+    --share                     sanitised, copy-pasteable savings card
+                                 (aggregate numbers only, never argv/paths)
+    --format text|json|markdown output format (default text; markdown only
+                                 valid with --share)
+  sctx bench                 reproducible local benchmark: runs a fixed command
+                              set for this repository raw vs. through sctx
+    --name <repo>               label the report (default "(unnamed)")
     --format text|json          output format (default text)
+    --verbose                   include full argv (paths) per command
   sctx flush                 force-drain the telemetry spool
   sctx init [--endpoint <url>] [--default]
                               authenticate against the SynapCTX platform for

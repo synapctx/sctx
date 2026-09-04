@@ -245,3 +245,91 @@ func TestRenderJSONFailures(t *testing.T) {
 		t.Fatalf("failures = %+v, want single curl verbatim entry", out.Failures)
 	}
 }
+
+// TestRenderSharePlainOmitsArgvAndPaths feeds the store rows whose argv
+// carries a path and a secret-shaped token (never rendered by the report
+// itself), and asserts the --share card contains only aggregate numbers and
+// the (already path/argv-free) normalized command key.
+func TestRenderSharePlainOmitsArgvAndPaths(t *testing.T) {
+	store := newTestStore(t)
+	seed(t, store, []stats.Run{
+		{ID: "01A", At: time.Now().UTC(), Command: "go test", Argv: "go test /Users/sebastian/secret-project/./... -run TestX --token=sctx_live_abcdef123456", Tier: "aggressive", RawTokens: 1000, OutTokens: 100, SavedTokens: 900},
+		{ID: "01B", At: time.Now().UTC(), Command: "git status", Argv: "git -C /Users/sebastian/.ssh status", Tier: "aggressive", RawTokens: 200, OutTokens: 20, SavedTokens: 180},
+	})
+
+	var buf strings.Builder
+	if err := Render(context.Background(), store, &buf, Options{Share: true, Version: "1.2.3"}); err != nil {
+		t.Fatalf("Render: %v", err)
+	}
+	out := buf.String()
+
+	forbidden := []string{"/Users/", "/.ssh", "sctx_live_", "-run TestX", "--token", "secret-project"}
+	for _, f := range forbidden {
+		if strings.Contains(out, f) {
+			t.Errorf("share card leaked %q, got:\n%s", f, out)
+		}
+	}
+	for _, want := range []string{"go test", "git status", "tokens = bytes/4, a floor", "sctx 1.2.3", "all-time"} {
+		if !strings.Contains(out, want) {
+			t.Errorf("share card missing %q, got:\n%s", want, out)
+		}
+	}
+}
+
+// TestRenderShareMarkdownOmitsArgvAndPaths is the markdown-variant twin of
+// the plain-text leak guard above.
+func TestRenderShareMarkdownOmitsArgvAndPaths(t *testing.T) {
+	store := newTestStore(t)
+	seed(t, store, []stats.Run{
+		{ID: "01A", At: time.Now().UTC(), Command: "npm install", Argv: "npm install --registry https://user:hunter2@registry.example.com/ /home/dev/app", Tier: "relaxed", RawTokens: 500, OutTokens: 50, SavedTokens: 450},
+	})
+
+	var buf strings.Builder
+	if err := Render(context.Background(), store, &buf, Options{Share: true, Format: "markdown", Version: "9.9.9"}); err != nil {
+		t.Fatalf("Render: %v", err)
+	}
+	out := buf.String()
+
+	forbidden := []string{"/home/dev", "hunter2", "registry.example.com", "user:hunter2"}
+	for _, f := range forbidden {
+		if strings.Contains(out, f) {
+			t.Errorf("markdown share card leaked %q, got:\n%s", f, out)
+		}
+	}
+	if !strings.HasPrefix(out, "**sctx token savings") {
+		t.Fatalf("markdown share card must open with a bold heading, got:\n%s", out)
+	}
+	if !strings.Contains(out, "`npm install`") {
+		t.Errorf("markdown share card missing the program row, got:\n%s", out)
+	}
+	if !strings.Contains(out, "sctx 9.9.9") {
+		t.Errorf("markdown share card missing the version, got:\n%s", out)
+	}
+}
+
+// TestRenderShareTop5AndScope exercises the 5-row cap and the --project/
+// --since scope lines flowing through to the window label.
+func TestRenderShareTop5AndScope(t *testing.T) {
+	store := newTestStore(t)
+	runs := make([]stats.Run, 0, 6)
+	for i, cmd := range []string{"go test", "go vet", "git status", "npm install", "pytest", "make build"} {
+		runs = append(runs, stats.Run{
+			ID: "01" + string(rune('A'+i)), At: time.Now().UTC(), Command: cmd, Argv: cmd,
+			Tier: "aggressive", RawTokens: int64(100 * (6 - i)), OutTokens: 10, SavedTokens: int64(90 * (6 - i)),
+		})
+	}
+	seed(t, store, runs)
+
+	var buf strings.Builder
+	since := time.Now().Add(-7 * 24 * time.Hour)
+	if err := Render(context.Background(), store, &buf, Options{Share: true, Since: since}); err != nil {
+		t.Fatalf("Render: %v", err)
+	}
+	out := buf.String()
+	if strings.Contains(out, "make build") {
+		t.Errorf("share card must cap at 5 programs, got a 6th:\n%s", out)
+	}
+	if !strings.Contains(out, "last 7d") {
+		t.Errorf("share card window must reflect --since, got:\n%s", out)
+	}
+}

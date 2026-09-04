@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/synapctx/sctx/internal/domain/telemetry"
+	"github.com/synapctx/sctx/internal/platform/httpclient"
 )
 
 const (
@@ -59,14 +60,17 @@ type Emitter struct {
 	resolver     TokenResolver
 	flushTimeout time.Duration
 	client       *http.Client
+	userAgent    string
 }
 
 // NewEmitter builds an Emitter for endpoint, selecting connect/flush budgets
 // by whether endpoint's host is loopback (fast, plain-HTTP local proxy) or
 // remote (slower, allows time for a TLS handshake). resolver picks the API
 // key (if any) that should deliver each event, keyed by the org slug of its
-// repositoryName.
-func NewEmitter(dir, endpoint string, resolver TokenResolver) *Emitter {
+// repositoryName. version and client identify the sctx binary and the coding
+// agent driving it (internal/platform/agentenv) and are rendered into the
+// User-Agent header sent with every batch POST.
+func NewEmitter(dir, endpoint string, resolver TokenResolver, version, client string) *Emitter {
 	connectTimeout, flushTimeout := loopbackConnectTimeout, loopbackFlushTimeout
 	if !isLoopbackEndpoint(endpoint) {
 		connectTimeout, flushTimeout = remoteConnectTimeout, remoteFlushTimeout
@@ -76,6 +80,7 @@ func NewEmitter(dir, endpoint string, resolver TokenResolver) *Emitter {
 		endpoint:     endpoint,
 		resolver:     resolver,
 		flushTimeout: flushTimeout,
+		userAgent:    httpclient.UserAgent(version, client),
 		// No client.Timeout: the deadline is enforced per-call via the
 		// context passed into Flush/FlushWithTimeout, so FlushWithTimeout
 		// can grant a longer budget than the default flushTimeout without
@@ -298,6 +303,7 @@ func (e *Emitter) flush(ctx context.Context, timeout time.Duration) error {
 			continue
 		}
 		req.Header.Set("Content-Type", "application/json")
+		req.Header.Set("User-Agent", e.userAgent)
 		if token != "" {
 			req.Header.Set("Authorization", "Bearer "+token)
 		}

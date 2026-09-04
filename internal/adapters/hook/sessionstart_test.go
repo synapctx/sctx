@@ -12,6 +12,7 @@ import (
 
 	"github.com/synapctx/sctx/internal/platform/config"
 	"github.com/synapctx/sctx/internal/platform/gitrepo"
+	"github.com/synapctx/sctx/internal/platform/httpclient"
 )
 
 // fakeRepo builds a checkout gitrepo.Detect reads as "acme/widgets", with a real
@@ -90,6 +91,27 @@ func cfgFor(srv *httptest.Server, token string) config.Config {
 		endpoint = srv.URL + "/v1/events"
 	}
 	return config.Config{TelemetryEndpoint: endpoint, OrgTokens: map[string]string{"acme": token}}
+}
+
+// TestFetchRepoBriefSendsSctxUserAgent asserts the session-start surface call
+// identifies itself as sctx traffic rather than the default Go-http-client.
+func TestFetchRepoBriefSendsSctxUserAgent(t *testing.T) {
+	const token = "tok-abc"
+	var gotUA string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotUA = r.Header.Get("User-Agent")
+		w.WriteHeader(http.StatusOK)
+		fmt.Fprint(w, briefFixture)
+	}))
+	defer srv.Close()
+
+	if _, err := fetchRepoBrief(cfgFor(srv, token), token, "acme/widgets", sessionStartCall{}, "9.9.9"); err != nil {
+		t.Fatalf("fetchRepoBrief: %v", err)
+	}
+	want := httpclient.UserAgent("9.9.9", "claude-code")
+	if gotUA != want {
+		t.Errorf("User-Agent = %q, want %q", gotUA, want)
+	}
 }
 
 func runSessionStart(t *testing.T, cfg config.Config, cwd, source string) string {

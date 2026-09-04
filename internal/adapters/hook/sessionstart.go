@@ -15,6 +15,7 @@ import (
 
 	"github.com/synapctx/sctx/internal/platform/config"
 	"github.com/synapctx/sctx/internal/platform/gitrepo"
+	"github.com/synapctx/sctx/internal/platform/httpclient"
 )
 
 // RunClaudeSessionStart implements `sctx hook claude-session-start`: a Claude
@@ -189,6 +190,7 @@ func fetchRepoBrief(cfg config.Config, token, repo string, call sessionStartCall
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("User-Agent", httpclient.UserAgent(version, "claude-code"))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

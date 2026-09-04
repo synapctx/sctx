@@ -15,6 +15,7 @@ import (
 
 	"github.com/synapctx/sctx/internal/platform/config"
 	"github.com/synapctx/sctx/internal/platform/gitrepo"
+	"github.com/synapctx/sctx/internal/platform/httpclient"
 )
 
 // RunClaudePostTool implements `sctx hook claude-post-tool`: a Claude Code
@@ -82,8 +83,9 @@ type hookOutput struct {
 }
 
 // RunClaudePostTool always returns 0. There is no failure mode worth reporting
-// to an agent mid-edit.
-func RunClaudePostTool(in io.Reader, out io.Writer, cfg config.Config) int {
+// to an agent mid-edit. version is rendered into the User-Agent header of the
+// surface calls it makes.
+func RunClaudePostTool(in io.Reader, out io.Writer, cfg config.Config, version string) int {
 	if os.Getenv("SCT__MEMORY_SURFACING_DISABLED") == "true" {
 		return 0
 	}
@@ -137,9 +139,9 @@ func RunClaudePostTool(in io.Reader, out io.Writer, cfg config.Config) int {
 	var body string
 	switch kind {
 	case kindFile:
-		body = memoryContext(subject, fetchNotes(cfg, token, repo, subject, call.SessionID))
+		body = memoryContext(subject, fetchNotes(cfg, token, repo, subject, call.SessionID, version))
 	case kindSymbol:
-		body = symbolContext(subject, fetchElsewhere(cfg, token, repo, subject, call.SessionID))
+		body = symbolContext(subject, fetchElsewhere(cfg, token, repo, subject, call.SessionID, version))
 	}
 	if body == "" {
 		return 0
@@ -182,10 +184,10 @@ func orgOf(repoFullName string) string {
 	return ""
 }
 
-func fetchNotes(cfg config.Config, token, repo, rel, sessionID string) []string {
+func fetchNotes(cfg config.Config, token, repo, rel, sessionID, version string) []string {
 	var out forFileResponse
 	if err := postSurface(cfg, token, surfacePath,
-		map[string]string{"repositoryName": repo, "filePath": rel, "sessionId": sessionID}, &out); err != nil {
+		map[string]string{"repositoryName": repo, "filePath": rel, "sessionId": sessionID}, &out, version); err != nil {
 		return nil
 	}
 	notes := make([]string, 0, len(out.Notes))
@@ -206,17 +208,18 @@ type elsewhereResult struct {
 }
 
 // fetchElsewhere asks for the call sites the developer's grep could not see.
-func fetchElsewhere(cfg config.Config, token, repo, symbol, sessionID string) elsewhereResult {
+func fetchElsewhere(cfg config.Config, token, repo, symbol, sessionID, version string) elsewhereResult {
 	var out elsewhereResult
 	_ = postSurface(cfg, token, surfaceSymbolPath,
-		map[string]string{"repositoryName": repo, "symbol": symbol, "sessionId": sessionID}, &out)
+		map[string]string{"repositoryName": repo, "symbol": symbol, "sessionId": sessionID}, &out, version)
 	return out
 }
 
 // postSurface is the one HTTP shape both lookups share. Every failure is
 // silence: sctx reads any error as "no suggestion", and an error rendered into
-// an agent's context would be pure noise.
-func postSurface(cfg config.Config, token, path string, payload map[string]string, into any) error {
+// an agent's context would be pure noise. version is rendered into the
+// request's User-Agent header.
+func postSurface(cfg config.Config, token, path string, payload map[string]string, into any, version string) error {
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return err
@@ -230,6 +233,7 @@ func postSurface(cfg config.Config, token, path string, payload map[string]strin
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("User-Agent", httpclient.UserAgent(version, "claude-code"))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

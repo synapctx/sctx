@@ -420,6 +420,8 @@ enforced by tests rather than convention.
 | `sctx <cmd> [args...]` | run a command with token-optimized output |
 | `sctx -- <cmd>` | run a command that shares a name with an `sctx` subcommand |
 | `sctx gain` | savings report, overall and per command |
+| `sctx gain --share` | sanitised, copy-pasteable savings card (aggregate numbers only) |
+| `sctx bench` | reproducible local benchmark against the current repository |
 | `sctx setup` | configure the AI coding agents you use |
 | `sctx doctor` | show the effective configuration |
 | `sctx init` | connect this installation to a SynapCTX account |
@@ -431,7 +433,10 @@ enforced by tests rather than convention.
 | `sctx version` | print the version |
 
 `sctx gain` accepts `--project` to scope to the current repository, `--since`
-for a time window, and `--format json` for machine-readable output.
+for a time window, and `--format json` for machine-readable output. `sctx
+gain --share` prints a sanitised, copy-pasteable savings card instead of the
+full report — aggregate numbers only, never argv or a path — in plain text
+or `--format markdown`.
 
 ### Trusted project-local filters
 
@@ -469,6 +474,64 @@ the new content is explicitly approved. Built-in formatters remain
 authoritative unless a trusted rule sets `override_builtin`. Every rule must
 also assert `finite: true`; streaming/watch/server commands must never be
 buffered behind a project filter.
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Benchmark
+
+`sctx bench` is a reproducible, local-only benchmark: it detects the current
+repository's language by the files present (a `go.mod` at the root means Go;
+anything else gets a language-agnostic generic set) and runs a **fixed,
+documented** command set against it twice — once raw, once through sctx's own
+pipeline in-process (the same registry and tier chain a real wrapped run
+uses, never a second `sctx` subprocess) — then prints the raw-vs-rendered
+token comparison. Nothing it measures is sent anywhere: no telemetry emitter
+is constructed, and the stats store it hands the pipeline is discarded when
+the command returns. Non-zero exits from a benchmarked command are recorded,
+never fatal to the run. By default the output never contains a file path —
+only program names — unless you pass `--verbose`.
+
+The Go set: `go build ./...`, `go vet ./...`, `go test ./...`, `git status`,
+`git log --oneline -n 50`, `git diff HEAD~1`,
+`grep -rn "func " --include=*.go .`, `ls -la`, `find . -name "*.go"`. The
+generic set: `git status`, `git log --oneline -n 50`, `git diff HEAD~1`,
+`ls -la`, `find . -maxdepth 2`.
+
+```shell
+sctx bench --name sctx
+```
+
+A real run on this repository (2026-09-04, darwin/arm64, sctx dev):
+
+```text
+sctx bench
+repository:  sctx
+language:    go
+machine:     darwin/arm64, sctx dev
+
+Command                             Raw   Rendered    Saved Tier       Exit
+go build                              0          0     0.0% verbatim   0
+go vet                                0          0     0.0% verbatim   0
+go test                            1.0K         13    98.7% aggressive 0
+git status                          147         32    78.2% aggressive 0
+git log                             734        493    32.8% aggressive 0
+git diff                           4.3K       3.5K    19.3% aggressive 0
+grep                              47.1K       3.4K    92.7% aggressive 0
+ls                                  253         88    65.2% aggressive 0
+find                               4.0K       1.5K    62.1% aggressive 0
+
+TOTAL                             57.5K       9.0K    84.3%
+
+tokens = bytes/4, a floor
+```
+
+`sctx bench --format json` emits the same numbers as a stable, versioned
+document (`schemaVersion`) for scripting; `--name <repo>` labels the report
+(omitted, it prints `(unnamed)`, never guessed from the checkout path).
 
 &nbsp;
 

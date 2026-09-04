@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/synapctx/sctx/internal/domain/telemetry"
+	"github.com/synapctx/sctx/internal/platform/httpclient"
 )
 
 func event(id string) telemetry.Event {
@@ -70,7 +71,7 @@ func TestEmitAndFlush(t *testing.T) {
 	defer srv.Close()
 
 	dir := t.TempDir()
-	e := NewEmitter(dir, srv.URL, okResolver(""))
+	e := NewEmitter(dir, srv.URL, okResolver(""), "1.2.3", "test-client")
 	e.Emit(event("01A"))
 	e.Emit(event("01B"))
 
@@ -97,7 +98,7 @@ func TestEmitAndFlush(t *testing.T) {
 func TestOfflineKeepsSpoolAndStaysFast(t *testing.T) {
 	dir := t.TempDir()
 	// Reserved TEST-NET-1 address: connect attempts hang until timeout.
-	e := NewEmitter(dir, "http://192.0.2.1:9/v1/telemetry/exec", okResolver(""))
+	e := NewEmitter(dir, "http://192.0.2.1:9/v1/telemetry/exec", okResolver(""), "1.2.3", "test-client")
 	e.Emit(event("01A"))
 
 	start := time.Now()
@@ -117,7 +118,7 @@ func TestOfflineKeepsSpoolAndStaysFast(t *testing.T) {
 }
 
 func TestFlushEmptySpoolIsNoop(t *testing.T) {
-	e := NewEmitter(t.TempDir(), "http://192.0.2.1:9/", okResolver(""))
+	e := NewEmitter(t.TempDir(), "http://192.0.2.1:9/", okResolver(""), "1.2.3", "test-client")
 	if err := e.Flush(context.Background()); err != nil {
 		t.Fatalf("empty spool flush should be a no-op, got %v", err)
 	}
@@ -132,7 +133,7 @@ func TestFlushSetsAuthorizationHeaderOnlyWhenTokenSet(t *testing.T) {
 	defer srv.Close()
 
 	dir := t.TempDir()
-	e := NewEmitter(dir, srv.URL, okResolver("sctx_live_secret"))
+	e := NewEmitter(dir, srv.URL, okResolver("sctx_live_secret"), "1.2.3", "test-client")
 	e.Emit(event("01A"))
 	if err := e.Flush(context.Background()); err != nil {
 		t.Fatalf("Flush: %v", err)
@@ -142,7 +143,7 @@ func TestFlushSetsAuthorizationHeaderOnlyWhenTokenSet(t *testing.T) {
 	}
 
 	dir2 := t.TempDir()
-	e2 := NewEmitter(dir2, srv.URL, okResolver(""))
+	e2 := NewEmitter(dir2, srv.URL, okResolver(""), "1.2.3", "test-client")
 	e2.Emit(event("01B"))
 	gotAuth = "unset"
 	if err := e2.Flush(context.Background()); err != nil {
@@ -172,11 +173,11 @@ func TestIsLoopbackEndpointSelectsBudget(t *testing.T) {
 		}
 	}
 
-	loopback := NewEmitter(t.TempDir(), "http://127.0.0.1:6220/v1/telemetry/exec", okResolver(""))
+	loopback := NewEmitter(t.TempDir(), "http://127.0.0.1:6220/v1/telemetry/exec", okResolver(""), "1.2.3", "test-client")
 	if loopback.flushTimeout != loopbackFlushTimeout {
 		t.Fatalf("loopback flushTimeout = %v, want %v", loopback.flushTimeout, loopbackFlushTimeout)
 	}
-	remote := NewEmitter(t.TempDir(), "https://sctx.synapctx.com/v1/telemetry/exec", okResolver(""))
+	remote := NewEmitter(t.TempDir(), "https://sctx.synapctx.com/v1/telemetry/exec", okResolver(""), "1.2.3", "test-client")
 	if remote.flushTimeout != remoteFlushTimeout {
 		t.Fatalf("remote flushTimeout = %v, want %v", remote.flushTimeout, remoteFlushTimeout)
 	}
@@ -191,7 +192,7 @@ func TestAutoFlushThrottles(t *testing.T) {
 	defer srv.Close()
 
 	dir := t.TempDir()
-	e := NewEmitter(dir, srv.URL, okResolver(""))
+	e := NewEmitter(dir, srv.URL, okResolver(""), "1.2.3", "test-client")
 
 	e.Emit(event("01A"))
 	if err := e.AutoFlush(context.Background()); err != nil {
@@ -232,7 +233,7 @@ func TestServerErrorKeepsSpool(t *testing.T) {
 	defer srv.Close()
 
 	dir := t.TempDir()
-	e := NewEmitter(dir, srv.URL, okResolver(""))
+	e := NewEmitter(dir, srv.URL, okResolver(""), "1.2.3", "test-client")
 	e.Emit(event("01A"))
 
 	if err := e.Flush(context.Background()); err == nil {
@@ -268,7 +269,7 @@ func TestFlushDeliversPerOrgUnderDistinctTokens(t *testing.T) {
 
 	dir := t.TempDir()
 	resolver := mapResolver{"parlitrack": "token-parlitrack", "synapctx": "token-synapctx"}
-	e := NewEmitter(dir, srv.URL, resolver)
+	e := NewEmitter(dir, srv.URL, resolver, "1.2.3", "test-client")
 	e.Emit(eventForRepo("01A", "parlitrack/repo-a"))
 	e.Emit(eventForRepo("01B", "synapctx/repo-b"))
 
@@ -308,7 +309,7 @@ func TestFlushRetainsOrgWithNoConfiguredKey(t *testing.T) {
 
 	dir := t.TempDir()
 	resolver := mapResolver{"synapctx": "token-synapctx"} // no key for parlitrack
-	e := NewEmitter(dir, srv.URL, resolver)
+	e := NewEmitter(dir, srv.URL, resolver, "1.2.3", "test-client")
 	e.Emit(eventForRepo("01A", "parlitrack/repo-a"))
 	e.Emit(eventForRepo("01B", "synapctx/repo-b"))
 
@@ -345,7 +346,7 @@ func TestFlushRetainsFailedOrgGroupOnly(t *testing.T) {
 
 	dir := t.TempDir()
 	resolver := mapResolver{"failing-org": "token-fails", "ok-org": "token-ok"}
-	e := NewEmitter(dir, srv.URL, resolver)
+	e := NewEmitter(dir, srv.URL, resolver, "1.2.3", "test-client")
 	e.Emit(eventForRepo("01A", "failing-org/repo-a"))
 	e.Emit(eventForRepo("01B", "ok-org/repo-b"))
 
@@ -361,5 +362,28 @@ func TestFlushRetainsFailedOrgGroupOnly(t *testing.T) {
 	}
 	if bytes.Contains(data, []byte("ok-org/repo-b")) {
 		t.Errorf("retained spool = %q, must not contain the delivered event", data)
+	}
+}
+
+// TestFlushSendsSctxUserAgent asserts the batch POST identifies itself as
+// sctx traffic rather than the default Go-http-client — see
+// httpclient.UserAgent.
+func TestFlushSendsSctxUserAgent(t *testing.T) {
+	var gotUA string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotUA = r.Header.Get("User-Agent")
+		w.WriteHeader(http.StatusAccepted)
+	}))
+	defer srv.Close()
+
+	dir := t.TempDir()
+	e := NewEmitter(dir, srv.URL, okResolver(""), "9.9.9", "claude-code")
+	e.Emit(event("01A"))
+	if err := e.Flush(context.Background()); err != nil {
+		t.Fatalf("Flush: %v", err)
+	}
+	want := httpclient.UserAgent("9.9.9", "claude-code")
+	if gotUA != want {
+		t.Errorf("User-Agent = %q, want %q", gotUA, want)
 	}
 }
