@@ -74,6 +74,13 @@ type Agent struct {
 	MCPType     string // transport discriminator; empty when the client has none
 	MCPEnabled  bool   // whether the client understands an `enabled` member
 
+	// MinVersion is the earliest release this row's WrapHook capability was
+	// verified against, for humans reading `sctx setup` output — never
+	// consulted by code, because sctx cannot see which version is installed.
+	// Empty for a row with no verified minimum (manual agents, and any hook
+	// verified against "whatever ships today" with no lower bound known).
+	MinVersion string
+
 	// PluginPath is a JS plugin file, relative to home, that this agent loads
 	// from its config directory with no registration. It is how the Kilo/OpenCode
 	// family gets the command rewriting that Claude and Gemini get from a hook.
@@ -243,6 +250,84 @@ var KnownAgents = []Agent{
 		MCPKey:      "mcp",
 		MCPURLField: "url",
 		MCPType:     "http",
+	},
+	{
+		// Cursor's `preToolUse` hook (matcher `"Shell"`) was introduced in
+		// Cursor 1.7 (Oct 2025) and is a different, newer contract than the
+		// older `beforeShellExecution` hook: that one is allow/deny only and
+		// cannot rewrite a command, which is why this row did not exist before
+		// 1.7 shipped. Verified against the rtk reference implementation
+		// (github.com/rtk-ai/rtk) rather than Cursor's own docs page, which
+		// this change could not fetch (no WebFetch tool available) — cursor.com
+		// pages are confirmed to render nothing usable from a plain HTTP GET.
+		//
+		// Root is `.cursor/AGENTS.md`, by the same reasoning as the Codex row:
+		// AGENTS.md is the cross-vendor convention Cursor's own docs list
+		// alongside Project/Team/User Rules (fetched 2026-09-04), but WHETHER
+		// Cursor reads one from the home directory the way Codex reads
+		// `~/.codex/AGENTS.md` is NOT independently confirmed here — Cursor's
+		// documented `.cursor/rules` mechanism is explicitly project-scoped
+		// ("version-controlled and scoped to your codebase"), and "User
+		// Rules" are stored in Cursor's own app settings, not a file this
+		// process could write. Includes stays off for the same reason every
+		// unverified-include row does: a wrong guess silently loads nothing.
+		ID:         "cursor",
+		Name:       "Cursor",
+		Root:       ".cursor/AGENTS.md",
+		Detect:     []string{".cursor"},
+		Wrapping:   WrapHook,
+		MinVersion: "1.7",
+	},
+	{
+		// GitHub Copilot CLI's `PreToolUse` hook. GitHub's own docs
+		// (docs.github.com/en/copilot/reference/hooks-reference, fetched
+		// 2026-09-04) accept the event key in either case (`preToolUse` /
+		// `PreToolUse`) and describe a camelCase `toolName`/`toolArgs`
+		// payload answered with `modifiedArgs`. The rtk reference
+		// implementation disagrees on which shape the CLI actually honours in
+		// practice: its source records a LIVE verification against Copilot
+		// CLI 1.0.73+ (Linux and Windows 11) that the CLI's shell tool is
+		// reported under the Claude-shaped `tool_name`/`tool_input.command`
+		// schema and answered with `updatedInput` — and rtk's own installer
+		// now registers ONLY that schema, having found the documented
+		// camelCase registration fires a second, redundant hook invocation
+		// per command once both are present. `sctx hook copilot` follows
+		// rtk's live-verified path and additionally decodes the documented
+		// camelCase shape (answered with `modifiedArgs`, per GitHub's docs)
+		// for any install that still has it registered — that second path is
+		// UNVERIFIED against a live CLI by this change.
+		//
+		// Root is `~/.copilot/AGENTS.md`: GitHub documents `AGENTS.md` and
+		// `.github/copilot-instructions.md` as project-scoped conventions;
+		// a home-directory equivalent is NOT independently verified here, so
+		// Includes stays off.
+		ID:         "copilot",
+		Name:       "GitHub Copilot CLI",
+		Root:       ".copilot/AGENTS.md",
+		Detect:     []string{".copilot"},
+		Wrapping:   WrapHook,
+		MinVersion: "1.0.73",
+	},
+	{
+		// Factory Droid's `PreToolUse` hook (matcher `"Execute"`). Verified
+		// against docs.factory.ai/cli/configuration/hooks-guide and the rtk
+		// reference implementation, which records live verification against
+		// Droid v0.140 through v0.164. Droid additionally publishes command
+		// deny lists (`commandDenylist`/`commandBlocklist`) across up to four
+		// settings scopes; `sctx hook droid` reads them and steps aside on a
+		// match rather than rewriting past Droid's own pattern matching — see
+		// the hook's own doc comment for the (deliberately over-inclusive)
+		// matching rule.
+		//
+		// Root is `~/.factory/AGENTS.md` by the same extrapolation as the
+		// Cursor and Copilot rows above: NOT independently verified for the
+		// home directory, so Includes stays off.
+		ID:         "droid",
+		Name:       "Factory Droid",
+		Root:       ".factory/AGENTS.md",
+		Detect:     []string{".factory"},
+		Wrapping:   WrapHook,
+		MinVersion: "0.164.0",
 	},
 }
 

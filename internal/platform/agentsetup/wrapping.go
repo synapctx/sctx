@@ -83,6 +83,29 @@ func wrapStateFor(home string, a Agent, binary string) WrapState {
 			}
 			return ws
 		}
+		// Cursor, Copilot CLI and Factory Droid each keep the hook in a
+		// config file of their own shape, not the shared settings.json map
+		// hooks.go manages for Claude/Gemini -- same reasoning as Codex's
+		// TOML file above, three more times.
+		if simple, ok := simpleHookStatusFor(a.ID, home, binary); ok {
+			ws.Path = simple.path
+			switch {
+			case simple.err != nil:
+				ws.Detail = simple.err.Error()
+			case simple.foreign:
+				ws.Detail = "a file of this name exists that sctx did not write"
+			case !simple.installed:
+				ws.Detail = "hook not wired"
+			case simple.missing != "":
+				ws.Detail = "the sctx it calls is gone: " + simple.missing
+			case simple.stale:
+				ws.Detail = "hook is out of date"
+			default:
+				ws.OK = true
+				ws.Detail = "rewrites covered commands before they run"
+			}
+			return ws
+		}
 		path, states, err := InspectAgentHooks(home, a, binary)
 		ws.Path = path
 		if err != nil {
@@ -144,11 +167,18 @@ func InstallWrapping(home, binary string, docs ...Doc) ([]string, []error) {
 		)
 		switch t.Wrapping {
 		case agentdoc.WrapHook:
-			if t.ID == "codex" {
+			switch t.ID {
+			case "codex":
 				c, e = InstallCodexHooks(home, binary)
-				break
+			case "cursor":
+				c, e = InstallCursorHooks(home, binary)
+			case "copilot":
+				c, e = InstallCopilotHooks(home, binary)
+			case "droid":
+				c, e = InstallDroidHooks(home, binary)
+			default:
+				c, e = InstallAgentHooks(home, t.Agent, binary)
 			}
-			c, e = InstallAgentHooks(home, t.Agent, binary)
 		case agentdoc.WrapPlugin:
 			c, e = InstallPlugin(home, t.Agent, binary)
 		default:
@@ -161,4 +191,35 @@ func InstallWrapping(home, binary string, docs ...Doc) ([]string, []error) {
 		changed = append(changed, c...)
 	}
 	return changed, problems
+}
+
+// simpleHookState is the common shape of Cursor/Copilot/Droid inspection
+// results, so wrapStateFor can report all three the same way it reports
+// Codex, without three near-identical switches inline.
+type simpleHookState struct {
+	path      string
+	installed bool
+	stale     bool
+	foreign   bool
+	missing   string
+	err       error
+}
+
+// simpleHookStatusFor inspects the hook file for one of the three agents
+// whose config is a dedicated JSON file rather than Claude/Gemini's shared
+// settings.json. ok is false for any other agent ID, so the caller falls
+// through to the settings.json path unchanged.
+func simpleHookStatusFor(id, home, binary string) (simpleHookState, bool) {
+	switch id {
+	case "cursor":
+		cs, err := InspectCursorHooks(home, binary)
+		return simpleHookState{path: cs.ConfigPath, installed: cs.Installed, stale: cs.Stale, missing: cs.Missing, err: err}, true
+	case "copilot":
+		cs, err := InspectCopilotHooks(home, binary)
+		return simpleHookState{path: cs.ConfigPath, installed: cs.Installed, stale: cs.Stale, foreign: cs.Foreign, missing: cs.Missing, err: err}, true
+	case "droid":
+		cs, err := InspectDroidHooks(home, binary)
+		return simpleHookState{path: cs.ConfigPath, installed: cs.Installed, stale: cs.Stale, missing: cs.Missing, err: err}, true
+	}
+	return simpleHookState{}, false
 }

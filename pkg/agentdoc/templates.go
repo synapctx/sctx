@@ -35,11 +35,13 @@ func sctxBody([]string) string {
 ` + "`sctx setup --install`" + ` wraps commands automatically wherever the client gives it
 somewhere to intervene:
 
-- **Claude Code**, **Codex** (PreToolUse hook) and **Gemini CLI** (BeforeTool hook)
+- **Claude Code**, **Codex** (PreToolUse hook), **Gemini CLI** (BeforeTool hook),
+  **Cursor** (1.7+, preToolUse hook), **GitHub Copilot CLI** (1.0.73+,
+  PreToolUse hook) and **Factory Droid** (PreToolUse hook)
 - **Kilo Code** and **OpenCode** (a plugin on ` + "`tool.execute.before`" + `)
 
-In those five, write commands naturally — including pipelines and ` + "`&&`" + ` — and do
-not prefix ` + "`sctx`" + ` yourself. Codex is the exception worth knowing: it will not
+In those eight, write commands naturally — including pipelines and ` + "`&&`" + ` — and
+do not prefix ` + "`sctx`" + ` yourself. Codex is the exception worth knowing: it will not
 run a hook until a human trusts it once with ` + "`/hooks`" + `, so until then nothing is
 wrapped there and prefixing is worth it.
 

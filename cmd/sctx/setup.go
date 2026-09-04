@@ -359,11 +359,29 @@ func printWrappingStatus(w io.Writer, st agentsetup.Status, cfg config.Config) {
 		case !ws.OK:
 			state = "[missing]"
 		}
-		fmt.Fprintf(w, "  %s %-16s %-7s %s\n", state, ws.AgentName, label, ws.Detail)
+		detail := ws.Detail
+		// The minimum version this row's hook contract was verified against —
+		// printed next to the row because sctx cannot see which version is
+		// actually installed, only what it wrote and what it looked for.
+		if minVer := minVersionFor(ws.AgentID); minVer != "" {
+			detail = fmt.Sprintf("%s (needs %s %s+)", detail, ws.AgentName, minVer)
+		}
+		fmt.Fprintf(w, "  %s %-16s %-7s %s\n", state, ws.AgentName, label, detail)
 		if ws.Path != "" && (!ws.OK || ws.NeedsTrust) {
 			fmt.Fprintf(w, "            %s\n", ws.Path)
 		}
 	}
+}
+
+// minVersionFor is the earliest release an agent's row was verified against,
+// looked up rather than threaded through WrapState because it is a property
+// of the KnownAgents row, not of any one machine's install.
+func minVersionFor(agentID string) string {
+	a, ok := agentdoc.AgentByID(agentID)
+	if !ok {
+		return ""
+	}
+	return a.MinVersion
 }
 
 // printHookStatus reports the hooks and returns whether they are all wired.
