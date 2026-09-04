@@ -1,6 +1,7 @@
 package hook
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -24,7 +25,7 @@ func TestPostSurfaceSendsSctxUserAgent(t *testing.T) {
 
 	cfg := config.Config{TelemetryEndpoint: srv.URL + "/v1/telemetry/exec"}
 	var out forFileResponse
-	if err := postSurface(cfg, "tok", surfacePath, map[string]string{"repositoryName": "acme/widgets"}, &out, "9.9.9"); err != nil {
+	if err := postSurface(context.Background(), cfg, "tok", surfacePath, map[string]string{"repositoryName": "acme/widgets"}, &out, "9.9.9"); err != nil {
 		t.Fatalf("postSurface: %v", err)
 	}
 	want := httpclient.UserAgent("9.9.9", "claude-code")

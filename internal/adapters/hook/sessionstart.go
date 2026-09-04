@@ -121,7 +121,10 @@ func RunClaudeSessionStart(in io.Reader, out io.Writer, cfg config.Config, versi
 	// HEAD, and to find a project-scope `.mcp.json` naming the MCP server.
 	root, repo, _ := gitrepo.RootAndName(call.CWD)
 	if repo == "" {
-		return 0
+		// Not inside a repository at all: a workspace root holding several
+		// checkouts side by side (plan item B5) gets an org-level brief
+		// instead of the per-repository one below.
+		return runClaudeWorkspaceBrief(out, cfg, call, version)
 	}
 	org := orgOf(repo)
 	token, _ := cfg.TokenForOrg(org)
@@ -323,6 +326,208 @@ func renderSessionBrief(repo, server string, guessed bool, brief forRepoResponse
 	}
 	b.WriteString("Record what you decide here with store_memory; supersede rather than forget.\n")
 	return b.String()
+}
+
+// Proactive guidance v2, workspace brief (plan item B5): the childRepos scan
+// bounds — cap 200 directory entries inspected, cap 100ms wall clock — and
+// the final render bound (1,200 tokens) are all from the shared wire doc.
+const (
+	workspaceScanMaxEntries = 200
+	workspaceScanWallBudget = 100 * time.Millisecond
+	workspaceRepoCap        = 8
+	workspaceBriefMaxTokens = 1200
+	// bytesPerToken mirrors the CLI's own conservative token estimate
+	// (CLAUDE.md: "Token estimate is bytes/4"), so the 1,200-token bound
+	// from the wire doc is enforced the same way everywhere else in sctx
+	// counts tokens.
+	bytesPerToken = 4
+)
+
+// surfaceWorkspacePath is the new org-scoped brief: no single repository, so
+// no per-repository memory bound to lean on — it exists for exactly the
+// workspace-root case runClaudeWorkspaceBrief handles.
+const surfaceWorkspacePath = "/v1/surface/for-workspace"
+
+type forWorkspaceRequest struct {
+	RepositoryNames []string `json:"repositoryNames"`
+	SessionID       string   `json:"sessionId"`
+	CWD             string   `json:"cwd"`
+}
+
+// forWorkspaceResponse mirrors forRepoResponse's own rule: every field is
+// optional, because a partially populated brief is still worth printing.
+type forWorkspaceResponse struct {
+	Organization string `json:"organization"`
+	Repositories []struct {
+		Name             string `json:"name"`
+		IndexingStatus   string `json:"indexingStatus"`
+		PrimaryRef       string `json:"primaryRef"`
+		IndexedAt        string `json:"indexedAt"`
+		IndexedCommitSha string `json:"indexedCommitSha"`
+	} `json:"repositories"`
+	Notes []struct {
+		ID           string   `json:"id"`
+		Kind         string   `json:"kind"`
+		CreatedAt    string   `json:"createdAt"`
+		Text         string   `json:"text"`
+		Repositories []string `json:"repositories"`
+	} `json:"notes"`
+	RetrievalHint string `json:"retrievalHint"`
+	Tools         string `json:"tools"`
+}
+
+// runClaudeWorkspaceBrief implements the cwd-is-not-a-repository half of
+// RunClaudeSessionStart: it lists the immediate child checkouts
+// (gitrepo.ChildRepos), ranks them by how recently their `.git/index` was
+// touched, keeps the busiest workspaceRepoCap, groups THOSE by organization
+// (an origin URL's own org, via orgOf/normalizeURL) and asks for a brief
+// scoped to whichever organization holds the most of them — the one this
+// developer is most likely actually working across right now. Every failure
+// is silence, including a 404 from an older proxy that predates this
+// endpoint.
+func runClaudeWorkspaceBrief(out io.Writer, cfg config.Config, call sessionStartCall, version string) int {
+	if call.Source == "compact" {
+		// Nothing repository-specific was said at startup for a workspace
+		// root, so there is nothing worth repeating on a compaction either.
+		return 0
+	}
+
+	children := gitrepo.ChildRepos(call.CWD, workspaceScanMaxEntries, workspaceScanWallBudget)
+	if len(children) == 0 {
+		return 0
+	}
+	if len(children) > workspaceRepoCap {
+		children = children[:workspaceRepoCap]
+	}
+
+	byOrg := make(map[string][]string)
+	for _, c := range children {
+		org := orgOf(c.Name)
+		if org == "" {
+			continue
+		}
+		byOrg[org] = append(byOrg[org], c.Name)
+	}
+	var bestOrg string
+	for org, names := range byOrg {
+		if len(names) > len(byOrg[bestOrg]) {
+			bestOrg = org
+		}
+	}
+	if bestOrg == "" {
+		return 0
+	}
+
+	token, _ := cfg.TokenForOrg(bestOrg)
+	if token == "" {
+		return 0
+	}
+
+	resp, err := fetchWorkspaceBrief(cfg, token, byOrg[bestOrg], call, version)
+	if err != nil {
+		return 0
+	}
+
+	home, _ := os.UserHomeDir()
+	// No single repository root exists here, so claudeServerNameFor is asked
+	// with an empty root — it still finds a USER-scope MCP entry, just never
+	// a project-scoped `.mcp.json`.
+	server := claudeServerNameFor(home, call.CWD, "", token)
+	guessed := server == ""
+	if guessed {
+		server = bestOrg
+	}
+	if text := renderWorkspaceBrief(resp, server, guessed); text != "" {
+		fmt.Fprint(out, text)
+	}
+	return 0
+}
+
+func fetchWorkspaceBrief(cfg config.Config, token string, names []string, call sessionStartCall, version string) (forWorkspaceResponse, error) {
+	var out forWorkspaceResponse
+	body, err := json.Marshal(forWorkspaceRequest{RepositoryNames: names, SessionID: call.SessionID, CWD: call.CWD})
+	if err != nil {
+		return out, err
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), sessionStartBudget)
+	defer cancel()
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost,
+		surfaceEndpointFor(cfg.TelemetryEndpoint, surfaceWorkspacePath), bytes.NewReader(body))
+	if err != nil {
+		return out, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("User-Agent", httpclient.UserAgent(version, "claude-code"))
+
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return out, err
+	}
+	defer resp.Body.Close()
+	// A 404 is an older proxy that predates this endpoint: silence, exactly
+	// like any other failure here — never a reason to print an error to the
+	// agent.
+	if resp.StatusCode != http.StatusOK {
+		return out, fmt.Errorf("surface: %s", resp.Status)
+	}
+	if err := json.UnmarshalDecode(jsontext.NewDecoder(io.LimitReader(resp.Body, 256<<10)), &out); err != nil {
+		return out, err
+	}
+	return out, nil
+}
+
+// renderWorkspaceBrief builds the plain-text workspace brief, bounded to
+// workspaceBriefMaxTokens per the wire doc: header, one line per repository
+// (name · status · indexed age), notes, hint, tools.
+func renderWorkspaceBrief(resp forWorkspaceResponse, server string, guessed bool) string {
+	if resp.Organization == "" && len(resp.Repositories) == 0 {
+		return ""
+	}
+
+	var b strings.Builder
+	fmt.Fprintf(&b, "=== SynapCTX workspace brief — org %s ===\n", resp.Organization)
+	for _, r := range resp.Repositories {
+		age := dateOnly(r.IndexedAt)
+		if age == "" {
+			age = "not yet indexed"
+		}
+		fmt.Fprintf(&b, "• %s · %s · indexed %s\n", r.Name, r.IndexingStatus, age)
+	}
+
+	notes := resp.Notes
+	if len(notes) > 4 {
+		notes = notes[:4]
+	}
+	for _, n := range notes {
+		label := n.Kind
+		if d := dateOnly(n.CreatedAt); d != "" {
+			if label != "" {
+				label += " · " + d
+			} else {
+				label = d
+			}
+		}
+		text := truncateRunes(n.Text, 280)
+		if label != "" {
+			fmt.Fprintf(&b, "• [%s] %s\n", label, text)
+		} else {
+			fmt.Fprintf(&b, "• %s\n", text)
+		}
+	}
+
+	if resp.RetrievalHint != "" {
+		fmt.Fprintf(&b, "Try first: %s\n", resp.RetrievalHint)
+	}
+	if resp.Tools != "" {
+		fmt.Fprintf(&b, "%s\n", resp.Tools)
+	} else {
+		fmt.Fprintf(&b, "Tools for org %s: %s, %s, find_references, get_dependents, get_service_dependencies, store_memory.\n",
+			resp.Organization, toolName(server, "retrieve_context", guessed), toolName(server, "recall_memory", guessed))
+	}
+
+	return truncateRunes(b.String(), workspaceBriefMaxTokens*bytesPerToken)
 }
 
 // shortSha is the 10 characters a human compares at a glance. Anything shorter

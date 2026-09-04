@@ -10,7 +10,9 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/synapctx/sctx/internal/platform/config"
@@ -44,7 +46,7 @@ import (
 //     absent, so the budget is short and expiring it is a normal outcome.
 //   - **Silence is the common case and the correct one.** The server returns
 //     notes only when a memory actually names the file; most edits get nothing.
-const postToolBudget = 1200 * time.Millisecond
+const postToolBudget = 2800 * time.Millisecond
 
 // surfacePath is the proxy endpoint. It lives on the telemetry ingest host
 // because it shares that audience — an authenticated CLI on a developer's
@@ -65,12 +67,102 @@ type postToolCall struct {
 	SessionID string `json:"session_id"`
 }
 
+// surfaceNote is one note as the wire doc's extended shape carries it:
+// kind/createdAt/verifiedAt/staleness/bound/id alongside the text, so the
+// full-mode render can label it `[kind · date · verified|unverified · stale]`.
+type surfaceNote struct {
+	Text       string `json:"text"`
+	CreatedAt  string `json:"createdAt"`
+	VerifiedAt string `json:"verifiedAt"`
+	ID         string `json:"id"`
+	Kind       string `json:"kind"`
+	Staleness  string `json:"staleness"`
+	Bound      bool   `json:"bound"`
+}
+
+// forFileResponse is the proxy's /v1/surface/for-file answer. Mode is
+// EMPTY, not defaulted here, when an old proxy predates it — the caller
+// (memoryContext) is what treats an absent mode as "full", per the wire
+// doc's additive rule ("an old proxy ignores unknown fields and returns no
+// mode; the client treats absent mode as full").
 type forFileResponse struct {
-	Notes []struct {
-		Text      string `json:"text"`
-		CreatedAt string `json:"createdAt"`
-		ID        string `json:"id"`
-	} `json:"notes"`
+	Mode    string `json:"mode"`
+	Pointer *struct {
+		Count  int    `json:"count"`
+		Newest string `json:"newest"`
+	} `json:"pointer"`
+	Notes []surfaceNote `json:"notes"`
+}
+
+// sessionStateWire is exactly the sessionState object the wire doc defines,
+// built from this session's persisted offerState (offerstate.go).
+type sessionStateWire struct {
+	LastOfferedAt string `json:"lastOfferedAt"`
+	NewestStamp   string `json:"newestStamp"`
+	FullOffers    int    `json:"fullOffers"`
+	PointerShown  bool   `json:"pointerShown"`
+}
+
+// forFileRequest is the extended /v1/surface/for-file request body: the
+// existing fields plus sessionId, sessionState and symbols, all field names
+// verbatim from the wire doc.
+type forFileRequest struct {
+	RepositoryName string           `json:"repositoryName"`
+	FilePath       string           `json:"filePath"`
+	SessionID      string           `json:"sessionId"`
+	SessionState   sessionStateWire `json:"sessionState"`
+	Symbols        []string         `json:"symbols,omitempty"`
+}
+
+// symbolEditRequest is the /v1/surface/for-symbol request in its "edit" mode
+// (blast radius): the file that changed and the exported declaration names
+// that changed in it, per the wire doc.
+type symbolEditRequest struct {
+	RepositoryName string   `json:"repositoryName"`
+	FilePath       string   `json:"filePath"`
+	Mode           string   `json:"mode"`
+	Symbols        []string `json:"symbols"`
+	SessionID      string   `json:"sessionId"`
+}
+
+// symbolEditResponse is the /v1/surface/for-symbol "edit" mode answer: only
+// symbols with references in OTHER repositories are present at all.
+type symbolEditResponse struct {
+	Symbols []struct {
+		Name              string   `json:"name"`
+		SymbolPath        string   `json:"symbolPath"`
+		OtherRepositories []string `json:"otherRepositories"`
+		References        int      `json:"references"`
+		Call              string   `json:"call"`
+	} `json:"symbols"`
+}
+
+// identifierRE finds bare identifiers in an edit's new_string, for the
+// "symbols" field the wire doc sends on for-file (≤12, for symbol-binding
+// preference server-side). Single-character tokens are skipped: they carry
+// no binding signal and would crowd out the cap with noise like loop
+// variables.
+var identifierRE = regexp.MustCompile(`[A-Za-z_][A-Za-z0-9_]*`)
+
+// identifiersInText returns up to capN distinct identifiers from s, in the
+// order they first appear.
+func identifiersInText(s string, capN int) []string {
+	if s == "" {
+		return nil
+	}
+	seen := make(map[string]bool)
+	var out []string
+	for _, m := range identifierRE.FindAllString(s, -1) {
+		if len(m) < 2 || seen[m] {
+			continue
+		}
+		seen[m] = true
+		out = append(out, m)
+		if len(out) >= capN {
+			break
+		}
+	}
+	return out
 }
 
 // hookOutput is the PostToolUse JSON contract: additionalContext is placed next
@@ -102,20 +194,33 @@ func RunClaudePostTool(in io.Reader, out io.Writer, cfg config.Config, version s
 		return runClaudePostToolBash(out, cfg, version, call)
 	}
 
-	var repo, rel string
 	switch call.ToolName {
 	case "Edit", "Write", "NotebookEdit", "MultiEdit":
 		absPath, _ := call.ToolInput["file_path"].(string)
 		if absPath == "" {
 			return 0
 		}
-		repo, rel = repoAndRelativePath(absPath, call.CWD)
+		root, repo, rel := repoRootAndRelativePath(absPath, call.CWD)
 		if rel == "" {
 			return 0
 		}
+		return runClaudePostToolEdit(out, cfg, version, call, root, repo, rel)
 	default:
 		return 0
 	}
+}
+
+// runClaudePostToolEdit is the Edit/Write/NotebookEdit/MultiEdit branch of
+// PostToolUse: it can make up to two surface calls, for-file (memory bound
+// to the edited file) and for-symbol in "edit" mode (blast radius on any
+// EXPORTED Go declaration the edit just changed) — run CONCURRENTLY under
+// one deadline (postToolBudget), per the wire doc: "Both hook calls run
+// concurrently under ONE deadline". Either call may be skipped entirely
+// before it ever reaches the network: for-file when the same file was
+// offered <60s ago this session (offerState.debounced), for-symbol when
+// there are no changed exported declarations or every one of them was
+// already asked about within the last 10 minutes.
+func runClaudePostToolEdit(out io.Writer, cfg config.Config, version string, call postToolCall, root, repo, rel string) int {
 	// No key means no organization to ask, and there is nothing useful to say
 	// about that here — `sctx setup` and `sctx gain` own that conversation.
 	token, _ := cfg.TokenForOrg(orgOf(repo))
@@ -123,11 +228,83 @@ func RunClaudePostTool(in io.Reader, out io.Writer, cfg config.Config, version s
 		return 0
 	}
 
-	body := memoryContext(rel, fetchNotes(cfg, token, repo, rel, call.SessionID, version))
-	if body == "" {
+	id := sanitizeSessionID(call.SessionID)
+	state := loadOfferState(id)
+
+	oldStr, _ := call.ToolInput["old_string"].(string)
+	newStr, _ := call.ToolInput["new_string"].(string)
+	symbols := identifiersInText(newStr, 12)
+
+	var askSymbols []string
+	for _, name := range changedExportedSymbols(rel, oldStr, newStr) {
+		if !state.symbolRecentlyAsked(name) {
+			askSymbols = append(askSymbols, name)
+		}
+	}
+	if len(askSymbols) > 3 {
+		askSymbols = askSymbols[:3]
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), postToolBudget)
+	defer cancel()
+
+	var wg sync.WaitGroup
+	callFile := !state.debounced(rel)
+
+	var fileResp forFileResponse
+	fileOK := false
+	if callFile {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			resp, err := fetchForFile(ctx, cfg, token, repo, rel, call.SessionID, version, state.sessionStateFor(rel), symbols)
+			if err == nil {
+				fileResp, fileOK = resp, true
+			}
+		}()
+	}
+
+	var symResp symbolEditResponse
+	symOK := false
+	if len(askSymbols) > 0 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			resp, err := fetchSymbolEdit(ctx, cfg, token, repo, rel, askSymbols, call.SessionID, version)
+			if err == nil {
+				symResp, symOK = resp, true
+			}
+		}()
+	}
+	wg.Wait()
+
+	var lines []string
+	if fileOK {
+		if body := memoryContext(rel, fileResp); body != "" {
+			lines = append(lines, body)
+		}
+		state.noteFileOffer(rel, fileResp, time.Now())
+	}
+	if symOK {
+		for _, name := range askSymbols {
+			state.markSymbolAsked(name)
+		}
+		home, _ := os.UserHomeDir()
+		server := claudeServerNameFor(home, call.CWD, root, token)
+		guessed := server == ""
+		if guessed {
+			server = orgOf(repo)
+		}
+		if body := symbolEditContext(server, guessed, symResp); body != "" {
+			lines = append(lines, body)
+		}
+	}
+	saveOfferState(id, state)
+
+	if len(lines) == 0 {
 		return 0
 	}
-	writeAdditionalContext(out, "PostToolUse", body)
+	writeAdditionalContext(out, "PostToolUse", strings.Join(lines, "\n\n"))
 	return 0
 }
 
@@ -172,26 +349,28 @@ func runClaudePostToolBash(out io.Writer, cfg config.Config, version string, cal
 	return 0
 }
 
-// repoAndRelativePath turns the absolute path the hook was given into the
-// (org/repo, repo-relative path) pair the server indexes by.
+// repoRootAndRelativePath turns the absolute path the hook was given into the
+// repository root, its (org/repo) name and the server-indexed relative path.
 //
 // Relative to the REPOSITORY ROOT, not to the agent's working directory: an
 // agent's cwd wanders during a session, and a path resolved against it would
-// silently stop matching anything the moment it changed.
-func repoAndRelativePath(absPath, cwd string) (repo, rel string) {
+// silently stop matching anything the moment it changed. The root is
+// returned too, alongside the name, because claudeServerNameFor needs it to
+// find a project-scope `.mcp.json` (see sessionstart.go / claudeservers.go).
+func repoRootAndRelativePath(absPath, cwd string) (root, repo, rel string) {
 	dir := filepath.Dir(absPath)
 	root, name, ok := gitrepo.RootAndName(dir)
 	if !ok {
 		// Fall back to the agent's cwd only to name the repository; without a
 		// root there is no relative path to compute, so we stop.
 		_ = cwd
-		return "", ""
+		return "", "", ""
 	}
 	r, err := filepath.Rel(root, absPath)
 	if err != nil || strings.HasPrefix(r, "..") {
-		return "", ""
+		return "", "", ""
 	}
-	return name, filepath.ToSlash(r)
+	return root, name, filepath.ToSlash(r)
 }
 
 func orgOf(repoFullName string) string {
@@ -201,21 +380,34 @@ func orgOf(repoFullName string) string {
 	return ""
 }
 
-func fetchNotes(cfg config.Config, token, repo, rel, sessionID, version string) []string {
+// fetchForFile calls /v1/surface/for-file with the wire doc's extended
+// request shape, under ctx — a caller-supplied, already-running deadline, so
+// this and fetchSymbolEdit share exactly ONE budget when run concurrently.
+func fetchForFile(ctx context.Context, cfg config.Config, token, repo, rel, sessionID, version string, state sessionStateWire, symbols []string) (forFileResponse, error) {
 	var out forFileResponse
-	if err := postSurface(cfg, token, surfacePath,
-		map[string]string{"repositoryName": repo, "filePath": rel, "sessionId": sessionID}, &out, version); err != nil {
-		return nil
-	}
-	notes := make([]string, 0, len(out.Notes))
-	for _, n := range out.Notes {
-		if n.CreatedAt != "" {
-			notes = append(notes, fmt.Sprintf("(%s) %s", n.CreatedAt, n.Text))
-			continue
-		}
-		notes = append(notes, n.Text)
-	}
-	return notes
+	err := postSurface(ctx, cfg, token, surfacePath, forFileRequest{
+		RepositoryName: repo,
+		FilePath:       rel,
+		SessionID:      sessionID,
+		SessionState:   state,
+		Symbols:        symbols,
+	}, &out, version)
+	return out, err
+}
+
+// fetchSymbolEdit calls /v1/surface/for-symbol in "edit" mode (blast
+// radius): the names diffed by exported.go, scoped to the file they changed
+// in.
+func fetchSymbolEdit(ctx context.Context, cfg config.Config, token, repo, rel string, symbols []string, sessionID, version string) (symbolEditResponse, error) {
+	var out symbolEditResponse
+	err := postSurface(ctx, cfg, token, surfaceSymbolPath, symbolEditRequest{
+		RepositoryName: repo,
+		FilePath:       rel,
+		Mode:           "edit",
+		Symbols:        symbols,
+		SessionID:      sessionID,
+	}, &out, version)
+	return out, err
 }
 
 type elsewhereResult struct {
@@ -225,24 +417,28 @@ type elsewhereResult struct {
 }
 
 // fetchElsewhere asks for the call sites the developer's grep could not see.
+// It owns its own deadline: unlike the Edit/Write branch, the Bash branch
+// never runs this alongside another network call.
 func fetchElsewhere(cfg config.Config, token, repo, symbol, sessionID, version string) elsewhereResult {
 	var out elsewhereResult
-	_ = postSurface(cfg, token, surfaceSymbolPath,
+	ctx, cancel := context.WithTimeout(context.Background(), postToolBudget)
+	defer cancel()
+	_ = postSurface(ctx, cfg, token, surfaceSymbolPath,
 		map[string]string{"repositoryName": repo, "symbol": symbol, "sessionId": sessionID}, &out, version)
 	return out
 }
 
-// postSurface is the one HTTP shape both lookups share. Every failure is
-// silence: sctx reads any error as "no suggestion", and an error rendered into
-// an agent's context would be pure noise. version is rendered into the
-// request's User-Agent header.
-func postSurface(cfg config.Config, token, path string, payload map[string]string, into any, version string) error {
+// postSurface is the one HTTP shape every surface lookup shares. Every
+// failure is silence: sctx reads any error as "no suggestion", and an error
+// rendered into an agent's context would be pure noise. version is rendered
+// into the request's User-Agent header. ctx carries the caller's own
+// deadline, so two calls made concurrently (runClaudePostToolEdit) share one
+// budget rather than each getting a fresh postToolBudget.
+func postSurface(ctx context.Context, cfg config.Config, token, path string, payload any, into any, version string) error {
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), postToolBudget)
-	defer cancel()
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, surfaceEndpointFor(cfg.TelemetryEndpoint, path), bytes.NewReader(body))
 	if err != nil {
@@ -279,18 +475,80 @@ func surfaceEndpointFor(telemetryEndpoint, path string) string {
 // an unattributed paragraph appearing next to a tool result is indistinguishable
 // from the agent's own reasoning — and a memory is a claim by a teammate, which
 // the agent should weigh as such rather than absorb as fact.
-// memoryContext renders what the organization knows about a file.
-func memoryContext(rel string, notes []string) string {
-	if len(notes) == 0 {
+// memoryContext renders what the organization knows about a file, per the
+// wire doc's three modes. An EMPTY resp.Mode is an old proxy that predates
+// this feature, and is treated as "full" — today's behaviour, unchanged.
+func memoryContext(rel string, resp forFileResponse) string {
+	mode := resp.Mode
+	if mode == "" {
+		mode = "full"
+	}
+	switch mode {
+	case "silent":
 		return ""
+	case "pointer":
+		if resp.Pointer == nil || resp.Pointer.Count == 0 {
+			return ""
+		}
+		return fmt.Sprintf("SynapCTX: %d notes on %s, newest %s — recall_memory",
+			resp.Pointer.Count, rel, dateOnly(resp.Pointer.Newest))
+	default: // "full"
+		notes := resp.Notes
+		if len(notes) > 2 {
+			notes = notes[:2]
+		}
+		if len(notes) == 0 {
+			return ""
+		}
+		var b strings.Builder
+		fmt.Fprintf(&b, "SynapCTX organizational memory about %s — recorded by a teammate's agent, surfaced because you edited this file (nobody asked for it):\n", rel)
+		for _, n := range notes {
+			fmt.Fprintf(&b, "\n• [%s] %s\n", noteLabel(n), truncateRunes(n.Text, 280))
+		}
+		b.WriteString("\nUse recall_memory for the full text, or store_memory if you learn something here that the next person will need.")
+		return b.String()
 	}
-	var b strings.Builder
-	fmt.Fprintf(&b, "SynapCTX organizational memory about %s — recorded by a teammate's agent, surfaced because you edited this file (nobody asked for it):\n", rel)
-	for _, n := range notes {
-		b.WriteString("\n• " + n + "\n")
+}
+
+// noteLabel renders the `kind · date · verified|unverified · stale?` tag the
+// wire doc specifies for a full-mode note.
+func noteLabel(n surfaceNote) string {
+	var parts []string
+	if n.Kind != "" {
+		parts = append(parts, n.Kind)
 	}
-	b.WriteString("\nUse recall_memory for the full text, or store_memory if you learn something here that the next person will need.")
-	return b.String()
+	if d := dateOnly(n.CreatedAt); d != "" {
+		parts = append(parts, d)
+	}
+	if n.VerifiedAt != "" {
+		parts = append(parts, "verified")
+	} else {
+		parts = append(parts, "unverified")
+	}
+	if n.Staleness != "" {
+		parts = append(parts, n.Staleness)
+	}
+	return strings.Join(parts, " · ")
+}
+
+// symbolEditContext renders the blast-radius line for the for-symbol "edit"
+// mode response: one line per symbol that has references in OTHER
+// repositories, naming the repositories, the count and the EXACT
+// find_references call — in THIS MACHINE'S own tool namespace
+// (claudeServerNameFor), not whatever name the proxy guessed, for the same
+// reason toolName() exists on the session brief: a tool name an agent cannot
+// call is worse than no suggestion.
+func symbolEditContext(server string, guessed bool, resp symbolEditResponse) string {
+	var lines []string
+	for _, s := range resp.Symbols {
+		if len(s.OtherRepositories) == 0 || s.SymbolPath == "" {
+			continue
+		}
+		call := fmt.Sprintf("%s {\"symbol_path\": %q}", toolName(server, "find_references", guessed), s.SymbolPath)
+		lines = append(lines, fmt.Sprintf("SynapCTX: %s is used in %s (%d references) — %s",
+			s.Name, strings.Join(s.OtherRepositories, ", "), s.References, call))
+	}
+	return strings.Join(lines, "\n")
 }
 
 // symbolContext renders ONLY what the grep could not have seen.

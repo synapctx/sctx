@@ -7,7 +7,9 @@ package gitrepo
 import (
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
+	"time"
 )
 
 // Detect walks up from dir looking for a .git entry, resolves it (handling
@@ -175,6 +177,71 @@ func splitKV(line string) (string, string, bool) {
 		return "", "", false
 	}
 	return strings.TrimSpace(before), strings.TrimSpace(after), true
+}
+
+// ChildRepo is one repository found immediately under a workspace root by
+// ChildRepos.
+type ChildRepo struct {
+	// Name is the "org/repo" form of its origin remote.
+	Name string
+	// Root is the child directory itself.
+	Root string
+	// IndexModTime is the mtime of `.git/index` (or the linked worktree's own
+	// index, via GitDirs) — the freshest available signal for "worked on
+	// recently" without shelling out to git or reading history.
+	IndexModTime time.Time
+}
+
+// ChildRepos scans cwd's IMMEDIATE child directories for one containing
+// `.git`, for the one case RootAndName cannot answer: a workspace root that
+// is not itself inside a repository, but holds several checkouts side by
+// side (proactive guidance v2, plan item B5). It never walks deeper than one
+// level and never walks UP — RootAndName already owns that direction.
+//
+// Two bounds keep this safe to call from a session's startup path on an
+// arbitrarily large directory (a home directory, say): at most maxEntries
+// directory entries are inspected, and the scan stops the instant it has run
+// for wallBudget, in either case simply returning what it already found
+// rather than erroring — a partial answer here is exactly as good as a full
+// one, since the caller only wants "the busiest few". Sorted busiest first
+// (index mtime, descending) so a caller taking the top N gets the checkouts
+// most likely to be the ones actually in use.
+func ChildRepos(cwd string, maxEntries int, wallBudget time.Duration) []ChildRepo {
+	start := time.Now()
+	entries, err := os.ReadDir(cwd)
+	if err != nil {
+		return nil
+	}
+
+	var out []ChildRepo
+	for i, e := range entries {
+		if i >= maxEntries || time.Since(start) > wallBudget {
+			break
+		}
+		if !e.IsDir() {
+			continue
+		}
+		child := filepath.Join(cwd, e.Name())
+		if _, err := os.Stat(filepath.Join(child, ".git")); err != nil {
+			continue
+		}
+		gitDir, commonDir, ok := GitDirs(child)
+		if !ok {
+			continue
+		}
+		name := normalizeURL(parseOriginURL(filepath.Join(commonDir, "config")))
+		if name == "" {
+			continue
+		}
+		var mtime time.Time
+		if info, err := os.Stat(filepath.Join(gitDir, "index")); err == nil {
+			mtime = info.ModTime()
+		}
+		out = append(out, ChildRepo{Name: name, Root: child, IndexModTime: mtime})
+	}
+
+	sort.SliceStable(out, func(i, j int) bool { return out[i].IndexModTime.After(out[j].IndexModTime) })
+	return out
 }
 
 // normalizeURL reduces a git remote URL (https, ssh scp-like, or ssh://) to
