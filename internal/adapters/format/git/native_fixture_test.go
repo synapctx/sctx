@@ -123,11 +123,14 @@ func TestNativeGitFixtures(t *testing.T) {
 	worktreePath := filepath.Join(root, "worktree with spaces")
 	mustNativeGit(t, repo, "worktree", "add", "-b", "fixture-worktree", worktreePath)
 	worktrees := mustNativeGit(t, repo, "worktree", "list")
-	// Git's own porcelain output always uses forward slashes, even on
-	// Windows, so compare against the slash form rather than the OS path —
-	// and case-insensitively, since Git for Windows normalizes the drive
-	// letter's case independently of whatever case TEMP/os.TempDir() used.
-	if !strings.Contains(strings.ToLower(string(worktrees.stdout)), strings.ToLower(filepath.ToSlash(worktreePath))) {
+	// Compare the unusual (space-containing) LAST PATH SEGMENT plus the
+	// branch it was checked out onto, rather than the full absolute path:
+	// Git for Windows can report the parent directories with a different
+	// case or short/long form than what os.TempDir() handed back, which has
+	// nothing to do with what this fixture is actually proving — that a
+	// path with spaces in it round-trips through `git worktree list`.
+	if !strings.Contains(string(worktrees.stdout), filepath.Base(worktreePath)) ||
+		!strings.Contains(string(worktrees.stdout), "fixture-worktree") {
 		t.Fatalf("native worktree list missing unusual path: %q", worktrees.stdout)
 	}
 
