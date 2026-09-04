@@ -320,3 +320,35 @@ answers about the code being changed rather than the last commit.
   and nothing auto-starts. The privacy posture is printed before anything is
   sent, and that printing lives here in the public binary so the claim can be
   audited against source.
+
+## `internal/platform/redact` (opt-in this release)
+
+Scrubs secrets from the FINAL rendered bytes of a wrapped command, on every
+tier including verbatim — a secret must not survive because a tier chose not
+to compress it. Not yet wired into the run pipeline; this is the standalone
+package only.
+
+- `Rules()` returns a fixed, `sync.Once`-compiled set of regexes (AWS/GitHub/
+  Slack/Stripe/Google/SendGrid/npm/PEM private key/JWT/bearer-header/
+  `sctx_live_`, plus a generic `key|secret|token|password=value` catch-all).
+  The generic rule additionally requires the captured value clear a 3.5
+  bits/char Shannon-entropy bar and not be one of a fixed placeholder deny
+  list (`changeme`, `<redacted>`, `xxxxxxxx`, `example`, `placeholder`, any
+  `your-...`), so `password=changeme` in a fixture is never reported as a
+  leak.
+- `Apply(b []byte) ([]byte, Report)` replaces each match with
+  `[REDACTED:<rule-name>]`. Overlapping matches resolve leftmost-longest, so
+  a JWT found inside `Authorization: Bearer ...` yields one marker, not two.
+  Only the first 8 MiB (`maxScan`) of `b` is scanned; the rest passes through
+  unchanged and its length is surfaced as `Report.Unscanned` so a caller can
+  print a notice — it is never silently left unscanned.
+- `NewWriter(w io.Writer) *Writer` is the streaming counterpart for the tee
+  path: it holds back the last 4 KiB of unflushed data on every `Write` so a
+  secret split across two writes is reassembled before `Apply` sees it.
+  `Report()` is only complete once `Close` has run.
+- Cost is one `FindAll` pass per rule over the buffer (currently 12 rules), not
+  a single combined-alternation scan: `BenchmarkApplyOneMiB` measured
+  ~7 MB/s (~145ms/MiB) on a mixed log fixture with a few real secrets
+  sprinkled in — acceptable for CLI-sized output, worth revisiting with a
+  single compiled alternation if it is ever applied to multi-MiB streams by
+  default.
