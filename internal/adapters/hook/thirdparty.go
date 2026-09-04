@@ -88,7 +88,7 @@ func RunCursor(_ []string, in io.Reader, out io.Writer, version string) int {
 		writeCursorEmpty(out)
 		return 0
 	}
-	rewritten, ok := rewriteForAgent(cmd, version)
+	rewritten, ok := rewriteForAgent(cmd, version, "cursor", "")
 	if !ok {
 		writeCursorEmpty(out)
 		return 0
@@ -158,7 +158,7 @@ func RunCopilot(_ []string, in io.Reader, out io.Writer, version string) int {
 		if !ok || cmd == "" {
 			return 0
 		}
-		rewritten, ok := rewriteForAgent(cmd, version)
+		rewritten, ok := rewriteForAgent(cmd, version, "copilot-cli", "")
 		if !ok {
 			return 0
 		}
@@ -186,7 +186,7 @@ func RunCopilot(_ []string, in io.Reader, out io.Writer, version string) int {
 		if !ok || cmd == "" {
 			return 0
 		}
-		rewritten, ok := rewriteForAgent(cmd, version)
+		rewritten, ok := rewriteForAgent(cmd, version, "copilot-cli", "")
 		if !ok {
 			return 0
 		}
@@ -251,7 +251,7 @@ func RunDroid(_ []string, in io.Reader, out io.Writer, version string) int {
 	if droidDenylisted(cmd, droidDenylistPatterns()) {
 		return 0
 	}
-	rewritten, ok := rewriteForAgent(cmd, version)
+	rewritten, ok := rewriteForAgent(cmd, version, "droid", "")
 	if !ok {
 		return 0
 	}

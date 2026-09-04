@@ -8,8 +8,10 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/synapctx/sctx/internal/domain/telemetry"
+	"github.com/synapctx/sctx/internal/platform/agentenv"
 )
 
 // readSpoolEvents decodes every JSONL line in dir's pending spool file, or
@@ -79,7 +81,7 @@ func TestRunClaudeNoFallback(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			var out bytes.Buffer
-			code := runClaude(nil, strings.NewReader(tt.stdin), &out, "v-test")
+			code := runClaude(nil, strings.NewReader(tt.stdin), &out, "v-test", "claude-code")
 			if code != 0 {
 				t.Fatalf("runClaude() exit code = %d, want 0", code)
 			}
@@ -120,7 +122,7 @@ func TestAnUnmatchedCommandIsRecordedAsACoverageGap(t *testing.T) {
 
 	stdin := `{"tool_name":"Bash","tool_input":{"command":"mix test"}}`
 	var out bytes.Buffer
-	if code := runClaude(nil, strings.NewReader(stdin), &out, "v-test"); code != 0 {
+	if code := runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code"); code != 0 {
 		t.Fatalf("runClaude() exit code = %d, want 0", code)
 	}
 	// The command is left exactly as written: sctx has nothing to offer it.
@@ -167,7 +169,7 @@ func TestACoveredCommandIsNotACoverageGap(t *testing.T) {
 
 	stdin := `{"tool_name":"Bash","tool_input":{"command":"git status"}}`
 	var out bytes.Buffer
-	if code := runClaude(nil, strings.NewReader(stdin), &out, "v-test"); code != 0 {
+	if code := runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code"); code != 0 {
 		t.Fatalf("runClaude() exit code = %d, want 0", code)
 	}
 	if events := readSpoolEvents(t, spoolDir); len(events) != 0 {
@@ -183,7 +185,7 @@ func TestNoiseIsNotRecordedAsACoverageGap(t *testing.T) {
 		t.Setenv("SCT__SPOOL_DIR", spoolDir)
 		stdin := `{"tool_name":"Bash","tool_input":{"command":"` + cmd + `"}}`
 		var out bytes.Buffer
-		runClaude(nil, strings.NewReader(stdin), &out, "v-test")
+		runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code")
 		if events := readSpoolEvents(t, spoolDir); len(events) != 0 {
 			t.Errorf("%q was recorded as a coverage gap: %+v", cmd, events)
 		}
@@ -204,7 +206,7 @@ func TestASpoolFailureNeverAffectsTheHook(t *testing.T) {
 
 	stdin := `{"tool_name":"Bash","tool_input":{"command":"mix test"}}`
 	var out bytes.Buffer
-	if code := runClaude(nil, strings.NewReader(stdin), &out, "v-test"); code != 0 {
+	if code := runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code"); code != 0 {
 		t.Fatalf("runClaude() exit code = %d, want 0", code)
 	}
 	if out.Len() != 0 {
@@ -220,7 +222,7 @@ func TestAGapInsideAPipelineIsStillRecorded(t *testing.T) {
 
 	stdin := `{"tool_name":"Bash","tool_input":{"command":"mix test | tail -5"}}`
 	var out bytes.Buffer
-	runClaude(nil, strings.NewReader(stdin), &out, "v-test")
+	runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code")
 
 	events := readSpoolEvents(t, spoolDir)
 	if len(events) != 1 || events[0].Program != "mix test" {
@@ -235,7 +237,7 @@ func TestAGapAfterACdIsStillRecorded(t *testing.T) {
 	stdin := `{"tool_name":"Bash","tool_input":{"command":"cd sub && mix test"}}`
 
 	var out bytes.Buffer
-	code := runClaude(nil, strings.NewReader(stdin), &out, "v-test")
+	code := runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code")
 	if code != 0 {
 		t.Fatalf("runClaude() exit code = %d, want 0", code)
 	}
@@ -269,7 +271,7 @@ func TestDeliberateHookDeclinesAreClassifiedWithoutArguments(t *testing.T) {
 			}
 
 			var out bytes.Buffer
-			code := runClaude(nil, bytes.NewReader(stdinBytes), &out, "v-test")
+			code := runClaude(nil, bytes.NewReader(stdinBytes), &out, "v-test", "claude-code")
 			if code != 0 {
 				t.Fatalf("runClaude() exit code = %d, want 0", code)
 			}
@@ -292,7 +294,7 @@ func TestCommandSubstitutionIsNotRecorded(t *testing.T) {
 	stdin := `{"tool_name":"Bash","tool_input":{"command":"mix test $(x)"}}`
 
 	var out bytes.Buffer
-	code := runClaude(nil, strings.NewReader(stdin), &out, "v-test")
+	code := runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code")
 	if code != 0 {
 		t.Fatalf("runClaude() exit code = %d, want 0", code)
 	}
@@ -304,7 +306,7 @@ func TestCommandSubstitutionIsNotRecorded(t *testing.T) {
 func TestRunClaudeRewritesSegmentInPipeNoFallback(t *testing.T) {
 	stdin := `{"tool_name":"Bash","tool_input":{"command":"go test ./... 2>&1 | tail -50"}}`
 	var out bytes.Buffer
-	code := runClaude(nil, strings.NewReader(stdin), &out, "v-test")
+	code := runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code")
 	if code != 0 {
 		t.Fatalf("runClaude() exit code = %d, want 0", code)
 	}
@@ -357,7 +359,7 @@ func TestACommandWithNoProgramTokenIsNotRecorded(t *testing.T) {
 
 	stdin := `{"tool_name":"Bash","tool_input":{"command":"A=\" go test \""}}`
 	var out bytes.Buffer
-	if code := runClaude(nil, strings.NewReader(stdin), &out, "v-test"); code != 0 {
+	if code := runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code"); code != 0 {
 		t.Fatalf("runClaude() exit code = %d, want 0", code)
 	}
 	if out.Len() != 0 {
@@ -402,7 +404,7 @@ func TestRealCoverageGapsAreStillRecorded(t *testing.T) {
 		t.Setenv("SCT__SPOOL_DIR", spoolDir)
 		stdin := `{"tool_name":"Bash","tool_input":{"command":` + strconv.Quote(cmd) + `}}`
 		var out bytes.Buffer
-		runClaude(nil, strings.NewReader(stdin), &out, "v-test")
+		runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code")
 		if events := readSpoolEvents(t, spoolDir); len(events) != 1 {
 			t.Errorf("%q recorded %d gap events, want 1 — this IS a coverage gap, not an unparseable command", cmd, len(events))
 		}
@@ -419,5 +421,44 @@ func TestGapFixturesAreActuallyUncovered(t *testing.T) {
 		if _, covered := matchSegment(cmd); covered {
 			t.Errorf("%q is now COVERED by sctx, so it is no longer a coverage gap and cannot test gap recording; pick another program for TestRealCoverageGapsAreStillRecorded", cmd)
 		}
+	}
+}
+
+// The hook and the wrapped command it triggers run in SEPARATE processes with
+// no shared environment, so the session id has to cross via a file — this is
+// that hand-off's other end (agentenv.ReadRecentSessionFile in the run
+// pipeline reads what runClaude/runCodex write here).
+func TestRunClaudeWritesTheSessionHandoff(t *testing.T) {
+	spoolDir := t.TempDir()
+	t.Setenv("SCT__SPOOL_DIR", spoolDir)
+	stdin := `{"tool_name":"Bash","tool_input":{"command":"echo hi"},"session_id":"sess-xyz"}`
+	var out bytes.Buffer
+	runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code")
+
+	got, ok := agentenv.ReadRecentSessionFile(spoolDir, time.Now())
+	if !ok {
+		t.Fatal("expected a session hand-off file to be written")
+	}
+	if got.Client != "claude-code" || got.SessionID != "sess-xyz" {
+		t.Fatalf("got %+v", got)
+	}
+}
+
+// The same PreToolUse contract, dispatched under the "codex" verb, must label
+// the hand-off "codex" — the whole reason RunCodex exists as its own entry
+// point rather than sharing RunClaude's label.
+func TestRunCodexLabelsTheSessionHandoffCodex(t *testing.T) {
+	spoolDir := t.TempDir()
+	t.Setenv("SCT__SPOOL_DIR", spoolDir)
+	stdin := `{"tool_name":"Bash","tool_input":{"command":"echo hi"},"session_id":"sess-codex"}`
+	var out bytes.Buffer
+	RunCodex(nil, strings.NewReader(stdin), &out, "v-test")
+
+	got, ok := agentenv.ReadRecentSessionFile(spoolDir, time.Now())
+	if !ok {
+		t.Fatal("expected a session hand-off file to be written")
+	}
+	if got.Client != "codex" || got.SessionID != "sess-codex" {
+		t.Fatalf("got %+v", got)
 	}
 }

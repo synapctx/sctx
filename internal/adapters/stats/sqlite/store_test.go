@@ -242,3 +242,77 @@ func TestFailures(t *testing.T) {
 		t.Fatalf("scoped failures = %+v, want just curl", scoped)
 	}
 }
+
+func TestByClient(t *testing.T) {
+	store, err := NewStore(filepath.Join(t.TempDir(), "stats.db"))
+	if err != nil {
+		t.Fatalf("NewStore: %v", err)
+	}
+	defer store.Close()
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+	runs := []stats.Run{
+		{ID: "01A", At: now, Command: "go test", Argv: "go test ./...", Client: "claude-code", RawTokens: 1000, OutTokens: 100, SavedTokens: 900},
+		{ID: "01B", At: now, Command: "go vet", Argv: "go vet ./...", Client: "claude-code", RawTokens: 500, OutTokens: 50, SavedTokens: 450},
+		{ID: "01C", At: now, Command: "ls", Argv: "ls", Client: "shell", RawTokens: 40, OutTokens: 40, SavedTokens: 0},
+	}
+	for _, r := range runs {
+		if err := store.Record(ctx, r); err != nil {
+			t.Fatalf("Record(%s): %v", r.ID, err)
+		}
+	}
+
+	byClient, err := store.ByClient(ctx, stats.AggregateOptions{})
+	if err != nil {
+		t.Fatalf("ByClient: %v", err)
+	}
+	if len(byClient) != 2 {
+		t.Fatalf("got %d client groups, want 2: %+v", len(byClient), byClient)
+	}
+	if byClient[0].Client != "claude-code" || byClient[0].Runs != 2 || byClient[0].SavedTokens != 1350 {
+		t.Fatalf("top client group = %+v, want claude-code/2/1350", byClient[0])
+	}
+	if byClient[1].Client != "shell" || byClient[1].Runs != 1 {
+		t.Fatalf("second client group = %+v, want shell/1", byClient[1])
+	}
+}
+
+func TestRepeatedRunsToday(t *testing.T) {
+	store, err := NewStore(filepath.Join(t.TempDir(), "stats.db"))
+	if err != nil {
+		t.Fatalf("NewStore: %v", err)
+	}
+	defer store.Close()
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+	yesterday := now.Add(-25 * time.Hour)
+	runs := []stats.Run{
+		{ID: "01A", At: now, Argv: "go test ./..."},
+		{ID: "01B", At: now, Argv: "go test ./..."},
+		{ID: "01C", At: now, Argv: "go test ./..."},
+		{ID: "01D", At: now, Argv: "git status"},
+		// Not repeated (only once today).
+		{ID: "01E", At: now, Argv: "go build ./..."},
+		// Repeated, but yesterday — must not count toward today's total.
+		{ID: "01F", At: yesterday, Argv: "ls -la"},
+		{ID: "01G", At: yesterday, Argv: "ls -la"},
+	}
+	for _, r := range runs {
+		if err := store.Record(ctx, r); err != nil {
+			t.Fatalf("Record(%s): %v", r.ID, err)
+		}
+	}
+
+	repeated, err := store.RepeatedRunsToday(ctx, 0)
+	if err != nil {
+		t.Fatalf("RepeatedRunsToday: %v", err)
+	}
+	if len(repeated) != 1 {
+		t.Fatalf("got %d repeated groups, want 1 (only today's `go test ./...`): %+v", len(repeated), repeated)
+	}
+	if repeated[0].Argv != "go test ./..." || repeated[0].Count != 3 {
+		t.Fatalf("got %+v, want go test ./... x3", repeated[0])
+	}
+}

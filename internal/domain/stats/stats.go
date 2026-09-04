@@ -23,6 +23,22 @@ type Run struct {
 	DurationMS  int64
 	Anomaly     string // empty when the render was clean
 	Repository  string // "org/repo", best-effort (may be empty)
+	// Client is which coding agent ran this: "claude-code", "shell", etc — see
+	// internal/platform/agentenv. Empty on rows recorded before this field
+	// existed.
+	Client string
+	// SessionID is the agent's own opaque session id, best-effort.
+	SessionID string
+	// ArgvHash is the same salted argv fingerprint sent in telemetry — kept
+	// locally too so `sctx gain` can report on it without a network round
+	// trip. See telemetry.Event.ArgvHash.
+	ArgvHash string
+	// Bypass records how sctx's own formatting was skipped for this run: ""
+	// (not bypassed), "force_tier" or "double_dash".
+	Bypass string
+	// RedactedCount is how many secrets a redaction pass hid before this run
+	// was recorded. Reserved for a future redaction feature; always 0 today.
+	RedactedCount int
 }
 
 // AggregateOptions scopes an Aggregate or Failures query. The zero value
@@ -51,7 +67,30 @@ type Store interface {
 	// Failures returns the most recent degraded runs matching opts (tier
 	// "verbatim" or a non-empty Anomaly), newest first, capped at limit.
 	Failures(ctx context.Context, opts AggregateOptions, limit int) ([]FailedRun, error)
+	// ByClient aggregates runs matching opts by which coding agent ran them,
+	// ordered by SavedTokens descending, for `sctx gain --by-client`. A row
+	// with an empty Client groups runs recorded before this field existed, or
+	// run from a plain shell.
+	ByClient(ctx context.Context, opts AggregateOptions) ([]ClientTotals, error)
+	// RepeatedRunsToday reports argv values run more than once since the
+	// start of today (local time), newest-heaviest first, capped at limit.
+	// Computed from the plain argv column, never ArgvHash — this is a local
+	// report reading the local store, not anything that could leave the
+	// machine.
+	RepeatedRunsToday(ctx context.Context, limit int) ([]RepeatedRun, error)
 	Close() error
+}
+
+// ClientTotals is Totals scoped to one coding-agent Client.
+type ClientTotals struct {
+	Client string `json:"client"`
+	Totals
+}
+
+// RepeatedRun is one argv value run more than once today.
+type RepeatedRun struct {
+	Argv  string `json:"argv"`
+	Count int64  `json:"count"`
 }
 
 // Report is the aggregate behind `sctx gain`.

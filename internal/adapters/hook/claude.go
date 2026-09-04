@@ -25,25 +25,38 @@ import (
 
 	"github.com/synapctx/sctx/internal/adapters/telemetry/spool"
 	"github.com/synapctx/sctx/internal/domain/telemetry"
+	"github.com/synapctx/sctx/internal/platform/agentenv"
 	"github.com/synapctx/sctx/internal/platform/config"
 	"github.com/synapctx/sctx/internal/platform/gitrepo"
 )
 
 // toolCall is decoded leniently: unknown/extra fields are ignored, and
-// tool_input is left as a map so we only need the "command" key.
+// tool_input is left as a map so we only need the "command" key. SessionID is
+// Claude Code's (and Codex's byte-identical PreToolUse) own top-level
+// session_id, handed off to the wrapped command's separate process via
+// agentenv.WriteSessionFile — the hook and the exec it triggers do not share
+// an environment.
 type toolCall struct {
 	ToolName  string         `json:"tool_name"`
 	ToolInput map[string]any `json:"tool_input"`
+	SessionID string         `json:"session_id"`
 }
 
 // RunClaude implements `sctx hook claude`. args is everything after "claude" on
 // the command line. version is sctx's own build version, recorded on any
 // coverage-gap event this run spools.
 func RunClaude(args []string, in io.Reader, out io.Writer, version string) int {
-	return runClaude(args, in, out, version)
+	return runClaude(args, in, out, version, "claude-code")
 }
 
-func runClaude(_ []string, in io.Reader, out io.Writer, version string) int {
+// RunCodex implements `sctx hook codex`. Codex's PreToolUse contract is
+// byte-identical to Claude Code's, but it keeps its own verb and agent label
+// so hook detection and telemetry can tell the two installs apart.
+func RunCodex(args []string, in io.Reader, out io.Writer, version string) int {
+	return runClaude(args, in, out, version, "codex")
+}
+
+func runClaude(_ []string, in io.Reader, out io.Writer, version, agent string) int {
 	data, err := io.ReadAll(in)
 	if err != nil {
 		return 0
@@ -69,6 +82,8 @@ func runClaude(_ []string, in io.Reader, out io.Writer, version string) int {
 		return 0
 	}
 
+	writeSessionHandoff(agent, call.SessionID)
+
 	root, matchers := trustedProjectMatchers()
 	if rewritten, ok := rewriteWithProject(cmd, root, matchers); ok {
 		writeRewrite(out, rewritten)
@@ -85,6 +100,19 @@ func runClaude(_ []string, in io.Reader, out io.Writer, version string) int {
 		spoolCoverageDecline(seg, reason, version)
 	}
 	return 0
+}
+
+// writeSessionHandoff records this hook's agent and session id for the
+// wrapped command's own process to pick up (agentenv.ReadRecentSessionFile).
+// Best-effort and unconditional on the rewrite decision: even a command sctx
+// does not rewrite still runs as a plain shell invocation the wrapped process
+// needs to attribute, and the freshest hand-off is the one most likely to
+// still be within the fallback's age window when that process starts.
+func writeSessionHandoff(agent, sessionID string) {
+	if sessionID == "" {
+		return
+	}
+	_ = agentenv.WriteSessionFile(spoolDir(), agent, sessionID)
 }
 
 func spoolCoverageDecline(segText, reason, version string) {

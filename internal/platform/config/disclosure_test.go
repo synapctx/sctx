@@ -35,6 +35,12 @@ var disclosedFields = map[string]string{
 	"id":               "",                        // random ULID, for de-duplication on ingest
 	"kind":             "",                        // exec_savings | coverage_gap | coverage_decline
 	"tool":             "",                        // constant "sctx"
+	"client":           "which coding agent ran it",
+	"sessionId":        "the agent's session id",
+	"bypass":           "whether sctx was bypassed",
+	"argvHash":         "a one-way argv fingerprint",
+	"synthetic":        "", // SCT__SYNTHETIC=1 marker, excluded from aggregation server-side
+	"redactedCount":    "how many secrets were hidden",
 }
 
 // THE test that makes consent mean something over time. A customer agreed to a

@@ -84,8 +84,9 @@ change the conclusion:
 repeated lines collapse, and a JSONL/NDJSON stream keeps both ends with a counted
 marker between them. Unrecognized output stays raw.
 
-` + "`sctx -- <cmd>`" + ` forces verbatim passthrough when you genuinely need every
-byte.
+` + "`sctx -- <cmd>`" + ` runs a reserved name (` + "`gain`" + `, ` + "`init`" + `, ...) as a
+program instead of a native subcommand; it does not force verbatim — use
+` + "`SCT__FORCE_TIER=verbatim`" + ` when you genuinely need every byte.
 
 ## The subcommand that changes what SynapCTX can answer
 

@@ -570,6 +570,13 @@ separately because they are not the same request:
 
 &nbsp;
 
+Your own savings report also carries which coding agent ran the command (`claude-code`,
+`codex`, `gemini-cli`, `cursor`, `copilot-cli`, `droid`, `kilo`, `opencode` or `shell`),
+that agent's own opaque session id, whether sctx was bypassed and how, and a
+one-way, salted fingerprint of the command line — a 64-bit hash that never
+leaves enough information to reconstruct the command, only enough to say "you
+ran this again". The salt is generated once per machine and never transmitted.
+
 Paths, filenames, arguments and command output are never transmitted. The queue is
 inspectable, unrendered, at any time:
 

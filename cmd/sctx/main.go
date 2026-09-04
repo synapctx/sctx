@@ -21,6 +21,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -63,10 +64,13 @@ import (
 	"github.com/synapctx/sctx/internal/application/run"
 	"github.com/synapctx/sctx/internal/domain/stats"
 	"github.com/synapctx/sctx/internal/domain/telemetry"
+	"github.com/synapctx/sctx/internal/platform/agentenv"
 	"github.com/synapctx/sctx/internal/platform/agentsetup"
+	"github.com/synapctx/sctx/internal/platform/binaries"
 	"github.com/synapctx/sctx/internal/platform/config"
 	"github.com/synapctx/sctx/internal/platform/gitrepo"
 	"github.com/synapctx/sctx/internal/platform/rawcache"
+	"github.com/synapctx/sctx/pkg/agentdoc"
 )
 
 var version = "dev" // set via -ldflags at release time
@@ -95,6 +99,13 @@ func realMain(args []string) int {
 	}
 
 	ctx := context.Background()
+
+	// doubleDash records that `sctx -- <cmd>` ran the "--" path: it strips the
+	// marker so a reserved name can be run as a program, and nothing else. It
+	// does NOT force verbatim — SCT__FORCE_TIER=verbatim does that — but it is
+	// still a deliberate bypass of sctx's own subcommand dispatch, worth
+	// telling apart from an ordinary wrapped run in telemetry.Bypass.
+	doubleDash := false
 
 	switch args[0] {
 	case "help", "-h", "--help":
@@ -125,6 +136,7 @@ func realMain(args []string) int {
 			printUsage()
 			return 2
 		}
+		doubleDash = true
 	}
 
 	// Checked on the wrapped path, not only on the native subcommands: someone who
@@ -132,10 +144,10 @@ func realMain(args []string) int {
 	// and `sctx go test` is the first thing they run. Interactive-only and
 	// rate-limited — see nudgeSetup.
 	nudgeSetup(cfg)
-	return runWrapped(ctx, cfg, args)
+	return runWrapped(ctx, cfg, args, doubleDash)
 }
 
-func runWrapped(ctx context.Context, cfg config.Config, argv []string) int {
+func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDash bool) int {
 	registry := run.NewRegistry()
 	registry.Register(gotest.New())
 	registry.Register(dig.New())
@@ -203,6 +215,18 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string) int {
 		recovery = rawcache.New(cfg.RawCacheDir, cfg.RawCacheTTL, cfg.RawCacheMaxBytes)
 	}
 
+	// Bypass records HOW sctx's own formatting was skipped, for telemetry only
+	// — it changes no behavior. "force_tier" wins over "double_dash" when both
+	// are true: forcing verbatim/off is the bypass that actually defeats
+	// formatting, while `sctx --` on its own still gets rewritten normally.
+	bypass := ""
+	switch {
+	case cfg.ForceTier == "verbatim" || cfg.ForceTier == "off":
+		bypass = "force_tier"
+	case doubleDash:
+		bypass = "double_dash"
+	}
+
 	svc := run.NewService(registry, osproc.NewRunner(cfg.MaxOutputBytes),
 		statsStore, emitter, generic.New(),
 		os.Stdout, os.Stderr,
@@ -213,6 +237,10 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string) int {
 			// decline meant "not my shape" or "leave the caller's machine output
 			// exactly as it is": the same JSON document, minus whitespace.
 			LosslessFallback: jsoncompact.New(),
+			Identity:         agentenv.DetectWithFallback(os.Getenv, cfg.SpoolDir),
+			Bypass:           bypass,
+			Salt:             cfg.ArgvSalt,
+			Synthetic:        cfg.Synthetic,
 		})
 
 	code, err := svc.Execute(ctx, argv)
@@ -252,7 +280,7 @@ func registerProjectFilters(registry *run.Registry) {
 	}
 }
 
-const gainUsage = `usage: sctx gain [--project|-p] [--since <dur>] [--failures|-F] [--format text|json]`
+const gainUsage = `usage: sctx gain [--project|-p] [--since <dur>] [--failures|-F] [--by-client] [--format text|json]`
 
 func runGain(ctx context.Context, cfg config.Config, args []string) int {
 	opts, err := parseGainArgs(args)
@@ -327,6 +355,8 @@ func parseGainArgs(args []string) (report.Options, error) {
 			opts.Since = time.Now().Add(-d)
 		case "--failures", "-F":
 			opts.Failures = true
+		case "--by-client":
+			opts.ByClient = true
 		case "--format":
 			i++
 			if i >= len(args) {
@@ -478,7 +508,7 @@ func runInit(ctx context.Context, cfg config.Config, args []string) int {
 	// hosted default is deliberately NOT written: it lives in code, so a machine
 	// that never chose a host follows the product rather than a line frozen into
 	// a file on the day it was installed.
-	if err := writeConfigFile(cfg.ConfigFilePath, endpoint, configuredWorkspaceProxy(cfg), defaultOrg, orgTokens, cfg.Consent); err != nil {
+	if err := writeConfigFile(cfg.ConfigFilePath, endpoint, configuredWorkspaceProxy(cfg), defaultOrg, orgTokens, cfg.Consent, cfg.ArgvSalt); err != nil {
 		fmt.Fprintf(os.Stderr, "sctx: init: writing config: %v\n", err)
 		return 1
 	}
@@ -601,7 +631,7 @@ func configuredWorkspaceProxy(cfg config.Config) string {
 // parses, mode 0600 (the keys are secrets), creating the parent directory
 // 0700 if needed. Orgs are written in sorted slug order for deterministic
 // output; defaultOrg is omitted from the file when empty.
-func writeConfigFile(path, endpoint, workspaceProxy, defaultOrg string, orgTokens map[string]string, consent config.ConsentRecord) error {
+func writeConfigFile(path, endpoint, workspaceProxy, defaultOrg string, orgTokens map[string]string, consent config.ConsentRecord, argvSalt string) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return fmt.Errorf("creating config directory: %w", err)
 	}
@@ -616,6 +646,15 @@ func writeConfigFile(path, endpoint, workspaceProxy, defaultOrg string, orgToken
 	}
 	if defaultOrg != "" {
 		fmt.Fprintf(&b, "default_org = %q\n", defaultOrg)
+	}
+	// The argv-fingerprint salt rides through every write of this file too:
+	// config.Load generates it once and persists it narrowly, but this
+	// function rewrites the file WHOLESALE, so an untracked value here would
+	// be silently regenerated on the next init/setup/telemetry write — and a
+	// customer's "you re-ran this N times" fingerprints would stop lining up
+	// with anything recorded before that write.
+	if argvSalt != "" {
+		fmt.Fprintf(&b, "argv_salt = %q\n", argvSalt)
 	}
 	// The consent record rides through every write of this file. This function
 	// rewrites it wholesale, so anything not threaded through here is erased —
@@ -655,8 +694,9 @@ func runHook(args []string) int {
 		// same `tool_name`, same `hookSpecificOutput.updatedInput.command`. It
 		// gets its own verb anyway: hook detection matches on the subcommand, so
 		// one name for two clients would make an installed Codex hook look like
-		// an installed Claude hook and vice versa.
-		return hook.RunClaude(args[1:], os.Stdin, os.Stdout, version)
+		// an installed Claude hook and vice versa. RunCodex shares the same
+		// decoding but labels the session hand-off "codex", not "claude-code".
+		return hook.RunCodex(args[1:], os.Stdin, os.Stdout, version)
 	case "rewrite":
 		// Plain-text rewrite for callers that speak no hook protocol: the JS
 		// plugin sctx installs into Kilo Code and OpenCode.
@@ -747,6 +787,7 @@ func runDoctor(cfg config.Config) int {
 	if cfg.ForceTier != "" {
 		fmt.Printf("force tier:     %s\n", cfg.ForceTier)
 	}
+	printBinaryReport(os.Stdout)
 	if home, err := os.UserHomeDir(); err == nil {
 		if st, err := agentsetup.InspectWithCodexMCP(home, codexOrgTokens(cfg), cfg.WorkspaceProxyURL, docsFor(cfg)...); err == nil {
 			printSetupStatus(os.Stdout, st, cfg, false)
@@ -755,6 +796,79 @@ func runDoctor(cfg config.Config) int {
 		}
 	}
 	return 0
+}
+
+// sctxExeName is "sctx" everywhere except Windows, where PATH resolution
+// requires the extension.
+func sctxExeName() string {
+	if runtime.GOOS == "windows" {
+		return "sctx.exe"
+	}
+	return "sctx"
+}
+
+// printBinaryReport prints every sctx found on PATH with its version,
+// marking SHADOWS for anything after the first (the one that actually runs
+// when a developer types `sctx`), and the Claude Code hook's own binary
+// against the newest version found — [stale] when the hook would run an
+// older sctx than what is on this machine, because dev never wins that
+// comparison and a customer who upgraded needs to know their hook did not
+// follow.
+func printBinaryReport(w io.Writer) {
+	found := binaries.OnPath(os.Getenv("PATH"), sctxExeName())
+	if len(found) == 0 {
+		return
+	}
+	fmt.Fprintln(w)
+	fmt.Fprintln(w, "sctx on PATH:")
+	newest := ""
+	for i, path := range found {
+		ver := binaries.VersionOf(path)
+		// A dev build never counts as "newest": string-comparing "sctx dev"
+		// against "sctx 0.6.0" would otherwise rank it ahead by ASCII order
+		// alone, and the whole point of [stale] is that a customer's real
+		// release wins the comparison, not whichever developer's checkout
+		// happens to be on PATH.
+		if ver != "" && !isDevVersion(ver) && ver > newest {
+			newest = ver
+		}
+		suffix := ""
+		if i > 0 {
+			suffix = "  [SHADOWS the one above]"
+		}
+		fmt.Fprintf(w, "  %s  (%s)%s\n", path, orUnknown(ver), suffix)
+	}
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return
+	}
+	claude, _ := agentdoc.AgentByID("claude")
+	hookBinary, ok := agentsetup.HookBinary(home, claude)
+	if !ok {
+		return
+	}
+	hookVersion := binaries.VersionOf(hookBinary)
+	stale := ""
+	if newest != "" && hookVersion != "" && !isDevVersion(hookVersion) && hookVersion != newest {
+		stale = "  [stale]"
+	}
+	fmt.Fprintf(w, "claude hook runs: %s  (%s)%s\n", hookBinary, orUnknown(hookVersion), stale)
+}
+
+func orUnknown(s string) string {
+	if s == "" {
+		return "version unknown"
+	}
+	return s
+}
+
+// isDevVersion reports whether a `<binary> version` answer is the unreleased
+// build ("sctx dev"), which must never win a "newest" comparison — a
+// developer's own checkout on PATH would otherwise outrank every real
+// release by plain string ordering.
+func isDevVersion(v string) bool {
+	return strings.HasSuffix(strings.TrimSpace(v), " dev") || strings.TrimSpace(v) == "dev"
 }
 
 // telemetryMode summarizes the effective delivery path: authenticated

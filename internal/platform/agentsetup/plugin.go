@@ -52,20 +52,43 @@ type PluginStatus struct {
 // OK reports whether this agent's commands are actually being wrapped.
 func (s PluginStatus) OK() bool { return s.Installed && !s.Stale && !s.Foreign }
 
+// pluginClientLabel maps an agent ID onto the SCT__CLIENT value its plugin's
+// shell.env hook should set, following the same allowlist as
+// internal/platform/agentenv. "kilocode" is spelled "kilo" there — shorter,
+// and consistent with every other client label being lowercase and
+// hyphen/word-only, not a product's own capitalized name.
+func pluginClientLabel(agentID string) string {
+	switch agentID {
+	case "kilocode":
+		return "kilo"
+	case "opencode":
+		return "opencode"
+	default:
+		return "unknown"
+	}
+}
+
 // SctxPluginSource is the plugin module sctx installs, bound to the absolute
-// path of the running binary.
+// path of the running binary and the agent it is written for.
 //
 // The path is baked in rather than resolved from PATH at run time on purpose:
 // the plugin runs inside the agent's process, which does not necessarily inherit
 // the shell PATH a human sees, and "sctx: command not found" inside a plugin is
 // invisible — the command simply never gets wrapped and nothing says why.
-func SctxPluginSource(binary string) string {
+func SctxPluginSource(binary string, agentID string) string {
+	client := pluginClientLabel(agentID)
 	return pluginMarker + `
 //
 // Rewrites covered commands to ` + "`sctx <cmd>`" + ` before the agent's bash tool runs
 // them, which is what produces the token savings. Every decision — which
 // commands are covered, and when wrapping would change the conclusion — is made
 // by the sctx binary, never here.
+//
+// Also tells the wrapped command WHICH agent and session ran it, through
+// shell.env — verified against this engine's own plugin type declarations
+// (@kilocode/plugin's index.d.ts: shell.env receives { cwd, sessionID?,
+// callID? } and answers { env }). That is telemetry provenance only: it never
+// changes what runs.
 //
 // FAIL-OPEN, ALWAYS: any error, timeout or unexpected output leaves the command
 // exactly as the agent wrote it. A plugin that can break a tool call costs the
@@ -75,6 +98,7 @@ func SctxPluginSource(binary string) string {
 import { execFile } from "node:child_process"
 
 const SCTX_BINARY = ` + jsString(binary) + `
+const SCTX_CLIENT = ` + jsString(client) + `
 
 function sctxRewrite(command) {
   return new Promise((resolve) => {
@@ -102,6 +126,13 @@ export const sctx = async () => ({
     if (typeof command !== "string" || command.trim() === "") return
     const rewritten = await sctxRewrite(command)
     if (rewritten && rewritten !== command) output.args.command = rewritten
+  },
+  "shell.env": async (input, output) => {
+    if (!output || typeof output.env !== "object" || output.env === null) return
+    output.env.SCT__CLIENT = SCTX_CLIENT
+    if (input && typeof input.sessionID === "string" && input.sessionID !== "") {
+      output.env.SCT__SESSION = input.sessionID
+    }
   },
 })
 `
@@ -147,7 +178,7 @@ func InspectPlugin(home string, a Agent, binary string) (PluginStatus, error) {
 	// only flip the report for the other binary. What matters is whether the file
 	// is ours, current for the binary it names, and whether that binary is still
 	// there.
-	st.Stale = strings.TrimSpace(string(raw)) != strings.TrimSpace(SctxPluginSource(st.WiredTo))
+	st.Stale = strings.TrimSpace(string(raw)) != strings.TrimSpace(SctxPluginSource(st.WiredTo, a.ID))
 	if !st.Stale && st.WiredTo != "" {
 		if _, err := os.Stat(st.WiredTo); err != nil {
 			st.Stale = true
@@ -189,7 +220,7 @@ func InstallPlugin(home string, a Agent, binary string) ([]string, error) {
 	if err := os.MkdirAll(filepath.Dir(st.Path), 0o755); err != nil {
 		return nil, fmt.Errorf("creating %s: %w", filepath.Dir(st.Path), err)
 	}
-	if err := os.WriteFile(st.Path, []byte(SctxPluginSource(binary)), 0o644); err != nil {
+	if err := os.WriteFile(st.Path, []byte(SctxPluginSource(binary, a.ID)), 0o644); err != nil {
 		return nil, fmt.Errorf("writing %s: %w", st.Path, err)
 	}
 	verb := "installed"

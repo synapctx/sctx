@@ -40,7 +40,13 @@ func RunRewrite(args []string, out io.Writer, version string) int {
 	if strings.TrimSpace(cmd) == "" {
 		return 0
 	}
-	if rewritten, ok := rewriteForAgent(cmd, version); ok {
+	// The plugin speaks for both Kilo Code and OpenCode through the same
+	// verb, and the argv it hands us carries no agent or session identity —
+	// that hand-off rides on the plugin's own `shell.env` hook instead (see
+	// agentsetup's plugin.go), which sets SCT__CLIENT/SCT__SESSION directly in
+	// the WRAPPED command's environment rather than through this file-based
+	// fallback. Nothing to hand off here.
+	if rewritten, ok := rewriteForAgent(cmd, version, "unknown", ""); ok {
 		fmt.Fprintln(out, rewritten)
 	}
 	return 0
@@ -83,7 +89,7 @@ func RunGemini(_ []string, in io.Reader, out io.Writer, version string) int {
 	if !ok || cmd == "" {
 		return 0
 	}
-	rewritten, ok := rewriteForAgent(cmd, version)
+	rewritten, ok := rewriteForAgent(cmd, version, "gemini-cli", "")
 	if !ok {
 		return 0
 	}
@@ -109,10 +115,11 @@ func RunGemini(_ []string, in io.Reader, out io.Writer, version string) int {
 // itself. A `go test` that Kilo runs and a `go test` that Claude runs are the
 // same command from the same customer, and the ranking of what to build next
 // must not depend on which client happened to be open.
-func rewriteForAgent(cmd, version string) (string, bool) {
+func rewriteForAgent(cmd, version, agent, sessionID string) (string, bool) {
 	if os.Getenv("SCT__REWRITE_DISABLED") == "true" {
 		return "", false
 	}
+	writeSessionHandoff(agent, sessionID)
 	root, matchers := trustedProjectMatchers()
 	if rewritten, ok := rewriteWithProject(cmd, root, matchers); ok {
 		return rewritten, true

@@ -7,6 +7,8 @@ package run
 import (
 	"bytes"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"os"
@@ -22,6 +24,7 @@ import (
 	"github.com/synapctx/sctx/internal/domain/format"
 	"github.com/synapctx/sctx/internal/domain/stats"
 	"github.com/synapctx/sctx/internal/domain/telemetry"
+	"github.com/synapctx/sctx/internal/platform/agentenv"
 	"github.com/synapctx/sctx/internal/platform/gitrepo"
 	"github.com/synapctx/sctx/internal/platform/rawcache"
 	"github.com/synapctx/sctx/internal/platform/tokenizer"
@@ -36,6 +39,20 @@ type Options struct {
 	// used and it must be information-preserving — see renderChain for why the
 	// generic formatter is deliberately not used here. Nil disables it.
 	LosslessFallback format.Formatter
+	// Identity is which coding agent (and session of it) is driving this
+	// process — see internal/platform/agentenv. Resolved once by the caller
+	// (main.go) rather than per-Execute, since it does not change within a
+	// process lifetime.
+	Identity agentenv.Identity
+	// Bypass records how sctx's own formatting was skipped for this run: ""
+	// (not bypassed), "force_tier" or "double_dash". See telemetry.Event.Bypass.
+	Bypass string
+	// Salt is config.ArgvSalt: a per-machine secret that makes ArgvHash a
+	// one-way, unlinkable-across-machines fingerprint of normalized argv.
+	Salt string
+	// Synthetic marks every event this Service emits as generated for testing
+	// or demonstration (SCT__SYNTHETIC=1), never a real developer command.
+	Synthetic bool
 }
 
 type Service struct {
@@ -193,6 +210,7 @@ func (s *Service) account(ctx context.Context, argv []string, formatter format.F
 		return
 	}
 	now := time.Now().UTC()
+	hash := argvHash(s.opts.Salt, argv)
 	formatterName := "verbatim"
 	if !formatterMatched && formatter != nil {
 		formatterName = "(generic)"
@@ -216,6 +234,10 @@ func (s *Service) account(ctx context.Context, argv []string, formatter format.F
 			DurationMS:  outcome.Duration.Milliseconds(),
 			Anomaly:     result.Anomaly,
 			Repository:  s.repository(),
+			Client:      s.opts.Identity.Client,
+			SessionID:   s.opts.Identity.SessionID,
+			ArgvHash:    hash,
+			Bypass:      s.opts.Bypass,
 		})
 	}
 
@@ -238,6 +260,11 @@ func (s *Service) account(ctx context.Context, argv []string, formatter format.F
 			FormatterKind:    formatterKind,
 			OutputReduced:    outputReduced,
 			DeclineReason:    declineReason,
+			Client:           s.opts.Identity.Client,
+			SessionID:        s.opts.Identity.SessionID,
+			Bypass:           s.opts.Bypass,
+			ArgvHash:         hash,
+			Synthetic:        s.opts.Synthetic,
 			At:               now,
 		})
 	}
@@ -263,6 +290,28 @@ func readAll(s domexec.Spill) ([]byte, error) {
 		return nil, err
 	}
 	return io.ReadAll(r)
+}
+
+// argvHash is a one-way, salted fingerprint of argv: hex(sha256(salt ||
+// normalizedArgv))[:16]. Normalized the same way the stats row's own argv
+// column is keyed (registry.go's normalize: env assignments stripped, program
+// reduced to its basename) so the two never drift into fingerprinting
+// different strings for what a human reads as the same command.
+//
+// Salted so the hash is unlinkable across machines (see PurposeOf's comment on
+// why this rides on the service-purpose event) and empty when there is no
+// salt to hash with, rather than emitting an unsalted, crackable one.
+func argvHash(salt string, argv []string) string {
+	if salt == "" {
+		return ""
+	}
+	program, rest := normalize(argv)
+	if program == "" {
+		return ""
+	}
+	normalized := strings.Join(append([]string{program}, rest...), " ")
+	sum := sha256.Sum256([]byte(salt + normalized))
+	return hex.EncodeToString(sum[:])[:16]
 }
 
 // deriveProgram returns the stable aggregation key used by telemetry: the

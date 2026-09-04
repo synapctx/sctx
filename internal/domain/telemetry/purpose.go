@@ -43,6 +43,18 @@ func PurposeOf(kind string) string {
 		// The customer's own savings report, rendered on their own dashboards.
 		// Aggregating it ACROSS customers is a separate question, answered by
 		// consent — but that boundary is on the server, not here.
+		//
+		// ArgvHash rides on this event and is service data too, not
+		// improvement data, even though it looks like it could identify a
+		// command: it is HMAC-shaped (a salted SHA-256 prefix), the salt is a
+		// machine-local secret that never leaves this machine (config.ArgvSalt),
+		// and at 64 bits of a keyed hash it cannot be dictionary-attacked back
+		// to an argv nor correlated with another customer's machine, which uses
+		// a different salt. What it buys the CUSTOMER — the only party who ever
+		// sees it, on their own console — is a same-machine "you re-ran this
+		// exact command N times today" insight, which is exactly the kind of
+		// thing PurposeService already covers: a report the product owes the
+		// person who bought it, not data we aggregate across them.
 		return PurposeService
 	case KindCoverageGap, KindCoverageDecline:
 		// Purely ours: it ranks which formatter to build next. It tells the

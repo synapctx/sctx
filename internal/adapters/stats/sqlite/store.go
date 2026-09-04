@@ -79,6 +79,25 @@ func NewStore(path string) (*Store, error) {
 		db.Close()
 		return nil, fmt.Errorf("initializing stats schema: %w", err)
 	}
+	// Same idempotent-migration idiom as repository above: client/session/argv
+	// fingerprint/bypass provenance and a reserved redaction count, added after
+	// the initial schema. Older rows keep the zero value for each.
+	for _, stmt := range []string{
+		`ALTER TABLE runs ADD COLUMN client TEXT NOT NULL DEFAULT ''`,
+		`ALTER TABLE runs ADD COLUMN session_id TEXT NOT NULL DEFAULT ''`,
+		`ALTER TABLE runs ADD COLUMN argv_hash TEXT NOT NULL DEFAULT ''`,
+		`ALTER TABLE runs ADD COLUMN bypass TEXT NOT NULL DEFAULT ''`,
+		`ALTER TABLE runs ADD COLUMN redacted_count INTEGER NOT NULL DEFAULT 0`,
+	} {
+		if _, err := db.Exec(stmt); err != nil && !isDuplicateColumn(err) {
+			db.Close()
+			return nil, fmt.Errorf("migrating stats schema: %w", err)
+		}
+	}
+	if _, err := db.Exec(`CREATE INDEX IF NOT EXISTS idx_runs_client ON runs(client)`); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("initializing stats schema: %w", err)
+	}
 	return &Store{db: db}, nil
 }
 
@@ -91,10 +110,11 @@ func isDuplicateColumn(err error) bool {
 
 func (s *Store) Record(ctx context.Context, r stats.Run) error {
 	_, err := s.db.ExecContext(ctx,
-		`INSERT INTO runs (id, at, command, argv, formatter, tier, raw_bytes, raw_tokens, out_tokens, saved_tokens, exit_code, duration_ms, anomaly, repository)
-		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		`INSERT INTO runs (id, at, command, argv, formatter, tier, raw_bytes, raw_tokens, out_tokens, saved_tokens, exit_code, duration_ms, anomaly, repository, client, session_id, argv_hash, bypass, redacted_count)
+		 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		r.ID, r.At.Format(time.RFC3339Nano), r.Command, r.Argv, r.Formatter, r.Tier,
-		r.RawBytes, r.RawTokens, r.OutTokens, r.SavedTokens, r.ExitCode, r.DurationMS, r.Anomaly, r.Repository)
+		r.RawBytes, r.RawTokens, r.OutTokens, r.SavedTokens, r.ExitCode, r.DurationMS, r.Anomaly, r.Repository,
+		r.Client, r.SessionID, r.ArgvHash, r.Bypass, r.RedactedCount)
 	if err != nil {
 		return fmt.Errorf("recording run: %w", err)
 	}
@@ -186,6 +206,67 @@ func (s *Store) Failures(ctx context.Context, opts stats.AggregateOptions, limit
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("iterating failures: %w", err)
+	}
+	return out, nil
+}
+
+// ByClient aggregates runs matching opts by which coding agent ran them.
+func (s *Store) ByClient(ctx context.Context, opts stats.AggregateOptions) ([]stats.ClientTotals, error) {
+	where, args := whereClause(opts)
+	rows, err := s.db.QueryContext(ctx,
+		`SELECT client, COUNT(*), COALESCE(SUM(raw_tokens),0), COALESCE(SUM(out_tokens),0),
+		        COALESCE(SUM(saved_tokens),0), COALESCE(SUM(duration_ms),0)
+		 FROM runs`+where+` GROUP BY client ORDER BY SUM(saved_tokens) DESC`, args...)
+	if err != nil {
+		return nil, fmt.Errorf("aggregating by client: %w", err)
+	}
+	defer rows.Close()
+
+	var out []stats.ClientTotals
+	for rows.Next() {
+		var ct stats.ClientTotals
+		var totalMS int64
+		if err := rows.Scan(&ct.Client, &ct.Runs, &ct.RawTokens, &ct.OutTokens, &ct.SavedTokens, &totalMS); err != nil {
+			return nil, fmt.Errorf("scanning by-client stats: %w", err)
+		}
+		if ct.Runs > 0 {
+			ct.AvgMS = totalMS / ct.Runs
+		}
+		out = append(out, ct)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterating by-client stats: %w", err)
+	}
+	return out, nil
+}
+
+// RepeatedRunsToday reports argv values run more than once since local
+// midnight, heaviest first. Grouped on the plain argv column — never
+// ArgvHash — because this reads the LOCAL store for a LOCAL report; nothing
+// here leaves the machine.
+func (s *Store) RepeatedRunsToday(ctx context.Context, limit int) ([]stats.RepeatedRun, error) {
+	if limit <= 0 {
+		limit = 5
+	}
+	startOfDay := time.Now().Local().Truncate(24 * time.Hour)
+	rows, err := s.db.QueryContext(ctx,
+		`SELECT argv, COUNT(*) AS n FROM runs WHERE at >= ? GROUP BY argv HAVING n > 1 ORDER BY n DESC LIMIT ?`,
+		startOfDay.UTC().Format(time.RFC3339Nano), limit)
+	if err != nil {
+		return nil, fmt.Errorf("querying repeated runs: %w", err)
+	}
+	defer rows.Close()
+
+	var out []stats.RepeatedRun
+	for rows.Next() {
+		var rr stats.RepeatedRun
+		if err := rows.Scan(&rr.Argv, &rr.Count); err != nil {
+			return nil, fmt.Errorf("scanning repeated runs: %w", err)
+		}
+		out = append(out, rr)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterating repeated runs: %w", err)
 	}
 	return out, nil
 }

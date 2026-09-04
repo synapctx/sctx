@@ -51,7 +51,12 @@ const (
 // fixed privacy-safe decline category became separate fields. No arguments,
 // paths or output were added, but the payload still grew and prior consent does
 // not silently extend to it.
-const CurrentDisclosure = 3
+// Bumped to 4 on 2026-09-04 when the payload gained agent/session provenance,
+// whether sctx was bypassed and how, a salted one-way argv fingerprint, a
+// synthetic-event marker, and a redaction count. Still no arguments, paths,
+// file contents or output — the fingerprint is HMAC-shaped and one-way — but
+// the field list changed and a prior "yes" does not silently cover it.
+const CurrentDisclosure = 4
 
 // ConsentRecord is a customer's answer, as stored.
 type ConsentRecord struct {
@@ -111,6 +116,11 @@ const ConsentDisclosure = `Every record sctx sends carries exactly these fields:
   which formatter matched      and which formatter path was selected
   whether output was reduced   and why output stayed native when it was not
   the sctx version             and when it happened
+  which coding agent ran it    "claude-code", "codex", "gemini-cli", "cursor", "copilot-cli", "droid", "kilo", "opencode" or "shell"
+  the agent's session id       an opaque id your agent generates, so one session's commands and SynapCTX calls line up
+  whether sctx was bypassed    and how (a forced tier, or "sctx --")
+  a one-way argv fingerprint   a salted SHA-256 prefix; the salt never leaves this machine, so nothing can be recovered from it — it only says "same command as before"
+  how many secrets were hidden a count, never the secrets
 
 NEVER: command ARGUMENTS, file paths, file contents, environment variables,
 output, branch names, or anything you typed. A command is recorded as

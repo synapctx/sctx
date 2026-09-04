@@ -8,6 +8,8 @@
 package config
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -109,6 +111,16 @@ type Config struct {
 	StatsDBPath      string
 	SpoolDir         string
 	ConfigFilePath   string
+	// ArgvSalt is a per-machine secret used to fingerprint normalized argv
+	// (see telemetry.Event.ArgvHash): hex(sha256(salt || argv))[:16]. Never
+	// sent anywhere itself. Generated once by Load and persisted to
+	// config.toml when absent; every subsequent full rewrite of the file
+	// (writeConfigFile) must thread it through, or a customer's fingerprints
+	// stop lining up the moment they next run `sctx init`/`setup`/`telemetry`.
+	ArgvSalt string
+	// Synthetic marks every telemetry event this process emits as generated
+	// for testing or demonstration, from SCT__SYNTHETIC=1. Never persisted.
+	Synthetic bool
 }
 
 // TokenForOrg returns the API key to deliver an event attributed to org
@@ -173,6 +185,19 @@ func Load() (Config, error) {
 		StatsDBPath:            env.Get("SCT__STATS_DB_PATH", filepath.Join(base, "stats.db")),
 		SpoolDir:               env.Get("SCT__SPOOL_DIR", filepath.Join(base, "spool")),
 		ConfigFilePath:         configPath,
+		ArgvSalt:               fv.argvSalt,
+		Synthetic:              env.Get("SCT__SYNTHETIC", "false") == "true",
+	}
+
+	if cfg.ArgvSalt == "" {
+		// Generated once per machine and persisted immediately: without this,
+		// argvHash would be a fresh, unlinkable value on every single run —
+		// worthless as a "same command as before" signal, which is the entire
+		// reason it exists. Best-effort: a persistence failure (read-only home,
+		// race with a concurrent sctx) still leaves this PROCESS a usable salt,
+		// it just is not guaranteed to be the one next time.
+		cfg.ArgvSalt = newArgvSalt()
+		_ = persistArgvSalt(configPath, cfg.ArgvSalt)
 	}
 
 	disclosure, _ := strconv.Atoi(fv.consentDisclosure)
@@ -239,6 +264,7 @@ type fileValues struct {
 	consent           string
 	consentAt         string
 	consentDisclosure string
+	argvSalt          string
 	// orgTokens holds token = "..." keys found under [org.<slug>] sections,
 	// keyed by slug. Lazily initialized; nil when no sections are present.
 	orgTokens map[string]string
@@ -309,6 +335,8 @@ func loadConfigFile(path string) fileValues {
 			fv.consentAt = value
 		case "telemetry_disclosure":
 			fv.consentDisclosure = value
+		case "argv_salt":
+			fv.argvSalt = value
 		}
 	}
 	return fv
@@ -332,6 +360,57 @@ func parseConfigLine(line string) (key, value string, ok bool) {
 		return "", "", false
 	}
 	return key, value, true
+}
+
+// newArgvSalt generates a fresh per-machine argv-fingerprint secret: 32
+// random bytes, hex-encoded.
+func newArgvSalt() string {
+	buf := make([]byte, 32)
+	if _, err := rand.Read(buf); err != nil {
+		// crypto/rand failing is effectively unrecoverable, but a fingerprint
+		// salt is not worth crashing sctx over: fall back to a value that is
+		// still unpredictable across runs of THIS process, at the cost of not
+		// persisting usefully.
+		return hex.EncodeToString(buf) + strconv.FormatInt(time.Now().UnixNano(), 16)
+	}
+	return hex.EncodeToString(buf)
+}
+
+// persistArgvSalt writes `argv_salt = "..."` into the config file, creating an
+// empty one (and its parent directory) if none exists yet. A full rewrite
+// lives in the CLI's own writeConfigFile, which Load must not depend on to
+// avoid an import cycle, so this is the narrowest write that still gets a
+// fresh salt onto disk before the next process starts.
+//
+// The line is inserted BEFORE the first `[org.*]` section, never simply
+// appended: a top-level key placed after a section header would parse as
+// belonging to that org (loadConfigFile only recognizes "token" there) and be
+// silently dropped on the very next read.
+func persistArgvSalt(path, salt string) error {
+	line := fmt.Sprintf("argv_salt = %q\n", salt)
+	data, err := os.ReadFile(path)
+	if os.IsNotExist(err) {
+		if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
+			return err
+		}
+		return os.WriteFile(path, []byte(line), 0o600)
+	}
+	if err != nil {
+		return err
+	}
+	lines := strings.Split(string(data), "\n")
+	insertAt := len(lines)
+	for i, raw := range lines {
+		if strings.HasPrefix(strings.TrimSpace(raw), "[") {
+			insertAt = i
+			break
+		}
+	}
+	out := make([]string, 0, len(lines)+1)
+	out = append(out, lines[:insertAt]...)
+	out = append(out, strings.TrimSuffix(line, "\n"))
+	out = append(out, lines[insertAt:]...)
+	return os.WriteFile(path, []byte(strings.Join(out, "\n")), 0o600)
 }
 
 // PermitsPurpose reports whether events collected for a purpose may be delivered.

@@ -58,6 +58,9 @@ type Options struct {
 	// Color enables ANSI-colored output for the text renderers. The caller
 	// sets it (TTY stdout, NO_COLOR unset); JSON output ignores it.
 	Color bool
+	// ByClient renders a breakdown by which coding agent ran each command
+	// (`sctx gain --by-client`), in addition to the normal report.
+	ByClient bool
 }
 
 // Render writes the `sctx gain` report to w per opts.
@@ -71,13 +74,32 @@ func Render(ctx context.Context, store stats.Store, w io.Writer, opts Options) e
 		return fmt.Errorf("aggregating stats: %w", err)
 	}
 
-	if opts.Format == "json" {
-		return renderReportJSON(w, rep, opts)
+	var byClient []stats.ClientTotals
+	if opts.ByClient {
+		byClient, err = store.ByClient(ctx, stats.AggregateOptions{Repository: opts.Repository, Since: opts.Since})
+		if err != nil {
+			return fmt.Errorf("aggregating by client: %w", err)
+		}
 	}
-	return renderReportText(w, rep, opts)
+	// Computed unconditionally (text mode only, below): a local read of the
+	// local store, telling the developer something useful about their own
+	// habits — not gated behind --by-client, which is a different axis
+	// (WHO ran commands, not WHICH commands repeat).
+	var repeated []stats.RepeatedRun
+	if opts.Format != "json" {
+		repeated, err = store.RepeatedRunsToday(ctx, 0)
+		if err != nil {
+			return fmt.Errorf("aggregating repeated runs: %w", err)
+		}
+	}
+
+	if opts.Format == "json" {
+		return renderReportJSON(w, rep, byClient, opts)
+	}
+	return renderReportText(w, rep, byClient, repeated, opts)
 }
 
-func renderReportText(w io.Writer, rep stats.Report, opts Options) error {
+func renderReportText(w io.Writer, rep stats.Report, byClient []stats.ClientTotals, repeated []stats.RepeatedRun, opts Options) error {
 	p := palette{on: opts.Color}
 	g := rep.Global
 	pct := 0.0
@@ -107,10 +129,23 @@ func renderReportText(w io.Writer, rep stats.Report, opts Options) error {
 	fmt.Fprintf(w, "%s %s %s\n", p.dim("Efficiency:     "),
 		p.meterBar("█", "░", effFilled, meterWidth), p.bold(p.pct(pctString(pct), pct)))
 
-	if len(rep.ByCommand) == 0 {
-		return nil
+	if len(rep.ByCommand) > 0 {
+		renderByCommand(w, p, rep, opts)
 	}
 
+	if len(byClient) > 0 {
+		renderByClient(w, p, byClient)
+	}
+
+	if len(repeated) > 0 {
+		renderRepeatedRunsToday(w, p, repeated)
+	}
+
+	return nil
+}
+
+func renderByCommand(w io.Writer, p palette, rep stats.Report, opts Options) {
+	g := rep.Global
 	fmt.Fprintln(w)
 	fmt.Fprintln(w, p.boldCyan("By Command"))
 	fmt.Fprintln(w, p.rule("─", tableWidth))
@@ -144,7 +179,48 @@ func renderReportText(w io.Writer, rep stats.Report, opts Options) error {
 			p.dim(num), p.cyan(name), count, p.green(saved),
 			p.pct(avg, cmdPct), p.dim(tm), p.meterBar("█", "░", impactFilled, impactWidth))
 	}
-	return nil
+}
+
+// renderByClient prints the `sctx gain --by-client` breakdown: the same
+// shape as By Command, grouped by which coding agent ran each command
+// instead of which command ran.
+func renderByClient(w io.Writer, p palette, byClient []stats.ClientTotals) {
+	fmt.Fprintln(w)
+	fmt.Fprintln(w, p.boldCyan("By Client"))
+	fmt.Fprintln(w, p.rule("─", tableWidth))
+	fmt.Fprintln(w, p.dim(fmt.Sprintf("%-*s %6s %8s %7s %8s",
+		commandColWidth, "Client", "Count", "Saved", "Avg%", "Time")))
+	fmt.Fprintln(w, p.rule("─", tableWidth))
+	for _, c := range byClient {
+		label := c.Client
+		if label == "" {
+			label = "(unknown)"
+		}
+		cmdPct := 0.0
+		if c.RawTokens > 0 {
+			cmdPct = float64(c.SavedTokens) / float64(c.RawTokens) * 100
+		}
+		name := fmt.Sprintf("%-*s", commandColWidth, truncate(label, commandColWidth))
+		count := fmt.Sprintf("%6d", c.Runs)
+		saved := fmt.Sprintf("%8s", humanTokens(c.SavedTokens))
+		avg := fmt.Sprintf("%7s", pctString(cmdPct))
+		tm := fmt.Sprintf("%8s", (time.Duration(c.AvgMS) * time.Millisecond).Round(time.Millisecond))
+		fmt.Fprintf(w, "%s %s %s %s %s\n", p.cyan(name), count, p.green(saved), p.pct(avg, cmdPct), p.dim(tm))
+	}
+}
+
+// renderRepeatedRunsToday prints the "you ran this again" line: a local read
+// of the local store, not anything that could leave the machine.
+func renderRepeatedRunsToday(w io.Writer, p palette, repeated []stats.RepeatedRun) {
+	total := int64(0)
+	parts := make([]string, 0, len(repeated))
+	for _, rr := range repeated {
+		total += rr.Count
+		parts = append(parts, fmt.Sprintf("%s %d", rr.Argv, rr.Count))
+	}
+	fmt.Fprintln(w)
+	fmt.Fprintf(w, "%s %s (top: %s)\n",
+		p.dim("Repeated identical runs today:"), p.bold(fmt.Sprintf("%d", total)), strings.Join(parts, ", "))
 }
 
 // jsonReport is the stable `sctx gain --format json` shape.
@@ -155,14 +231,16 @@ type jsonReport struct {
 	EarliestRun *time.Time            `json:"earliest_run,omitzero"` // earliest run in the (scoped) data
 	Global      stats.Totals          `json:"global"`
 	ByCommand   []stats.CommandTotals `json:"by_command"`
+	ByClient    []stats.ClientTotals  `json:"by_client,omitempty"`
 	TotalExecMS int64                 `json:"total_exec_ms"`
 }
 
-func renderReportJSON(w io.Writer, rep stats.Report, opts Options) error {
+func renderReportJSON(w io.Writer, rep stats.Report, byClient []stats.ClientTotals, opts Options) error {
 	out := jsonReport{
 		Scope:       "global",
 		Global:      rep.Global,
 		ByCommand:   rep.ByCommand,
+		ByClient:    byClient,
 		TotalExecMS: rep.TotalExecMS,
 	}
 	if opts.Repository != "" {

@@ -307,3 +307,22 @@ func TestInvokesSctxHookIsWholeToken(t *testing.T) {
 		}
 	}
 }
+
+func TestHookBinaryParsesTheInstalledProgramToken(t *testing.T) {
+	home := t.TempDir()
+	settingsAt(t, home, theRealSettings)
+	got, ok := HookBinary(home, claudeAgent())
+	if !ok {
+		t.Fatal("expected a hook binary to be found")
+	}
+	if got != "/Users/x/.local/bin/sctx" {
+		t.Fatalf("got %q, want /Users/x/.local/bin/sctx", got)
+	}
+}
+
+func TestHookBinaryMissingHookIsNotOK(t *testing.T) {
+	home := t.TempDir()
+	if _, ok := HookBinary(home, claudeAgent()); ok {
+		t.Fatal("expected no hook binary on a machine with no settings.json")
+	}
+}

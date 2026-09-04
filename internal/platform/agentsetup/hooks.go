@@ -318,6 +318,73 @@ func invokesSctxHook(cmd, subcommand string) bool {
 	return false
 }
 
+// HookBinary parses the program token out of one of a's installed hook
+// entries (any of them — every hook `sctx setup` writes for one agent in one
+// run points at the same binary), for `sctx doctor` to compare against the
+// binary running now and the newest one found on PATH.
+//
+// Returns ok=false when the agent has no hooks (or none of ours installed),
+// which the caller must not read as an error: an agent sctx has not been set
+// up for simply has nothing to compare.
+//
+// Scoped to the JSON-hooks agents (Claude Code, Gemini CLI) that hooksFor
+// covers. Cursor/Copilot/Droid keep the hook in their own config files
+// (cursorhooks.go/copilothooks.go/droidhooks.go) and Codex's is TOML
+// (codexmcp.go) — neither is wired into this lookup yet.
+func HookBinary(home string, a Agent) (string, bool) {
+	specs := hooksFor(a, "")
+	settingsPath := hookSettingsPath(home, a)
+	if len(specs) == 0 || settingsPath == "" {
+		return "", false
+	}
+	raw, err := os.ReadFile(settingsPath)
+	if err != nil {
+		return "", false
+	}
+	var doc map[string]any
+	if err := json.Unmarshal(raw, &doc); err != nil {
+		return "", false
+	}
+	hooks, _ := doc["hooks"].(map[string]any)
+	for _, spec := range specs {
+		groups, _ := hooks[spec.Event].([]any)
+		for _, g := range groups {
+			group, _ := g.(map[string]any)
+			if m, _ := group["matcher"].(string); m != spec.Matcher {
+				continue
+			}
+			entries, _ := group["hooks"].([]any)
+			for _, e := range entries {
+				entry, _ := e.(map[string]any)
+				cmd, _ := entry["command"].(string)
+				if prog, ok := hookProgramToken(cmd, spec.Subcommand); ok {
+					return prog, true
+				}
+			}
+		}
+	}
+	return "", false
+}
+
+// hookProgramToken is invokesSctxHook, but returning the WHOLE first token
+// (the path the hook actually runs) rather than a bool.
+func hookProgramToken(cmd, subcommand string) (string, bool) {
+	fields := strings.Fields(cmd)
+	for i, f := range fields {
+		base := f
+		if idx := strings.LastIndexAny(base, `/\`); idx >= 0 {
+			base = base[idx+1:]
+		}
+		if base != "sctx" && base != "sctx.exe" {
+			continue
+		}
+		if i+2 < len(fields) && fields[i+1] == "hook" && fields[i+2] == subcommand {
+			return f, true
+		}
+	}
+	return "", false
+}
+
 // addHook appends our entry, reusing an existing group for the same matcher
 // rather than creating a second one — two groups with the same matcher both
 // fire, which is legal and confusing.

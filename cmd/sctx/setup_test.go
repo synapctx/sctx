@@ -381,7 +381,7 @@ func TestConfigRewritePreservesAChosenMCPHost(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "config.toml")
 	if err := writeConfigFile(path, defaultInitEndpoint, "https://mcp.internal.example", "acme",
-		map[string]string{"acme": "sctx_live_acme"}, config.ConsentRecord{}); err != nil {
+		map[string]string{"acme": "sctx_live_acme"}, config.ConsentRecord{}, ""); err != nil {
 		t.Fatal(err)
 	}
 	raw, err := os.ReadFile(path)
@@ -400,6 +400,26 @@ func TestConfigRewritePreservesAChosenMCPHost(t *testing.T) {
 	// chose a host has to follow the binary rather than a copy of today's value.
 	if got := configuredWorkspaceProxy(config.Config{WorkspaceProxyURL: config.DefaultWorkspaceProxy}); got != "" {
 		t.Errorf("the shipped default would be frozen into the config file: %q", got)
+	}
+}
+
+// The argv-fingerprint salt must survive the same wholesale rewrite: it is
+// generated once per machine by config.Load, and a rewrite that dropped it
+// would make config.Load mint a NEW one on the next process, silently
+// breaking the "same command as before" signal it exists to provide.
+func TestConfigRewritePreservesTheArgvSalt(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, "config.toml")
+	if err := writeConfigFile(path, defaultInitEndpoint, "", "acme",
+		map[string]string{"acme": "sctx_live_acme"}, config.ConsentRecord{}, "deadbeef"); err != nil {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(raw), `argv_salt = "deadbeef"`) {
+		t.Fatalf("the argv salt was not persisted:\n%s", raw)
 	}
 }
 

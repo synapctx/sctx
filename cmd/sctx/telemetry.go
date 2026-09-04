@@ -221,7 +221,7 @@ func counted(m map[string]int) string {
 // the next `sctx init`.
 func recordConsent(cfg config.Config, decision string) error {
 	return writeConfigFile(cfg.ConfigFilePath, cfg.TelemetryEndpoint, configuredWorkspaceProxy(cfg), cfg.DefaultOrg,
-		cfg.OrgTokens, config.NewConsent(decision, time.Now()))
+		cfg.OrgTokens, config.NewConsent(decision, time.Now()), cfg.ArgvSalt)
 }
 
 // shouldAskConsent decides whether the customer is asked during `sctx setup`.

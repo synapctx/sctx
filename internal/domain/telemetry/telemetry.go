@@ -73,11 +73,35 @@ type Event struct {
 	DurationMS  int64  `json:"durationMs"`
 	// FormatterMatched is retained for older servers and means a dedicated
 	// formatter was selected. It never meant that output was reduced.
-	FormatterMatched bool      `json:"formatterMatched,omitzero"`
-	FormatterKind    string    `json:"formatterKind,omitempty"`
-	OutputReduced    bool      `json:"outputReduced,omitzero"`
-	DeclineReason    string    `json:"declineReason,omitempty"`
-	At               time.Time `json:"at"`
+	FormatterMatched bool   `json:"formatterMatched,omitzero"`
+	FormatterKind    string `json:"formatterKind,omitempty"`
+	OutputReduced    bool   `json:"outputReduced,omitzero"`
+	DeclineReason    string `json:"declineReason,omitempty"`
+	// Client is which coding agent ran this: "claude-code", "codex",
+	// "gemini-cli", "cursor", "copilot-cli", "droid", "kilo", "opencode" or
+	// "shell" — see internal/platform/agentenv.
+	Client string `json:"client,omitempty"`
+	// SessionID is an opaque id the agent (or sctx itself, for agents with no
+	// env marker) generated, so one session's commands and its SynapCTX calls
+	// line up. Never a value that identifies a person or a machine.
+	SessionID string `json:"sessionId,omitempty"`
+	// Bypass records whether sctx's own formatting was skipped, and how: ""
+	// (not bypassed), "force_tier" (SCT__FORCE_TIER=off|verbatim) or
+	// "double_dash" (`sctx -- <cmd>`).
+	Bypass string `json:"bypass,omitempty"`
+	// ArgvHash is a one-way, salted fingerprint of the normalized argv — see
+	// PurposeOf for why this is service data, not improvement data. The salt
+	// never leaves the machine, so the hash alone cannot be reversed; it only
+	// says "same command as before".
+	ArgvHash string `json:"argvHash,omitempty"`
+	// Synthetic marks an event generated for testing or demonstration
+	// (SCT__SYNTHETIC=1) rather than a real developer command, so server-side
+	// aggregation can exclude it.
+	Synthetic bool `json:"synthetic,omitempty"`
+	// RedactedCount is how many secrets a redaction pass hid before this event
+	// was recorded. Reserved for a future redaction feature; always 0 today.
+	RedactedCount int       `json:"redactedCount,omitempty"`
+	At            time.Time `json:"at"`
 }
 
 // Emitter accepts events without ever blocking on the network. Emit appends

@@ -140,6 +140,23 @@ make install   # ~/.local/bin/sctx
   decision older than the current version counts as no decision. A test reflects
   over the telemetry event: a new field fails the build until it is disclosed and
   the version bumped.
+- **Client/session provenance and the argv fingerprint are `PurposeService`,
+  not `PurposeImprovement`.** `internal/platform/agentenv` resolves which
+  coding agent is driving the process (env markers, e.g. Claude Code's
+  `CLAUDECODE=1`/`CLAUDE_CODE_SESSION_ID`, with an `SCT__CLIENT`/`SCT__SESSION`
+  override; unmatched reports `"shell"`, unrecognised reports `"unknown"` —
+  never an arbitrary string). A hook and the wrapped command it triggers run in
+  SEPARATE processes with no shared environment, so the hook also writes
+  `<spoolDir>/sessions/current` (atomic, 0600) as a fallback the run pipeline
+  reads only when its own env carries no session id AND the file is ≤2s old —
+  old enough to be a previous session's leftover otherwise.
+  `telemetry.Event.ArgvHash` is `hex(sha256(config.ArgvSalt + normalizedArgv))[:16]`:
+  one-way, salted with a 32-byte secret generated once per machine
+  (`config.ArgvSalt`, persisted to `config.toml`, never transmitted), so it
+  says "same command as before" without being reversible or comparable across
+  machines. It rides on `exec_savings` (service purpose) rather than
+  `coverage_gap`, argued in `telemetry.PurposeOf`'s comment: the customer is
+  the only party who ever reads it, on their own console.
 - **Never send paths or filenames.** The program key is `program` or
   `program subcommand`, and which one is decided by an explicit allowlist of
   programs whose first argument is genuinely an operation — never by how the
