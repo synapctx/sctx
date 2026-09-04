@@ -223,6 +223,21 @@ make install   # ~/.local/bin/sctx
   machines. It rides on `exec_savings` (service purpose) rather than
   `coverage_gap`, argued in `telemetry.PurposeOf`'s comment: the customer is
   the only party who ever reads it, on their own console.
+  **`persistArgvSalt` (config.go, 2026-09-04) REWRITES, never appends.** It
+  used to append a fresh `argv_salt` line every time `Load` saw an empty
+  salt — which any single malformed line elsewhere in the file used to
+  cause, since `loadConfigFile` discarded the WHOLE file (including an
+  already-persisted salt) on one bad line. Compounded across every wrapped
+  invocation: 43 duplicate `argv_salt` lines within two hours of v0.7.0 on
+  one machine. Now: the malformed-line parser skips only that line (warns
+  once); `persistArgvSalt` strips any existing `argv_salt` line(s) before
+  writing exactly one, atomically (temp file + rename); a file already
+  carrying duplicates is deduplicated once, keeping the LAST value. An
+  ordinary wrapped run, once one salt is on disk, never touches
+  `config.toml` again. `parseConfigLine` also accepts bare TOML
+  `true`/`false`/integers now, not only double-quoted strings — `redact =
+  true` (unquoted, valid TOML) used to parse as malformed while `redact =
+  "true"` worked; the writer emits bare booleans for boolean keys.
 - **Never send paths or filenames.** The program key is `program` or
   `program subcommand`, and which one is decided by an explicit allowlist of
   programs whose first argument is genuinely an operation — never by how the
@@ -347,6 +362,22 @@ load-bearing.
     `[A-Za-z0-9._-]` and a name of only dots is refused. Read-modify-write with
     no lock is deliberate: one developer, one agent, and a lost update costs one
     extra nudge.
+  - **The PostToolUse Bash branch also nudges on a repeated IDENTICAL run
+    (2026-09-04, `internal/adapters/hook/repeatnudge.go`)**: if the same
+    normalized argv has produced the exact same raw output size at least 3
+    times in this session (two indexed queries against the local stats.db,
+    `stats.Store.LatestRawBytes`/`IdenticalRunCount`, joined by `session_id`),
+    one line asks the agent to stop re-running it. Local-only — no network,
+    no API key needed, unlike the memory/symbol nudges this shares a hook
+    process with — so `runClaudePostToolBash` computes both independently and
+    joins non-empty results into one `additionalContext` body. Rate-limited
+    per session, state at `<spoolDir>/sessions/<id>.repeat` (a SEPARATE file
+    from the first-search counter — unrelated lifecycles, would race on one
+    file): at most once per (session, argv), at most 3 nudges total. An
+    allowlist (`repeatNudgeAllowlist`) exempts commands that legitimately
+    repeat — `git status`/`log`/`diff`, `kubectl get`, `ls`, `cat`, `head`,
+    `tail` — keyed on (program, subcommand) after stripping the rewrite
+    hook's own leading `sctx` token.
 - **Auto-wrap is per-client and there are three mechanisms.** A hook process in
   JSON settings (Claude Code, Gemini CLI), a hook in TOML with a trust step
   (Codex), and an in-process plugin (Kilo Code, OpenCode) — all reporting through
