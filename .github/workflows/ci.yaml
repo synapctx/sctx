@@ -230,7 +230,7 @@ jobs:
 
           # (d) sctx.exe setup (inspect) — every row [ok], never [stale].
           $inspectOut = & $sctx setup 2>&1 | Out-String
-          Assert ($LASTEXITCODE -eq 0) "setup (inspect) exited $LASTEXITCODE:`n$inspectOut"
+          Assert ($LASTEXITCODE -eq 0) "setup (inspect) exited ${LASTEXITCODE}:`n$inspectOut"
           AssertLoud (-not ($inspectOut -match '\[stale\]')) "setup reported [stale] on a fresh install" $inspectOut
 
           # (e) the PreToolUse rewrite hook itself.
