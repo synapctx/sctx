@@ -728,7 +728,7 @@ func writeConfigFile(path, endpoint, workspaceProxy, defaultOrg string, orgToken
 	// telemetry write. Omitted when false (the default) so the file stays
 	// unchanged for anyone who never touched it.
 	if redact {
-		fmt.Fprintf(&b, "redact = \"true\"\n")
+		fmt.Fprintf(&b, "redact = true\n")
 	}
 	// The consent record rides through every write of this file. This function
 	// rewrites it wholesale, so anything not threaded through here is erased —

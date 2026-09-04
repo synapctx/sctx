@@ -466,7 +466,7 @@ func TestConfigRewriteThreadsRedact(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if !strings.Contains(string(raw), `redact = "true"`) {
+	if !strings.Contains(string(raw), `redact = true`) {
 		t.Fatalf("redact=true was not persisted:\n%s", raw)
 	}
 

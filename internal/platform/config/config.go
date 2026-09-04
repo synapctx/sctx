@@ -321,6 +321,7 @@ func loadConfigFile(path string) fileValues {
 	// section is "" at top level, "org:<slug>" inside a recognized [org.<slug>]
 	// section, or "?" inside an unknown section (keys ignored, forward-compat).
 	section := ""
+	warnedMalformed := false
 	for i, rawLine := range strings.Split(string(data), "\n") {
 		line := strings.TrimSpace(rawLine)
 		if line == "" || strings.HasPrefix(line, "#") {
@@ -337,8 +338,14 @@ func loadConfigFile(path string) fileValues {
 		}
 		key, value, ok := parseConfigLine(line)
 		if !ok {
-			fmt.Fprintf(os.Stderr, "sctx: warning: config file %s: malformed line %d, ignoring file (falling back to env-only configuration)\n", path, i+1)
-			return fileValues{}
+			// One bad line must not cost the whole file — dropping every org
+			// token because one unrelated line is malformed is far worse than
+			// the line itself. Warn once per file and keep parsing the rest.
+			if !warnedMalformed {
+				fmt.Fprintf(os.Stderr, "sctx: warning: config file %s: malformed line %d, skipping\n", path, i+1)
+				warnedMalformed = true
+			}
+			continue
 		}
 		if slug, ok := strings.CutPrefix(section, "org:"); ok {
 			if key == "token" {
@@ -378,9 +385,13 @@ func loadConfigFile(path string) fileValues {
 	return fv
 }
 
-// parseConfigLine parses one `key = "value"` line of the strict, zero-dep
-// config file format: bare keys, double-quoted string values, no nesting,
-// no multi-line values. Anything else is malformed.
+// parseConfigLine parses one `key = value` line of the strict, zero-dep
+// config file format: bare keys, no nesting, no multi-line values. The value
+// is either a double-quoted string, or a bare TOML boolean (`true`/`false`)
+// or bare integer — both accepted so a hand-written or hand-edited
+// `redact = true` (unquoted, valid TOML) is not silently ignored just
+// because every value this format has ever WRITTEN so far happened to be
+// quoted. Anything else is malformed.
 func parseConfigLine(line string) (key, value string, ok bool) {
 	before, after, ok := strings.Cut(line, "=")
 	if !ok {
@@ -388,14 +399,43 @@ func parseConfigLine(line string) (key, value string, ok bool) {
 	}
 	key = strings.TrimSpace(before)
 	rawValue := strings.TrimSpace(after)
-	if key == "" || len(rawValue) < 2 || rawValue[0] != '"' || rawValue[len(rawValue)-1] != '"' {
+	if key == "" || rawValue == "" {
 		return "", "", false
 	}
-	value = rawValue[1 : len(rawValue)-1]
-	if strings.ContainsRune(value, '"') {
-		return "", "", false
+	if rawValue[0] == '"' {
+		if len(rawValue) < 2 || rawValue[len(rawValue)-1] != '"' {
+			return "", "", false
+		}
+		value = rawValue[1 : len(rawValue)-1]
+		if strings.ContainsRune(value, '"') {
+			return "", "", false
+		}
+		return key, value, true
 	}
-	return key, value, true
+	if rawValue == "true" || rawValue == "false" || isBareInteger(rawValue) {
+		return key, rawValue, true
+	}
+	return "", "", false
+}
+
+// isBareInteger reports whether s is an unquoted TOML integer: an optional
+// leading '-' followed by one or more digits.
+func isBareInteger(s string) bool {
+	if s == "" {
+		return false
+	}
+	if s[0] == '-' {
+		s = s[1:]
+	}
+	if s == "" {
+		return false
+	}
+	for _, r := range s {
+		if r < '0' || r > '9' {
+			return false
+		}
+	}
+	return true
 }
 
 // newArgvSalt generates a fresh per-machine argv-fingerprint secret: 32

@@ -199,6 +199,78 @@ func TestLoadMalformedConfigFileWarnsAndContinuesEnvOnly(t *testing.T) {
 	}
 }
 
+// TestLoadMalformedLineIsSkippedNotTheWholeFile proves one bad line costs
+// only itself: an org token on a later, well-formed line must still load
+// even though an earlier line in the same file is malformed.
+func TestLoadMalformedLineIsSkippedNotTheWholeFile(t *testing.T) {
+	home := withHome(t)
+	clearTelemetryEnv(t)
+	writeConfigTOML(t, home, strings.Join([]string{
+		`telemetry_endpoint = not-quoted`,
+		`default_org = "acme"`,
+		`[org.acme]`,
+		`token = "sctx_live_acme"`,
+		``,
+	}, "\n"))
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if cfg.DefaultOrg != "acme" {
+		t.Errorf("DefaultOrg = %q, want %q (one malformed line must not drop the rest of the file)", cfg.DefaultOrg, "acme")
+	}
+	if token, ok := cfg.TokenForOrg("acme"); !ok || token != "sctx_live_acme" {
+		t.Errorf("TokenForOrg(acme) = (%q, %v), want (%q, true)", token, ok, "sctx_live_acme")
+	}
+}
+
+// TestParseConfigLineAcceptsBareBooleansAndIntegers covers the parser fix:
+// `redact = true` (unquoted, valid TOML) must take effect exactly like
+// `redact = "true"` did before, for both `redact` and `telemetry_enabled`.
+func TestParseConfigLineAcceptsBareBooleansAndIntegers(t *testing.T) {
+	tests := []struct {
+		name       string
+		fileBody   string
+		wantRedact bool
+	}{
+		{name: "bare true", fileBody: "redact = true\n", wantRedact: true},
+		{name: "bare false", fileBody: "redact = false\n", wantRedact: false},
+		{name: "quoted true still works", fileBody: `redact = "true"` + "\n", wantRedact: true},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			home := withHome(t)
+			clearTelemetryEnv(t)
+			t.Setenv("SCT__REDACT", "")
+			os.Unsetenv("SCT__REDACT")
+			writeConfigTOML(t, home, tc.fileBody)
+
+			cfg, err := Load()
+			if err != nil {
+				t.Fatalf("Load: %v", err)
+			}
+			if cfg.Redact != tc.wantRedact {
+				t.Errorf("Redact = %v, want %v", cfg.Redact, tc.wantRedact)
+			}
+		})
+	}
+}
+
+func TestParseConfigLineAcceptsBareTelemetryEnabled(t *testing.T) {
+	home := withHome(t)
+	clearTelemetryEnv(t)
+	writeConfigTOML(t, home, "telemetry_enabled = true\n")
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if !cfg.TelemetryExplicit || !cfg.TelemetryEnabled {
+		t.Errorf("bare `telemetry_enabled = true` did not take effect: explicit=%v enabled=%v", cfg.TelemetryExplicit, cfg.TelemetryEnabled)
+	}
+}
+
 func TestLoadMissingConfigFileIsSilent(t *testing.T) {
 	withHome(t)
 	clearTelemetryEnv(t)
