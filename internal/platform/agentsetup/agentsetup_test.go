@@ -191,6 +191,42 @@ func TestStaleInstructionsAreDetectedAndReplacedInPlace(t *testing.T) {
 	}
 }
 
+// A repaired instruction file must not turn into a MIXED-EOL file. Notepad
+// and a fair few Windows editors render a mixed-EOL file as one unbroken
+// line, so a stale-block repair on an all-CRLF AGENTS.md must produce a
+// block whose OWN newlines are CRLF too, not the LF `agentdoc.Wrap` emits by
+// default.
+func TestStaleInstructionsAreReplacedPreservingCRLF(t *testing.T) {
+	home := t.TempDir()
+	configure(t, home, "codex")
+	root := filepath.Join(home, ".codex", "AGENTS.md")
+	crlf := "# My rules\r\n\r\nBe terse.\r\n\r\n" +
+		agentdoc.BeginMarker + "\r\nancient instructions\r\n" + agentdoc.EndMarker +
+		"\r\n\r\n# After\r\n"
+	write(t, root, crlf)
+
+	if _, err := Install(home, nil); err != nil {
+		t.Fatal(err)
+	}
+	got, _ := os.ReadFile(root)
+	out := string(got)
+
+	if strings.Contains(out, "ancient instructions") {
+		t.Error("stale block survived a reinstall")
+	}
+	if strings.Contains(out, "\n") && !strings.Contains(out, "\r\n") {
+		t.Fatalf("file has bare LF at all, want CRLF throughout:\n%q", out)
+	}
+	for i, r := range out {
+		if r == '\n' && (i == 0 || out[i-1] != '\r') {
+			t.Fatalf("bare LF at byte %d, want CRLF throughout:\n%q", i, out)
+		}
+	}
+	if !strings.HasPrefix(out, "# My rules\r\n\r\nBe terse.\r\n") || !strings.Contains(out, "# After") {
+		t.Errorf("content outside the block was altered:\n%q", out)
+	}
+}
+
 // A hand-edited sidecar was customised on purpose; replacing it silently is
 // worse than leaving it slightly stale.
 func TestSidecarsAreNeverOverwritten(t *testing.T) {

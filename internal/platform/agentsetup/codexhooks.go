@@ -54,7 +54,7 @@ matcher = "^Bash$"
 
 [[hooks.PreToolUse.hooks]]
 type = "command"
-command = ` + tomlBasicString(binary+" hook codex") + `
+command = ` + tomlBasicString(quoteBinaryForCommand(binary)+" hook codex") + `
 timeout = 10
 statusMessage = "sctx: wrapping command"
 `

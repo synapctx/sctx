@@ -530,18 +530,50 @@ func sidecarAction(state agentdoc.SidecarState, force bool) (verb string, write 
 // exactly one blank line, so the block can neither land on the end of an
 // existing sentence — which rewrites their last instruction AND installs
 // nothing — nor accumulate blank lines across repeated runs.
+//
+// Emits `agentdoc.Wrap`'s LF unchanged UNLESS the file being repaired is
+// CRLF end-to-end, in which case the block we insert matches it. A fair few
+// Windows editors — Notepad among them — still render a mixed-EOL file as one
+// unbroken line, so writing LF into an otherwise-CRLF instruction file would
+// make everything BUT our own block unreadable there. Detected once, from the
+// file as found: a MIXED file (some CRLF, some bare LF — not ours, since
+// nothing here ever produces one) is left exactly as ambiguous as it already
+// was rather than guessed at.
 func upsertBlock(existing, block string) string {
 	wrapped := agentdoc.Wrap(block)
+	if isCRLF(existing) {
+		wrapped = toCRLF(wrapped)
+	}
 	if before, after, ok := strings.Cut(existing, agentdoc.BeginMarker); ok {
 		rest := after
 		if _, after, ok := strings.Cut(rest, agentdoc.EndMarker); ok {
 			tail := after
-			return before + strings.TrimSuffix(wrapped, "\n") + tail
+			return before + strings.TrimRight(wrapped, "\r\n") + tail
 		}
 	}
-	out := strings.TrimRight(existing, "\n")
+	out := strings.TrimRight(existing, "\r\n")
 	if out != "" {
-		out += "\n\n"
+		if isCRLF(existing) {
+			out += "\r\n\r\n"
+		} else {
+			out += "\n\n"
+		}
 	}
 	return out + wrapped
+}
+
+// isCRLF reports whether s's line endings are CRLF, judged from its first
+// newline — a file with none (the common case, and every file sctx itself
+// creates) reads as LF.
+func isCRLF(s string) bool {
+	if i := strings.IndexByte(s, '\n'); i > 0 {
+		return s[i-1] == '\r'
+	}
+	return false
+}
+
+// toCRLF converts LF line endings to CRLF, normalising away any CRLF already
+// present first so a straight replace never doubles the \r.
+func toCRLF(s string) string {
+	return strings.ReplaceAll(strings.ReplaceAll(s, "\r\n", "\n"), "\n", "\r\n")
 }

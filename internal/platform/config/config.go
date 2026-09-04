@@ -166,12 +166,26 @@ func (c Config) HasAnyToken() bool {
 	return c.TelemetryTokenEnv != "" || c.LegacyToken != "" || len(c.OrgTokens) > 0
 }
 
-func Load() (Config, error) {
+// BaseDir returns `~/.config/sctx` (`%USERPROFILE%\.config\sctx` on Windows —
+// filepath.Join already renders the separator the platform wants). Load and
+// the hook's own spool resolution (internal/adapters/hook/firstsearch.go)
+// used to each join this by hand; a coding agent's own config already lives
+// under the user's profile on every platform (~\.claude, ~\.codex,
+// ~\.gemini), so sctx's own state follows it there rather than inventing a
+// second convention (e.g. LOCALAPPDATA) nothing else here uses.
+func BaseDir() (string, error) {
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return Config{}, fmt.Errorf("resolving home directory: %w", err)
+		return "", fmt.Errorf("resolving home directory: %w", err)
 	}
-	base := filepath.Join(home, ".config", "sctx")
+	return filepath.Join(home, ".config", "sctx"), nil
+}
+
+func Load() (Config, error) {
+	base, err := BaseDir()
+	if err != nil {
+		return Config{}, err
+	}
 	configPath := filepath.Join(base, "config.toml")
 	fv := loadConfigFile(configPath)
 

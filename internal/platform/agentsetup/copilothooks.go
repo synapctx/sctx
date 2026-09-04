@@ -49,7 +49,7 @@ func copilotHookDoc(binary string) map[string]any {
 			"PreToolUse": []any{
 				map[string]any{
 					"type":    "command",
-					"command": binary + " hook copilot",
+					"command": quoteBinaryForCommand(binary) + " hook copilot",
 					"cwd":     ".",
 					"timeout": 5,
 				},

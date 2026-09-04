@@ -199,9 +199,9 @@ func spoolDir() string {
 	if dir := os.Getenv("SCT__SPOOL_DIR"); dir != "" {
 		return dir
 	}
-	home, err := os.UserHomeDir()
+	base, err := config.BaseDir()
 	if err != nil {
 		return ""
 	}
-	return filepath.Join(home, ".config", "sctx", "spool")
+	return filepath.Join(base, "spool")
 }
