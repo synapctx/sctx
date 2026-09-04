@@ -271,6 +271,122 @@ func TestParseConfigLineAcceptsBareTelemetryEnabled(t *testing.T) {
 	}
 }
 
+// TestLoadPersistsArgvSaltOnlyOnce runs Load, then Load again against the
+// resulting file, and requires exactly one `argv_salt` line and the SAME
+// value both times — the bug this guards against generated and appended a
+// fresh salt on every single invocation.
+func TestLoadPersistsArgvSaltOnlyOnce(t *testing.T) {
+	home := withHome(t)
+	clearTelemetryEnv(t)
+	configPath := filepath.Join(home, ".config", "sctx", "config.toml")
+
+	cfg1, err := Load()
+	if err != nil {
+		t.Fatalf("Load (1st): %v", err)
+	}
+	if cfg1.ArgvSalt == "" {
+		t.Fatal("ArgvSalt must be generated on first Load")
+	}
+
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		t.Fatalf("reading persisted config: %v", err)
+	}
+	if got := strings.Count(string(data), "argv_salt ="); got != 1 {
+		t.Fatalf("expected exactly one argv_salt line after 1st Load, got %d in: %s", got, data)
+	}
+
+	cfg2, err := Load()
+	if err != nil {
+		t.Fatalf("Load (2nd): %v", err)
+	}
+	if cfg2.ArgvSalt != cfg1.ArgvSalt {
+		t.Errorf("ArgvSalt changed across Load calls: %q -> %q", cfg1.ArgvSalt, cfg2.ArgvSalt)
+	}
+
+	data, err = os.ReadFile(configPath)
+	if err != nil {
+		t.Fatalf("reading persisted config (2nd): %v", err)
+	}
+	if got := strings.Count(string(data), "argv_salt ="); got != 1 {
+		t.Fatalf("expected exactly one argv_salt line after 2nd Load, got %d in: %s", got, data)
+	}
+}
+
+// TestLoadDeduplicatesPreexistingDuplicateArgvSaltLines covers the recovery
+// path: a config file already carrying several `argv_salt` lines (left by
+// the old appending-not-rewriting bug) is cleaned up to exactly one, keeping
+// the LAST value — the most recently used, since later lines were written
+// more recently.
+func TestLoadDeduplicatesPreexistingDuplicateArgvSaltLines(t *testing.T) {
+	home := withHome(t)
+	clearTelemetryEnv(t)
+	writeConfigTOML(t, home, strings.Join([]string{
+		`argv_salt = "first"`,
+		`argv_salt = "second"`,
+		`argv_salt = "third"`,
+		`default_org = "acme"`,
+		``,
+	}, "\n"))
+	configPath := filepath.Join(home, ".config", "sctx", "config.toml")
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load: %v", err)
+	}
+	if cfg.ArgvSalt != "third" {
+		t.Errorf("ArgvSalt = %q, want the LAST duplicate %q", cfg.ArgvSalt, "third")
+	}
+	if cfg.DefaultOrg != "acme" {
+		t.Errorf("DefaultOrg = %q, want %q (dedup rewrite must not disturb other keys)", cfg.DefaultOrg, "acme")
+	}
+
+	data, err := os.ReadFile(configPath)
+	if err != nil {
+		t.Fatalf("reading persisted config: %v", err)
+	}
+	if got := strings.Count(string(data), "argv_salt ="); got != 1 {
+		t.Fatalf("expected exactly one argv_salt line after dedup, got %d in: %s", got, data)
+	}
+	if !strings.Contains(string(data), `argv_salt = "third"`) {
+		t.Errorf("expected the surviving line to keep the last value, got: %s", data)
+	}
+}
+
+// TestOrdinaryLoadDoesNotTouchConfigMtime proves a wrapped run's Load — once
+// a salt already exists and there is nothing to deduplicate — never rewrites
+// config.toml. A rewrite per command was the performance/correctness defect:
+// every wrapped invocation touching disk on the hot path.
+func TestOrdinaryLoadDoesNotTouchConfigMtime(t *testing.T) {
+	home := withHome(t)
+	clearTelemetryEnv(t)
+	configPath := filepath.Join(home, ".config", "sctx", "config.toml")
+
+	if _, err := Load(); err != nil { // generates and persists the salt once
+		t.Fatalf("Load (seed): %v", err)
+	}
+	info, err := os.Stat(configPath)
+	if err != nil {
+		t.Fatalf("Stat: %v", err)
+	}
+	before := info.ModTime()
+
+	// Ensure any filesystem mtime granularity would show a change if a write
+	// happened.
+	time.Sleep(10 * time.Millisecond)
+
+	if _, err := Load(); err != nil {
+		t.Fatalf("Load (2nd, ordinary): %v", err)
+	}
+	info, err = os.Stat(configPath)
+	if err != nil {
+		t.Fatalf("Stat (2nd): %v", err)
+	}
+	if !info.ModTime().Equal(before) {
+		t.Errorf("config.toml mtime changed on an ordinary Load: %v -> %v", before, info.ModTime())
+	}
+}
+
 func TestLoadMissingConfigFileIsSilent(t *testing.T) {
 	withHome(t)
 	clearTelemetryEnv(t)

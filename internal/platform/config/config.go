@@ -228,8 +228,18 @@ func Load() (Config, error) {
 		// worthless as a "same command as before" signal, which is the entire
 		// reason it exists. Best-effort: a persistence failure (read-only home,
 		// race with a concurrent sctx) still leaves this PROCESS a usable salt,
-		// it just is not guaranteed to be the one next time.
+		// it just is not guaranteed to be the one next time. persistArgvSalt
+		// itself is idempotent (it rewrites, never appends), so a second sctx
+		// racing this same branch converges rather than compounding.
 		cfg.ArgvSalt = newArgvSalt()
+		_ = persistArgvSalt(configPath, cfg.ArgvSalt)
+	} else if fv.argvSaltDuplicate {
+		// The file already carries more than one `argv_salt` line — leftover
+		// from a version that appended a fresh one on every run instead of
+		// rewriting. The parser above already kept the LAST one (most
+		// recently used, since later lines were written more recently); make
+		// that the on-disk truth too, once, rather than leaving the file to
+		// grow forever every time it is read.
 		_ = persistArgvSalt(configPath, cfg.ArgvSalt)
 	}
 
@@ -298,6 +308,7 @@ type fileValues struct {
 	consentAt         string
 	consentDisclosure string
 	argvSalt          string
+	argvSaltDuplicate bool // more than one `argv_salt` line was found; Load rewrites once to clean up
 	redact            string
 	// orgTokens holds token = "..." keys found under [org.<slug>] sections,
 	// keyed by slug. Lazily initialized; nil when no sections are present.
@@ -377,6 +388,9 @@ func loadConfigFile(path string) fileValues {
 		case "telemetry_disclosure":
 			fv.consentDisclosure = value
 		case "argv_salt":
+			if fv.argvSalt != "" {
+				fv.argvSaltDuplicate = true
+			}
 			fv.argvSalt = value
 		case "redact":
 			fv.redact = value
@@ -452,41 +466,80 @@ func newArgvSalt() string {
 	return hex.EncodeToString(buf)
 }
 
-// persistArgvSalt writes `argv_salt = "..."` into the config file, creating an
-// empty one (and its parent directory) if none exists yet. A full rewrite
-// lives in the CLI's own writeConfigFile, which Load must not depend on to
-// avoid an import cycle, so this is the narrowest write that still gets a
-// fresh salt onto disk before the next process starts.
+// persistArgvSalt writes exactly one `argv_salt = "..."` line into the config
+// file, creating an empty one (and its parent directory) if none exists yet.
+// A full rewrite lives in the CLI's own writeConfigFile, which Load must not
+// depend on to avoid an import cycle, so this is the narrowest write that
+// still gets a fresh salt onto disk before the next process starts.
 //
-// The line is inserted BEFORE the first `[org.*]` section, never simply
-// appended: a top-level key placed after a section header would parse as
-// belonging to that org (loadConfigFile only recognizes "token" there) and be
-// silently dropped on the very next read.
+// It REWRITES rather than appends: any existing `argv_salt` line(s) —
+// including duplicates left by an older buggy build — are removed first, so
+// calling this twice, or calling it on a file that already has several,
+// converges on a file with exactly one. The (possibly new) line is inserted
+// BEFORE the first `[org.*]` section, never simply appended: a top-level key
+// placed after a section header would parse as belonging to that org
+// (loadConfigFile only recognizes "token" there) and be silently dropped on
+// the very next read.
+//
+// The write is atomic (temp file + rename in the same directory): a crash or
+// concurrent sctx mid-write must never leave config.toml half-written and
+// unparseable.
 func persistArgvSalt(path, salt string) error {
-	line := fmt.Sprintf("argv_salt = %q\n", salt)
+	line := fmt.Sprintf("argv_salt = %q", salt)
 	data, err := os.ReadFile(path)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
 	if os.IsNotExist(err) {
 		if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 			return err
 		}
-		return os.WriteFile(path, []byte(line), 0o600)
+		return atomicWriteFile(path, []byte(line+"\n"), 0o600)
 	}
+
+	lines := strings.Split(string(data), "\n")
+	kept := make([]string, 0, len(lines))
+	insertAt := -1
+	for _, raw := range lines {
+		trimmed := strings.TrimSpace(raw)
+		if key, _, ok := parseConfigLine(trimmed); ok && key == "argv_salt" {
+			continue // dropped: replaced by the single line inserted below
+		}
+		if insertAt == -1 && strings.HasPrefix(trimmed, "[") {
+			insertAt = len(kept)
+		}
+		kept = append(kept, raw)
+	}
+	if insertAt == -1 {
+		insertAt = len(kept)
+	}
+	out := make([]string, 0, len(kept)+1)
+	out = append(out, kept[:insertAt]...)
+	out = append(out, line)
+	out = append(out, kept[insertAt:]...)
+	return atomicWriteFile(path, []byte(strings.Join(out, "\n")), 0o600)
+}
+
+// atomicWriteFile writes data to a temp file in path's directory and renames
+// it over path, so a reader never observes a partially written config file.
+func atomicWriteFile(path string, data []byte, perm os.FileMode) error {
+	tmp, err := os.CreateTemp(filepath.Dir(path), ".config-*.tmp")
 	if err != nil {
 		return err
 	}
-	lines := strings.Split(string(data), "\n")
-	insertAt := len(lines)
-	for i, raw := range lines {
-		if strings.HasPrefix(strings.TrimSpace(raw), "[") {
-			insertAt = i
-			break
-		}
+	tmpPath := tmp.Name()
+	defer os.Remove(tmpPath) // no-op once the rename below succeeds
+	if _, err := tmp.Write(data); err != nil {
+		tmp.Close()
+		return err
 	}
-	out := make([]string, 0, len(lines)+1)
-	out = append(out, lines[:insertAt]...)
-	out = append(out, strings.TrimSuffix(line, "\n"))
-	out = append(out, lines[insertAt:]...)
-	return os.WriteFile(path, []byte(strings.Join(out, "\n")), 0o600)
+	if err := tmp.Close(); err != nil {
+		return err
+	}
+	if err := os.Chmod(tmpPath, perm); err != nil {
+		return err
+	}
+	return os.Rename(tmpPath, path)
 }
 
 // PermitsPurpose reports whether events collected for a purpose may be delivered.
