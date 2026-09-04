@@ -3,7 +3,6 @@ package generic
 import (
 	"context"
 	"fmt"
-	"net/url"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -154,7 +153,15 @@ func TestNativeJSONLinesMeasurements(t *testing.T) {
 		if err := os.WriteFile(path, raw, 0o600); err != nil {
 			t.Fatal(err)
 		}
-		resource := (&url.URL{Scheme: "file", Path: path}).String()
+		// A plain url.URL{Scheme:"file", Path: path} mishandles a Windows
+		// path: backslashes go into the URL unescaped and there is no
+		// leading slash before the drive letter, so curl.exe cannot parse
+		// it. Build the file:// form curl accepts on every platform.
+		slashPath := filepath.ToSlash(path)
+		if !strings.HasPrefix(slashPath, "/") {
+			slashPath = "/" + slashPath
+		}
+		resource := "file://" + slashPath
 		curlRaw, err := exec.Command("curl", "--silent", "--show-error", resource).Output()
 		if err != nil {
 			t.Fatalf("native curl local NDJSON command: %v", err)

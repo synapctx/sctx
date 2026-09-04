@@ -123,7 +123,9 @@ func TestNativeGitFixtures(t *testing.T) {
 	worktreePath := filepath.Join(root, "worktree with spaces")
 	mustNativeGit(t, repo, "worktree", "add", "-b", "fixture-worktree", worktreePath)
 	worktrees := mustNativeGit(t, repo, "worktree", "list")
-	if !bytes.Contains(worktrees.stdout, []byte(worktreePath)) {
+	// Git's own porcelain output always uses forward slashes, even on
+	// Windows, so compare against the slash form rather than the OS path.
+	if !bytes.Contains(worktrees.stdout, []byte(filepath.ToSlash(worktreePath))) {
 		t.Fatalf("native worktree list missing unusual path: %q", worktrees.stdout)
 	}
 

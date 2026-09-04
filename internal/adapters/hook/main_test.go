@@ -55,6 +55,10 @@ func TestMain(m *testing.M) {
 	if err := os.Setenv("HOME", home); err != nil {
 		panic("hook tests: cannot redirect HOME: " + err.Error())
 	}
+	// windows: os.UserHomeDir reads %USERPROFILE%, not $HOME.
+	if err := os.Setenv("USERPROFILE", home); err != nil {
+		panic("hook tests: cannot redirect USERPROFILE: " + err.Error())
+	}
 
 	code := m.Run()
 	_ = os.RemoveAll(dir)

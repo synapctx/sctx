@@ -42,9 +42,9 @@ func TestExitCodes(t *testing.T) {
 		argv []string
 		want int
 	}{
-		{"success", []string{"/bin/sh", "-c", "exit 0"}, 0},
-		{"failure", []string{"/bin/sh", "-c", "exit 1"}, 1},
-		{"arbitrary code", []string{"/bin/sh", "-c", "exit 42"}, 42},
+		{"success", []string{"sh", "-c", "exit 0"}, 0},
+		{"failure", []string{"sh", "-c", "exit 1"}, 1},
+		{"arbitrary code", []string{"sh", "-c", "exit 42"}, 42},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -67,7 +67,7 @@ func TestCommandNotFound(t *testing.T) {
 }
 
 func TestStreamsSeparated(t *testing.T) {
-	out := run(t, "/bin/sh", "-c", "echo to-stdout; echo to-stderr 1>&2")
+	out := run(t, "sh", "-c", "echo to-stdout; echo to-stderr 1>&2")
 	if got := readSpill(t, out.Stdout); got != "to-stdout\n" {
 		t.Fatalf("stdout = %q", got)
 	}
@@ -79,7 +79,7 @@ func TestStreamsSeparated(t *testing.T) {
 func TestLargeOutputSpills(t *testing.T) {
 	r := NewRunner(1024) // 1 KiB threshold forces the spill path
 	out, err := r.Run(context.Background(), domexec.Command{
-		Argv: []string{"/bin/sh", "-c", `i=0; while [ $i -lt 1000 ]; do echo "line $i of filler output"; i=$((i+1)); done`},
+		Argv: []string{"sh", "-c", `i=0; while [ $i -lt 1000 ]; do echo "line $i of filler output"; i=$((i+1)); done`},
 	})
 	if err != nil {
 		t.Fatalf("Run: %v", err)

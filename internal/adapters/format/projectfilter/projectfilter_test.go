@@ -89,10 +89,15 @@ func TestFormatterMatchesExactlyAndPreservesFailures(t *testing.T) {
 }
 
 func TestRelativeProjectCommandCannotEscapeRoot(t *testing.T) {
-	if commandMatches("/repo", "scripts/check", "/repo/scripts/check") != true {
+	// Real temp dirs rather than hardcoded POSIX literals: filepath.IsAbs
+	// requires a volume name on Windows, so a bare "/repo" is never absolute
+	// there and would misreport this check on that platform.
+	root := t.TempDir()
+	other := t.TempDir()
+	if commandMatches(root, "scripts/check", filepath.Join(root, "scripts", "check")) != true {
 		t.Fatal("project command did not match its absolute invocation")
 	}
-	if commandMatches("/repo", "scripts/check", "/other/scripts/check") {
+	if commandMatches(root, "scripts/check", filepath.Join(other, "scripts", "check")) {
 		t.Fatal("same-basename command outside project matched")
 	}
 	if err := validateCommand("../check"); err == nil {
