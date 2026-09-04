@@ -107,6 +107,28 @@ make install   # ~/.local/bin/sctx
   platform the workload runs on.** Tool output differs by implementation and
   platform far more than it looks — capture fixtures by running the thing, never
   from memory.
+- **A transport/build formatter can DELEGATE a region of its own output to
+  another formatter without forking that formatter's parser.** `makefmt`
+  (2026-09-04) recognises a bare `go test`/`go vet`/`go build` or
+  `golangci-lint run` recipe echo and hands JUST that region's lines to
+  `gotest`/`golangci-lint`'s own Aggressive-then-Relaxed tiers, splicing the
+  render back into make's own directory/dedupe collapsing
+  (`adapters/format/makefmt/delegate.go`). A recipe that pipes or chains the
+  tool (`go test ./... | tee log`) declines delegation for that region on
+  purpose — the captured stream is no longer the tool's own. `ssh`'s
+  delegation (`platform/nestedcmd.Remote`) was widened the same day to accept
+  a PIPELINE whose head is a registered program and whose trailing stages are
+  all line-narrowing (`head`/`tail`/`cat`/`less`/`more`, mirroring
+  `hook.pipeSafeDownstream`) — `ssh host 'go test ./... | tail -20'` now
+  delegates to `go test`'s formatter over the (possibly truncated) combined
+  output. `sed` (`adapters/format/sed`, row + grammar in
+  `platform/sedargv`) and `gofmt` (`adapters/format/gofmt`, delegating `-d`
+  to `filediff`) are new leading-program formatters from the same pass: sed
+  only for the two read-only shapes `sed -n 'A,Bp' FILE` / `sed -n '/re/p'
+  FILE` (everything else stays in `unformattable`, a documented exception —
+  see that map's sed comment — because a program can be partially coverable
+  without every invocation being one); gofmt only for `-d` (`-l`/`-w`
+  already print at most a short line list or nothing).
 - **The hook rewrite must never insert text inside a quoted string or a heredoc
   body.** `hook/rewrite.go` scans quote- and escape-aware, and declines outright
   (fail-open, command untouched) on anything it cannot read confidently:

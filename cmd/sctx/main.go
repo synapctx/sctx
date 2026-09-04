@@ -39,6 +39,7 @@ import (
 	"github.com/synapctx/sctx/internal/adapters/format/generic"
 	ghfmt "github.com/synapctx/sctx/internal/adapters/format/gh"
 	gitfmt "github.com/synapctx/sctx/internal/adapters/format/git"
+	gofmtfmt "github.com/synapctx/sctx/internal/adapters/format/gofmt"
 	"github.com/synapctx/sctx/internal/adapters/format/golangcilint"
 	"github.com/synapctx/sctx/internal/adapters/format/gotest"
 	grepfmt "github.com/synapctx/sctx/internal/adapters/format/grep"
@@ -56,6 +57,7 @@ import (
 	"github.com/synapctx/sctx/internal/adapters/format/read"
 	"github.com/synapctx/sctx/internal/adapters/format/rsync"
 	"github.com/synapctx/sctx/internal/adapters/format/ruff"
+	"github.com/synapctx/sctx/internal/adapters/format/sed"
 	"github.com/synapctx/sctx/internal/adapters/format/ssh"
 	"github.com/synapctx/sctx/internal/adapters/hook"
 	"github.com/synapctx/sctx/internal/adapters/stats/sqlite"
@@ -158,6 +160,8 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDas
 	registry.Register(ghfmt.New())
 	registry.Register(golangcilint.New())
 	registry.Register(makefmt.New())
+	registry.Register(gofmtfmt.New())
+	registry.Register(sed.New())
 	registry.Register(psproc.New())
 	registry.Register(filediff.New())
 	registry.Register(pytest.New())

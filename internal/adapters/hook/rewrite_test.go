@@ -90,6 +90,8 @@ func rewriteTestCases() []rewriteTestCase {
 		{"ssh forced tty declines", "ssh -t host 'go test ./...'", "ssh -t host 'go test ./...'", false},
 		{"ssh compound declines", "ssh host 'go test && echo done'", "ssh host 'go test && echo done'", false},
 		{"ssh unknown inner declines", "ssh host uptime", "ssh host uptime", false},
+		{"ssh pipe into narrowing tail", "ssh host 'go test ./... | tail -20'", "sctx ssh host 'go test ./... | tail -20'", true},
+		{"ssh pipe into non-narrowing tail declines", "ssh host 'go test ./... | grep FAIL'", "ssh host 'go test ./... | grep FAIL'", false},
 		{"golangci-lint run", "golangci-lint run", "sctx golangci-lint run", true},
 		{"make", "make build", "sctx make build", true},
 		{"ps", "ps aux", "sctx ps aux", true},

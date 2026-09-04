@@ -35,7 +35,7 @@ func dirLineMatch(line string) (path string, ok bool) {
 	return m[1], true
 }
 
-// aggressiveMake classifies make output line by line:
+// collapseLines applies make's own line-level classification to lines:
 //   - runs of consecutive Entering/Leaving directory markers collapse into a
 //     single "dir: <path> ×N" marker (path is the last directory in the run);
 //   - lines carrying error/warning signal always pass through verbatim, never
@@ -47,19 +47,10 @@ func dirLineMatch(line string) (path string, ok bool) {
 //
 // Nothing is ever silently erased: every collapse carries its ×N count, so
 // the same logic is safe to apply regardless of exit code and never
-// compresses away the error signal on a failing build.
-func aggressiveMake(in format.Input) (format.Rendered, error) {
-	rawStdout := readAll(in.Stdout)
-	rawStderr := readAll(in.Stderr)
-	lines := append(splitLines(rawStdout), splitLines(rawStderr)...)
-
-	if len(lines) == 0 {
-		return format.Rendered{}, format.ErrTierInapplicable
-	}
-
-	var out []string
-	transforms := 0
-
+// compresses away the error signal on a failing build. Operates on a single
+// contiguous run of make's OWN lines — see delegate.go for the lines
+// attributed to a recognised inner tool instead.
+func collapseLines(lines []string) (out []string, transforms int) {
 	i := 0
 	for i < len(lines) {
 		line := lines[i]
@@ -106,13 +97,50 @@ func aggressiveMake(in format.Input) (format.Rendered, error) {
 		}
 		i = j
 	}
+	return out, transforms
+}
 
-	if transforms == 0 {
+// aggressiveMake first tries to delegate any recognisable inner-tool region
+// (go test/vet/build, golangci-lint run) to that tool's own formatter — see
+// delegate.go — then applies collapseLines to whatever make-owned lines
+// remain, splicing the two back together in original order.
+func aggressiveMake(in format.Input) (format.Rendered, error) {
+	rawStdout := readAll(in.Stdout)
+	rawStderr := readAll(in.Stderr)
+	lines := append(splitLines(rawStdout), splitLines(rawStderr)...)
+
+	if len(lines) == 0 {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+
+	segs := splitDelegatableSegments(lines, in.ExitCode)
+
+	delegated := false
+	var out []string
+	transforms := 0
+	for _, seg := range segs {
+		if seg.delegated {
+			delegated = true
+			out = append(out, seg.body)
+			continue
+		}
+		collapsed, n := collapseLines(seg.lines)
+		transforms += n
+		out = append(out, collapsed...)
+	}
+
+	if !delegated && transforms == 0 {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+
+	body := strings.Join(out, "\n")
+	rawLen := len(rawStdout) + len(rawStderr)
+	if len(body) >= rawLen {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
 	return format.Rendered{
-		Body:       []byte(strings.Join(out, "\n")),
+		Body:       []byte(body),
 		FoldStderr: len(rawStderr) > 0,
 	}, nil
 }
