@@ -206,6 +206,37 @@ func TestSessionBriefInvitesTheFirstMemory(t *testing.T) {
 	}
 }
 
+// The proxy's own NudgeLedger already gates bootstrapNote to once per
+// session; sctx's job is only to print the line when the field is present and
+// say nothing when it is absent — an older proxy, or a session where the gate
+// already fired, decodes bootstrapNote to "" either way.
+func TestSessionBriefPrintsTheBootstrapNoteWhenPresent(t *testing.T) {
+	const token = "tok-abc"
+	fakeClaudeConfig(t, token, "acme-graph")
+	root := fakeRepo(t, "abcdef0123456789")
+	fixture := `{"repository":{"name":"acme/widgets"},"bootstrapNote":"12 memories mined from this repository's history, 3 kept so far — review them in the console"}`
+	srv := briefServer(t, token, fixture, http.StatusOK)
+
+	got := runSessionStart(t, cfgFor(srv, token), root, "startup")
+
+	if !strings.Contains(got, "12 memories mined from this repository's history, 3 kept so far") {
+		t.Errorf("brief did not print the bootstrap note:\n%s", got)
+	}
+}
+
+func TestSessionBriefIsSilentAboutBootstrapWhenAbsent(t *testing.T) {
+	const token = "tok-abc"
+	fakeClaudeConfig(t, token, "acme-graph")
+	root := fakeRepo(t, "abcdef0123456789")
+	srv := briefServer(t, token, briefFixture, http.StatusOK)
+
+	got := runSessionStart(t, cfgFor(srv, token), root, "startup")
+
+	if strings.Contains(got, "mined from this repository") {
+		t.Errorf("brief printed a bootstrap note the server never sent:\n%s", got)
+	}
+}
+
 // Compaction happens under context pressure, which is the worst possible moment
 // to spend three seconds on a network call. The reminder is free.
 func TestCompactSourceRemindsWithoutAskingTheServer(t *testing.T) {

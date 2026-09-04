@@ -85,6 +85,11 @@ type forRepoResponse struct {
 	// Empty when the repository did not resolve; older proxies simply omit
 	// the field, which decodes to the zero value here.
 	RetrievalHint string `json:"retrievalHint"`
+	// BootstrapNote is shown at most once per session (the proxy's own
+	// NudgeLedger gate) — a fact about the memory system itself, not about
+	// this repository, so it is worth one line the first time and noise
+	// after. Absent from an older proxy decodes to the zero value.
+	BootstrapNote string `json:"bootstrapNote"`
 	Notes         []struct {
 		ID           string   `json:"id"`
 		Kind         string   `json:"kind"`
@@ -267,6 +272,9 @@ func renderSessionBrief(repo, server string, guessed bool, brief forRepoResponse
 	// retrieval it is skipping instead of a bare name in a deferred catalog.
 	if brief.RetrievalHint != "" {
 		fmt.Fprintf(&b, "Try first: %s\n", brief.RetrievalHint)
+	}
+	if brief.BootstrapNote != "" {
+		fmt.Fprintf(&b, "%s\n", brief.BootstrapNote)
 	}
 	// The tool line names the namespace because that is the one fact no shipped
 	// document can carry: it depends on what this developer called the server.
