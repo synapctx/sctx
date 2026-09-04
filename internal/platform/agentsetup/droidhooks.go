@@ -4,7 +4,7 @@ package agentsetup
 //
 // Droid's PreToolUse hook (matcher `"Execute"`) uses the SAME entry shape as
 // Claude Code's — `{"matcher": ..., "hooks": [{"type": "command", "command":
-// ...}]}` — which is why this file reuses `hookPresent`/`addHook` from
+// ...}]}` — which is why this file reuses `findHookEntry`/`addHook` from
 // hooks.go rather than re-deriving them. What differs is the FILE: Droid keeps
 // its events at the ROOT of `hooks.json` (no surrounding `"hooks"` key), with
 // a `settings.json` fallback whose `hooks` key Droid merges hooks.json OVER,
@@ -28,15 +28,18 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/synapctx/sctx/internal/platform/binaries"
 )
 
 // DroidHookStatus is the auto-wrap state for Factory Droid.
 type DroidHookStatus struct {
-	ConfigPath string
-	Installed  bool
-	Stale      bool
-	WiredTo    string
-	Missing    string
+	ConfigPath  string
+	Installed   bool
+	Stale       bool
+	StaleReason string
+	WiredTo     string
+	Missing     string
 }
 
 func (s DroidHookStatus) Complete() bool { return s.Installed && !s.Stale }
@@ -58,23 +61,33 @@ func InspectDroidHooks(home, binary string) (DroidHookStatus, error) {
 		return st, err
 	}
 	// The root layout puts the event map at the top level, so it is wrapped
-	// as {"hooks": doc} to reuse hookPresent/addHook, which both expect a
+	// as {"hooks": doc} to reuse findHookEntry/addHook, which both expect a
 	// document with a "hooks" key.
 	wrapped := map[string]any{"hooks": any(doc)}
 	spec := droidSpec(binary)
-	st.Installed = hookPresent(wrapped, spec)
-	if st.Installed {
-		st.WiredTo = binary
-		if _, err := os.Stat(binary); err != nil {
-			st.Stale = true
-			st.Missing = binary
+	entry, found := findHookEntry(wrapped, spec)
+	st.Installed = found
+	if found {
+		cmd, _ := entry["command"].(string)
+		st.WiredTo = wiredBinary(cmd, "", " hook droid")
+		if st.WiredTo != "" && !samePath(st.WiredTo, binary) {
+			if _, err := os.Stat(st.WiredTo); err != nil {
+				st.Stale = true
+				st.Missing = st.WiredTo
+				st.StaleReason = "the sctx it calls no longer exists"
+			} else if reason, stale := StaleHookReason(st.WiredTo, binary, binaries.VersionOf(binary)); stale {
+				st.Stale = true
+				st.StaleReason = reason
+			}
 		}
 	}
 	return st, nil
 }
 
 // InstallDroidHooks adds the sctx PreToolUse/Execute entry to hooks.json,
-// preserving everything else.
+// preserving everything else, and REWIRES an existing entry in place when it
+// is stale (see StaleHookReason) rather than leaving it wired to a dev build
+// or an older release forever.
 func InstallDroidHooks(home, binary string) ([]string, error) {
 	path := filepath.Join(home, ".factory", "hooks.json")
 	doc, err := readJSONObject(path)
@@ -83,8 +96,22 @@ func InstallDroidHooks(home, binary string) ([]string, error) {
 	}
 	spec := droidSpec(binary)
 	wrapped := map[string]any{"hooks": any(doc)}
-	if hookPresent(wrapped, spec) {
-		return nil, nil
+	if entry, found := findHookEntry(wrapped, spec); found {
+		st, err := InspectDroidHooks(home, binary)
+		if err != nil {
+			return nil, err
+		}
+		if !st.Stale {
+			return nil, nil
+		}
+		entry["command"] = spec.Command
+		if events, ok := wrapped["hooks"].(map[string]any); ok {
+			doc = events
+		}
+		if err := writeJSONObject(path, doc); err != nil {
+			return nil, err
+		}
+		return []string{rewireMessage("Factory Droid", st.WiredTo, binary)}, nil
 	}
 	addHook(wrapped, spec)
 	// addHook may have created the "hooks" key on wrapped (a fresh map, not

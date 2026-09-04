@@ -20,6 +20,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/synapctx/sctx/internal/platform/binaries"
 )
 
 const (
@@ -32,6 +34,9 @@ type CodexHookStatus struct {
 	ConfigPath string
 	Installed  bool
 	Stale      bool
+	// StaleReason explains Stale: missing binary, a dev build, an older
+	// release, or (unrelated to StaleHookReason) a hand-edited block.
+	StaleReason string
 	// WiredTo is the sctx binary the installed hook calls; Missing is set when
 	// that binary no longer exists.
 	WiredTo string
@@ -74,14 +79,24 @@ func InspectCodexHooks(home, binary string) (CodexHookStatus, error) {
 	st.Installed = found
 	if found {
 		// Same rule as the plugin: the hook names whichever sctx installed it,
-		// and naming another copy is not a fault. Only a hook we would not have
-		// written, or one calling a binary that is gone, is stale.
+		// and naming another copy is not a fault by itself. It is stale when
+		// the block does not match what we would write for its OWN wired
+		// binary (a hand edit, or a template change), when that binary is
+		// gone, OR — the check that used to be entirely missing — when it is
+		// a dev build or older than the sctx running `setup` now.
 		st.WiredTo = wiredBinary(body, `command = "`, ` hook codex"`)
 		st.Stale = strings.TrimSpace(body) != strings.TrimSpace(codexHookBody(st.WiredTo))
-		if !st.Stale && st.WiredTo != "" {
+		if st.Stale {
+			st.StaleReason = "hook definition does not match what sctx would write"
+		}
+		if !st.Stale && st.WiredTo != "" && !samePath(st.WiredTo, binary) {
 			if _, err := os.Stat(st.WiredTo); err != nil {
 				st.Stale = true
 				st.Missing = st.WiredTo
+				st.StaleReason = "the sctx it calls no longer exists"
+			} else if reason, stale := StaleHookReason(st.WiredTo, binary, binaries.VersionOf(binary)); stale {
+				st.Stale = true
+				st.StaleReason = reason
 			}
 		}
 	}
@@ -129,6 +144,9 @@ func InstallCodexHooks(home, binary string) ([]string, error) {
 	}
 	if err := writePrivateFile(st.ConfigPath, []byte(out)); err != nil {
 		return nil, fmt.Errorf("writing %s: %w", st.ConfigPath, err)
+	}
+	if st.Installed && st.WiredTo != "" && !samePath(st.WiredTo, binary) {
+		return []string{rewireMessage("OpenAI Codex CLI", st.WiredTo, binary) + " — run /hooks in Codex once to trust it"}, nil
 	}
 	verb := "installed"
 	if st.Installed {

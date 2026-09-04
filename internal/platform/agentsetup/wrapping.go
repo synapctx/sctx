@@ -39,7 +39,12 @@ type WrapState struct {
 	// server pointing at a host nothing is listening on: true about what we
 	// wrote, false about what the customer has.
 	NeedsTrust bool
-	Detail     string
+	// Stale marks the specific failure mode "this WOULD run, but calls a
+	// binary sctx setup should replace" (see StaleHookReason) — always false
+	// while OK is false for any other reason (not installed, foreign file),
+	// so a caller can tell "never wired" apart from "wired to the wrong sctx".
+	Stale  bool
+	Detail string
 }
 
 // InspectWrapping reports auto-wrap for every detected agent.
@@ -75,7 +80,8 @@ func wrapStateFor(home string, a Agent, binary string) WrapState {
 			case cs.Missing != "":
 				ws.Detail = "the sctx it calls is gone: " + cs.Missing
 			case cs.Stale:
-				ws.Detail = "hook is out of date"
+				ws.Stale = true
+				ws.Detail = "hook is out of date: " + cs.StaleReason
 			default:
 				ws.OK = true
 				ws.NeedsTrust = true
@@ -99,7 +105,8 @@ func wrapStateFor(home string, a Agent, binary string) WrapState {
 			case simple.missing != "":
 				ws.Detail = "the sctx it calls is gone: " + simple.missing
 			case simple.stale:
-				ws.Detail = "hook is out of date"
+				ws.Stale = true
+				ws.Detail = "hook is out of date: " + simple.staleReason
 			default:
 				ws.OK = true
 				ws.Detail = "rewrites covered commands before they run"
@@ -112,16 +119,29 @@ func wrapStateFor(home string, a Agent, binary string) WrapState {
 			ws.Detail = err.Error()
 			return ws
 		}
-		missing := 0
+		missing, stale := 0, 0
+		var staleReason string
 		for _, hs := range states {
-			if !hs.Installed {
+			switch {
+			case !hs.Installed:
 				missing++
+			case hs.Stale:
+				stale++
+				staleReason = hs.StaleReason
 			}
 		}
-		ws.OK = missing == 0 && len(states) > 0
+		ws.OK = missing == 0 && stale == 0 && len(states) > 0
 		ws.Detail = "rewrites covered commands before they run"
-		if missing > 0 {
+		switch {
+		case missing > 0:
 			ws.Detail = fmt.Sprintf("%d hook(s) not wired", missing)
+		case stale > 0:
+			ws.Stale = true
+			if stale == 1 {
+				ws.Detail = "hook is out of date: " + staleReason
+			} else {
+				ws.Detail = fmt.Sprintf("%d hook(s) out of date, e.g. %s", stale, staleReason)
+			}
 		}
 	case agentdoc.WrapPlugin:
 		ps, err := InspectPlugin(home, a, binary)
@@ -138,7 +158,8 @@ func wrapStateFor(home string, a Agent, binary string) WrapState {
 		case ps.Missing != "":
 			ws.Detail = "the sctx it calls is gone: " + ps.Missing
 		case ps.Stale:
-			ws.Detail = "plugin is out of date"
+			ws.Stale = true
+			ws.Detail = "plugin is out of date: " + ps.StaleReason
 		default:
 			ws.OK = true
 			ws.Detail = "rewrites covered commands before they run"
@@ -197,12 +218,13 @@ func InstallWrapping(home, binary string, docs ...Doc) ([]string, []error) {
 // results, so wrapStateFor can report all three the same way it reports
 // Codex, without three near-identical switches inline.
 type simpleHookState struct {
-	path      string
-	installed bool
-	stale     bool
-	foreign   bool
-	missing   string
-	err       error
+	path        string
+	installed   bool
+	stale       bool
+	staleReason string
+	foreign     bool
+	missing     string
+	err         error
 }
 
 // simpleHookStatusFor inspects the hook file for one of the three agents
@@ -213,13 +235,13 @@ func simpleHookStatusFor(id, home, binary string) (simpleHookState, bool) {
 	switch id {
 	case "cursor":
 		cs, err := InspectCursorHooks(home, binary)
-		return simpleHookState{path: cs.ConfigPath, installed: cs.Installed, stale: cs.Stale, missing: cs.Missing, err: err}, true
+		return simpleHookState{path: cs.ConfigPath, installed: cs.Installed, stale: cs.Stale, staleReason: cs.StaleReason, missing: cs.Missing, err: err}, true
 	case "copilot":
 		cs, err := InspectCopilotHooks(home, binary)
-		return simpleHookState{path: cs.ConfigPath, installed: cs.Installed, stale: cs.Stale, foreign: cs.Foreign, missing: cs.Missing, err: err}, true
+		return simpleHookState{path: cs.ConfigPath, installed: cs.Installed, stale: cs.Stale, staleReason: cs.StaleReason, foreign: cs.Foreign, missing: cs.Missing, err: err}, true
 	case "droid":
 		cs, err := InspectDroidHooks(home, binary)
-		return simpleHookState{path: cs.ConfigPath, installed: cs.Installed, stale: cs.Stale, missing: cs.Missing, err: err}, true
+		return simpleHookState{path: cs.ConfigPath, installed: cs.Installed, stale: cs.Stale, staleReason: cs.StaleReason, missing: cs.Missing, err: err}, true
 	}
 	return simpleHookState{}, false
 }

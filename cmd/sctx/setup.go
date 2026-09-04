@@ -365,6 +365,11 @@ func printWrappingStatus(w io.Writer, st agentsetup.Status, cfg config.Config) {
 			// time anyway, because an agent that is not being wrapped has to be
 			// typing `sctx` itself, and that is worth seeing.
 			state = "[manual] "
+		case ws.Stale:
+			// Distinct from [missing]: this one WOULD run right now, it just
+			// calls a binary `--install` should replace (moved, a dev build,
+			// or an older release) — see StaleHookReason.
+			state = "[stale]  "
 		case !ws.OK:
 			state = "[missing]"
 		}

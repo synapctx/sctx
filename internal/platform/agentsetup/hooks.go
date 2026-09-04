@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/synapctx/sctx/internal/platform/binaries"
 	"github.com/synapctx/sctx/pkg/agentdoc"
 )
 
@@ -177,6 +178,14 @@ func ClaudeHooks(binary string) []HookSpec {
 type HookState struct {
 	HookSpec
 	Installed bool
+	// WiredTo is the sctx binary the installed entry actually calls — not
+	// necessarily the one running now. Empty when not Installed.
+	WiredTo string
+	// Stale is set when WiredTo should be replaced with the binary running
+	// `setup` now (see StaleHookReason): moved/missing, a dev build, or an
+	// older release. StaleReason is the human-readable why.
+	Stale       bool
+	StaleReason string
 }
 
 // InspectHooks reports which of our hooks are wired into Claude Code's settings.
@@ -217,13 +226,33 @@ func InspectAgentHooks(home string, a Agent, binary string) (settingsPath string
 			return settingsPath, nil, fmt.Errorf("parsing %s: %w", settingsPath, jsonErr)
 		}
 	}
+	runningVersion := binaries.VersionOf(binary)
 	for _, spec := range specs {
-		states = append(states, HookState{HookSpec: spec, Installed: hookPresent(doc, spec)})
+		hs := HookState{HookSpec: spec}
+		if entry, found := findHookEntry(doc, spec); found {
+			hs.Installed = true
+			cmd, _ := entry["command"].(string)
+			hs.WiredTo = wiredBinary(cmd, "", " hook "+spec.Subcommand)
+			if hs.WiredTo != "" && !samePath(hs.WiredTo, binary) {
+				if _, statErr := os.Stat(hs.WiredTo); statErr != nil {
+					hs.Stale = true
+					hs.StaleReason = "the sctx it calls no longer exists"
+				} else if reason, stale := StaleHookReason(hs.WiredTo, binary, runningVersion); stale {
+					hs.Stale = true
+					hs.StaleReason = reason
+				}
+			}
+		}
+		states = append(states, hs)
 	}
 	return settingsPath, states, nil
 }
 
-// InstallAgentHooks adds any missing hook entry, preserving everything else.
+// InstallAgentHooks adds any missing hook entry and REWIRES any entry that is
+// present but stale (see StaleHookReason) — the fix for "an existing sctx
+// hook is preserved" silently leaving a hook wired to a dev build or an
+// older release after `sctx init` or an upgrade put a newer one on this
+// machine. Everything else in settings.json is preserved untouched.
 func InstallAgentHooks(home string, a Agent, binary string) ([]string, error) {
 	settingsPath, states, err := InspectAgentHooks(home, a, binary)
 	if err != nil {
@@ -232,13 +261,17 @@ func InstallAgentHooks(home string, a Agent, binary string) ([]string, error) {
 	if settingsPath == "" || len(states) == 0 {
 		return nil, nil
 	}
-	missing := make([]HookSpec, 0, len(states))
+	var missing []HookSpec
+	var stale []HookState
 	for _, st := range states {
-		if !st.Installed {
+		switch {
+		case !st.Installed:
 			missing = append(missing, st.HookSpec)
+		case st.Stale:
+			stale = append(stale, st)
 		}
 	}
-	if len(missing) == 0 {
+	if len(missing) == 0 && len(stale) == 0 {
 		return nil, nil
 	}
 
@@ -258,6 +291,18 @@ func InstallAgentHooks(home string, a Agent, binary string) ([]string, error) {
 		addHook(doc, spec)
 		changed = append(changed, fmt.Sprintf("hooked %s(%s) — %s", spec.Event, spec.Matcher, spec.Purpose))
 	}
+	for _, st := range stale {
+		entry, found := findHookEntry(doc, st.HookSpec)
+		if !found {
+			// Vanished between Inspect's read and this one (a concurrent
+			// edit) — nothing safe to rewire, fall through to a fresh add.
+			addHook(doc, st.HookSpec)
+			changed = append(changed, fmt.Sprintf("hooked %s(%s) — %s", st.Event, st.Matcher, st.Purpose))
+			continue
+		}
+		entry["command"] = st.Command
+		changed = append(changed, rewireMessage(a.Name, st.WiredTo, binary))
+	}
 	if n := dropRemovedFlags(doc); n > 0 {
 		changed = append(changed, fmt.Sprintf("removed %d stale --fallback flag(s) from existing sctx hooks", n))
 	}
@@ -275,8 +320,11 @@ func InstallAgentHooks(home string, a Agent, binary string) ([]string, error) {
 	return changed, nil
 }
 
-// hookPresent reports whether one of OUR hooks is already registered for this
-// event and matcher.
+// findHookEntry reports whether one of OUR hooks is already registered for
+// this event and matcher, returning the MUTABLE entry map so a caller can
+// both read its wired binary (for staleness, see StaleHookReason) and
+// rewrite its "command" in place — never a second entry appended beside a
+// stale one.
 //
 // Matching is on the sctx INVOCATION, never on the absolute path. The path in an
 // existing entry is whatever sctx was when the developer first ran setup — a
@@ -289,7 +337,7 @@ func InstallAgentHooks(home string, a Agent, binary string) ([]string, error) {
 // It also cannot be a substring test, because `sctx hook claude` is a prefix of
 // `sctx hook claude-post-tool`: the memory hook would satisfy the Bash hook and
 // the savings engine would never be installed.
-func hookPresent(doc map[string]any, spec HookSpec) bool {
+func findHookEntry(doc map[string]any, spec HookSpec) (map[string]any, bool) {
 	// Split rather than chained: a single-value type assertion PANICS on a miss,
 	// and a machine with no settings.json at all is the normal fresh-install
 	// case, not an edge case.
@@ -305,11 +353,11 @@ func hookPresent(doc map[string]any, spec HookSpec) bool {
 			entry, _ := e.(map[string]any)
 			cmd, _ := entry["command"].(string)
 			if invokesSctxHook(cmd, spec.Subcommand) {
-				return true
+				return entry, true
 			}
 		}
 	}
-	return false
+	return nil, false
 }
 
 // invokesSctxHook reports whether cmd runs `<anything>/sctx hook <subcommand>`.

@@ -156,6 +156,29 @@ make install   # ~/.local/bin/sctx
 - **Consent gates COLLECTION, not just delivery**, and is enforced again at the
   flush boundary — authorisation can change underneath a spool. Unauthorised
   events are dropped, never retained.
+- **A flush POSTs at most `chunkMaxEvents` (200, ~256 KiB) events per
+  request, each under its OWN timeout, and removes a chunk from the spool
+  ONLY once its own request is acknowledged 2xx** (`spool.go`, 2026-09-04). A
+  single flush used to POST an org's entire backlog as one request under one
+  shared deadline: once a backlog grew large enough that sending it exceeded
+  the deadline, the client always saw a context-deadline error and retained
+  every line for resend, while the server — having already received and
+  processed the full request body — ingested it anyway. The spool never
+  shrank and the same events were re-ingested on every retry. **`sctx`
+  events carry an `id` (`telemetry.Event.ID`) that is NOT used as the
+  Elasticsearch document id anywhere in graph-retrieval-engine's
+  `RecordUsage`** (plain `{"index": {"_index": index}}` bulk actions, ES
+  mints its own doc id) — so a re-sent chunk is a genuine duplicate
+  server-side, not a no-op upsert. Chunking removes the client-side cause;
+  de-duplicating server-side on `id` would additionally make a resend safe,
+  but is not implemented as of this note. The opportunistic post-command
+  path (`Flush`, via `AutoFlush`) sends AT MOST ONE chunk and never loops, so
+  it can never block a wrapped command on a large backlog; `sctx
+  flush`/`sctx init` (`FlushWithTimeout`) loop chunk by chunk until the spool
+  is empty or a chunk fails outright. A chunk rejected 4xx three times in a
+  row (a malformed line from an ancient sctx version, most likely) is
+  quarantined to `<spoolDir>/rejected.jsonl` rather than retried forever —
+  see `maxConsecutiveChunkRejects`.
 - **The consent prompt is `[y/N]` and an empty answer declines.** It runs only
   from `sctx setup` on a TTY, never on the wrapped path or in the hook.
 - **A decision is stored with the disclosure version it was made against**, and a
@@ -239,6 +262,26 @@ load-bearing.
   `~/.kilocode`, which a current install never creates. Kilo was installed, in
   daily use, and invisible. Unverified capabilities stay at their zero value,
   which reports as "sctx does not do this here" rather than being assumed.
+- **"An existing sctx hook is preserved" is not the same claim as "the RIGHT
+  sctx hook is preserved" (2026-09-04, `StaleHookReason` in
+  `internal/platform/agentsetup/stalehook.go`).** Presence used to be the
+  only test everywhere a hook/plugin is detected (Claude/Gemini's
+  `hookPresent`/`findHookEntry`, Codex's TOML block, Cursor/Copilot/Droid's
+  own JSON files, the Kilo/OpenCode plugin's `SCTX_BINARY`) — an entry
+  invoking `sctx hook <subcommand>` counted as installed FOREVER, even when
+  the binary it named was a `dev` build or several releases behind the one
+  running `setup` now. `--install` on the real, newer binary left the hook
+  wired to the old one untouched, because nothing compared the two paths.
+  `StaleHookReason(wired, running, runningVersion)` is that comparison:
+  stale when the wired binary no longer exists, reports a dev build, or
+  reports an older release — NOT merely when it names a different (but
+  equally current) path, since two Homebrew installs on separate PATH
+  entries are not a fault. `--install` rewrites the entry'S COMMAND IN
+  PLACE (never appends a second one) and prints `rewired <agent> hook: <old>
+  -> <new>`; `sctx setup` without `--install` reports `[stale]` with the
+  same reason. A hook already pointing at the exact binary running now is
+  never re-versioned against itself — `samePath` short-circuits before
+  `VersionOf` ever runs a subprocess.
 - **The instruction document must not promise a hook to an agent that has none.**
   `InstallHooks` wires Claude Code only, yet SCTX.md told all seven agents "a
   PreToolUse hook rewrites covered commands; do not prefix `sctx` yourself" — so

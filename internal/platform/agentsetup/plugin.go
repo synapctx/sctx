@@ -21,6 +21,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/synapctx/sctx/internal/platform/binaries"
 )
 
 // pluginMarker is the first line of every plugin we write. Ownership has to be
@@ -37,8 +39,12 @@ type PluginStatus struct {
 	Installed bool
 	// Stale is set when the file is ours but not what we would write now —
 	// usually because sctx moved, which silently breaks the rewrite: the plugin
-	// keeps running and keeps calling a binary that is no longer there.
-	Stale bool
+	// keeps running and keeps calling a binary that is no longer there. Also
+	// set (2026-09-04, StaleHookReason) when SCTX_BINARY is a dev build or an
+	// older release than the one running `setup` now, even though that binary
+	// still runs fine today — see StaleReason.
+	Stale       bool
+	StaleReason string
 	// Foreign is set when a file of that name exists without our marker. We
 	// report it and change nothing.
 	Foreign bool
@@ -179,10 +185,17 @@ func InspectPlugin(home string, a Agent, binary string) (PluginStatus, error) {
 	// is ours, current for the binary it names, and whether that binary is still
 	// there.
 	st.Stale = strings.TrimSpace(string(raw)) != strings.TrimSpace(SctxPluginSource(st.WiredTo, a.ID))
-	if !st.Stale && st.WiredTo != "" {
+	if st.Stale {
+		st.StaleReason = "plugin body does not match what sctx would write"
+	}
+	if !st.Stale && st.WiredTo != "" && !samePath(st.WiredTo, binary) {
 		if _, err := os.Stat(st.WiredTo); err != nil {
 			st.Stale = true
 			st.Missing = st.WiredTo
+			st.StaleReason = "the sctx it calls no longer exists"
+		} else if reason, stale := StaleHookReason(st.WiredTo, binary, binaries.VersionOf(binary)); stale {
+			st.Stale = true
+			st.StaleReason = reason
 		}
 	}
 	return st, nil
@@ -234,6 +247,9 @@ func InstallPlugin(home string, a Agent, binary string) ([]string, error) {
 	}
 	if err := os.WriteFile(st.Path, []byte(SctxPluginSource(binary, a.ID)), 0o644); err != nil {
 		return nil, fmt.Errorf("writing %s: %w", st.Path, err)
+	}
+	if st.Installed && st.WiredTo != "" && !samePath(st.WiredTo, binary) {
+		return []string{rewireMessage(st.AgentName, st.WiredTo, binary)}, nil
 	}
 	verb := "installed"
 	if st.Installed {

@@ -25,17 +25,20 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/synapctx/sctx/internal/platform/binaries"
 )
 
 const cursorHookMatcher = "Shell"
 
 // CursorHookStatus is the auto-wrap state for Cursor.
 type CursorHookStatus struct {
-	ConfigPath string
-	Installed  bool
-	Stale      bool
-	WiredTo    string
-	Missing    string
+	ConfigPath  string
+	Installed   bool
+	Stale       bool
+	StaleReason string
+	WiredTo     string
+	Missing     string
 }
 
 func (s CursorHookStatus) Complete() bool { return s.Installed && !s.Stale }
@@ -52,10 +55,14 @@ func InspectCursorHooks(home, binary string) (CursorHookStatus, error) {
 	if found {
 		cmd, _ := entry["command"].(string)
 		st.WiredTo = wiredBinary(cmd, "", " hook cursor")
-		if st.WiredTo != "" {
+		if st.WiredTo != "" && !samePath(st.WiredTo, binary) {
 			if _, err := os.Stat(st.WiredTo); err != nil {
 				st.Stale = true
 				st.Missing = st.WiredTo
+				st.StaleReason = "the sctx it calls no longer exists"
+			} else if reason, stale := StaleHookReason(st.WiredTo, binary, binaries.VersionOf(binary)); stale {
+				st.Stale = true
+				st.StaleReason = reason
 			}
 		}
 	}
@@ -70,13 +77,16 @@ func InstallCursorHooks(home, binary string) ([]string, error) {
 	if err != nil {
 		return nil, err
 	}
+	oldWired := ""
 	if _, found := findCursorHookEntry(doc); found {
 		st, err := InspectCursorHooks(home, binary)
 		if err != nil || !st.Stale {
 			return nil, err
 		}
-		// Stale: our own entry names a binary that moved or is gone. Replace
-		// it in place rather than appending a second one.
+		// Stale: our own entry names a binary that moved, is gone, is a dev
+		// build, or is an older release than the one running now. Replace it
+		// in place rather than appending a second one.
+		oldWired = st.WiredTo
 		removeCursorHookEntries(doc)
 	}
 	if doc == nil {
@@ -97,6 +107,9 @@ func InstallCursorHooks(home, binary string) ([]string, error) {
 
 	if err := writeJSONObject(path, doc); err != nil {
 		return nil, err
+	}
+	if oldWired != "" && !samePath(oldWired, binary) {
+		return []string{rewireMessage("Cursor", oldWired, binary)}, nil
 	}
 	return []string{fmt.Sprintf("installed the Cursor auto-wrap hook (%s)", path)}, nil
 }

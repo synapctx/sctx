@@ -437,11 +437,15 @@ func runFlush(ctx context.Context, cfg config.Config) int {
 	// Partially-authorised flushes are normal now and must not look like an
 	// error: the spool is filtered by purpose inside FlushWithTimeout.
 	emitter := spool.NewEmitter(cfg.SpoolDir, cfg.TelemetryEndpoint, cfg, version, agentenv.Detect(os.Getenv).Client)
-	if err := emitter.FlushWithTimeout(ctx, backlogFlushTimeout); err != nil {
+	res, err := emitter.FlushWithTimeout(ctx, backlogFlushTimeout)
+	fmt.Printf("flushed %d events in %d requests; %d pending\n", res.Sent, res.Requests, res.Pending)
+	if res.Quarantined > 0 {
+		fmt.Printf("sctx: flush: quarantined %d event(s) after repeated rejection (see %s/%s)\n", res.Quarantined, cfg.SpoolDir, "rejected.jsonl")
+	}
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "sctx: flush: %v\n", err)
 		return 1
 	}
-	fmt.Println("spool flushed")
 	return 0
 }
 
@@ -572,10 +576,14 @@ func runInit(ctx context.Context, cfg config.Config, args []string) int {
 			fmt.Fprintf(os.Stderr, "sctx: init: backlog drain: reloading config: %v\n", loadErr)
 		} else {
 			emitter := spool.NewEmitter(cfg.SpoolDir, endpoint, cfg2, version, agentenv.Detect(os.Getenv).Client)
-			if err := emitter.FlushWithTimeout(ctx, backlogFlushTimeout); err != nil {
+			res, err := emitter.FlushWithTimeout(ctx, backlogFlushTimeout)
+			if err != nil {
 				fmt.Fprintf(os.Stderr, "sctx: init: backlog drain: %v\n", err)
 			} else {
-				fmt.Printf("drained %d spooled event(s)\n", pending)
+				fmt.Printf("drained %d spooled event(s)\n", res.Sent)
+			}
+			if res.Quarantined > 0 {
+				fmt.Fprintf(os.Stderr, "sctx: init: backlog drain: quarantined %d event(s) after repeated rejection\n", res.Quarantined)
 			}
 		}
 	}
@@ -850,13 +858,17 @@ func sctxExeName() string {
 	return "sctx"
 }
 
-// printBinaryReport prints every sctx found on PATH with its version,
-// marking SHADOWS for anything after the first (the one that actually runs
-// when a developer types `sctx`), and the Claude Code hook's own binary
-// against the newest version found — [stale] when the hook would run an
-// older sctx than what is on this machine, because dev never wins that
-// comparison and a customer who upgraded needs to know their hook did not
-// follow.
+// printBinaryReport prints every sctx found on PATH with its version. PATH
+// resolution runs left to right and stops at the first match, so the FIRST
+// entry is the one that actually runs when a developer types `sctx` — every
+// entry after it is dead weight, marked [shadowed by the first]. (This used
+// to be inverted: entries after the first were marked "[SHADOWS the one
+// above]", which told a developer staring at their own PATH order exactly
+// backwards — the entry doing the shadowing was reported as the victim.)
+// Also reports the Claude Code hook's own binary against the newest version
+// found — [stale] when the hook would run an older sctx than what is on this
+// machine, because dev never wins that comparison and a customer who
+// upgraded needs to know their hook did not follow.
 func printBinaryReport(w io.Writer) {
 	found := binaries.OnPath(os.Getenv("PATH"), sctxExeName())
 	if len(found) == 0 {
@@ -877,7 +889,7 @@ func printBinaryReport(w io.Writer) {
 		}
 		suffix := ""
 		if i > 0 {
-			suffix = "  [SHADOWS the one above]"
+			suffix = "  [shadowed by the first]"
 		}
 		fmt.Fprintf(w, "  %s  (%s)%s\n", path, orUnknown(ver), suffix)
 	}

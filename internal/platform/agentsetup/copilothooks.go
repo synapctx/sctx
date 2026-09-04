@@ -26,18 +26,21 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+
+	"github.com/synapctx/sctx/internal/platform/binaries"
 )
 
 const copilotHookFileName = "sctx-rewrite.json"
 
 // CopilotHookStatus is the auto-wrap state for GitHub Copilot CLI.
 type CopilotHookStatus struct {
-	ConfigPath string
-	Installed  bool
-	Stale      bool
-	Foreign    bool // a file of this name exists that sctx did not write
-	WiredTo    string
-	Missing    string
+	ConfigPath  string
+	Installed   bool
+	Stale       bool
+	StaleReason string
+	Foreign     bool // a file of this name exists that sctx did not write
+	WiredTo     string
+	Missing     string
 }
 
 func (s CopilotHookStatus) Complete() bool { return s.Installed && !s.Stale && !s.Foreign }
@@ -76,10 +79,14 @@ func InspectCopilotHooks(home, binary string) (CopilotHookStatus, error) {
 	}
 	st.Installed = true
 	st.WiredTo = wiredBinary(cmd, "", " hook copilot")
-	if st.WiredTo != "" {
+	if st.WiredTo != "" && !samePath(st.WiredTo, binary) {
 		if _, err := os.Stat(st.WiredTo); err != nil {
 			st.Stale = true
 			st.Missing = st.WiredTo
+			st.StaleReason = "the sctx it calls no longer exists"
+		} else if reason, stale := StaleHookReason(st.WiredTo, binary, binaries.VersionOf(binary)); stale {
+			st.Stale = true
+			st.StaleReason = reason
 		}
 	}
 	return st, nil
@@ -123,6 +130,9 @@ func InstallCopilotHooks(home, binary string) ([]string, error) {
 	}
 	if err := writeJSONObject(st.ConfigPath, copilotHookDoc(binary)); err != nil {
 		return nil, err
+	}
+	if st.Installed && st.WiredTo != "" && !samePath(st.WiredTo, binary) {
+		return []string{rewireMessage("GitHub Copilot CLI", st.WiredTo, binary)}, nil
 	}
 	verb := "installed"
 	if st.Installed {
