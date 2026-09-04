@@ -119,6 +119,8 @@ func realMain(args []string) int {
 		return 0
 	case "gain":
 		return runGain(ctx, cfg, args[1:])
+	case "bench":
+		return runBench(ctx, cfg, args[1:])
 	case "filters":
 		return runFilters(args[1:])
 	case "flush":
@@ -150,7 +152,12 @@ func realMain(args []string) int {
 	return runWrapped(ctx, cfg, args, doubleDash)
 }
 
-func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDash bool) int {
+// buildRegistry assembles the full formatter registry sctx wraps commands
+// with: every built-in formatter, in the same order runWrapped has always
+// registered them, plus any project-local filters trusted for the current
+// directory. Shared with `sctx bench`, which renders through the identical
+// in-process pipeline rather than a second, drifting copy of it.
+func buildRegistry() *run.Registry {
 	registry := run.NewRegistry()
 	registry.Register(gotest.New())
 	registry.Register(dig.New())
@@ -195,6 +202,11 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDas
 		registry.Register(f)
 	}
 	registerProjectFilters(registry)
+	return registry
+}
+
+func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDash bool) int {
+	registry := buildRegistry()
 
 	// Stats and telemetry are auxiliary: a failure disables them with a
 	// warning, never the wrapped command. Assignment into the interface
@@ -947,6 +959,11 @@ Usage:
                                  (aggregate numbers only, never argv/paths)
     --format text|json|markdown output format (default text; markdown only
                                  valid with --share)
+  sctx bench                 reproducible local benchmark: runs a fixed command
+                              set for this repository raw vs. through sctx
+    --name <repo>               label the report (default "(unnamed)")
+    --format text|json          output format (default text)
+    --verbose                   include full argv (paths) per command
   sctx flush                 force-drain the telemetry spool
   sctx init [--endpoint <url>] [--default]
                               authenticate against the SynapCTX platform for
