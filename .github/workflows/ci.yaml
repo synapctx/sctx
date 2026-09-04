@@ -100,6 +100,154 @@ jobs:
             exit 1
           fi
 
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    # `sctx setup --install` is a bash-script-free install path: every hook
+    # command it writes is a plain COMMAND STRING (settings.json/config.toml/
+    # hooks.json), never a shell script, specifically so Claude Code and the
+    # rest can spawn it directly on a platform with no bash. This job is the
+    # only thing that actually proves that — cross-compile below only checks
+    # `go build`, which says nothing about os.Executable() returning a path
+    # with a space (`C:\Users\Jane Doe\...`) or about line endings.
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Set up Go
+        uses: actions/setup-go@v7
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: go.sum
+
+      - name: Build
+        run: go build -o sctx.exe ./cmd/sctx
+
+      # No -race: the race detector needs a matching cgo/gcc toolchain sctx
+      # does not otherwise depend on, and every package here builds and runs
+      # -race clean on macOS/Linux CI already (see the `verify` job). This is
+      # the platform-behavior check, not a second race sweep.
+      - name: Test
+        run: go test ./...
+
+      - name: Windows setup --install end to end
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          function Assert($cond, $msg) {
+            if (-not $cond) {
+              Write-Host "::error::$msg"
+              exit 1
+            }
+          }
+          function AssertLoud($cond, $msg, $content) {
+            if (-not $cond) {
+              Write-Host "::error::$msg"
+              Write-Host "--- offending content ---"
+              Write-Host $content
+              exit 1
+            }
+          }
+
+          # A home directory with a SPACE in it, on purpose: os.Executable()
+          # on a real machine routinely returns `C:\Users\Jane Doe\...`, and a
+          # hook command string that does not double-quote that path is split
+          # by the shell that reads it (see agentsetup.quoteBinaryForCommand).
+          $fixtureHome = Join-Path $env:TEMP "home\Jane Doe"
+          New-Item -ItemType Directory -Force -Path $fixtureHome | Out-Null
+          New-Item -ItemType Directory -Force -Path "$fixtureHome\.claude" | Out-Null
+          New-Item -ItemType Directory -Force -Path "$fixtureHome\.codex" | Out-Null
+          New-Item -ItemType Directory -Force -Path "$fixtureHome\.gemini" | Out-Null
+          New-Item -ItemType Directory -Force -Path "$fixtureHome\.config\kilo" | Out-Null
+          '{"hooks":{}}' | Set-Content -NoNewline -Path "$fixtureHome\.claude\settings.json"
+          '{}' | Set-Content -NoNewline -Path "$fixtureHome\.claude.json"
+          New-Item -ItemType File -Force -Path "$fixtureHome\.codex\config.toml" | Out-Null
+          '{}' | Set-Content -NoNewline -Path "$fixtureHome\.gemini\settings.json"
+
+          $sctx = Join-Path (Get-Location) "sctx.exe"
+          $binDir = Join-Path $fixtureHome "sctx-bin"
+          New-Item -ItemType Directory -Force -Path $binDir | Out-Null
+          Copy-Item $sctx (Join-Path $binDir "sctx.exe")
+          $sctx = Join-Path $binDir "sctx.exe"
+
+          $env:HOME = $fixtureHome
+          $env:USERPROFILE = $fixtureHome
+          $env:SCT__SPOOL_DIR = Join-Path $fixtureHome "spool"
+          $env:SCT__TELEMETRY_ENABLED = "false"
+
+          # (c) sctx.exe setup --install. No stdin redirection needed: the
+          # consent prompt only fires on an interactive TTY
+          # (shouldAskConsent), which a GitHub Actions step's stdin is not.
+          & $sctx setup --install
+          Assert ($LASTEXITCODE -eq 0) "setup --install exited $LASTEXITCODE"
+
+          $settingsPath = "$fixtureHome\.claude\settings.json"
+          $settingsRaw = Get-Content -Raw $settingsPath
+          $settings = $settingsRaw | ConvertFrom-Json
+          Assert ($null -ne $settings.hooks) "settings.json has no hooks key:`n$settingsRaw"
+
+          function CommandFor($eventName, $matcher) {
+            $group = $settings.hooks.$eventName | Where-Object { $_.matcher -eq $matcher }
+            Assert ($null -ne $group) "no $eventName(<$matcher>) hook group in settings.json:`n$settingsRaw"
+            return $group.hooks[0].command
+          }
+          $claudeGroups = @(
+            @{ event = "PreToolUse"; matcher = "Bash"; verb = "claude" },
+            @{ event = "PostToolUse"; matcher = "Edit|Write|Bash"; verb = "claude-post-tool" },
+            @{ event = "SessionStart"; matcher = "startup|resume|clear|compact"; verb = "claude-session-start" },
+            @{ event = "PreToolUse"; matcher = "Grep|Glob|Agent"; verb = "claude-first-search" }
+          )
+          foreach ($g in $claudeGroups) {
+            $cmd = CommandFor $g.event $g.matcher
+            AssertLoud ($cmd.StartsWith('"') -and $cmd.EndsWith('sctx.exe" hook ' + $g.verb)) `
+              "Claude $($g.event)($($g.matcher)) command is not a quoted sctx.exe path ending in 'hook $($g.verb)'" $cmd
+          }
+
+          $codexRaw = Get-Content -Raw "$fixtureHome\.codex\config.toml"
+          AssertLoud ($codexRaw -match '\[\[hooks\.PreToolUse\]\]') "no [[hooks.PreToolUse]] table in config.toml" $codexRaw
+          AssertLoud ($codexRaw -match 'command = "\\"') "Codex command is not TOML-escaped-quoted (want command = `"\`"...)" $codexRaw
+          AssertLoud ($codexRaw -match [regex]::Escape('sctx.exe\" hook codex"')) "Codex command does not end in the quoted sctx.exe path + hook codex" $codexRaw
+
+          $geminiRaw = Get-Content -Raw "$fixtureHome\.gemini\settings.json"
+          $gemini = $geminiRaw | ConvertFrom-Json
+          $beforeTool = $gemini.hooks.BeforeTool | Where-Object { $_.matcher -eq "run_shell_command" }
+          Assert ($null -ne $beforeTool) "no BeforeTool(run_shell_command) entry in Gemini settings.json:`n$geminiRaw"
+          $gcmd = $beforeTool.hooks[0].command
+          AssertLoud ($gcmd.StartsWith('"') -and $gcmd.EndsWith('sctx.exe" hook gemini')) `
+            "Gemini BeforeTool command is not a quoted sctx.exe path ending in 'hook gemini'" $gcmd
+
+          $kiloPluginPath = "$fixtureHome\.config\kilo\plugin\sctx.js"
+          Assert (Test-Path $kiloPluginPath) "$kiloPluginPath was not written"
+          $kiloRaw = Get-Content -Raw $kiloPluginPath
+          $escapedBin = $sctx -replace '\\', '\\\\'
+          AssertLoud ($kiloRaw -match [regex]::Escape('SCTX_BINARY = "' + $escapedBin + '"')) `
+            "Kilo plugin does not embed the backslash-escaped sctx.exe path" $kiloRaw
+
+          $sctxDocPath = "$fixtureHome\.claude\SCTX.md"
+          Assert (Test-Path $sctxDocPath) "$sctxDocPath was not written"
+          $sctxDocFirstLine = (Get-Content -TotalCount 1 $sctxDocPath)
+          AssertLoud ($sctxDocFirstLine.StartsWith("<!-- sctx-doc")) "SCTX.md does not start with the provenance stamp" $sctxDocFirstLine
+
+          # (d) sctx.exe setup (inspect) — every row [ok], never [stale].
+          $inspectOut = & $sctx setup 2>&1 | Out-String
+          Assert ($LASTEXITCODE -eq 0) "setup (inspect) exited $LASTEXITCODE:`n$inspectOut"
+          AssertLoud (-not ($inspectOut -match '\[stale\]')) "setup reported [stale] on a fresh install" $inspectOut
+
+          # (e) the PreToolUse rewrite hook itself.
+          $payload = '{"tool_name":"Bash","session_id":"ci-1","tool_input":{"command":"go test ./..."}}'
+          $hookOut = $payload | & $sctx hook claude
+          Assert ($LASTEXITCODE -eq 0) "sctx hook claude exited $LASTEXITCODE"
+          $decoded = $hookOut | ConvertFrom-Json
+          AssertLoud ($decoded.hookSpecificOutput.updatedInput.command -eq "sctx go test ./...") `
+            "hook claude did not rewrite go test ./..." $hookOut
+
+          # (f) a plain wrapped command still runs and still prints its own output.
+          $goVersionOut = & $sctx go version
+          Assert ($LASTEXITCODE -eq 0) "sctx go version exited $LASTEXITCODE"
+          AssertLoud ($goVersionOut -match '^go version') "sctx go version did not print go's own version line" $goVersionOut
+
+          Write-Host "windows setup/hook checks passed"
+
   cross-compile:
     name: Cross-compile
     runs-on: ubuntu-latest

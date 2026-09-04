@@ -90,7 +90,7 @@ func InstallCursorHooks(home, binary string) ([]string, error) {
 	}
 	pre, _ := hooks["preToolUse"].([]any)
 	pre = append(pre, map[string]any{
-		"command": binary + " hook cursor",
+		"command": quoteBinaryForCommand(binary) + " hook cursor",
 		"matcher": cursorHookMatcher,
 	})
 	hooks["preToolUse"] = pre

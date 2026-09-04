@@ -219,6 +219,35 @@ rm -rf ~/.config/sctx
 
 &nbsp;
 
+### Windows
+
+`sctx` itself works identically on every platform: it is a single static
+binary, and the wrapped command's exit code and output are unchanged.
+`sctx setup --install` writes every hook as a plain **command string** —
+never a shell script — because Claude Code and the other clients below spawn
+that string directly, with no bash available on Windows to run one.
+
+Verified by a `windows-latest` CI job on every change (not just tested once by
+hand), `sctx setup --install` wires auto-wrap for:
+
+- **Claude Code** — all four hooks (`settings.json`)
+- **OpenAI Codex CLI** — the `PreToolUse` hook (`config.toml`); Codex still
+  requires a one-time `/hooks` trust step before it runs, same as elsewhere
+- **Gemini CLI** — the `BeforeTool` hook (`settings.json`)
+- **Kilo Code** — the auto-wrap plugin (`%USERPROFILE%\.config\kilo\plugin\sctx.js`)
+
+**Untested on Windows by CI** (the code path is the same, cross-compiled and
+`go vet`-clean, but nothing exercises it on the platform yet): Cursor,
+GitHub Copilot CLI, Factory Droid, and `sctx watch`'s `sctxd` helper process.
+
+Configuration and the local savings ledger live under
+`%USERPROFILE%\.config\sctx` — the same relative layout as `~/.config/sctx`
+elsewhere, chosen because that is also where Claude Code, Codex and Gemini
+already keep their own configuration on Windows (`~\.claude`, `~\.codex`,
+`~\.gemini`).
+
+&nbsp;
+
 🔝 [back to top](#sctx)
 
 &nbsp;

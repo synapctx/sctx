@@ -191,6 +191,14 @@ func InspectPlugin(home string, a Agent, binary string) (PluginStatus, error) {
 // wiredBinary pulls the sctx path out of something we generated. An empty
 // result means we could not read it, which the caller treats as stale — the
 // safe direction, since a rewrite restores a known-good file.
+//
+// Callers with a shell COMMAND string (Cursor/Copilot/Codex, via a `prefix`/
+// `suffix` that straddle the whole `"command": "..."` or `command = "..."`
+// value) hand this a body that may itself be `quoteBinaryForCommand`-wrapped —
+// `"C:\Users\Jane Doe\bin\sctx.exe"` — because the surrounding JSON/TOML
+// string quoting is a SEPARATE layer from ours. One surrounding pair of our
+// own quotes is stripped so the result is a bare path `os.Stat` can open;
+// plugin.go's own SCTX_BINARY extraction never has one to strip.
 func wiredBinary(body, prefix, suffix string) string {
 	_, after, ok := strings.Cut(body, prefix)
 	if !ok {
@@ -201,7 +209,11 @@ func wiredBinary(body, prefix, suffix string) string {
 	if !ok0 {
 		return ""
 	}
-	return strings.NewReplacer(`\\`, `\`, `\"`, `"`).Replace(before0)
+	result := strings.NewReplacer(`\\`, `\`, `\"`, `"`).Replace(before0)
+	if len(result) >= 2 && result[0] == '"' && result[len(result)-1] == '"' {
+		result = result[1 : len(result)-1]
+	}
+	return result
 }
 
 // InstallPlugin writes or refreshes the plugin, and never touches a file that is

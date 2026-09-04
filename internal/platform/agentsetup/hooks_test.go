@@ -301,9 +301,47 @@ func TestInvokesSctxHookIsWholeToken(t *testing.T) {
 		{"/x/sctx hook claude-first-search", "claude-session-start", false},
 		{"/x/sctx hook claude-post-tool", "claude-first-search", false},
 		{"", "claude", false},
+		// Windows: os.Executable() can return a path with a space
+		// (`quoteBinaryForCommand` double-quotes it), so `strings.Fields` alone
+		// would split the program token in two. splitCommandTokens must treat
+		// the whole quoted run as one token before comparison.
+		{`"C:\Users\Jane Doe\bin\sctx.exe" hook claude`, "claude", true},
+		{`"C:\Users\Jane Doe\bin\sctx.exe" hook claude-post-tool`, "claude", false},
+		{`"C:\Program Files\sctx\sctx.exe" hook claude`, "claude", true},
 	} {
 		if got := invokesSctxHook(tc.cmd, tc.sub); got != tc.want {
 			t.Errorf("invokesSctxHook(%q, %q) = %v, want %v", tc.cmd, tc.sub, got, tc.want)
+		}
+	}
+}
+
+// The program TOKEN handed back for a doctor-style version comparison must be
+// a bare, unquoted path — the caller passes it straight to exec, never
+// through a shell — even though the settings.json entry embeds it quoted for
+// the shell that DOES read it there.
+func TestHookProgramTokenStripsQuotes(t *testing.T) {
+	for _, tc := range []struct{ cmd, sub, want string }{
+		{`"C:\Users\Jane Doe\bin\sctx.exe" hook claude`, "claude", `C:\Users\Jane Doe\bin\sctx.exe`},
+		{"/opt/homebrew/bin/sctx hook claude", "claude", "/opt/homebrew/bin/sctx"},
+	} {
+		got, ok := hookProgramToken(tc.cmd, tc.sub)
+		if !ok || got != tc.want {
+			t.Errorf("hookProgramToken(%q, %q) = (%q, %v), want (%q, true)", tc.cmd, tc.sub, got, ok, tc.want)
+		}
+	}
+}
+
+// quoteBinaryForCommand is the other half: a path with a space is quoted for
+// embedding in a hook COMMAND STRING, a path without one is left exactly as
+// every non-Windows fixture already expects.
+func TestQuoteBinaryForCommand(t *testing.T) {
+	for _, tc := range []struct{ in, want string }{
+		{`C:\Users\Jane Doe\bin\sctx.exe`, `"C:\Users\Jane Doe\bin\sctx.exe"`},
+		{`/opt/homebrew/bin/sctx`, `/opt/homebrew/bin/sctx`},
+		{`C:\sctx\sctx.exe`, `C:\sctx\sctx.exe`},
+	} {
+		if got := quoteBinaryForCommand(tc.in); got != tc.want {
+			t.Errorf("quoteBinaryForCommand(%q) = %q, want %q", tc.in, got, tc.want)
 		}
 	}
 }

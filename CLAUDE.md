@@ -342,6 +342,30 @@ load-bearing.
   a same-named unmanaged table rather than overwriting or duplicating it. Only
   write this block when Codex was actually detected and at least one org key is
   configured.
+- **A hook COMMAND STRING is not argv.** `os.Executable()` on Windows routinely
+  returns a path with a space (`C:\Users\Jane Doe\...\sctx.exe`), and every hook
+  entry this package writes for Claude, Gemini, Cursor, Copilot, Droid and
+  Codex is one shell-visible string, not an argv array — so
+  `agentsetup.quoteBinaryForCommand` double-quotes the binary path whenever it
+  contains whitespace before it is embedded (`hooks.go`, and the per-agent
+  `cursorhooks.go`/`copilothooks.go`/`droidhooks.go`/`codexhooks.go`), leaving
+  it byte-for-byte unchanged otherwise. Detection has to undo exactly that:
+  `splitCommandTokens` (not `strings.Fields`) tokenizes a quoted run as one
+  token before `invokesSctxHook`/`hookProgramToken` compare it, and
+  `wiredBinary` (`plugin.go`, shared by the JSON/TOML inspectors) strips one
+  surrounding pair of quotes off whatever it extracts — both paths feed
+  `os.Stat` or an `exec.Command`, neither of which goes through a shell, so a
+  quoted string handed to either would report a working install as stale. The
+  Kilo/OpenCode plugin needs none of this: `SCTX_BINARY` is a plain JS string
+  passed straight to `execFile` (argv, not a shell), so `jsString`'s existing
+  backslash escaping is already sufficient.
+- **`config.BaseDir()` is the one place `~/.config/sctx` is joined.** `Load`
+  and the hook's own spool resolution (`internal/adapters/hook/firstsearch.go`
+  `spoolDir`) used to each hand-join it; both now call `config.BaseDir()`,
+  which resolves to `%USERPROFILE%\.config\sctx` on Windows via
+  `os.UserHomeDir()` + `filepath.Join` — no separate Windows convention (e.g.
+  `%LOCALAPPDATA%`), matching where the coding agents themselves already keep
+  their configuration on that platform (`~\.claude`, `~\.codex`, `~\.gemini`).
 
 ## `sctx watch`
 

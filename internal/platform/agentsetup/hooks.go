@@ -84,11 +84,28 @@ func GeminiHooks(binary string) []HookSpec {
 			Matcher:    "run_shell_command",
 			Purpose:    "rewrites covered commands to sctx — this is what produces the savings",
 			Subcommand: "gemini",
-			Command:    binary + " hook gemini",
+			Command:    quoteBinaryForCommand(binary) + " hook gemini",
 			Name:       "sctx",
 			Timeout:    5000,
 		},
 	}
+}
+
+// quoteBinaryForCommand wraps binary in double quotes when it contains
+// whitespace, so a hook COMMAND STRING — parsed by a shell, not exec'd as
+// argv — does not split on a space in the path. `os.Executable()` on Windows
+// commonly returns something like `C:\Users\Jane Doe\...\sctx.exe`, which
+// every hooks.json/config.toml/settings.json here embeds as one shell-visible
+// string. Backslashes are left untouched: JSON encoding escapes them on its
+// own, and `tomlBasicString` does the same for TOML.
+//
+// Left unquoted when there is no whitespace, so every existing fixture and
+// the huge majority of POSIX installs are byte-for-byte unchanged.
+func quoteBinaryForCommand(binary string) string {
+	if strings.ContainsAny(binary, " \t") {
+		return `"` + binary + `"`
+	}
+	return binary
 }
 
 // hooksFor is the hook set for one agent, empty when sctx installs none.
@@ -122,14 +139,14 @@ func ClaudeHooks(binary string) []HookSpec {
 			Matcher:    "Bash",
 			Purpose:    "rewrites covered commands to sctx — this is what produces the savings",
 			Subcommand: "claude",
-			Command:    binary + " hook claude",
+			Command:    quoteBinaryForCommand(binary) + " hook claude",
 		},
 		{
 			Event:      "PostToolUse",
 			Matcher:    "Edit|Write|Bash",
 			Purpose:    "surfaces org memory for files you edit, and cross-repo call sites grep cannot see",
 			Subcommand: "claude-post-tool",
-			Command:    binary + " hook claude-post-tool",
+			Command:    quoteBinaryForCommand(binary) + " hook claude-post-tool",
 		},
 		{
 			Event: "SessionStart",
@@ -139,7 +156,7 @@ func ClaudeHooks(binary string) []HookSpec {
 			Matcher:    "startup|resume|clear|compact",
 			Purpose:    "briefs the agent at session start: org memory bound to this repository, index freshness, the tools to open with",
 			Subcommand: "claude-session-start",
-			Command:    binary + " hook claude-session-start",
+			Command:    quoteBinaryForCommand(binary) + " hook claude-session-start",
 		},
 		{
 			// A SECOND PreToolUse group, not an extension of the Bash matcher.
@@ -151,7 +168,7 @@ func ClaudeHooks(binary string) []HookSpec {
 			Matcher:    "Grep|Glob|Agent",
 			Purpose:    "on the first local searches of a session, points at the org-wide graph and memory",
 			Subcommand: "claude-first-search",
-			Command:    binary + " hook claude-first-search",
+			Command:    quoteBinaryForCommand(binary) + " hook claude-first-search",
 		},
 	}
 }
@@ -302,7 +319,7 @@ func hookPresent(doc map[string]any, spec HookSpec) bool {
 // it must be exactly "hook" and the subcommand. Trailing flags are the
 // developer's and are ignored.
 func invokesSctxHook(cmd, subcommand string) bool {
-	fields := strings.Fields(cmd)
+	fields := splitCommandTokens(cmd)
 	for i, f := range fields {
 		prog := f
 		if idx := strings.LastIndexAny(prog, `/\`); idx >= 0 {
@@ -316,6 +333,41 @@ func invokesSctxHook(cmd, subcommand string) bool {
 		}
 	}
 	return false
+}
+
+// splitCommandTokens is strings.Fields, except a `"..."` run is one token
+// with its quotes stripped, whitespace and all — the shape
+// `quoteBinaryForCommand` produces for a Windows path containing a space
+// (`"C:\Users\Jane Doe\bin\sctx.exe" hook claude`). Plain `strings.Fields`
+// would split that path in two and every detector here would miss it.
+//
+// Deliberately minimal: no escape handling, no single quotes — sctx never
+// writes either, and a hand-edited command with them is outside what
+// detection promises to recognise.
+func splitCommandTokens(cmd string) []string {
+	var tokens []string
+	var cur strings.Builder
+	inQuotes, has := false, false
+	for _, r := range cmd {
+		switch {
+		case r == '"':
+			inQuotes = !inQuotes
+			has = true
+		case (r == ' ' || r == '\t') && !inQuotes:
+			if has {
+				tokens = append(tokens, cur.String())
+				cur.Reset()
+				has = false
+			}
+		default:
+			cur.WriteRune(r)
+			has = true
+		}
+	}
+	if has {
+		tokens = append(tokens, cur.String())
+	}
+	return tokens
 }
 
 // HookBinary parses the program token out of one of a's installed hook
@@ -367,9 +419,10 @@ func HookBinary(home string, a Agent) (string, bool) {
 }
 
 // hookProgramToken is invokesSctxHook, but returning the WHOLE first token
-// (the path the hook actually runs) rather than a bool.
+// (the path the hook actually runs, quotes already stripped by
+// splitCommandTokens) rather than a bool.
 func hookProgramToken(cmd, subcommand string) (string, bool) {
-	fields := strings.Fields(cmd)
+	fields := splitCommandTokens(cmd)
 	for i, f := range fields {
 		base := f
 		if idx := strings.LastIndexAny(base, `/\`); idx >= 0 {

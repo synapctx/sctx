@@ -46,7 +46,7 @@ func droidSpec(binary string) HookSpec {
 		Event:      "PreToolUse",
 		Matcher:    "Execute",
 		Subcommand: "droid",
-		Command:    binary + " hook droid",
+		Command:    quoteBinaryForCommand(binary) + " hook droid",
 	}
 }
 
