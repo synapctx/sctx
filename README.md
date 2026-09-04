@@ -671,7 +671,10 @@ leaves enough information to reconstruct the command, only enough to say "you
 ran this again". The salt is generated once per machine and never transmitted.
 
 Paths, filenames, arguments and command output are never transmitted. The queue is
-inspectable, unrendered, at any time:
+inspectable, unrendered, at any time. If a repository's organization has no key
+configured, its events are delivered under your configured default org's key
+instead, with the repository name cleared, so another organization never learns
+it, and `sctx flush`/`sctx doctor` say so when this happens.
 
 ```bash
 sctx telemetry             # what is currently shared

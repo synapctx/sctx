@@ -440,6 +440,10 @@ func runFlush(ctx context.Context, cfg config.Config) int {
 	emitter := spool.NewEmitter(cfg.SpoolDir, cfg.TelemetryEndpoint, cfg, version, agentenv.Detect(os.Getenv).Client)
 	res, err := emitter.FlushWithTimeout(ctx, backlogFlushTimeout)
 	fmt.Printf("flushed %d events in %d requests; %d pending\n", res.Sent, res.Requests, res.Pending)
+	if res.Reattributed > 0 {
+		fmt.Printf("re-attributed %d events from orgs without a key to %s\n", res.Reattributed, res.ReattributedTo)
+	}
+	printNoKeyOrgs(res.NoKeyEvents)
 	if res.Quarantined > 0 {
 		fmt.Printf("sctx: flush: quarantined %d event(s) after repeated rejection (see %s/%s)\n", res.Quarantined, cfg.SpoolDir, "rejected.jsonl")
 	}
@@ -448,6 +452,29 @@ func runFlush(ctx context.Context, cfg config.Config) int {
 		return 1
 	}
 	return 0
+}
+
+// printNoKeyOrgs prints one line per org slug in noKey (sorted, for
+// deterministic output), reporting events that could neither be delivered
+// under their own key nor re-attributed to a default org — see
+// spool.FlushResult.NoKeyEvents / spool.PendingSummary. Shared by `sctx
+// flush` and `sctx doctor` so the wording matches wherever it is seen.
+func printNoKeyOrgs(noKey map[string]int) {
+	if len(noKey) == 0 {
+		return
+	}
+	orgs := make([]string, 0, len(noKey))
+	for org := range noKey {
+		orgs = append(orgs, org)
+	}
+	sort.Strings(orgs)
+	for _, org := range orgs {
+		label := org
+		if label == "" {
+			label = "(no repository)"
+		}
+		fmt.Printf("%d events undeliverable: no API key for org %s (run `sctx init` for that org, or set a default org)\n", noKey[org], label)
+	}
 }
 
 // defaultInitEndpoint is the SynapCTX platform's authenticated remote
@@ -801,6 +828,10 @@ func runDoctor(cfg config.Config) int {
 		fmt.Println("raw recovery:   disabled (opt in with SCT__RAW_CACHE_ENABLED=true)")
 	}
 	fmt.Printf("config file:    %s\n", cfg.ConfigFilePath)
+	if pending, noKey, err := spool.PendingSummary(cfg.SpoolDir, cfg); err == nil {
+		fmt.Printf("pending events: %d\n", pending)
+		printNoKeyOrgs(noKey)
+	}
 	printProjectFilters()
 	fmt.Printf("telemetry:      enabled=%t mode=%s\n", cfg.TelemetryEnabled, telemetryMode(cfg))
 	fmt.Printf("endpoint:       %s\n", cfg.TelemetryEndpoint)

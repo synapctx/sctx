@@ -160,6 +160,17 @@ func (c Config) TokenForOrg(org string) (string, bool) {
 	return "", true
 }
 
+// DefaultOrgSlug reports the org slug attributed to events with no org key of
+// their own — TokenForOrg already substitutes it for an empty-repository
+// event; spool.flushOnce reuses it (spool.TokenResolver) at flush time to
+// RE-ATTRIBUTE a *named* org's events to it when that org has no key of its
+// own, rather than leaving them stuck forever. Named DefaultOrgSlug, not
+// DefaultOrg, because Config already has a DefaultOrg FIELD and Go forbids a
+// method and a field sharing one name.
+func (c Config) DefaultOrgSlug() (string, bool) {
+	return c.DefaultOrg, c.DefaultOrg != ""
+}
+
 // HasAnyToken reports whether any delivery key is configured (env, sectioned,
 // or legacy). Used by doctor and telemetryMode.
 func (c Config) HasAnyToken() bool {

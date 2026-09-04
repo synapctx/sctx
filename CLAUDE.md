@@ -179,6 +179,27 @@ make install   # ~/.local/bin/sctx
   row (a malformed line from an ancient sctx version, most likely) is
   quarantined to `<spoolDir>/rejected.jsonl` rather than retried forever —
   see `maxConsecutiveChunkRejects`.
+- **A keyless org's events are RE-ATTRIBUTED to the default org, never
+  dropped and never sent under a sibling org's key** (`spool.go` /
+  `flushOnce`, 2026-09-04). A repository whose org has no configured key
+  (e.g. a personal or third-party clone with no `sctx init` run against it)
+  used to sit in the spool forever, growing until `maxSpoolBytes` silently
+  dropped it — the developer's own savings on that work never reached any
+  console. Instead, once `default_org` names an org that DOES have a key,
+  the event is delivered under THAT key with `repositoryName` cleared to
+  `""` (a value the proto already accepts, "not attributed to a
+  repository") — the id, program key and token counts are untouched, so the
+  saving still counts, but org-isolation rule 0009 (an org must never learn
+  another org's repository names) holds because the real name never leaves
+  the machine under someone else's bearer token. An event whose own org
+  already has a key is untouched. `org == ""` (no repo at all) already
+  resolved to the default org through `Config.TokenForOrg` before this
+  existed; re-attribution only ever fires for a NAMED org. With no default
+  org configured either, the event stays pending exactly as before, and
+  `FlushResult.NoKeyEvents` (surfaced by `sctx flush` and `sctx doctor`)
+  says which org and how many, rather than the backlog looking like an
+  unexplained no-op. The purpose gate (service vs. improvement) is applied
+  BEFORE grouping, so re-attribution can never become a bypass for consent.
 - **The consent prompt is `[y/N]` and an empty answer declines.** It runs only
   from `sctx setup` on a TTY, never on the wrapped path or in the hook.
 - **A decision is stored with the disclosure version it was made against**, and a

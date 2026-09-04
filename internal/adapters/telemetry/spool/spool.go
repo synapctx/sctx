@@ -81,6 +81,14 @@ const (
 // config.Config satisfies it.
 type TokenResolver interface {
 	TokenForOrg(org string) (token string, ok bool)
+	// DefaultOrgSlug reports the org slug flushOnce re-attributes a NAMED
+	// org's events to when that org has no key of its own — org-isolation
+	// rule 0009 forbids sending them under a sibling org's key with the real
+	// repositoryName attached, so they are sent under the default org's key
+	// with repositoryName CLEARED instead. ok is false when no default org
+	// is configured (e.g. an unauthenticated machine), in which case such
+	// events stay pending rather than being sent anywhere.
+	DefaultOrgSlug() (org string, ok bool)
 	// PermitsPurpose reports whether events collected for this purpose may be
 	// delivered NOW — asked at flush, not at collection, because authorisation
 	// changes underneath a spool: consent can be withdrawn, and a disclosure
@@ -186,6 +194,50 @@ func CountPending(dir string) int {
 	return n
 }
 
+// PendingSummary reports dir's total pending event count and, per org slug,
+// how many of them are currently stuck because that org has no configured
+// key and re-attribution to the default org is not possible either (see
+// TokenResolver.DefaultOrgSlug) — for `sctx doctor`. It NEVER mutates the
+// spool (unlike flushOnce, which purges unauthorised-purpose lines as a
+// side effect): a status command must be safe to run at any time.
+func PendingSummary(dir string, resolver TokenResolver) (pending int, noKey map[string]int, err error) {
+	data, err := os.ReadFile(filepath.Join(dir, pendingFile))
+	if err != nil {
+		if os.IsNotExist(err) {
+			return 0, nil, nil
+		}
+		return 0, nil, fmt.Errorf("reading spool: %w", err)
+	}
+	for line := range bytes.SplitSeq(data, []byte{'\n'}) {
+		line = bytes.TrimSpace(line)
+		if len(line) == 0 {
+			continue
+		}
+		pending++
+
+		var meta struct {
+			RepositoryName string `json:"repositoryName"`
+		}
+		org := ""
+		if json.Unmarshal(line, &meta) == nil {
+			org = orgOf(meta.RepositoryName)
+		}
+		if _, ok := resolver.TokenForOrg(org); ok {
+			continue
+		}
+		if defOrg, hasDefault := resolver.DefaultOrgSlug(); hasDefault && defOrg != org {
+			if _, ok := resolver.TokenForOrg(defOrg); ok {
+				continue
+			}
+		}
+		if noKey == nil {
+			noKey = make(map[string]int)
+		}
+		noKey[org]++
+	}
+	return pending, noKey, nil
+}
+
 // FlushResult reports what one drain accomplished, for `sctx flush`'s
 // "flushed N events in M requests; K pending" line.
 type FlushResult struct {
@@ -193,6 +245,18 @@ type FlushResult struct {
 	Requests    int // HTTP requests attempted
 	Quarantined int // events moved to rejectedFile after repeated 4xx
 	Pending     int // events remaining in the spool afterwards
+	// Reattributed counts events, already included in Sent, that belonged to
+	// a named org with no key of its own and were delivered under the
+	// default org's key instead, repositoryName cleared. See DefaultOrgSlug.
+	Reattributed int
+	// ReattributedTo is the default org's slug reattribution was sent under
+	// this round, "" if Reattributed is 0.
+	ReattributedTo string
+	// NoKeyEvents counts, per org slug, events left pending because that org
+	// has no configured key and re-attribution was not possible either (no
+	// default org configured, or the default org has no key of its own).
+	// Nil when nothing is stuck this way.
+	NoKeyEvents map[string]int
 }
 
 // Flush drains AT MOST ONE CHUNK per org group, each under the Emitter's
@@ -219,6 +283,11 @@ func (e *Emitter) FlushWithTimeout(ctx context.Context, timeout time.Duration) (
 		total.Requests += res.Requests
 		total.Quarantined += res.Quarantined
 		total.Pending = res.Pending
+		total.Reattributed += res.Reattributed
+		if res.ReattributedTo != "" {
+			total.ReattributedTo = res.ReattributedTo
+		}
+		total.NoKeyEvents = res.NoKeyEvents // latest snapshot: who is still stuck
 		if err != nil {
 			return total, err
 		}
@@ -250,6 +319,29 @@ func (e *Emitter) AutoFlush(ctx context.Context) error {
 		}
 	}
 	return e.Flush(ctx)
+}
+
+// stripRepositoryName decodes line as a telemetry.Event, clears
+// RepositoryName and re-encodes it, for a keyless org's events re-attributed
+// to the default org — org-isolation rule 0009 forbids another org ever
+// learning this repository's name, so it is cleared rather than merely sent
+// under a different bearer token. An empty repositoryName is a value the
+// proto already accepts ("not attributed to a repository"); the event's id,
+// token counts and every other field are untouched, so the developer's
+// savings still count. ok is false when line does not decode as a
+// well-formed event, in which case the caller must NOT send it — guessing
+// at its shape risks leaking the very field this exists to protect.
+func stripRepositoryName(line []byte) (out []byte, ok bool) {
+	var ev telemetry.Event
+	if err := json.Unmarshal(line, &ev); err != nil {
+		return nil, false
+	}
+	ev.RepositoryName = ""
+	encoded, err := json.Marshal(ev)
+	if err != nil {
+		return nil, false
+	}
+	return encoded, true
 }
 
 // orgOf returns the org slug from a "org/repo" repositoryName: the substring
@@ -355,16 +447,57 @@ func (e *Emitter) flushOnce(ctx context.Context, timeout time.Duration) (FlushRe
 	for _, org := range groupOrder {
 		idxs := groups[org]
 		token, ok := e.resolver.TokenForOrg(org)
+		reattributed := false
 		if !ok {
-			// No key configured for this org yet: keep for a later flush,
-			// never deliver it under the wrong key.
-			continue
+			// No key of its own. Before retaining, try the default org
+			// (org-isolation rule 0009: never send it under a SIBLING org's
+			// key, since that would hand the sibling this org's repository
+			// name). org == "" already resolves through DefaultOrgSlug
+			// inside TokenForOrg itself, so this path only ever fires for a
+			// NAMED org, never the empty-repository group.
+			if defOrg, hasDefault := e.resolver.DefaultOrgSlug(); hasDefault && defOrg != org {
+				if defToken, defOk := e.resolver.TokenForOrg(defOrg); defOk {
+					token, ok, reattributed = defToken, true, true
+				}
+			}
+			if !ok {
+				// Still nothing deliverable: keep for a later flush, and
+				// report it so `sctx flush`/`sctx doctor` can say why.
+				if result.NoKeyEvents == nil {
+					result.NoKeyEvents = make(map[string]int)
+				}
+				result.NoKeyEvents[org] += len(idxs)
+				continue
+			}
 		}
 
 		chunkIdx := headChunkIndices(lines, idxs)
 		chunk := make([][]byte, len(chunkIdx))
-		for j, i := range chunkIdx {
-			chunk[j] = lines[i]
+		if reattributed {
+			// Strip repositoryName before it ever leaves the machine under
+			// another org's key. A line that fails to decode as a well-formed
+			// event is NOT sent under a guess — it is left pending, same as
+			// "no key", rather than risk leaking its repositoryName verbatim.
+			ok := true
+			for j, i := range chunkIdx {
+				stripped, sok := stripRepositoryName(lines[i])
+				if !sok {
+					ok = false
+					break
+				}
+				chunk[j] = stripped
+			}
+			if !ok {
+				if result.NoKeyEvents == nil {
+					result.NoKeyEvents = make(map[string]int)
+				}
+				result.NoKeyEvents[org] += len(idxs)
+				continue
+			}
+		} else {
+			for j, i := range chunkIdx {
+				chunk[j] = lines[i]
+			}
 		}
 
 		status, postErr := e.postChunk(ctx, timeout, token, chunk)
@@ -376,6 +509,10 @@ func (e *Emitter) flushOnce(ctx context.Context, timeout time.Duration) (FlushRe
 				removed[i] = true
 			}
 			result.Sent += len(chunk)
+			if reattributed {
+				result.Reattributed += len(chunk)
+				result.ReattributedTo, _ = e.resolver.DefaultOrgSlug()
+			}
 			clearRejectCount(e.dir, chunkFingerprint(chunk))
 
 		case postErr == nil && status >= 400 && status <= 499:

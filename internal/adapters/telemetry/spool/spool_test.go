@@ -47,6 +47,12 @@ func (o okResolver) TokenForOrg(string) (string, bool) {
 	return string(o), true
 }
 
+// Neither test resolver models a default org unless wrapped by
+// defaultOrgResolver below; the plain forms exercise the pre-existing
+// "no key, no default" retain behaviour.
+func (o okResolver) DefaultOrgSlug() (string, bool)  { return "", false }
+func (m mapResolver) DefaultOrgSlug() (string, bool) { return "", false }
+
 // mapResolver is a TokenResolver keyed by org slug, for tests exercising
 // per-org delivery and the "no key configured yet" retain path.
 type mapResolver map[string]string
@@ -54,6 +60,17 @@ type mapResolver map[string]string
 func (m mapResolver) TokenForOrg(org string) (string, bool) {
 	t, ok := m[org]
 	return t, ok
+}
+
+// defaultOrgResolver wraps mapResolver with a configured default org, for
+// tests exercising re-attribution of a keyless org's events to it.
+type defaultOrgResolver struct {
+	mapResolver
+	defaultOrg string
+}
+
+func (d defaultOrgResolver) DefaultOrgSlug() (string, bool) {
+	return d.defaultOrg, d.defaultOrg != ""
 }
 
 func TestEmitAndFlush(t *testing.T) {
@@ -387,3 +404,153 @@ func TestFlushSendsSctxUserAgent(t *testing.T) {
 		t.Errorf("User-Agent = %q, want %q", gotUA, want)
 	}
 }
+
+// TestFlushReattributesKeylessOrgToDefault proves org-isolation rule 0009:
+// a named org with no key of its own is delivered under the DEFAULT org's
+// token, with repositoryName CLEARED — never under a sibling org's key with
+// its real repository name attached — while a sibling org that DOES have its
+// own key is sent untouched, under its own token, with its repositoryName
+// intact.
+func TestFlushReattributesKeylessOrgToDefault(t *testing.T) {
+	type received struct {
+		auth string
+		repo string
+	}
+	var got []received
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := io.ReadAll(r.Body)
+		var payload struct {
+			Events []struct {
+				RepositoryName string `json:"repositoryName"`
+			} `json:"events"`
+		}
+		_ = json.Unmarshal(body, &payload)
+		auth := r.Header.Get("Authorization")
+		for _, ev := range payload.Events {
+			got = append(got, received{auth: auth, repo: ev.RepositoryName})
+		}
+		w.WriteHeader(http.StatusAccepted)
+	}))
+	defer srv.Close()
+
+	dir := t.TempDir()
+	resolver := defaultOrgResolver{
+		mapResolver: mapResolver{"synapctx": "token-synapctx"}, // no key for podsteer
+		defaultOrg:  "synapctx",
+	}
+	e := NewEmitter(dir, srv.URL, resolver, "1.2.3", "test-client")
+	e.Emit(eventForRepo("01A", "podsteer/repo-a")) // no key of its own
+	e.Emit(eventForRepo("01B", "synapctx/repo-b")) // has its own key
+
+	res, err := e.FlushWithTimeout(context.Background(), 5*time.Second)
+	if err != nil {
+		t.Fatalf("FlushWithTimeout: %v", err)
+	}
+	if res.Reattributed != 1 || res.ReattributedTo != "synapctx" {
+		t.Errorf("Reattributed = %d, ReattributedTo = %q, want 1, \"synapctx\"", res.Reattributed, res.ReattributedTo)
+	}
+	if len(res.NoKeyEvents) != 0 {
+		t.Errorf("NoKeyEvents = %v, want none: the default org had a key", res.NoKeyEvents)
+	}
+	if len(got) != 2 {
+		t.Fatalf("delivered %d events, want 2: %+v", len(got), got)
+	}
+	for _, r := range got {
+		if r.auth != "Bearer token-synapctx" {
+			t.Errorf("event repo=%q delivered under %q, want the synapctx token for BOTH (own key + reattribution)", r.repo, r.auth)
+		}
+		switch r.repo {
+		case "":
+			// The re-attributed podsteer event: repositoryName must be
+			// cleared so synapctx's key never learns podsteer's repo name.
+		case "synapctx/repo-b":
+			// Untouched: synapctx delivering its own event under its own key.
+		default:
+			t.Errorf("unexpected repositoryName %q reached the server: podsteer's real name must never leave the machine", r.repo)
+		}
+	}
+	if _, err := os.Stat(filepath.Join(dir, pendingFile)); !os.IsNotExist(err) {
+		t.Fatal("spool file should be removed once every event is delivered (directly or reattributed)")
+	}
+}
+
+// TestFlushWithNoDefaultOrgLeavesKeylessEventsPending proves that without a
+// default org configured at all, a keyless org's events are neither
+// delivered nor lost: they stay pending, and FlushResult.NoKeyEvents reports
+// them (the source for `sctx flush`'s and `sctx doctor`'s message) rather
+// than the flush looking like a silent, unexplained no-op.
+func TestFlushWithNoDefaultOrgLeavesKeylessEventsPending(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		t.Fatal("no request should ever be sent: there is no deliverable key")
+	}))
+	defer srv.Close()
+
+	dir := t.TempDir()
+	resolver := mapResolver{} // no keys, no default org (DefaultOrgSlug ⇒ false)
+	e := NewEmitter(dir, srv.URL, resolver, "1.2.3", "test-client")
+	e.Emit(eventForRepo("01A", "podsteer/repo-a"))
+	e.Emit(eventForRepo("01B", "k8sense/repo-b"))
+
+	res, err := e.FlushWithTimeout(context.Background(), 5*time.Second)
+	if err != nil {
+		t.Fatalf("FlushWithTimeout: %v", err)
+	}
+	if res.Sent != 0 || res.Reattributed != 0 {
+		t.Errorf("Sent = %d, Reattributed = %d, want 0, 0: nothing is deliverable", res.Sent, res.Reattributed)
+	}
+	if res.NoKeyEvents["podsteer"] != 1 || res.NoKeyEvents["k8sense"] != 1 {
+		t.Errorf("NoKeyEvents = %v, want podsteer:1, k8sense:1", res.NoKeyEvents)
+	}
+	data, err := os.ReadFile(filepath.Join(dir, pendingFile))
+	if err != nil {
+		t.Fatalf("spool must retain undeliverable events: %v", err)
+	}
+	if !bytes.Contains(data, []byte("podsteer/repo-a")) || !bytes.Contains(data, []byte("k8sense/repo-b")) {
+		t.Errorf("retained spool = %q, want both events untouched (never delivered under a wrong key)", data)
+	}
+}
+
+// TestFlushPurposeGateAppliesBeforeReattribution proves that an
+// improvement-purpose event without consent is dropped, never reattributed
+// and delivered to the default org — the purpose gate runs before grouping,
+// so re-attribution never becomes a bypass for consent.
+func TestFlushPurposeGateAppliesBeforeReattribution(t *testing.T) {
+	var delivered int
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		body, _ := io.ReadAll(r.Body)
+		var payload struct {
+			Events []jsontext.Value `json:"events"`
+		}
+		_ = json.Unmarshal(body, &payload)
+		delivered += len(payload.Events)
+		w.WriteHeader(http.StatusAccepted)
+	}))
+	defer srv.Close()
+
+	dir := t.TempDir()
+	lines := `{"id":"a","kind":"coverage_gap","program":"go build","repositoryName":"podsteer/repo-a"}
+`
+	if err := os.WriteFile(filepath.Join(dir, pendingFile), []byte(lines), 0o600); err != nil {
+		t.Fatal(err)
+	}
+	// Permits nothing: matches a customer who declined improvement telemetry
+	// (coverage_gap's purpose), on a machine that DOES have a default org.
+	resolver := defaultOrgResolver{mapResolver: mapResolver{"synapctx": "tok"}, defaultOrg: "synapctx"}
+	e := NewEmitter(dir, srv.URL, permitsNothing{resolver}, "1.2.3", "test-client")
+
+	if _, err := e.FlushWithTimeout(context.Background(), 5*time.Second); err != nil {
+		t.Fatalf("FlushWithTimeout: %v", err)
+	}
+	if delivered != 0 {
+		t.Errorf("delivered %d events, want 0: an unconsented event must never be reattributed and sent", delivered)
+	}
+	if _, err := os.Stat(filepath.Join(dir, pendingFile)); !os.IsNotExist(err) {
+		t.Error("an unauthorised-purpose event must be dropped, not retained, per the purpose gate's own contract")
+	}
+}
+
+// permitsNothing wraps a TokenResolver and refuses every purpose, isolating
+// the purpose gate from the token/reattribution logic under test.
+type permitsNothing struct{ TokenResolver }
+
+func (permitsNothing) PermitsPurpose(string) bool { return false }

@@ -19,6 +19,7 @@ import (
 type serviceOnlyResolver struct{}
 
 func (serviceOnlyResolver) TokenForOrg(string) (string, bool) { return "tok", true }
+func (serviceOnlyResolver) DefaultOrgSlug() (string, bool)    { return "", false }
 func (serviceOnlyResolver) PermitsPurpose(p string) bool      { return p == telemetry.PurposeService }
 
 // THE property the split exists for, at the boundary where it is enforced. A
