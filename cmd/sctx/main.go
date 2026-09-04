@@ -605,13 +605,19 @@ func runInit(ctx context.Context, cfg config.Config, args []string) int {
 		} else {
 			emitter := spool.NewEmitter(cfg.SpoolDir, endpoint, cfg2, version, agentenv.Detect(os.Getenv).Client)
 			res, err := emitter.FlushWithTimeout(ctx, backlogFlushTimeout)
+			// Same wording as `sctx flush`, deliberately: this is the same
+			// drain, just triggered from init instead of typed explicitly,
+			// and a customer comparing the two outputs should see one report.
+			fmt.Printf("flushed %d events in %d requests; %d pending\n", res.Sent, res.Requests, res.Pending)
+			if res.Reattributed > 0 {
+				fmt.Printf("re-attributed %d events from orgs without a key to %s\n", res.Reattributed, res.ReattributedTo)
+			}
+			printNoKeyOrgs(res.NoKeyEvents)
+			if res.Quarantined > 0 {
+				fmt.Printf("sctx: init: quarantined %d event(s) after repeated rejection (see %s/%s)\n", res.Quarantined, cfg.SpoolDir, "rejected.jsonl")
+			}
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "sctx: init: backlog drain: %v\n", err)
-			} else {
-				fmt.Printf("drained %d spooled event(s)\n", res.Sent)
-			}
-			if res.Quarantined > 0 {
-				fmt.Fprintf(os.Stderr, "sctx: init: backlog drain: quarantined %d event(s) after repeated rejection\n", res.Quarantined)
 			}
 		}
 	}

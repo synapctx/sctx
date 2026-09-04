@@ -135,6 +135,48 @@ func TestRunInitSuccessWritesConfigAndDrainsBacklog(t *testing.T) {
 	}
 }
 
+// TestRunInitDrainMessageMatchesFlushWording covers item 3: init's post-init
+// backlog drain must report in the exact same shape as `sctx flush`
+// ("flushed N events in M requests; K pending"), not a bespoke "drained N
+// spooled event(s)" line, so a customer comparing the two sees one report.
+func TestRunInitDrainMessageMatchesFlushWording(t *testing.T) {
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Authorization") != "Bearer sctx_live_validtoken" {
+			w.WriteHeader(http.StatusUnauthorized)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_ = json.MarshalEncode(jsontext.NewEncoder(w), map[string]string{"organization": "acme"})
+	}))
+	defer srv.Close()
+
+	for _, k := range []string{"SCT__TELEMETRY_TOKEN", "SCT__TELEMETRY_ENDPOINT", "SCT__TELEMETRY_DEFAULT_ORG"} {
+		t.Setenv(k, "")
+		os.Unsetenv(k)
+	}
+	cfg := testConfigAtHome(t)
+	if err := spool.Append(cfg.SpoolDir, telemetry.Event{ID: "01A", Kind: telemetry.KindExecSavings, At: time.Now().UTC()}); err != nil {
+		t.Fatalf("seeding spool: %v", err)
+	}
+
+	withPipedStdin(t, "sctx_live_validtoken\n")
+
+	out := captureDoctorStdout(t, func() {
+		code := runInit(context.Background(), cfg, []string{"--endpoint", srv.URL})
+		if code != 0 {
+			t.Fatalf("runInit exit = %d, want 0", code)
+		}
+	})
+
+	if !strings.Contains(out, "flushed 1 events in 1 requests; 0 pending") {
+		t.Errorf("init drain output = %q, want the same wording as `sctx flush`", out)
+	}
+	if strings.Contains(out, "drained") && strings.Contains(out, "spooled event(s)") {
+		t.Errorf("init drain output still uses the old bespoke wording: %q", out)
+	}
+}
+
 func TestRunInitFailureWritesNothing(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusUnauthorized)
