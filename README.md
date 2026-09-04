@@ -286,6 +286,20 @@ home directory, or into a directory that does not exist, are reported and never
 written to. A document sctx cannot prove it wrote is reported too, with the
 one-time `sctx setup --install --force` that adopts it.
 
+Three more agents get the same rewrite hook, each in its own config file and
+its own envelope:
+
+| Agent | Minimum version | Config file | Event (matcher) | Output field |
+| :--- | :--- | :--- | :--- | :--- |
+| Cursor | 1.7 | `~/.cursor/hooks.json` | `preToolUse` (`"Shell"`) | `updated_input` (Cursor's own envelope — `permission`/`updated_input`, never `hookSpecificOutput`) |
+| GitHub Copilot CLI | 1.0.73 | `~/.copilot/hooks/sctx-rewrite.json` | `PreToolUse` | `updatedInput` (Claude-shaped `tool_input`; a documented camelCase `toolName`/`toolArgs` input is also decoded and answered with `modifiedArgs`) |
+| Factory Droid | 0.164.0 | `~/.factory/hooks.json` | `PreToolUse` (`Execute`) | `updatedInput`, same envelope as Claude Code |
+
+Droid additionally honours its own `commandDenylist`/`commandBlocklist` entries
+(read from every settings scope Droid itself reads): a command already on one
+of those lists is left untouched rather than rewritten, so Droid's own
+confirm/block flow still sees the command it was written to match.
+
 Codex MCP entries live in a clearly marked block in `~/.codex/config.toml`.
 Everything outside that block is preserved, the file is kept mode `0600`, and a
 same-named registration outside the block is reported as a conflict rather than

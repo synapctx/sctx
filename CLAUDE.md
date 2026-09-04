@@ -260,6 +260,26 @@ load-bearing.
     over the model's arguments — send only `command`. Codex's PreToolUse contract
     is byte-identical to Claude's `updatedInput`, but keeps its own subcommand so
     hook detection can tell the two installs apart.
+  - **Three more agents, verified from primary sources on 2026-09-04, each keep
+    the hook in their OWN config file rather than the settings.json map
+    `hooks.go` manages (`cursorhooks.go`/`copilothooks.go`/`droidhooks.go`;
+    `jsonhooks.go` holds the small JSON read/write both share).** Cursor's
+    `preToolUse` hook (matcher `"Shell"`, `~/.cursor/hooks.json`, Cursor 1.7+)
+    answers with Cursor's OWN envelope — `updated_input` under
+    `permission: "allow"`, never `hookSpecificOutput` — and Cursor requires
+    JSON on every code path, so a miss prints `{}`, not nothing. GitHub
+    Copilot CLI's `PreToolUse` hook (`~/.copilot/hooks/*.json`, 1.0.73+) has
+    two DISAGREEING sources: GitHub's own docs document a camelCase
+    `toolName`/`toolArgs` payload answered with `modifiedArgs`, while the rtk
+    reference implementation records a LIVE verification that the CLI's shell
+    tool is reported under the Claude-shaped `tool_name`/`tool_input.command`
+    schema and answers to `updatedInput` — `sctx hook copilot` follows the
+    live-verified path and decodes the documented shape too, for anything
+    still registering it. Factory Droid's `PreToolUse` hook (matcher
+    `"Execute"`, `~/.factory/hooks.json`) answers with Claude's exact envelope,
+    but additionally reads Droid's own `commandDenylist`/`commandBlocklist`
+    across every settings scope and steps aside on a match — rewriting first
+    would dodge Droid's own pattern matching on the command as written.
 - **The default MCP host is the hosted one, in code** (`config.DefaultWorkspaceProxy`).
   It was the local dev proxy, and `sctx init` never wrote a host, so every
   customer registered their agents against a port on their own laptop. Nothing
