@@ -44,7 +44,7 @@ func TestFlushSendsServiceDataAndDropsUnconsentedImprovementData(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	e := NewEmitter(dir, srv.URL, serviceOnlyResolver{})
+	e := NewEmitter(dir, srv.URL, serviceOnlyResolver{}, "1.2.3", "test-client")
 	if err := e.FlushWithTimeout(context.Background(), 5*time.Second); err != nil {
 		t.Fatalf("flush: %v", err)
 	}

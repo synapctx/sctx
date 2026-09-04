@@ -12,8 +12,10 @@ import (
 
 	"golang.org/x/term"
 
+	"github.com/synapctx/sctx/internal/platform/agentenv"
 	"github.com/synapctx/sctx/internal/platform/agentsetup"
 	"github.com/synapctx/sctx/internal/platform/config"
+	"github.com/synapctx/sctx/internal/platform/httpclient"
 	"github.com/synapctx/sctx/pkg/agentdoc"
 )
 
@@ -208,11 +210,17 @@ func httpProbeMCPEndpoint(endpoint, token string) (probeResult, string) {
 		return probeUnreachable, "no MCP host configured"
 	}
 	client := &http.Client{Timeout: 4 * time.Second}
+	userAgent := httpclient.UserAgent(version, agentenv.Detect(os.Getenv).Client)
 
 	if token == "" {
 		// Nothing to authenticate with yet. The only question left is whether
 		// anything is listening, and any answer at all settles it.
-		resp, err := client.Get(endpoint)
+		req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+		if err != nil {
+			return probeUnreachable, err.Error()
+		}
+		req.Header.Set("User-Agent", userAgent)
+		resp, err := client.Do(req)
 		if err != nil {
 			return probeUnreachable, transportReason(err)
 		}
@@ -231,6 +239,7 @@ func httpProbeMCPEndpoint(endpoint, token string) (probeResult, string) {
 	// content-negotiation 406 from being mistaken for a rejected credential.
 	req.Header.Set("Accept", "application/json, text/event-stream")
 	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("User-Agent", userAgent)
 
 	resp, err := client.Do(req)
 	if err != nil {

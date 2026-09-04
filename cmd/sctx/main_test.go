@@ -14,8 +14,32 @@ import (
 
 	"github.com/synapctx/sctx/internal/adapters/telemetry/spool"
 	"github.com/synapctx/sctx/internal/domain/telemetry"
+	"github.com/synapctx/sctx/internal/platform/agentenv"
 	"github.com/synapctx/sctx/internal/platform/config"
+	"github.com/synapctx/sctx/internal/platform/httpclient"
 )
+
+// TestValidateTelemetryTokenSendsSctxUserAgent covers `sctx init`'s
+// reachability/validation probe: the User-Agent must identify sctx traffic
+// rather than the default Go-http-client.
+func TestValidateTelemetryTokenSendsSctxUserAgent(t *testing.T) {
+	var gotUA string
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		gotUA = r.Header.Get("User-Agent")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		_ = json.MarshalEncode(jsontext.NewEncoder(w), map[string]string{"organization": "acme"})
+	}))
+	defer srv.Close()
+
+	if _, err := validateTelemetryToken(context.Background(), srv.URL, "sctx_live_tok"); err != nil {
+		t.Fatalf("validateTelemetryToken: %v", err)
+	}
+	want := httpclient.UserAgent(version, agentenv.Detect(os.Getenv).Client)
+	if gotUA != want {
+		t.Errorf("User-Agent = %q, want %q", gotUA, want)
+	}
+}
 
 // withPipedStdin replaces os.Stdin for the duration of the test with a pipe
 // pre-loaded with body, restoring the original afterward.

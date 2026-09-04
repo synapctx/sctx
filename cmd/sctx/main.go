@@ -71,6 +71,7 @@ import (
 	"github.com/synapctx/sctx/internal/platform/binaries"
 	"github.com/synapctx/sctx/internal/platform/config"
 	"github.com/synapctx/sctx/internal/platform/gitrepo"
+	"github.com/synapctx/sctx/internal/platform/httpclient"
 	"github.com/synapctx/sctx/internal/platform/rawcache"
 	"github.com/synapctx/sctx/pkg/agentdoc"
 )
@@ -210,7 +211,7 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDas
 	var emitter telemetry.Emitter
 	var spooler *spool.Emitter
 	if cfg.TelemetryEnabled {
-		spooler = spool.NewEmitter(cfg.SpoolDir, cfg.TelemetryEndpoint, cfg)
+		spooler = spool.NewEmitter(cfg.SpoolDir, cfg.TelemetryEndpoint, cfg, version, agentenv.Detect(os.Getenv).Client)
 		emitter = spooler
 	}
 
@@ -411,7 +412,7 @@ func runFlush(ctx context.Context, cfg config.Config) int {
 	}
 	// Partially-authorised flushes are normal now and must not look like an
 	// error: the spool is filtered by purpose inside FlushWithTimeout.
-	emitter := spool.NewEmitter(cfg.SpoolDir, cfg.TelemetryEndpoint, cfg)
+	emitter := spool.NewEmitter(cfg.SpoolDir, cfg.TelemetryEndpoint, cfg, version, agentenv.Detect(os.Getenv).Client)
 	if err := emitter.FlushWithTimeout(ctx, backlogFlushTimeout); err != nil {
 		fmt.Fprintf(os.Stderr, "sctx: flush: %v\n", err)
 		return 1
@@ -546,7 +547,7 @@ func runInit(ctx context.Context, cfg config.Config, args []string) int {
 		if loadErr != nil {
 			fmt.Fprintf(os.Stderr, "sctx: init: backlog drain: reloading config: %v\n", loadErr)
 		} else {
-			emitter := spool.NewEmitter(cfg.SpoolDir, endpoint, cfg2)
+			emitter := spool.NewEmitter(cfg.SpoolDir, endpoint, cfg2, version, agentenv.Detect(os.Getenv).Client)
 			if err := emitter.FlushWithTimeout(ctx, backlogFlushTimeout); err != nil {
 				fmt.Fprintf(os.Stderr, "sctx: init: backlog drain: %v\n", err)
 			} else {
@@ -595,6 +596,7 @@ func validateTelemetryToken(ctx context.Context, endpoint, token string) (string
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("User-Agent", httpclient.UserAgent(version, agentenv.Detect(os.Getenv).Client))
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
@@ -722,7 +724,7 @@ func runHook(args []string) int {
 		if err != nil {
 			return 0 // fail open, exactly like every other hook path
 		}
-		return hook.RunClaudePostTool(os.Stdin, os.Stdout, cfg)
+		return hook.RunClaudePostTool(os.Stdin, os.Stdout, cfg, version)
 	case "claude-session-start":
 		// The session brief. Config is loaded here for the same reason as
 		// claude-post-tool: it needs an API key, and the Bash hook must keep
