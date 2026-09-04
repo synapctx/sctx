@@ -18,7 +18,10 @@ func TestRemoteCommand(t *testing.T) {
 		{[]string{"ssh", "-N", "host", "go test"}, "", false},
 		{[]string{"ssh", "-t", "host", "go test"}, "", false},
 		{[]string{"ssh", "host", "sh -c 'go test'"}, "", false},
-		{[]string{"ssh", "host", "go test | head"}, "", false},
+		// A pipeline into a narrowing tail (head/tail/cat/less/more) delegates
+		// to the HEAD program's formatter; anything else piped stays declined.
+		{[]string{"ssh", "host", "go test | head"}, "go test", true},
+		{[]string{"ssh", "host", "go test | grep FAIL"}, "", false},
 		{[]string{"ssh", "host", "ssh other go test"}, "", false},
 	}
 	for _, tt := range tests {

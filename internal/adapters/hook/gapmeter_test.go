@@ -109,12 +109,31 @@ func TestRealCoverageGapsAreStillReported(t *testing.T) {
 func TestTheExclusionDoesNotChangeWhatGetsWrapped(t *testing.T) {
 	// Programs in the exclusion list are not in subcommandTable either, so they were
 	// never wrapped; this pins that the two decisions stayed independent.
-	for _, prog := range []string{"python3", "sed", "awk", "cp", "wc", "bash"} {
+	//
+	// sed is the one deliberate exception (see the sed comment in unformattable):
+	// it has a formatter for exactly two narrow read-only shapes, `sed -n
+	// 'A,Bp' FILE` and `sed -n '/re/p' FILE`, so it is both excluded from the
+	// METER (the overwhelming majority of sed usage has no coherent output
+	// shape, and reporting it would reopen the churn the exclusion exists to
+	// stop) and present in subcommandTable (the two narrow shapes ARE wrapped).
+	// matchSegment's own sed branch enforces the same narrow grammar
+	// (platform/sedargv), so a non-matching invocation still declines wrapping
+	// even though the program name is listed.
+	for _, prog := range []string{"python3", "awk", "cp", "wc", "bash"} {
 		if _, wrapped := subcommandTable[prog]; wrapped {
 			t.Errorf("%q is both excluded from the meter and present in subcommandTable.\n"+
 				"  If a formatter genuinely exists for it, it does not belong in unformattable —\n"+
 				"  the two lists would then disagree about whether it is servable.", prog)
 		}
+	}
+	if _, wrapped := subcommandTable["sed"]; !wrapped {
+		t.Error(`"sed" must be present in subcommandTable — see the exception documented above`)
+	}
+	if out, ok := Rewrite("sed -n '2,4p' file.txt"); !ok || out == "sed -n '2,4p' file.txt" {
+		t.Errorf("Rewrite(sed -n '2,4p' file.txt) = %q, %v; want the narrow read-only shape wrapped", out, ok)
+	}
+	if _, ok := Rewrite("sed -i s/a/b/ file.txt"); ok {
+		t.Error("Rewrite(sed -i s/a/b/ file.txt) wrapped a transform sed cannot safely buffer")
 	}
 	// And a covered program must still rewrite exactly as before.
 	for _, cmd := range []string{"go test ./...", "git status", "rsync -a a b"} {

@@ -14,6 +14,7 @@ import (
 	"github.com/synapctx/sctx/internal/platform/ghargv"
 	"github.com/synapctx/sctx/internal/platform/gitargv"
 	"github.com/synapctx/sctx/internal/platform/kubectlargv"
+	"github.com/synapctx/sctx/internal/platform/sedargv"
 	"github.com/synapctx/sctx/internal/platform/sshargv"
 )
 
@@ -80,7 +81,20 @@ var unformattable = map[string]bool{
 	"sh": true, "bash": true, "zsh": true, "osascript": true,
 	// awk and sed are stream editors: their output is the transformed stream, i.e.
 	// arbitrary text chosen by the expression. sed alone was the single largest
-	// entry in the gap list.
+	// entry in the gap list (207, later 1,454 once the meter was decontaminated
+	// again). sed stays HERE, for the gap METER specifically, because the
+	// overwhelming majority of real sed usage — a substitution, `-i`, a script
+	// file — has no coherent output shape and reporting it would reopen the
+	// exact churn this exclusion exists to stop. But it is now a DELIBERATE
+	// exception to "present here means absent from subcommandTable" (see
+	// TestTheExclusionDoesNotChangeWhatGetsWrapped): two invocation shapes,
+	// `sed -n 'A,Bp' FILE` and `sed -n '/re/p' FILE`, are actually a READ (an
+	// untransformed subset of the file's own lines, like cat) rather than a
+	// transform, and those two are both wrapped (row below) and formatted
+	// (adapters/format/sed, sharing the recognition grammar in
+	// platform/sedargv with matchSegment here) without ever being counted as
+	// a gap either way — a covered shape is not a gap, and an uncovered one
+	// still cannot get a formatter.
 	"awk": true, "sed": true,
 
 	// 2. NO MEANINGFUL OUTPUT TO COMPRESS. These are silent on success or emit a
@@ -146,12 +160,24 @@ var subcommandTable = map[string][]string{
 	"tail":          nil,
 	"pytest":        nil,
 	"mypy":          nil,
-	"ruff":          {"check", "format"},
-	"brew":          {"install", "upgrade"},
-	"pip":           {"install", "list", "show", "freeze", "download", "uninstall"},
-	"pip3":          {"install", "list", "show", "freeze", "download", "uninstall"},
-	"mongosh":       nil,
-	"du":            nil,
+	// gofmt: -d prints a real unified diff, delegated to filediff; -l/-w already
+	// print at most a short line list or nothing. Its first argument is a flag
+	// or a file, never a subcommand.
+	"gofmt": nil,
+	// sed: wrapped for every invocation because the formatter, not this table,
+	// decides which shapes are safe (see the sed comment in unformattable
+	// above) — only `sed -n 'A,Bp' FILE` and `sed -n '/re/p' FILE` render
+	// through it; everything else degrades to the generic/verbatim fallback,
+	// same as an unwrapped sed would have shown. This mostly stops
+	// coverage-gap churn on the leading program (1,454 events) rather than
+	// compressing sed's typical output.
+	"sed":     nil,
+	"ruff":    {"check", "format"},
+	"brew":    {"install", "upgrade"},
+	"pip":     {"install", "list", "show", "freeze", "download", "uninstall"},
+	"pip3":    {"install", "list", "show", "freeze", "download", "uninstall"},
+	"mongosh": nil,
+	"du":      nil,
 	// rsync was the top real coverage gap (32 delegations in 7 days) once the meter was
 	// decontaminated. Its first argument is a path, so it takes no subcommand.
 	"rsync": nil,
@@ -855,6 +881,18 @@ func matchSegment(text string) (int, bool) {
 			argv = append(argv, shellTokenValue(token.text))
 		}
 		if !psqlSafeToBuffer(argv) {
+			return 0, false
+		}
+	} else if lookupProgram == "sed" {
+		// Only the two read-only shapes are wrapped; every other sed
+		// invocation is a transform sctx cannot safely buffer and declines
+		// here rather than being counted as a gap (see the sed comment in
+		// unformattable above — this is the deliberate exception).
+		argv := make([]string, 0, len(tokens)-idx)
+		for _, token := range tokens[idx:] {
+			argv = append(argv, shellTokenValue(token.text))
+		}
+		if !sedargv.RecognizedRead(argv) {
 			return 0, false
 		}
 	} else if len(subs) > 0 {

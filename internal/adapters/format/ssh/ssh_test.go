@@ -65,6 +65,13 @@ func TestDelegatesToTheRemoteCommandsFormatter(t *testing.T) {
 		"-o option":              {[]string{"ssh", "-o", "StrictHostKeyChecking=no", "vm", "go test ./..."}, []string{"go", "test", "./..."}, "go test"},
 		"-i identity":            {[]string{"ssh", "-i", "/k/id_ed25519", "vm", "kubectl get pods"}, []string{"kubectl", "get", "pods"}, "kubectl get"},
 		"after --":               {[]string{"ssh", "--", "vm", "docker ps"}, []string{"docker", "ps"}, "docker ps"},
+		// A pipeline whose head is a registered program and whose trailing
+		// stages only narrow/truncate the stream still delegates to the
+		// HEAD's formatter — the combined captured output (whatever `head
+		// -3` let through) still faithfully matches docker's own shape.
+		"pipe into head":       {[]string{"ssh", "vm", "docker ps | head -3"}, []string{"docker", "ps"}, "docker ps"},
+		"pipe into tail":       {[]string{"ssh", "vm", "go test ./... | tail -n 20"}, []string{"go", "test", "./..."}, "go test"},
+		"pipe into two stages": {[]string{"ssh", "vm", "docker ps | head -20 | tail -3"}, []string{"docker", "ps"}, "docker ps"},
 	} {
 		t.Run(name, func(t *testing.T) {
 			inner := &fake{}
@@ -109,8 +116,10 @@ func TestDeclinesWhenThereIsNothingSafeToDo(t *testing.T) {
 			"255 is ssh's own failure: the output is ssh's, not docker's"},
 		"compound: &&": {[]string{"ssh", "vm", "cd /opt && docker ps"}, 0,
 			"two programs produced this output"},
-		"compound: pipe": {[]string{"ssh", "vm", "docker ps | head -3"}, 0,
-			"a downstream filter already transformed it"},
+		"compound: pipe into grep": {[]string{"ssh", "vm", "docker ps | grep nginx"}, 0,
+			"grep could silently misread the compressed output"},
+		"compound: pipe into unregistered": {[]string{"ssh", "vm", "docker ps | jq ."}, 0,
+			"jq is not a recognised narrowing tail"},
 		"compound: semicolon": {[]string{"ssh", "vm", "docker ps; ls"}, 0,
 			"two programs"},
 		"compound: redirect": {[]string{"ssh", "vm", "docker ps > out.txt"}, 0,
