@@ -72,6 +72,9 @@ const versionTimeout = 2 * time.Second
 // versionTimeout. Best-effort by design: this is a diagnostic, never
 // something `sctx doctor` should fail over.
 func VersionOf(path string) string {
+	if isSelf(path) {
+		return selfVersion
+	}
 	ctx, cancel := context.WithTimeout(context.Background(), versionTimeout)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, path, "version")
@@ -80,4 +83,32 @@ func VersionOf(path string) string {
 		return ""
 	}
 	return strings.TrimSpace(string(out))
+}
+
+// selfVersion is what VersionOf answers for the running binary itself, set
+// once by main from its -ldflags version. VersionOf must NEVER execute the
+// current executable: every hook installer asks for the running binary's
+// version, and under `go test` the running binary is the test binary, so
+// executing it re-ran the whole test package as a child until the 2s timeout
+// killed it -- on Windows the killed child still held the .exe open and
+// `go test` failed with "unlinkat sctx.test.exe: Access is denied" although
+// every package had passed.
+var selfVersion string
+
+// SetSelfVersion records the running binary's version for VersionOf.
+func SetSelfVersion(v string) { selfVersion = v }
+
+// isSelf reports whether path names the current executable, following
+// symlinks on both sides so ~/.local/bin/sctx -> /opt/homebrew/... matches.
+func isSelf(path string) bool {
+	self, err := os.Executable()
+	if err != nil {
+		return false
+	}
+	a, errA := filepath.EvalSymlinks(path)
+	b, errB := filepath.EvalSymlinks(self)
+	if errA != nil || errB != nil {
+		return path == self
+	}
+	return a == b
 }

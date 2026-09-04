@@ -92,3 +92,18 @@ func TestVersionOfMissingBinaryIsEmpty(t *testing.T) {
 		t.Fatalf("got %q, want empty", got)
 	}
 }
+
+// The running binary must never be executed to learn its own version: under
+// `go test` that re-runs the test package and, on Windows, leaves the test
+// executable locked so the cleanup fails.
+func TestVersionOfNeverExecutesTheRunningBinary(t *testing.T) {
+	self, err := os.Executable()
+	if err != nil {
+		t.Skip("no executable path:", err)
+	}
+	SetSelfVersion("v9.9.9-test")
+	t.Cleanup(func() { SetSelfVersion("") })
+	if got := VersionOf(self); got != "v9.9.9-test" {
+		t.Fatalf("VersionOf(self) = %q, want the recorded self version", got)
+	}
+}

@@ -79,6 +79,7 @@ import (
 var version = "dev" // set via -ldflags at release time
 
 func main() {
+	binaries.SetSelfVersion(version)
 	os.Exit(realMain(os.Args[1:]))
 }
 
