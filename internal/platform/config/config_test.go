@@ -99,6 +99,47 @@ func TestLoadPrecedence(t *testing.T) {
 	}
 }
 
+// TestRedactPrecedence covers config.Redact's default/file/env precedence
+// table: default false this release, `redact` in config.toml can turn it on,
+// and SCT__REDACT always wins over the file in either direction.
+func TestRedactPrecedence(t *testing.T) {
+	tests := []struct {
+		name     string
+		fileBody string
+		env      string // "" means unset
+		want     bool
+	}{
+		{name: "default is off when neither env nor file set", want: false},
+		{name: "file turns it on", fileBody: `redact = "true"` + "\n", want: true},
+		{name: "env true overrides an absent file", env: "true", want: true},
+		{name: "env false overrides a file that turned it on", fileBody: `redact = "true"` + "\n", env: "false", want: false},
+		{name: "env true overrides a file that left it off", fileBody: `redact = "false"` + "\n", env: "true", want: true},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			home := withHome(t)
+			clearTelemetryEnv(t)
+			t.Setenv("SCT__REDACT", "")
+			os.Unsetenv("SCT__REDACT")
+			if tc.fileBody != "" {
+				writeConfigTOML(t, home, tc.fileBody)
+			}
+			if tc.env != "" {
+				t.Setenv("SCT__REDACT", tc.env)
+			}
+
+			cfg, err := Load()
+			if err != nil {
+				t.Fatalf("Load: %v", err)
+			}
+			if cfg.Redact != tc.want {
+				t.Errorf("Redact = %v, want %v", cfg.Redact, tc.want)
+			}
+		})
+	}
+}
+
 func TestRawCacheIsOptInAndBoundedByConfiguration(t *testing.T) {
 	home := withHome(t)
 	clearTelemetryEnv(t)

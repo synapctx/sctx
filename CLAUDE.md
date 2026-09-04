@@ -365,8 +365,38 @@ answers about the code being changed rather than the last commit.
 
 Scrubs secrets from the FINAL rendered bytes of a wrapped command, on every
 tier including verbatim — a secret must not survive because a tier chose not
-to compress it. Not yet wired into the run pipeline; this is the standalone
-package only.
+to compress it.
+
+- **Wired into `run.Service.Execute`, gated by `Options.Redact` /
+  `config.Config.Redact` (`redact` in config.toml, `SCT__REDACT` env — env
+  always wins, default false this release).** Applied AFTER `renderChain`
+  returns, never before: redacting raw bytes before a tier reads them could
+  perturb that tier's own parsing (e.g. a JSON formatter), so every tier is
+  covered by construction rather than by teaching each one about secrets.
+  Both live streams get it (the final stdout body, and raw stderr unless
+  `FoldStderr` suppressed it), and so does the raw-cache recovery sidecar —
+  it is what an agent reads back on request, so an unredacted copy on disk
+  would defeat the whole point the moment it is recovered. `Report.Unscanned`
+  is surfaced as `[REDACTION-LIMIT: N bytes unscanned]` on stderr.
+- **The exit code never passes through redaction.** `Execute` returns it as a
+  plain `int`, untouched by anything in the redaction path; guarded by
+  `TestExitCodeAndCountsAreNeverRedacted`-shaped tests alongside a proof that
+  sctx's own accounting notation (`FAIL ×3`, `…+12 more`) survives redaction
+  byte-identical — it must never be mistaken for a secret.
+- **`domexec.Command.Tee`** (the live-stream path for unknown commands whose
+  progress is followed as it runs) is DEFINED but **not yet set anywhere in
+  `Execute`** — no caller constructs a `Command` with `Tee` populated today.
+  `redact.NewWriter` is the intended wrapper for that path once it lands
+  (`Close` before reading `Report()`, exactly like the buffered case); until
+  then it is exercised directly against the real `osproc` runner
+  (`TestExecuteRedactionStreamSplitToken`) to prove the mechanism reassembles
+  a secret split across two `Write` calls, rather than at the `Service`
+  level where there is nothing yet to wire.
+- **`stats.Run.RedactedCount` / `telemetry.Event.RedactedCount`** are filled by
+  `Service.account`; `stats.Report.RedactedCount` sums them for the scoped
+  window and `sctx gain` prints `secrets kept out of the model context: N`
+  when it is non-zero (omitted at zero, so a plain install's report is
+  unchanged). `sctx doctor` prints the on/off state and the opt-in env var.
 
 - `Rules()` returns a fixed, `sync.Once`-compiled set of regexes (AWS/GitHub/
   Slack/Stripe/Google/SendGrid/npm/PEM private key/JWT/bearer-header/

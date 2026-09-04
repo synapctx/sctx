@@ -27,6 +27,7 @@ import (
 	"github.com/synapctx/sctx/internal/platform/agentenv"
 	"github.com/synapctx/sctx/internal/platform/gitrepo"
 	"github.com/synapctx/sctx/internal/platform/rawcache"
+	"github.com/synapctx/sctx/internal/platform/redact"
 	"github.com/synapctx/sctx/internal/platform/tokenizer"
 )
 
@@ -53,6 +54,11 @@ type Options struct {
 	// Synthetic marks every event this Service emits as generated for testing
 	// or demonstration (SCT__SYNTHETIC=1), never a real developer command.
 	Synthetic bool
+	// Redact enables internal/platform/redact against every byte this
+	// Service writes: the final rendered stdout, the raw stderr, the raw
+	// cache sidecar, and (once wired) the live Tee stream — see Execute.
+	// Opt-in this release; config.Config.Redact / SCT__REDACT feed it.
+	Redact bool
 }
 
 type Service struct {
@@ -151,32 +157,70 @@ func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
 		formatterMatched = false
 	}
 
-	if _, err := s.stdout.Write(result.Body); err != nil {
+	// Redaction runs AFTER the tier chain, on the FINAL bytes each stream is
+	// about to emit — never on raw before formatting, so it cannot perturb a
+	// tier's own parsing. It covers every tier (aggressive/relaxed/verbatim/
+	// generic fallback) by construction: whichever tier produced result.Body,
+	// this scrubs it the same way. The exit code never passes through here —
+	// it is returned untouched below.
+	redactedCount := 0
+	unscanned := 0
+	stdoutBody := result.Body
+	stderrBody := rawStderr
+	if s.opts.Redact {
+		var rep redact.Report
+		stdoutBody, rep = redact.Apply(stdoutBody)
+		redactedCount += rep.Count
+		unscanned += rep.Unscanned
+		if !result.FoldStderr {
+			stderrBody, rep = redact.Apply(stderrBody)
+			redactedCount += rep.Count
+			unscanned += rep.Unscanned
+		}
+	}
+
+	if _, err := s.stdout.Write(stdoutBody); err != nil {
 		return outcome.ExitCode, err
 	}
 	emittedStderr := 0
-	if !result.FoldStderr && len(rawStderr) > 0 {
-		if _, err := s.stderr.Write(rawStderr); err != nil {
+	if !result.FoldStderr && len(stderrBody) > 0 {
+		if _, err := s.stderr.Write(stderrBody); err != nil {
 			return outcome.ExitCode, err
 		}
-		emittedStderr = len(rawStderr)
+		emittedStderr = len(stderrBody)
 	}
 	if result.Elided && s.opts.RawCache != nil {
-		if entry, err := s.opts.RawCache.Store(raw, rawStderr); err == nil {
+		// The sidecar is what an agent reads back on request via the "sctx:
+		// raw output" hint below, so it is redacted too — an unredacted copy
+		// on disk would defeat the whole feature the moment it is recovered.
+		cacheStdout, cacheStderr := raw, rawStderr
+		if s.opts.Redact {
+			var rep redact.Report
+			cacheStdout, rep = redact.Apply(cacheStdout)
+			redactedCount += rep.Count
+			unscanned += rep.Unscanned
+			cacheStderr, rep = redact.Apply(cacheStderr)
+			redactedCount += rep.Count
+			unscanned += rep.Unscanned
+		}
+		if entry, err := s.opts.RawCache.Store(cacheStdout, cacheStderr); err == nil {
 			hint := fmt.Sprintf("sctx: raw output: %s (%s)\n", entry.Path, s.opts.RawCache.TTL)
 			if n, err := s.stderr.Write([]byte(hint)); err == nil {
 				emittedStderr += n
 			}
 		}
 	}
+	if unscanned > 0 {
+		fmt.Fprintf(s.stderr, "[REDACTION-LIMIT: %d bytes unscanned]\n", unscanned)
+	}
 
-	s.account(ctx, argv, formatter, formatterMatched, outcome, result, int64(len(raw)+len(rawStderr)), int64(len(result.Body)+emittedStderr))
+	s.account(ctx, argv, formatter, formatterMatched, outcome, result, int64(len(raw)+len(rawStderr)), int64(len(stdoutBody)+emittedStderr), redactedCount)
 	return outcome.ExitCode, nil
 }
 
 // account records local stats and spools a telemetry event. Best-effort by
 // design: failures are ignored so they can never affect the wrapped command.
-func (s *Service) account(ctx context.Context, argv []string, formatter format.Formatter, formatterMatched bool, outcome domexec.Outcome, result RenderResult, rawBytes, outBytes int64) {
+func (s *Service) account(ctx context.Context, argv []string, formatter format.Formatter, formatterMatched bool, outcome domexec.Outcome, result RenderResult, rawBytes, outBytes int64, redactedCount int) {
 	rawTokens := tokenizer.Estimate(rawBytes)
 	outTokens := tokenizer.Estimate(outBytes)
 	saved := max(rawTokens-outTokens, 0)
@@ -220,24 +264,25 @@ func (s *Service) account(ctx context.Context, argv []string, formatter format.F
 
 	if s.store != nil {
 		_ = s.store.Record(ctx, stats.Run{
-			ID:          id,
-			At:          now,
-			Command:     CommandKey(argv),
-			Argv:        strings.Join(argv, " "),
-			Formatter:   formatterName,
-			Tier:        string(result.Tier),
-			RawBytes:    rawBytes,
-			RawTokens:   rawTokens,
-			OutTokens:   outTokens,
-			SavedTokens: saved,
-			ExitCode:    outcome.ExitCode,
-			DurationMS:  outcome.Duration.Milliseconds(),
-			Anomaly:     result.Anomaly,
-			Repository:  s.repository(),
-			Client:      s.opts.Identity.Client,
-			SessionID:   s.opts.Identity.SessionID,
-			ArgvHash:    hash,
-			Bypass:      s.opts.Bypass,
+			ID:            id,
+			At:            now,
+			Command:       CommandKey(argv),
+			Argv:          strings.Join(argv, " "),
+			Formatter:     formatterName,
+			Tier:          string(result.Tier),
+			RawBytes:      rawBytes,
+			RawTokens:     rawTokens,
+			OutTokens:     outTokens,
+			SavedTokens:   saved,
+			ExitCode:      outcome.ExitCode,
+			DurationMS:    outcome.Duration.Milliseconds(),
+			Anomaly:       result.Anomaly,
+			Repository:    s.repository(),
+			Client:        s.opts.Identity.Client,
+			SessionID:     s.opts.Identity.SessionID,
+			ArgvHash:      hash,
+			Bypass:        s.opts.Bypass,
+			RedactedCount: redactedCount,
 		})
 	}
 
@@ -265,6 +310,7 @@ func (s *Service) account(ctx context.Context, argv []string, formatter format.F
 			Bypass:           s.opts.Bypass,
 			ArgvHash:         hash,
 			Synthetic:        s.opts.Synthetic,
+			RedactedCount:    redactedCount,
 			At:               now,
 		})
 	}

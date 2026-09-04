@@ -540,6 +540,7 @@ single warning and is ignored - configuration problems cannot break a command.
 | `SCT__TELEMETRY_ENDPOINT` | `http://127.0.0.1:6221/v1/telemetry/exec` | usage-event destination; `sctx init` sets this to `https://sctx.synapctx.com/v1/telemetry/exec` |
 | `SCT__WORKSPACE_PROXY_URL` | `http://127.0.0.1:6220` | destination for `sctx watch`; `https://mcp.synapctx.com` for the hosted platform |
 | `SCT__WATCH_HELPER` | *(unset)* | path to `sctxd`, if it is not installed alongside `sctx` |
+| `SCT__REDACT` | `false` | scrub secrets from output before it reaches your agent - see [Secret redaction](#secret-redaction-opt-in) |
 
 &nbsp;
 
@@ -585,6 +586,44 @@ sctx telemetry             # what is currently shared
 sctx telemetry --preview   # the exact queued events, raw
 sctx telemetry --disable   # stop sharing, and delete anything queued
 ```
+
+&nbsp;
+
+🔝 [back to top](#sctx)
+
+&nbsp;
+
+## Secret redaction (opt-in)
+
+`sctx` can scrub secrets out of a command's output before it reaches your
+agent's context: AWS/GitHub/Slack/Stripe/Google/SendGrid/npm keys, PEM private
+keys, JWTs, `Authorization: Bearer` headers, `sctx_live_` keys, and a generic
+`key|secret|token|password=value` pattern (gated on entropy so
+`password=changeme` in a fixture is never flagged). A match is replaced with
+`[REDACTED:<rule-name>]` - the marker, not the value, so an accidentally
+committed credential in a build log or test failure never reaches the model.
+
+It runs on the FINAL rendered bytes, after every compression tier
+(aggressive/relaxed/verbatim) has already produced its output, so a secret
+cannot survive because a tier chose not to compress it - and on the raw-output
+recovery sidecar too, since that is exactly what an agent reads back on
+request.
+
+Off by default this release. Enable it with:
+
+```bash
+SCT__REDACT=true sctx <cmd>
+# or, persistently:
+echo 'redact = "true"' >> ~/.config/sctx/config.toml
+```
+
+`sctx doctor` reports whether it is active (`redaction: on` /
+`redaction: off (opt in with SCT__REDACT=true)`), and `sctx gain` prints
+`secrets kept out of the model context: N` whenever the window's total is
+non-zero.
+
+**The plan is to flip the default to on in a future release**, keeping
+`SCT__REDACT=false` as the opt-out for anyone who needs byte-exact output.
 
 &nbsp;
 

@@ -245,6 +245,7 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDas
 			Bypass:           bypass,
 			Salt:             cfg.ArgvSalt,
 			Synthetic:        cfg.Synthetic,
+			Redact:           cfg.Redact,
 		})
 
 	code, err := svc.Execute(ctx, argv)
@@ -512,7 +513,7 @@ func runInit(ctx context.Context, cfg config.Config, args []string) int {
 	// hosted default is deliberately NOT written: it lives in code, so a machine
 	// that never chose a host follows the product rather than a line frozen into
 	// a file on the day it was installed.
-	if err := writeConfigFile(cfg.ConfigFilePath, endpoint, configuredWorkspaceProxy(cfg), defaultOrg, orgTokens, cfg.Consent, cfg.ArgvSalt); err != nil {
+	if err := writeConfigFile(cfg.ConfigFilePath, endpoint, configuredWorkspaceProxy(cfg), defaultOrg, orgTokens, cfg.Consent, cfg.ArgvSalt, cfg.Redact); err != nil {
 		fmt.Fprintf(os.Stderr, "sctx: init: writing config: %v\n", err)
 		return 1
 	}
@@ -635,7 +636,7 @@ func configuredWorkspaceProxy(cfg config.Config) string {
 // parses, mode 0600 (the keys are secrets), creating the parent directory
 // 0700 if needed. Orgs are written in sorted slug order for deterministic
 // output; defaultOrg is omitted from the file when empty.
-func writeConfigFile(path, endpoint, workspaceProxy, defaultOrg string, orgTokens map[string]string, consent config.ConsentRecord, argvSalt string) error {
+func writeConfigFile(path, endpoint, workspaceProxy, defaultOrg string, orgTokens map[string]string, consent config.ConsentRecord, argvSalt string, redact bool) error {
 	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return fmt.Errorf("creating config directory: %w", err)
 	}
@@ -659,6 +660,14 @@ func writeConfigFile(path, endpoint, workspaceProxy, defaultOrg string, orgToken
 	// with anything recorded before that write.
 	if argvSalt != "" {
 		fmt.Fprintf(&b, "argv_salt = %q\n", argvSalt)
+	}
+	// redact rides through every write of this file too, for the same reason
+	// argv_salt does: this function rewrites wholesale, so an operator's
+	// explicit opt-in would otherwise be erased by the next init/setup/
+	// telemetry write. Omitted when false (the default) so the file stays
+	// unchanged for anyone who never touched it.
+	if redact {
+		fmt.Fprintf(&b, "redact = \"true\"\n")
 	}
 	// The consent record rides through every write of this file. This function
 	// rewrites it wholesale, so anything not threaded through here is erased —
@@ -790,6 +799,11 @@ func runDoctor(cfg config.Config) int {
 	}
 	if cfg.ForceTier != "" {
 		fmt.Printf("force tier:     %s\n", cfg.ForceTier)
+	}
+	if cfg.Redact {
+		fmt.Println("redaction:      on")
+	} else {
+		fmt.Println("redaction:      off (opt in with SCT__REDACT=true)")
 	}
 	printBinaryReport(os.Stdout)
 	if home, err := os.UserHomeDir(); err == nil {

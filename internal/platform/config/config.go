@@ -121,6 +121,13 @@ type Config struct {
 	// Synthetic marks every telemetry event this process emits as generated
 	// for testing or demonstration, from SCT__SYNTHETIC=1. Never persisted.
 	Synthetic bool
+	// Redact enables internal/platform/redact against the final rendered
+	// output of every wrapped command. Opt-in THIS release (default false);
+	// the plan is to flip the default in a future release and keep
+	// SCT__REDACT=false as the opt-out. From `redact` in config.toml,
+	// overridden by SCT__REDACT ("true"/"false" — the env always wins, per
+	// this package's doc comment).
+	Redact bool
 }
 
 // TokenForOrg returns the API key to deliver an event attributed to org
@@ -187,6 +194,7 @@ func Load() (Config, error) {
 		ConfigFilePath:         configPath,
 		ArgvSalt:               fv.argvSalt,
 		Synthetic:              env.Get("SCT__SYNTHETIC", "false") == "true",
+		Redact:                 env.Get("SCT__REDACT", firstNonEmpty(fv.redact, "false")) == "true",
 	}
 
 	if cfg.ArgvSalt == "" {
@@ -265,6 +273,7 @@ type fileValues struct {
 	consentAt         string
 	consentDisclosure string
 	argvSalt          string
+	redact            string
 	// orgTokens holds token = "..." keys found under [org.<slug>] sections,
 	// keyed by slug. Lazily initialized; nil when no sections are present.
 	orgTokens map[string]string
@@ -337,6 +346,8 @@ func loadConfigFile(path string) fileValues {
 			fv.consentDisclosure = value
 		case "argv_salt":
 			fv.argvSalt = value
+		case "redact":
+			fv.redact = value
 		}
 	}
 	return fv

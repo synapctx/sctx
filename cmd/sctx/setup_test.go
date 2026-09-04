@@ -381,7 +381,7 @@ func TestConfigRewritePreservesAChosenMCPHost(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "config.toml")
 	if err := writeConfigFile(path, defaultInitEndpoint, "https://mcp.internal.example", "acme",
-		map[string]string{"acme": "sctx_live_acme"}, config.ConsentRecord{}, ""); err != nil {
+		map[string]string{"acme": "sctx_live_acme"}, config.ConsentRecord{}, "", false); err != nil {
 		t.Fatal(err)
 	}
 	raw, err := os.ReadFile(path)
@@ -411,7 +411,7 @@ func TestConfigRewritePreservesTheArgvSalt(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "config.toml")
 	if err := writeConfigFile(path, defaultInitEndpoint, "", "acme",
-		map[string]string{"acme": "sctx_live_acme"}, config.ConsentRecord{}, "deadbeef"); err != nil {
+		map[string]string{"acme": "sctx_live_acme"}, config.ConsentRecord{}, "deadbeef", false); err != nil {
 		t.Fatal(err)
 	}
 	raw, err := os.ReadFile(path)
@@ -420,6 +420,40 @@ func TestConfigRewritePreservesTheArgvSalt(t *testing.T) {
 	}
 	if !strings.Contains(string(raw), `argv_salt = "deadbeef"`) {
 		t.Fatalf("the argv salt was not persisted:\n%s", raw)
+	}
+}
+
+// The redact opt-in must survive the same wholesale rewrite an operator's
+// argv_salt and MCP host do, and it must NOT appear in the file at all when
+// off — the default this release — so a plain install's config.toml stays
+// unchanged from before this feature existed.
+func TestConfigRewriteThreadsRedact(t *testing.T) {
+	dir := t.TempDir()
+
+	onPath := filepath.Join(dir, "on.toml")
+	if err := writeConfigFile(onPath, defaultInitEndpoint, "", "acme",
+		map[string]string{"acme": "sctx_live_acme"}, config.ConsentRecord{}, "", true); err != nil {
+		t.Fatal(err)
+	}
+	raw, err := os.ReadFile(onPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(raw), `redact = "true"`) {
+		t.Fatalf("redact=true was not persisted:\n%s", raw)
+	}
+
+	offPath := filepath.Join(dir, "off.toml")
+	if err := writeConfigFile(offPath, defaultInitEndpoint, "", "acme",
+		map[string]string{"acme": "sctx_live_acme"}, config.ConsentRecord{}, "", false); err != nil {
+		t.Fatal(err)
+	}
+	raw, err = os.ReadFile(offPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(raw), "redact") {
+		t.Fatalf("redact=false should be omitted, not written:\n%s", raw)
 	}
 }
 

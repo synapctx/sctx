@@ -129,10 +129,11 @@ func (s *Store) Aggregate(ctx context.Context, opts stats.AggregateOptions) (sta
 	var since sql.NullString
 	row := s.db.QueryRowContext(ctx,
 		`SELECT COUNT(*), COALESCE(SUM(raw_tokens),0), COALESCE(SUM(out_tokens),0),
-		        COALESCE(SUM(saved_tokens),0), COALESCE(SUM(duration_ms),0), MIN(at)
+		        COALESCE(SUM(saved_tokens),0), COALESCE(SUM(duration_ms),0), MIN(at),
+		        COALESCE(SUM(redacted_count),0)
 		 FROM runs`+where, args...)
 	if err := row.Scan(&report.Global.Runs, &report.Global.RawTokens, &report.Global.OutTokens,
-		&report.Global.SavedTokens, &report.TotalExecMS, &since); err != nil {
+		&report.Global.SavedTokens, &report.TotalExecMS, &since, &report.RedactedCount); err != nil {
 		return stats.Report{}, fmt.Errorf("aggregating global stats: %w", err)
 	}
 	if report.Global.Runs > 0 {

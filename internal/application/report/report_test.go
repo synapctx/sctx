@@ -54,6 +54,56 @@ func TestRenderDefaultTextUnscoped(t *testing.T) {
 	}
 }
 
+// TestRenderReportsSecretsKeptOutOfContext covers `sctx gain`'s redaction
+// line: it sums RedactedCount across the scoped runs and prints nothing when
+// the total is zero (the common case today, since redaction is opt-in).
+func TestRenderReportsSecretsKeptOutOfContext(t *testing.T) {
+	store := newTestStore(t)
+	seed(t, store, []stats.Run{
+		{ID: "01A", At: time.Now().UTC(), Command: "go test", Argv: "go test ./...", Tier: "aggressive", RawTokens: 1000, OutTokens: 100, SavedTokens: 900, RedactedCount: 2},
+		{ID: "01B", At: time.Now().UTC(), Command: "curl", Argv: "curl example", Tier: "verbatim", RawTokens: 100, OutTokens: 100, SavedTokens: 0, RedactedCount: 1},
+	})
+
+	var buf strings.Builder
+	if err := Render(context.Background(), store, &buf, Options{}); err != nil {
+		t.Fatalf("Render: %v", err)
+	}
+	if !strings.Contains(buf.String(), "secrets kept out of the model context: 3") {
+		t.Fatalf("missing redaction summary line, got:\n%s", buf.String())
+	}
+
+	var jsonBuf strings.Builder
+	if err := Render(context.Background(), store, &jsonBuf, Options{Format: "json"}); err != nil {
+		t.Fatalf("Render json: %v", err)
+	}
+	var decoded struct {
+		RedactedCount int64 `json:"redacted_count"`
+	}
+	if err := json.Unmarshal([]byte(jsonBuf.String()), &decoded); err != nil {
+		t.Fatalf("Unmarshal: %v", err)
+	}
+	if decoded.RedactedCount != 3 {
+		t.Fatalf("RedactedCount = %d, want 3", decoded.RedactedCount)
+	}
+}
+
+// TestRenderOmitsRedactionLineWhenZero keeps the default (no redaction
+// configured) report unchanged from before this feature existed.
+func TestRenderOmitsRedactionLineWhenZero(t *testing.T) {
+	store := newTestStore(t)
+	seed(t, store, []stats.Run{
+		{ID: "01A", At: time.Now().UTC(), Command: "go test", Argv: "go test ./...", Tier: "aggressive", RawTokens: 1000, OutTokens: 100, SavedTokens: 900},
+	})
+
+	var buf strings.Builder
+	if err := Render(context.Background(), store, &buf, Options{}); err != nil {
+		t.Fatalf("Render: %v", err)
+	}
+	if strings.Contains(buf.String(), "secrets kept out of the model context") {
+		t.Fatalf("redaction line should be omitted at zero, got:\n%s", buf.String())
+	}
+}
+
 func TestRenderColorAndPlain(t *testing.T) {
 	store := newTestStore(t)
 	seed(t, store, []stats.Run{

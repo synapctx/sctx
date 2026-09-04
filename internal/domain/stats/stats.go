@@ -100,6 +100,9 @@ type Report struct {
 	Since     time.Time
 	// TotalExecMS is the summed child wall-clock across all runs.
 	TotalExecMS int64
+	// RedactedCount sums Run.RedactedCount across the scoped runs: how many
+	// secrets a redaction pass hid from the model's context in this window.
+	RedactedCount int64
 }
 
 // Totals accumulates token accounting over a set of runs.

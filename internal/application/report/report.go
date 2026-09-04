@@ -129,6 +129,11 @@ func renderReportText(w io.Writer, rep stats.Report, byClient []stats.ClientTota
 	fmt.Fprintf(w, "%s %s %s\n", p.dim("Efficiency:     "),
 		p.meterBar("█", "░", effFilled, meterWidth), p.bold(p.pct(pctString(pct), pct)))
 
+	if rep.RedactedCount > 0 {
+		fmt.Fprintf(w, "%s %s\n", p.dim("secrets kept out of the model context:"),
+			p.bold(fmt.Sprintf("%d", rep.RedactedCount)))
+	}
+
 	if len(rep.ByCommand) > 0 {
 		renderByCommand(w, p, rep, opts)
 	}
@@ -233,15 +238,19 @@ type jsonReport struct {
 	ByCommand   []stats.CommandTotals `json:"by_command"`
 	ByClient    []stats.ClientTotals  `json:"by_client,omitempty"`
 	TotalExecMS int64                 `json:"total_exec_ms"`
+	// RedactedCount is how many secrets a redaction pass hid from the model's
+	// context across the scoped runs.
+	RedactedCount int64 `json:"redacted_count,omitempty"`
 }
 
 func renderReportJSON(w io.Writer, rep stats.Report, byClient []stats.ClientTotals, opts Options) error {
 	out := jsonReport{
-		Scope:       "global",
-		Global:      rep.Global,
-		ByCommand:   rep.ByCommand,
-		ByClient:    byClient,
-		TotalExecMS: rep.TotalExecMS,
+		Scope:         "global",
+		Global:        rep.Global,
+		ByCommand:     rep.ByCommand,
+		ByClient:      byClient,
+		TotalExecMS:   rep.TotalExecMS,
+		RedactedCount: rep.RedactedCount,
 	}
 	if opts.Repository != "" {
 		out.Scope = "project"
