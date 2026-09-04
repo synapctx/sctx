@@ -644,7 +644,7 @@ func writeConfigFile(path, endpoint, workspaceProxy, defaultOrg string, orgToken
 
 func runHook(args []string) int {
 	if len(args) == 0 {
-		fmt.Fprintln(os.Stderr, "usage: sctx hook claude | sctx hook claude-post-tool | sctx hook claude-session-start | sctx hook claude-first-search | sctx hook codex | sctx hook gemini | sctx hook rewrite <command>")
+		fmt.Fprintln(os.Stderr, "usage: sctx hook claude | sctx hook claude-post-tool | sctx hook claude-session-start | sctx hook claude-first-search | sctx hook codex | sctx hook gemini | sctx hook cursor | sctx hook copilot | sctx hook droid | sctx hook rewrite <command>")
 		return 2
 	}
 	switch args[0] {
@@ -663,6 +663,12 @@ func runHook(args []string) int {
 		return hook.RunRewrite(args[1:], os.Stdout, version)
 	case "gemini":
 		return hook.RunGemini(args[1:], os.Stdin, os.Stdout, version)
+	case "cursor":
+		return hook.RunCursor(args[1:], os.Stdin, os.Stdout, version)
+	case "copilot":
+		return hook.RunCopilot(args[1:], os.Stdin, os.Stdout, version)
+	case "droid":
+		return hook.RunDroid(args[1:], os.Stdin, os.Stdout, version)
 	case "claude-post-tool":
 		// Memory surfacing. Config is loaded HERE rather than in realMain's
 		// pre-hook branch because this hook needs an API key and the Bash hook
@@ -689,7 +695,7 @@ func runHook(args []string) int {
 		}
 		return hook.RunClaudeFirstSearch(os.Stdin, os.Stdout, cfg)
 	default:
-		fmt.Fprintln(os.Stderr, "usage: sctx hook claude | sctx hook claude-post-tool | sctx hook claude-session-start | sctx hook claude-first-search | sctx hook codex | sctx hook gemini | sctx hook rewrite <command>")
+		fmt.Fprintln(os.Stderr, "usage: sctx hook claude | sctx hook claude-post-tool | sctx hook claude-session-start | sctx hook claude-first-search | sctx hook codex | sctx hook gemini | sctx hook cursor | sctx hook copilot | sctx hook droid | sctx hook rewrite <command>")
 		return 2
 	}
 }
