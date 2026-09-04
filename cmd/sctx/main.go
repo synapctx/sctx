@@ -285,7 +285,7 @@ func registerProjectFilters(registry *run.Registry) {
 	}
 }
 
-const gainUsage = `usage: sctx gain [--project|-p] [--since <dur>] [--failures|-F] [--by-client] [--format text|json]`
+const gainUsage = `usage: sctx gain [--project|-p] [--since <dur>] [--failures|-F] [--by-client] [--share] [--format text|json|markdown]`
 
 func runGain(ctx context.Context, cfg config.Config, args []string) int {
 	opts, err := parseGainArgs(args)
@@ -294,6 +294,7 @@ func runGain(ctx context.Context, cfg config.Config, args []string) int {
 		fmt.Fprintln(os.Stderr, gainUsage)
 		return 2
 	}
+	opts.Version = version
 
 	store, err := sqlite.NewStore(cfg.StatsDBPath)
 	if err != nil {
@@ -303,7 +304,8 @@ func runGain(ctx context.Context, cfg config.Config, args []string) int {
 	defer store.Close()
 	// Color is a TTY affordance: on only for the text renderers writing to an
 	// interactive stdout, and suppressed when NO_COLOR is set (https://no-color.org).
-	if opts.Format != "json" {
+	// --share is copy-pasteable by design, so it never carries ANSI escapes.
+	if opts.Format != "json" && !opts.Share {
 		if _, noColor := os.LookupEnv("NO_COLOR"); !noColor {
 			opts.Color = term.IsTerminal(int(os.Stdout.Fd()))
 		}
@@ -317,9 +319,10 @@ func runGain(ctx context.Context, cfg config.Config, args []string) int {
 	// someone goes to decide whether this tool is earning its place. A savings
 	// report that omits "your agent was never told any of this exists" is not an
 	// honest one, so unlike the wrapped-path nudge this is neither rate-limited
-	// nor conditional on detection. Suppressed for --format json, which is
-	// machine-read, and written to stderr so it can never corrupt that contract.
-	if opts.Format != "json" {
+	// nor conditional on detection. Suppressed for --format json (machine-read)
+	// and --share (a card meant to be copied verbatim), written to stderr so it
+	// can never corrupt either contract.
+	if opts.Format != "json" && !opts.Share {
 		if home, err := os.UserHomeDir(); err == nil {
 			if st, err := agentsetup.InspectWithCodexMCP(home, codexOrgTokens(cfg), cfg.WorkspaceProxyURL, docsFor(cfg)...); err == nil {
 				if notice := gainNotice(st); notice != "" {
@@ -362,20 +365,28 @@ func parseGainArgs(args []string) (report.Options, error) {
 			opts.Failures = true
 		case "--by-client":
 			opts.ByClient = true
+		case "--share":
+			opts.Share = true
 		case "--format":
 			i++
 			if i >= len(args) {
-				return report.Options{}, fmt.Errorf("--format requires a value: text or json")
+				return report.Options{}, fmt.Errorf("--format requires a value: text, json or markdown")
 			}
 			switch args[i] {
-			case "text", "json":
+			case "text", "json", "markdown":
 				opts.Format = args[i]
 			default:
-				return report.Options{}, fmt.Errorf("--format: unsupported value %q (want text or json)", args[i])
+				return report.Options{}, fmt.Errorf("--format: unsupported value %q (want text, json or markdown)", args[i])
 			}
 		default:
 			return report.Options{}, fmt.Errorf("unknown flag %q", a)
 		}
+	}
+	if opts.Format == "markdown" && !opts.Share {
+		return report.Options{}, fmt.Errorf("--format markdown is only valid with --share")
+	}
+	if opts.Share && opts.Format == "json" {
+		return report.Options{}, fmt.Errorf("--share supports --format text or markdown, not json")
 	}
 	return opts, nil
 }
@@ -932,7 +943,10 @@ Usage:
     --project, -p              scope to the current repository
     --since <dur>               only runs newer than <dur> (e.g. 7d, 24h)
     --failures, -F              show the degradation log instead
-    --format text|json          output format (default text)
+    --share                     sanitised, copy-pasteable savings card
+                                 (aggregate numbers only, never argv/paths)
+    --format text|json|markdown output format (default text; markdown only
+                                 valid with --share)
   sctx flush                 force-drain the telemetry spool
   sctx init [--endpoint <url>] [--default]
                               authenticate against the SynapCTX platform for

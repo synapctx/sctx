@@ -12,7 +12,11 @@ import (
 	"time"
 
 	"github.com/synapctx/sctx/internal/domain/stats"
+	"github.com/synapctx/sctx/internal/platform/tokenizer"
 )
+
+// maxShareCommands is how many programs the `sctx gain --share` card names.
+const maxShareCommands = 5
 
 const (
 	maxCommandRows  = 10
@@ -61,10 +65,21 @@ type Options struct {
 	// ByClient renders a breakdown by which coding agent ran each command
 	// (`sctx gain --by-client`), in addition to the normal report.
 	ByClient bool
+	// Share renders the sanitised, copy-pasteable `sctx gain --share` card
+	// instead of the full report: aggregate numbers only, built exclusively
+	// from stats.CommandTotals.Command (already argv/path-free — see
+	// CommandKey) and never from stats.Run.Argv. Format selects plain text
+	// (default) or "markdown"; "json" is rejected by the caller.
+	Share bool
+	// Version is the sctx build version, printed on the share card.
+	Version string
 }
 
 // Render writes the `sctx gain` report to w per opts.
 func Render(ctx context.Context, store stats.Store, w io.Writer, opts Options) error {
+	if opts.Share {
+		return renderShare(ctx, store, w, opts)
+	}
 	if opts.Failures {
 		return renderFailures(ctx, store, w, opts)
 	}
@@ -257,6 +272,89 @@ func renderReportJSON(w io.Writer, rep stats.Report, byClient []stats.ClientTota
 	}
 	enc := jsontext.NewEncoder(w, jsontext.WithIndent("  "))
 	return json.MarshalEncode(enc, out)
+}
+
+// renderShare renders the `sctx gain --share` card: ONLY aggregate numbers —
+// window, commands wrapped, raw→rendered tokens, saved %, the top programs by
+// tokens saved, the estimator note and the sctx version. It never touches
+// stats.Run.Argv (the source of paths and secrets); the per-program rows come
+// from stats.CommandTotals.Command, which CommandKey already strips to a bare
+// program or "program subcommand" before it ever reaches the store. It never
+// sends anything anywhere — it only writes to w.
+func renderShare(ctx context.Context, store stats.Store, w io.Writer, opts Options) error {
+	rep, err := store.Aggregate(ctx, stats.AggregateOptions{Repository: opts.Repository, Since: opts.Since})
+	if err != nil {
+		return fmt.Errorf("aggregating stats: %w", err)
+	}
+	top := rep.ByCommand
+	if len(top) > maxShareCommands {
+		top = top[:maxShareCommands]
+	}
+	pct := 0.0
+	if rep.Global.RawTokens > 0 {
+		pct = float64(rep.Global.SavedTokens) / float64(rep.Global.RawTokens) * 100
+	}
+	window := windowLabel(opts.Since)
+	if opts.Format == "markdown" {
+		return renderShareMarkdown(w, rep, top, pct, window, opts.Version)
+	}
+	return renderSharePlain(w, rep, top, pct, window, opts.Version)
+}
+
+// windowLabel renders opts.Since as the human-readable window a share card
+// prints. Zero (no --since) is "all-time"; anything else is rounded to the
+// coarsest unit that stays a whole number, matching the --since <N>d/h shape
+// the flag itself accepts.
+func windowLabel(since time.Time) string {
+	if since.IsZero() {
+		return "all-time"
+	}
+	d := time.Since(since)
+	switch {
+	case d >= 24*time.Hour:
+		return fmt.Sprintf("last %dd", int(d.Hours()/24+0.5))
+	case d >= time.Hour:
+		return fmt.Sprintf("last %dh", int(d.Hours()+0.5))
+	default:
+		return fmt.Sprintf("last %dm", int(d.Minutes()+0.5))
+	}
+}
+
+func renderSharePlain(w io.Writer, rep stats.Report, top []stats.CommandTotals, pct float64, window, version string) error {
+	fmt.Fprintln(w, "sctx token savings — "+window)
+	fmt.Fprintf(w, "commands wrapped: %d\n", rep.Global.Runs)
+	fmt.Fprintf(w, "tokens: %s -> %s (saved %s)\n",
+		humanTokens(rep.Global.RawTokens), humanTokens(rep.Global.OutTokens), pctString(pct))
+	if len(top) > 0 {
+		fmt.Fprintln(w, "top programs by tokens saved:")
+		for i, c := range top {
+			fmt.Fprintf(w, "  %d. %-20s %s\n", i+1, c.Command, humanTokens(c.SavedTokens))
+		}
+	}
+	fmt.Fprintln(w, tokenizer.EstimatorNote)
+	if version != "" {
+		fmt.Fprintf(w, "sctx %s\n", version)
+	}
+	return nil
+}
+
+func renderShareMarkdown(w io.Writer, rep stats.Report, top []stats.CommandTotals, pct float64, window, version string) error {
+	fmt.Fprintf(w, "**sctx token savings — %s**\n\n", window)
+	fmt.Fprintf(w, "- commands wrapped: %d\n", rep.Global.Runs)
+	fmt.Fprintf(w, "- tokens: %s → %s (saved %s)\n",
+		humanTokens(rep.Global.RawTokens), humanTokens(rep.Global.OutTokens), pctString(pct))
+	if len(top) > 0 {
+		fmt.Fprintln(w, "- top programs by tokens saved:")
+		for i, c := range top {
+			fmt.Fprintf(w, "  %d. `%s` — %s\n", i+1, c.Command, humanTokens(c.SavedTokens))
+		}
+	}
+	fmt.Fprintf(w, "\n_%s_", tokenizer.EstimatorNote)
+	if version != "" {
+		fmt.Fprintf(w, " · sctx %s", version)
+	}
+	fmt.Fprintln(w)
+	return nil
 }
 
 // renderFailures renders the degradation log: runs sctx couldn't compress

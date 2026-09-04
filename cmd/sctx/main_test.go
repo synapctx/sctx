@@ -236,3 +236,35 @@ func TestRunInitStillAcceptsPipedStdin(t *testing.T) {
 		t.Errorf("piped init did not write the org section:\n%s", string(data))
 	}
 }
+
+func TestParseGainArgsShare(t *testing.T) {
+	opts, err := parseGainArgs([]string{"--share"})
+	if err != nil {
+		t.Fatalf("parseGainArgs: %v", err)
+	}
+	if !opts.Share {
+		t.Fatal("expected Share to be true")
+	}
+}
+
+func TestParseGainArgsShareMarkdown(t *testing.T) {
+	opts, err := parseGainArgs([]string{"--share", "--format", "markdown"})
+	if err != nil {
+		t.Fatalf("parseGainArgs: %v", err)
+	}
+	if !opts.Share || opts.Format != "markdown" {
+		t.Fatalf("got %+v", opts)
+	}
+}
+
+func TestParseGainArgsMarkdownWithoutShareIsRejected(t *testing.T) {
+	if _, err := parseGainArgs([]string{"--format", "markdown"}); err == nil {
+		t.Fatal("expected an error: markdown is only valid with --share")
+	}
+}
+
+func TestParseGainArgsShareJSONIsRejected(t *testing.T) {
+	if _, err := parseGainArgs([]string{"--share", "--format", "json"}); err == nil {
+		t.Fatal("expected an error: --share does not support --format json")
+	}
+}
