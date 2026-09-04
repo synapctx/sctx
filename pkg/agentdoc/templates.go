@@ -219,6 +219,12 @@ notes arriving does not mean org memory was checked — only ` + "`recall_memory
 A decision, convention, root cause or lesson goes to ` + "`store_memory`" + ` with its
 why; supersede rather than forget.
 
+A verified stamp shows someone recently re-confirmed a memory; an aging
+warning flags an unconfirmed infra detail (host, port, path, flag) past
+thirty days. Check the live system, then re-confirm with
+` + "`{verifies: <id>}`" + ` or replace it with
+` + "`{verifies: <new id>, supersedes: <old id>}`" + `.
+
 ## Also reach for it
 
 - **Before renaming, deleting or changing a shared signature** —
