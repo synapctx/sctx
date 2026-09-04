@@ -97,35 +97,22 @@ func RunClaudePostTool(in io.Reader, out io.Writer, cfg config.Config, version s
 	if err := json.Unmarshal(data, &call); err != nil {
 		return 0
 	}
-	var repo, subject, kind string
+
+	if call.ToolName == "Bash" {
+		return runClaudePostToolBash(out, cfg, version, call)
+	}
+
+	var repo, rel string
 	switch call.ToolName {
 	case "Edit", "Write", "NotebookEdit", "MultiEdit":
 		absPath, _ := call.ToolInput["file_path"].(string)
 		if absPath == "" {
 			return 0
 		}
-		var rel string
 		repo, rel = repoAndRelativePath(absPath, call.CWD)
 		if rel == "" {
 			return 0
 		}
-		subject, kind = rel, kindFile
-	case "Bash":
-		// Roadmap item 0b. Every rejection here happens BEFORE any network call,
-		// because the cheapest nudge is the one we decide not to make — and this
-		// fires on every Bash command the agent runs.
-		cmd, _ := call.ToolInput["command"].(string)
-		sym := grepSymbol(cmd)
-		if sym == "" {
-			return 0
-		}
-		repo = gitrepo.Detect(call.CWD)
-		if repo == "" {
-			// Without knowing where they searched there is no difference to
-			// report, only a total — which is the noise this exists to avoid.
-			return 0
-		}
-		subject, kind = sym, kindSymbol
 	default:
 		return 0
 	}
@@ -136,13 +123,7 @@ func RunClaudePostTool(in io.Reader, out io.Writer, cfg config.Config, version s
 		return 0
 	}
 
-	var body string
-	switch kind {
-	case kindFile:
-		body = memoryContext(subject, fetchNotes(cfg, token, repo, subject, call.SessionID, version))
-	case kindSymbol:
-		body = symbolContext(subject, fetchElsewhere(cfg, token, repo, subject, call.SessionID, version))
-	}
+	body := memoryContext(rel, fetchNotes(cfg, token, repo, rel, call.SessionID, version))
 	if body == "" {
 		return 0
 	}
@@ -150,10 +131,46 @@ func RunClaudePostTool(in io.Reader, out io.Writer, cfg config.Config, version s
 	return 0
 }
 
-const (
-	kindFile   = "file"
-	kindSymbol = "symbol"
-)
+// runClaudePostToolBash handles the Bash branch of PostToolUse. Two
+// independent signals about the same just-run command are computed and
+// combined into ONE additionalContext body rather than one pre-empting the
+// other:
+//
+//   - repeatedRunNudge (roadmap item 4, 2026-09-04): local-only, no API key
+//     needed, reads this machine's own stats.db.
+//   - the cross-repository call-site nudge (roadmap item 0b): needs an org
+//     key and a network call, and only applies when the command was a
+//     genuine symbol search a plain grep could not see past.
+func runClaudePostToolBash(out io.Writer, cfg config.Config, version string, call postToolCall) int {
+	cmd, _ := call.ToolInput["command"].(string)
+
+	var lines []string
+	if line := repeatedRunNudge(cfg, call.SessionID, cmd); line != "" {
+		lines = append(lines, line)
+	}
+
+	// Every rejection here happens BEFORE any network call, because the
+	// cheapest nudge is the one we decide not to make — and this fires on
+	// every Bash command the agent runs.
+	if sym := grepSymbol(cmd); sym != "" {
+		if repo := gitrepo.Detect(call.CWD); repo != "" {
+			// No key means no organization to ask, and there is nothing
+			// useful to say about that here — `sctx setup`/`sctx gain` own
+			// that conversation.
+			if token, _ := cfg.TokenForOrg(orgOf(repo)); token != "" {
+				if body := symbolContext(sym, fetchElsewhere(cfg, token, repo, sym, call.SessionID, version)); body != "" {
+					lines = append(lines, body)
+				}
+			}
+		}
+	}
+
+	if len(lines) == 0 {
+		return 0
+	}
+	writeAdditionalContext(out, "PostToolUse", strings.Join(lines, "\n\n"))
+	return 0
+}
 
 // repoAndRelativePath turns the absolute path the hook was given into the
 // (org/repo, repo-relative path) pair the server indexes by.

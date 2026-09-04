@@ -272,6 +272,35 @@ func (s *Store) RepeatedRunsToday(ctx context.Context, limit int) ([]stats.Repea
 	return out, nil
 }
 
+// LatestRawBytes returns the RawBytes of the most recently recorded run
+// matching sessionID and argv exactly.
+func (s *Store) LatestRawBytes(ctx context.Context, sessionID, argv string) (int64, bool, error) {
+	var rawBytes int64
+	err := s.db.QueryRowContext(ctx,
+		`SELECT raw_bytes FROM runs WHERE session_id = ? AND argv = ? ORDER BY at DESC LIMIT 1`,
+		sessionID, argv).Scan(&rawBytes)
+	if err == sql.ErrNoRows {
+		return 0, false, nil
+	}
+	if err != nil {
+		return 0, false, fmt.Errorf("querying latest raw bytes: %w", err)
+	}
+	return rawBytes, true, nil
+}
+
+// IdenticalRunCount counts runs matching sessionID and argv exactly whose
+// RawBytes equals rawBytes.
+func (s *Store) IdenticalRunCount(ctx context.Context, sessionID, argv string, rawBytes int64) (int64, error) {
+	var n int64
+	err := s.db.QueryRowContext(ctx,
+		`SELECT COUNT(*) FROM runs WHERE session_id = ? AND argv = ? AND raw_bytes = ?`,
+		sessionID, argv, rawBytes).Scan(&n)
+	if err != nil {
+		return 0, fmt.Errorf("counting identical runs: %w", err)
+	}
+	return n, nil
+}
+
 // whereClause builds the optional WHERE clause and its bound args for opts.
 // An empty Repository or zero Since means "no filter on that dimension";
 // a fully empty opts yields ("", nil).

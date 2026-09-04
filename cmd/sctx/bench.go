@@ -124,6 +124,12 @@ func (c *captureStore) ByClient(context.Context, stats.AggregateOptions) ([]stat
 func (c *captureStore) RepeatedRunsToday(context.Context, int) ([]stats.RepeatedRun, error) {
 	return nil, nil
 }
+func (c *captureStore) LatestRawBytes(context.Context, string, string) (int64, bool, error) {
+	return 0, false, nil
+}
+func (c *captureStore) IdenticalRunCount(context.Context, string, string, int64) (int64, error) {
+	return 0, nil
+}
 func (c *captureStore) Close() error { return nil }
 
 // runBench implements `sctx bench`: a reproducible, publishable benchmark

@@ -78,6 +78,16 @@ type Store interface {
 	// report reading the local store, not anything that could leave the
 	// machine.
 	RepeatedRunsToday(ctx context.Context, limit int) ([]RepeatedRun, error)
+	// LatestRawBytes returns the RawBytes of the most recently recorded run
+	// matching sessionID and argv exactly, and whether any such run exists.
+	// Backs the PostToolUse hook's repeated-identical-run nudge.
+	LatestRawBytes(ctx context.Context, sessionID, argv string) (rawBytes int64, ok bool, err error)
+	// IdenticalRunCount counts runs matching sessionID and argv exactly whose
+	// RawBytes equals rawBytes — i.e. how many times, in this session, this
+	// exact command produced this exact amount of output. Backs the
+	// PostToolUse hook's repeated-identical-run nudge; local-only, reads the
+	// local store, nothing here leaves the machine.
+	IdenticalRunCount(ctx context.Context, sessionID, argv string, rawBytes int64) (int64, error)
 	Close() error
 }
 
