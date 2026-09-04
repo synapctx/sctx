@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 )
@@ -65,6 +66,9 @@ func fakeSctxBinary(t *testing.T, dir, version string) string {
 // the one marked "SHADOWS", which told a developer reading their own PATH
 // order exactly backwards.
 func TestPrintBinaryReportMarksEntriesAfterTheFirstAsShadowed(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("the fake PATH binaries are shell-script stubs, which Windows cannot execute")
+	}
 	firstDir := t.TempDir()
 	secondDir := t.TempDir()
 	fakeSctxBinary(t, firstDir, "sctx 0.7.0")
