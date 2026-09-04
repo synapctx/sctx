@@ -133,6 +133,7 @@ type symbolEditResponse struct {
 		SymbolPath        string   `json:"symbolPath"`
 		OtherRepositories []string `json:"otherRepositories"`
 		References        int      `json:"references"`
+		Ambiguous         int      `json:"ambiguous"`
 		Call              string   `json:"call"`
 	} `json:"symbols"`
 }
@@ -545,8 +546,18 @@ func symbolEditContext(server string, guessed bool, resp symbolEditResponse) str
 			continue
 		}
 		call := fmt.Sprintf("%s {\"symbol_path\": %q}", toolName(server, "find_references", guessed), s.SymbolPath)
-		lines = append(lines, fmt.Sprintf("SynapCTX: %s is used in %s (%d references) — %s",
-			s.Name, strings.Join(s.OtherRepositories, ", "), s.References, call))
+		repos := strings.Join(s.OtherRepositories, ", ")
+		switch {
+		case s.Ambiguous <= 0:
+			lines = append(lines, fmt.Sprintf("SynapCTX: %s is used in %s (%d references) — %s",
+				s.Name, repos, s.References, call))
+		case s.Ambiguous >= s.References:
+			lines = append(lines, fmt.Sprintf("SynapCTX: %s may be used in %s (%d name-only matches, receiver unresolved) — %s",
+				s.Name, repos, s.References, call))
+		default:
+			lines = append(lines, fmt.Sprintf("SynapCTX: %s is used in %s (%d references, %d name-only) — %s",
+				s.Name, repos, s.References, s.Ambiguous, call))
+		}
 	}
 	return strings.Join(lines, "\n")
 }

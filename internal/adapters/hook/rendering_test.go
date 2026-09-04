@@ -1,6 +1,7 @@
 package hook
 
 import (
+	json "encoding/json/v2"
 	"strings"
 	"testing"
 )
@@ -75,6 +76,7 @@ func TestSymbolEditContextRendersCallAndSkipsUnresolved(t *testing.T) {
 		SymbolPath        string   `json:"symbolPath"`
 		OtherRepositories []string `json:"otherRepositories"`
 		References        int      `json:"references"`
+		Ambiguous         int      `json:"ambiguous"`
 		Call              string   `json:"call"`
 	}{
 		{Name: "DoThing", SymbolPath: "pkg.DoThing", OtherRepositories: []string{"acme/a", "acme/b"}, References: 4},
@@ -90,6 +92,76 @@ func TestSymbolEditContextRendersCallAndSkipsUnresolved(t *testing.T) {
 func TestSymbolEditContextEmptyWhenNothingElsewhere(t *testing.T) {
 	if got := symbolEditContext("acme", false, symbolEditResponse{}); got != "" {
 		t.Fatalf("no symbols with other-repository references must render nothing, got %q", got)
+	}
+}
+
+// TestSymbolEditContextAmbiguity covers the three ambiguity shapes plus an
+// absent field (an older proxy), which must fall back to today's wording.
+func TestSymbolEditContextAmbiguity(t *testing.T) {
+	cases := []struct {
+		name       string
+		references int
+		ambiguous  int
+		want       string
+	}{
+		{
+			name:       "zero ambiguous unchanged",
+			references: 4,
+			ambiguous:  0,
+			want:       `SynapCTX: DoThing is used in acme/a, acme/b (4 references) — mcp__acme__find_references {"symbol_path": "pkg.DoThing"}`,
+		},
+		{
+			name:       "all ambiguous nothing proven",
+			references: 4,
+			ambiguous:  4,
+			want:       `SynapCTX: DoThing may be used in acme/a, acme/b (4 name-only matches, receiver unresolved) — mcp__acme__find_references {"symbol_path": "pkg.DoThing"}`,
+		},
+		{
+			name:       "mixed",
+			references: 4,
+			ambiguous:  1,
+			want:       `SynapCTX: DoThing is used in acme/a, acme/b (4 references, 1 name-only) — mcp__acme__find_references {"symbol_path": "pkg.DoThing"}`,
+		},
+		{
+			name:       "absent field treated as zero (old proxy)",
+			references: 4,
+			ambiguous:  0, // zero value when the field is absent from the wire payload
+			want:       `SynapCTX: DoThing is used in acme/a, acme/b (4 references) — mcp__acme__find_references {"symbol_path": "pkg.DoThing"}`,
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			resp := symbolEditResponse{Symbols: []struct {
+				Name              string   `json:"name"`
+				SymbolPath        string   `json:"symbolPath"`
+				OtherRepositories []string `json:"otherRepositories"`
+				References        int      `json:"references"`
+				Ambiguous         int      `json:"ambiguous"`
+				Call              string   `json:"call"`
+			}{
+				{Name: "DoThing", SymbolPath: "pkg.DoThing", OtherRepositories: []string{"acme/a", "acme/b"}, References: tc.references, Ambiguous: tc.ambiguous},
+			}}
+			got := symbolEditContext("acme", false, resp)
+			if got != tc.want {
+				t.Fatalf("symbolEditContext() = %q, want %q", got, tc.want)
+			}
+		})
+	}
+}
+
+// TestSymbolEditContextAbsentAmbiguousFieldFromWire proves the JSON path: a
+// wire payload with no "ambiguous" key at all (an older proxy) unmarshals to
+// zero and renders today's wording, not the ambiguous case.
+func TestSymbolEditContextAbsentAmbiguousFieldFromWire(t *testing.T) {
+	wire := `{"symbols":[{"name":"DoThing","symbolPath":"pkg.DoThing","otherRepositories":["acme/a","acme/b"],"references":4,"call":"ignored"}]}`
+	var resp symbolEditResponse
+	if err := json.Unmarshal([]byte(wire), &resp); err != nil {
+		t.Fatalf("unmarshal: %v", err)
+	}
+	got := symbolEditContext("acme", false, resp)
+	want := `SynapCTX: DoThing is used in acme/a, acme/b (4 references) — mcp__acme__find_references {"symbol_path": "pkg.DoThing"}`
+	if got != want {
+		t.Fatalf("symbolEditContext() = %q, want %q", got, want)
 	}
 }
 
