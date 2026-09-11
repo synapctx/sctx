@@ -3,6 +3,7 @@ package sqlite
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"path/filepath"
 	"testing"
 	"time"
@@ -314,5 +315,141 @@ func TestRepeatedRunsToday(t *testing.T) {
 	}
 	if repeated[0].Argv != "go test ./..." || repeated[0].Count != 3 {
 		t.Fatalf("got %+v, want go test ./... x3", repeated[0])
+	}
+}
+
+// TestRepeatedRunsTodaySummaryMatchesTrueTotals proves the summary reports
+// the TRUE totals across every repeated group, not merely the ones a caller
+// happens to ask RepeatedRunsToday to return — the bug this guards against is
+// treating the sum of a LIMIT-ed row set as the day's total.
+func TestRepeatedRunsTodaySummaryMatchesTrueTotals(t *testing.T) {
+	store, err := NewStore(filepath.Join(t.TempDir(), "stats.db"))
+	if err != nil {
+		t.Fatalf("NewStore: %v", err)
+	}
+	defer store.Close()
+
+	ctx := context.Background()
+	now := time.Now().UTC()
+	yesterday := now.Add(-25 * time.Hour)
+
+	var runs []stats.Run
+	id := 0
+	nextID := func() string {
+		id++
+		return fmt.Sprintf("%04d", id)
+	}
+	// 6 distinct argv values, each repeated a different number of times
+	// today, so the LIMIT(0 -> 5) cap on RepeatedRunsToday genuinely leaves
+	// one out.
+	counts := map[string]int{
+		"go build ./...":         66,
+		"gofmt -l .":             52,
+		"go vet ./...":           50,
+		"git status --short":     23,
+		"go test -count=1 ./...": 21,
+		"golangci-lint run":      7,
+	}
+	for argv, n := range counts {
+		for i := 0; i < n; i++ {
+			runs = append(runs, stats.Run{ID: nextID(), At: now, Argv: argv})
+		}
+	}
+	// Repeated, but yesterday — must not count toward today's totals.
+	runs = append(runs, stats.Run{ID: nextID(), At: yesterday, Argv: "ls -la"})
+	runs = append(runs, stats.Run{ID: nextID(), At: yesterday, Argv: "ls -la"})
+
+	for _, r := range runs {
+		if err := store.Record(ctx, r); err != nil {
+			t.Fatalf("Record(%s): %v", r.ID, err)
+		}
+	}
+
+	gotRuns, gotCommands, err := store.RepeatedRunsTodaySummary(ctx)
+	if err != nil {
+		t.Fatalf("RepeatedRunsTodaySummary: %v", err)
+	}
+	wantRuns, wantCommands := int64(0), int64(len(counts))
+	for _, n := range counts {
+		wantRuns += int64(n)
+	}
+	if gotRuns != wantRuns || gotCommands != wantCommands {
+		t.Fatalf("summary = (%d runs, %d commands), want (%d, %d)", gotRuns, gotCommands, wantRuns, wantCommands)
+	}
+
+	// The capped row list leaves the 6th group out, proving the summary is
+	// not merely the sum of what RepeatedRunsToday(ctx, 0) returns.
+	repeated, err := store.RepeatedRunsToday(ctx, 0)
+	if err != nil {
+		t.Fatalf("RepeatedRunsToday: %v", err)
+	}
+	if len(repeated) != 5 {
+		t.Fatalf("got %d rows, want the 5-row default cap", len(repeated))
+	}
+	var shownRuns int64
+	for _, rr := range repeated {
+		shownRuns += rr.Count
+	}
+	if shownRuns == gotRuns {
+		t.Fatalf("shown-rows sum (%d) unexpectedly equals the true total (%d); the 6th group should have been excluded from the shown rows", shownRuns, gotRuns)
+	}
+}
+
+// TestRepeatedRunsTodayUsesLocalMidnightNotUTC pins the "today" cutoff to
+// local midnight. time.Time.Truncate rounds down relative to the absolute
+// instant since the zero time and ignores location entirely, so
+// time.Now().Local().Truncate(24*time.Hour) actually lands on UTC midnight —
+// in a positive UTC offset zone that silently drops runs made between UTC
+// midnight and local midnight. This test pins the machine's local zone via
+// the package's timeNow seam (there is no other clock injection point in
+// this store) to a fixed +1h offset and a wall-clock time in the first hour
+// after local midnight, so the two candidate boundaries disagree.
+func TestRepeatedRunsTodayUsesLocalMidnightNotUTC(t *testing.T) {
+	store, err := NewStore(filepath.Join(t.TempDir(), "stats.db"))
+	if err != nil {
+		t.Fatalf("NewStore: %v", err)
+	}
+	defer store.Close()
+
+	loc := time.FixedZone("UTC+1", 3600)
+	origLocal, origNow := time.Local, timeNow
+	time.Local = loc
+	t.Cleanup(func() {
+		time.Local = origLocal
+		timeNow = origNow
+	})
+
+	// Pin "now" to 2026-01-02 00:30 local (= 2025-01-01 23:30 UTC). Local
+	// midnight for "today" (2026-01-02) is 2025-01-01 23:00 UTC; UTC midnight
+	// for "today" (by UTC's own date, still 2026-01-01) is 2026-01-01 00:00
+	// UTC. The two boundaries disagree by almost a full day here, which is
+	// the point: a run recorded at 23:45 UTC on 2026-01-01 is AFTER local
+	// midnight (so it counts as "today") but BEFORE the UTC-midnight
+	// boundary the bug used to compute.
+	fixedNow := time.Date(2026, 1, 1, 23, 30, 0, 0, time.UTC)
+	timeNow = func() time.Time { return fixedNow }
+
+	ctx := context.Background()
+	inWindow := fixedNow.Add(15 * time.Minute)      // 23:45 UTC, after local midnight
+	beforeLocalMidnight := fixedNow.Add(-time.Hour) // 22:30 UTC, before local midnight
+
+	runs := []stats.Run{
+		{ID: "01A", At: inWindow, Argv: "go build ./..."},
+		{ID: "01B", At: inWindow, Argv: "go build ./..."},
+		{ID: "01C", At: beforeLocalMidnight, Argv: "gofmt -l ."},
+		{ID: "01D", At: beforeLocalMidnight, Argv: "gofmt -l ."},
+	}
+	for _, r := range runs {
+		if err := store.Record(ctx, r); err != nil {
+			t.Fatalf("Record(%s): %v", r.ID, err)
+		}
+	}
+
+	repeated, err := store.RepeatedRunsToday(ctx, 0)
+	if err != nil {
+		t.Fatalf("RepeatedRunsToday: %v", err)
+	}
+	if len(repeated) != 1 || repeated[0].Argv != "go build ./..." || repeated[0].Count != 2 {
+		t.Fatalf("got %+v, want only the post-local-midnight `go build ./...` x2 (a UTC-midnight cutoff would wrongly include the pre-local-midnight `gofmt -l .` rows too)", repeated)
 	}
 }

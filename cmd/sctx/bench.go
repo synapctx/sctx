@@ -124,6 +124,9 @@ func (c *captureStore) ByClient(context.Context, stats.AggregateOptions) ([]stat
 func (c *captureStore) RepeatedRunsToday(context.Context, int) ([]stats.RepeatedRun, error) {
 	return nil, nil
 }
+func (c *captureStore) RepeatedRunsTodaySummary(context.Context) (int64, int64, error) {
+	return 0, 0, nil
+}
 func (c *captureStore) LatestRawBytes(context.Context, string, string) (int64, bool, error) {
 	return 0, false, nil
 }

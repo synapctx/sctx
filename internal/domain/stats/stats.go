@@ -78,6 +78,13 @@ type Store interface {
 	// report reading the local store, not anything that could leave the
 	// machine.
 	RepeatedRunsToday(ctx context.Context, limit int) ([]RepeatedRun, error)
+	// RepeatedRunsTodaySummary reports the TRUE totals behind
+	// RepeatedRunsToday: how many distinct argv values repeated since local
+	// midnight (commands) and how many runs those repeats account for in
+	// total (runs) — independent of any limit applied to the row list, so a
+	// caller can report an accurate headline even when it renders only the
+	// top few rows.
+	RepeatedRunsTodaySummary(ctx context.Context) (runs int64, commands int64, err error)
 	// LatestRawBytes returns the RawBytes of the most recently recorded run
 	// matching sessionID and argv exactly, and whether any such run exists.
 	// Backs the PostToolUse hook's repeated-identical-run nudge.

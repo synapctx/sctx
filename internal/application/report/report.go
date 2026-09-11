@@ -38,6 +38,19 @@ const (
 	// failTableWidth is the printed width of a degradation-log row, from
 	// "%-*s %-10s %-*s %s" → cmd + 1 + tier(10) + 1 + anomaly + 1 + at.
 	failTableWidth = failCmdWidth + 1 + 10 + 1 + failAnomWidth + 1 + rfc3339Width
+
+	// headerLabelWidth is the width every summary label is padded to, so the
+	// values form a single column. It is one constant rather than eight
+	// hand-padded literals because that is how the "secrets" line drifted out
+	// of the column in the first place: it was written as a sentence while its
+	// neighbours were padded labels, and nothing could notice.
+	headerLabelWidth = 17
+
+	// repeatedCmdWidth is the command column width for the Repeated Identical
+	// Runs table, derived from tableWidth (not a fresh literal) so this
+	// section is exactly as wide as every other table and cannot drift, from
+	// "%3s  %-*s %6s" → rank(3) + 2 + name + 1 + runs(6).
+	repeatedCmdWidth = tableWidth - 3 - 2 - 1 - 6
 )
 
 // Options configures Render's scope, mode, and output format.
@@ -101,20 +114,30 @@ func Render(ctx context.Context, store stats.Store, w io.Writer, opts Options) e
 	// habits — not gated behind --by-client, which is a different axis
 	// (WHO ran commands, not WHICH commands repeat).
 	var repeated []stats.RepeatedRun
+	var repeatedRuns, repeatedCommands int64
 	if opts.Format != "json" {
 		repeated, err = store.RepeatedRunsToday(ctx, 0)
 		if err != nil {
 			return fmt.Errorf("aggregating repeated runs: %w", err)
+		}
+		repeatedRuns, repeatedCommands, err = store.RepeatedRunsTodaySummary(ctx)
+		if err != nil {
+			return fmt.Errorf("aggregating repeated runs summary: %w", err)
 		}
 	}
 
 	if opts.Format == "json" {
 		return renderReportJSON(w, rep, byClient, opts)
 	}
-	return renderReportText(w, rep, byClient, repeated, opts)
+	return renderReportText(w, rep, byClient, repeated, repeatedRuns, repeatedCommands, opts)
 }
 
-func renderReportText(w io.Writer, rep stats.Report, byClient []stats.ClientTotals, repeated []stats.RepeatedRun, opts Options) error {
+// hdr pads a summary label to headerLabelWidth as PLAIN text. Padding must
+// happen before colouring: ANSI escape bytes count toward %-*s and would
+// throw the column off by exactly the length of the escape sequence.
+func hdr(label string) string { return fmt.Sprintf("%-*s", headerLabelWidth, label) }
+
+func renderReportText(w io.Writer, rep stats.Report, byClient []stats.ClientTotals, repeated []stats.RepeatedRun, repeatedRuns, repeatedCommands int64, opts Options) error {
 	p := palette{on: opts.Color}
 	g := rep.Global
 	pct := 0.0
@@ -127,26 +150,27 @@ func renderReportText(w io.Writer, rep stats.Report, byClient []stats.ClientTota
 	// Scope lines are only printed when the report is actually scoped, so
 	// the default (no --project/--since) output is unchanged.
 	if opts.Repository != "" {
-		fmt.Fprintf(w, "%s %s\n", p.dim("Project Scope:  "), p.cyan(opts.Repository))
+		fmt.Fprintf(w, "%s %s\n", p.dim(hdr("Project Scope:")), p.cyan(opts.Repository))
 	}
 	if !opts.Since.IsZero() {
-		fmt.Fprintf(w, "%s since %s\n", p.dim("Window:         "), opts.Since.Format(time.RFC3339))
+		fmt.Fprintf(w, "%s since %s\n", p.dim(hdr("Window:")), opts.Since.Format(time.RFC3339))
 	}
-	fmt.Fprintf(w, "%s %s\n", p.dim("Total commands: "), p.bold(fmt.Sprintf("%d", g.Runs)))
-	fmt.Fprintf(w, "%s %s\n", p.dim("Raw tokens:     "), humanTokens(g.RawTokens))
-	fmt.Fprintf(w, "%s %s\n", p.dim("Output tokens:  "), humanTokens(g.OutTokens))
-	fmt.Fprintf(w, "%s %s (%s)\n", p.dim("Tokens saved:   "),
+	fmt.Fprintf(w, "%s %s\n", p.dim(hdr("Total commands:")), p.bold(fmt.Sprintf("%d", g.Runs)))
+	fmt.Fprintf(w, "%s %s\n", p.dim(hdr("Raw tokens:")), humanTokens(g.RawTokens))
+	fmt.Fprintf(w, "%s %s\n", p.dim(hdr("Output tokens:")), humanTokens(g.OutTokens))
+	fmt.Fprintf(w, "%s %s (%s)\n", p.dim(hdr("Tokens saved:")),
 		p.boldGreen(humanTokens(g.SavedTokens)), p.pct(pctString(pct), pct))
-	fmt.Fprintf(w, "%s %s (avg %s)\n", p.dim("Total exec time:"),
+	fmt.Fprintf(w, "%s %s (avg %s)\n", p.dim(hdr("Total exec time:")),
 		(time.Duration(rep.TotalExecMS) * time.Millisecond).Round(time.Second),
 		(time.Duration(g.AvgMS) * time.Millisecond).Round(time.Millisecond))
 	effFilled := int(pct / 100 * meterWidth)
-	fmt.Fprintf(w, "%s %s %s\n", p.dim("Efficiency:     "),
+	fmt.Fprintf(w, "%s %s %s\n", p.dim(hdr("Efficiency:")),
 		p.meterBar("█", "░", effFilled, meterWidth), p.bold(p.pct(pctString(pct), pct)))
 
 	if rep.RedactedCount > 0 {
-		fmt.Fprintf(w, "%s %s\n", p.dim("secrets kept out of the model context:"),
-			p.bold(fmt.Sprintf("%d", rep.RedactedCount)))
+		fmt.Fprintf(w, "%s %s %s\n", p.dim(hdr("Secrets redacted:")),
+			p.bold(fmt.Sprintf("%d", rep.RedactedCount)),
+			p.dim("(never reached the model)"))
 	}
 
 	if len(rep.ByCommand) > 0 {
@@ -158,7 +182,7 @@ func renderReportText(w io.Writer, rep stats.Report, byClient []stats.ClientTota
 	}
 
 	if len(repeated) > 0 {
-		renderRepeatedRunsToday(w, p, repeated)
+		renderRepeatedRunsToday(w, p, repeated, repeatedRuns, repeatedCommands)
 	}
 
 	return nil
@@ -229,18 +253,41 @@ func renderByClient(w io.Writer, p palette, byClient []stats.ClientTotals) {
 	}
 }
 
-// renderRepeatedRunsToday prints the "you ran this again" line: a local read
-// of the local store, not anything that could leave the machine.
-func renderRepeatedRunsToday(w io.Writer, p palette, repeated []stats.RepeatedRun) {
-	total := int64(0)
-	parts := make([]string, 0, len(repeated))
-	for _, rr := range repeated {
-		total += rr.Count
-		parts = append(parts, fmt.Sprintf("%s %d", rr.Argv, rr.Count))
-	}
+// renderRepeatedRunsToday prints the "you ran this again" table: a local read
+// of the local store, not anything that could leave the machine. repeated is
+// (at most) the top rows to show; runs/commands are the TRUE totals behind
+// them (stats.Store.RepeatedRunsTodaySummary), which may cover more rows than
+// are actually rendered here.
+func renderRepeatedRunsToday(w io.Writer, p palette, repeated []stats.RepeatedRun, runs, commands int64) {
 	fmt.Fprintln(w)
-	fmt.Fprintf(w, "%s %s (top: %s)\n",
-		p.dim("Repeated identical runs today:"), p.bold(fmt.Sprintf("%d", total)), strings.Join(parts, ", "))
+	fmt.Fprintln(w, p.boldCyan("Repeated Identical Runs"))
+	fmt.Fprintln(w, p.rule("─", tableWidth))
+	fmt.Fprintln(w, p.dim(fmt.Sprintf("%3s  %-*s %6s",
+		"#", repeatedCmdWidth, "Command", "Runs")))
+	fmt.Fprintln(w, p.rule("─", tableWidth))
+	for i, rr := range repeated {
+		// Pad each cell to its column width as plain text first, then color
+		// it — ANSI escape bytes would otherwise throw off %-*s alignment.
+		num := fmt.Sprintf("%2d.", i+1)
+		name := fmt.Sprintf("%-*s", repeatedCmdWidth, truncate(rr.Argv, repeatedCmdWidth))
+		count := fmt.Sprintf("%6d", rr.Count)
+		fmt.Fprintf(w, "%s  %s %s\n", p.dim(num), p.cyan(name), count)
+	}
+	fmt.Fprintln(w, p.rule("─", tableWidth))
+
+	runWord := "runs"
+	if runs == 1 {
+		runWord = "run"
+	}
+	cmdWord := "commands"
+	if commands == 1 {
+		cmdWord = "command"
+	}
+	footer := fmt.Sprintf("%d identical %s today across %d %s", runs, runWord, commands, cmdWord)
+	if int64(len(repeated)) < commands {
+		footer += fmt.Sprintf(" · top %d shown", len(repeated))
+	}
+	fmt.Fprintln(w, p.dim("     "+footer))
 }
 
 // jsonReport is the stable `sctx gain --format json` shape.

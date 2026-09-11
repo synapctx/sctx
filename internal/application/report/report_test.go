@@ -3,14 +3,24 @@ package report
 import (
 	"context"
 	json "encoding/json/v2"
+	"fmt"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 	"time"
+	"unicode/utf8"
 
 	"github.com/synapctx/sctx/internal/adapters/stats/sqlite"
 	"github.com/synapctx/sctx/internal/domain/stats"
 )
+
+// ansiEscape matches a single ANSI SGR escape sequence, e.g. "\x1b[1;32m" or
+// the reset "\x1b[0m". Used only by tests, to check the PLAIN width of a
+// colored line.
+var ansiEscape = regexp.MustCompile("\x1b\\[[0-9;]*m")
+
+func stripANSI(s string) string { return ansiEscape.ReplaceAllString(s, "") }
 
 func newTestStore(t *testing.T) *sqlite.Store {
 	t.Helper()
@@ -49,7 +59,7 @@ func TestRenderDefaultTextUnscoped(t *testing.T) {
 	if !strings.HasPrefix(out, "sctx Token Savings\n") {
 		t.Fatalf("unexpected header, got:\n%s", out)
 	}
-	if !strings.Contains(out, "Total commands:  1") {
+	if !strings.Contains(out, "Total commands:   1") {
 		t.Fatalf("missing total commands line, got:\n%s", out)
 	}
 }
@@ -68,7 +78,7 @@ func TestRenderReportsSecretsKeptOutOfContext(t *testing.T) {
 	if err := Render(context.Background(), store, &buf, Options{}); err != nil {
 		t.Fatalf("Render: %v", err)
 	}
-	if !strings.Contains(buf.String(), "secrets kept out of the model context: 3") {
+	if !strings.Contains(buf.String(), "Secrets redacted: 3 (never reached the model)") {
 		t.Fatalf("missing redaction summary line, got:\n%s", buf.String())
 	}
 
@@ -99,7 +109,7 @@ func TestRenderOmitsRedactionLineWhenZero(t *testing.T) {
 	if err := Render(context.Background(), store, &buf, Options{}); err != nil {
 		t.Fatalf("Render: %v", err)
 	}
-	if strings.Contains(buf.String(), "secrets kept out of the model context") {
+	if strings.Contains(buf.String(), "Secrets redacted:") {
 		t.Fatalf("redaction line should be omitted at zero, got:\n%s", buf.String())
 	}
 }
@@ -146,10 +156,10 @@ func TestRenderProjectScopedHeader(t *testing.T) {
 		t.Fatalf("Render: %v", err)
 	}
 	out := buf.String()
-	if !strings.Contains(out, "Project Scope:   org/repo-a") {
+	if !strings.Contains(out, "Project Scope:    org/repo-a") {
 		t.Fatalf("missing project scope header, got:\n%s", out)
 	}
-	if !strings.Contains(out, "Total commands:  1") {
+	if !strings.Contains(out, "Total commands:   1") {
 		t.Fatalf("project scope should only count repo-a's run, got:\n%s", out)
 	}
 }
@@ -304,6 +314,137 @@ func TestRenderShareMarkdownOmitsArgvAndPaths(t *testing.T) {
 	}
 	if !strings.Contains(out, "sctx 9.9.9") {
 		t.Errorf("markdown share card missing the version, got:\n%s", out)
+	}
+}
+
+// TestReportNoLineExceedsTableWidth is the width regression guard for the
+// bug this change fixes: every line the (text) report emits, ANSI stripped,
+// must be at most tableWidth wide. The Repeated Identical Runs section used
+// to print one unbounded "Repeated identical runs today: N (top: ...)" line
+// that wrapped in a normal terminal; this must never come back silently.
+func TestReportNoLineExceedsTableWidth(t *testing.T) {
+	store := newTestStore(t)
+	now := time.Now().UTC()
+	var runs []stats.Run
+	id := 0
+	nextID := func() string {
+		id++
+		return fmt.Sprintf("%04d", id)
+	}
+	for _, cmd := range []string{"go build ./...", "gofmt -l .", "go vet ./...", "git status --short", "go test -count=1 ./..."} {
+		for i := 0; i < 3; i++ {
+			runs = append(runs, stats.Run{ID: nextID(), At: now, Command: cmd, Argv: cmd, Tier: "aggressive", RawTokens: 100, OutTokens: 10, SavedTokens: 90})
+		}
+	}
+	seed(t, store, runs)
+
+	for _, colored := range []bool{false, true} {
+		var buf strings.Builder
+		if err := Render(context.Background(), store, &buf, Options{Color: colored, ByClient: true}); err != nil {
+			t.Fatalf("Render(color=%v): %v", colored, err)
+		}
+		for i, line := range strings.Split(buf.String(), "\n") {
+			plain := stripANSI(line)
+			if n := utf8.RuneCountInString(plain); n > tableWidth {
+				t.Fatalf("line %d exceeds tableWidth (%d): %q (len %d)", i, tableWidth, plain, n)
+			}
+		}
+	}
+}
+
+// TestRenderRepeatedRunsTodayTrueTotals proves the footer reports the TRUE
+// totals from the store (RepeatedRunsTodaySummary), not the sum of the rows
+// actually shown — the bug this change fixes reported the sum of the
+// (at most 5) shown rows as if it were the whole day's total.
+func TestRenderRepeatedRunsTodayTrueTotals(t *testing.T) {
+	store := newTestStore(t)
+	now := time.Now().UTC()
+	var runs []stats.Run
+	id := 0
+	nextID := func() string {
+		id++
+		return fmt.Sprintf("%04d", id)
+	}
+	commands := []struct {
+		argv string
+		n    int
+	}{
+		{"go build ./...", 66},
+		{"gofmt -l .", 52},
+		{"go vet ./...", 50},
+		{"git status --short", 23},
+		{"go test -count=1 ./...", 21},
+		{"golangci-lint run", 27},
+	}
+	total := 0
+	for _, c := range commands {
+		total += c.n
+		for i := 0; i < c.n; i++ {
+			runs = append(runs, stats.Run{ID: nextID(), At: now, Argv: c.argv})
+		}
+	}
+	seed(t, store, runs)
+
+	var buf strings.Builder
+	if err := Render(context.Background(), store, &buf, Options{}); err != nil {
+		t.Fatalf("Render: %v", err)
+	}
+	out := buf.String()
+
+	if !strings.Contains(out, "Repeated Identical Runs") {
+		t.Fatalf("missing section title, got:\n%s", out)
+	}
+	wantFooter := fmt.Sprintf("%d identical runs today across %d commands · top 5 shown", total, len(commands))
+	if !strings.Contains(out, wantFooter) {
+		t.Fatalf("footer missing true totals + shown clause, want %q, got:\n%s", wantFooter, out)
+	}
+	// The shown rows sum to less than the true total: proves the number in
+	// the footer is not merely the sum of what's rendered.
+	shownSum := 66 + 52 + 50 + 23 + 27 // top 5 by count, descending
+	if shownSum == total {
+		t.Fatalf("test fixture degenerate: shown sum equals true total")
+	}
+}
+
+// TestRenderRepeatedRunsTodayOmitsShownClauseWhenComplete covers the
+// complementary case: when every repeated command fits in the shown rows,
+// the footer must not print a redundant "top N shown" clause.
+func TestRenderRepeatedRunsTodayOmitsShownClauseWhenComplete(t *testing.T) {
+	store := newTestStore(t)
+	now := time.Now().UTC()
+	seed(t, store, []stats.Run{
+		{ID: "0001", At: now, Argv: "go test ./..."},
+		{ID: "0002", At: now, Argv: "go test ./..."},
+	})
+
+	var buf strings.Builder
+	if err := Render(context.Background(), store, &buf, Options{}); err != nil {
+		t.Fatalf("Render: %v", err)
+	}
+	out := buf.String()
+	if !strings.Contains(out, "2 identical runs today across 1 command\n") {
+		t.Fatalf("expected singular-command footer with no shown-clause, got:\n%s", out)
+	}
+	if strings.Contains(out, "shown") {
+		t.Fatalf("footer should omit the shown-clause when every command is displayed, got:\n%s", out)
+	}
+}
+
+// TestRenderRepeatedRunsTodaySingularWording drives renderRepeatedRunsToday
+// directly (rather than through a seeded store) to hit the singular-count
+// edge cases: 1 run and 1 command are grammatically impossible together from
+// a real store (a repeated group needs at least 2 runs), but the renderer's
+// pluralization must still be correct in isolation.
+func TestRenderRepeatedRunsTodaySingularWording(t *testing.T) {
+	p := palette{on: false}
+	var buf strings.Builder
+	renderRepeatedRunsToday(&buf, p, []stats.RepeatedRun{{Argv: "go test ./...", Count: 1}}, 1, 1)
+	out := buf.String()
+	if !strings.Contains(out, "1 identical run today across 1 command\n") {
+		t.Fatalf("expected singular run+command wording, got:\n%s", out)
+	}
+	if strings.Contains(out, "shown") {
+		t.Fatalf("footer should omit the shown-clause when nothing is truncated, got:\n%s", out)
 	}
 }
 

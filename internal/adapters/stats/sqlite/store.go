@@ -17,6 +17,12 @@ import (
 	"github.com/synapctx/sctx/internal/domain/stats"
 )
 
+// timeNow is time.Now, indirected only so tests can pin the instant and
+// exercise the local-midnight boundary in a non-UTC zone deterministically.
+// Nothing else in this package needs a seam; production code always uses the
+// real clock.
+var timeNow = time.Now
+
 const schema = `
 CREATE TABLE IF NOT EXISTS runs (
 	id TEXT PRIMARY KEY,
@@ -249,7 +255,7 @@ func (s *Store) RepeatedRunsToday(ctx context.Context, limit int) ([]stats.Repea
 	if limit <= 0 {
 		limit = 5
 	}
-	startOfDay := time.Now().Local().Truncate(24 * time.Hour)
+	startOfDay := localMidnight()
 	rows, err := s.db.QueryContext(ctx,
 		`SELECT argv, COUNT(*) AS n FROM runs WHERE at >= ? GROUP BY argv HAVING n > 1 ORDER BY n DESC LIMIT ?`,
 		startOfDay.UTC().Format(time.RFC3339Nano), limit)
@@ -270,6 +276,36 @@ func (s *Store) RepeatedRunsToday(ctx context.Context, limit int) ([]stats.Repea
 		return nil, fmt.Errorf("iterating repeated runs: %w", err)
 	}
 	return out, nil
+}
+
+// RepeatedRunsTodaySummary reports the TRUE totals behind RepeatedRunsToday:
+// how many distinct argv values repeated since local midnight, and how many
+// runs those repeats account for in total — independent of any LIMIT applied
+// to the row list, so a caller can report an accurate headline even when it
+// only renders the top few rows.
+func (s *Store) RepeatedRunsTodaySummary(ctx context.Context) (runs int64, commands int64, err error) {
+	startOfDay := localMidnight()
+	row := s.db.QueryRowContext(ctx,
+		`SELECT COUNT(*), COALESCE(SUM(n), 0) FROM (
+			SELECT COUNT(*) AS n FROM runs WHERE at >= ? GROUP BY argv HAVING n > 1
+		)`,
+		startOfDay.UTC().Format(time.RFC3339Nano))
+	if err := row.Scan(&commands, &runs); err != nil {
+		return 0, 0, fmt.Errorf("querying repeated runs summary: %w", err)
+	}
+	return runs, commands, nil
+}
+
+// localMidnight returns the start of "today" in the machine's local zone.
+// time.Time.Truncate rounds down relative to the absolute instant since the
+// zero time and ignores the location entirely, so
+// time.Now().Local().Truncate(24*time.Hour) actually yields UTC midnight —
+// in a positive UTC offset (e.g. BST) that silently excludes runs made
+// between UTC midnight and local midnight. Building the boundary from the
+// wall-clock date components instead gives the real local midnight.
+func localMidnight() time.Time {
+	t := timeNow().Local()
+	return time.Date(t.Year(), t.Month(), t.Day(), 0, 0, 0, 0, t.Location())
 }
 
 // LatestRawBytes returns the RawBytes of the most recently recorded run
