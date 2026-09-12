@@ -84,9 +84,17 @@ func runClaude(_ []string, in io.Reader, out io.Writer, version, agent string) i
 
 	writeSessionHandoff(agent, call.SessionID)
 
+	// Rate-limited to roughly once per day (see staleHookNoticeWindow) and
+	// never on the critical path otherwise: staleHookVersionNotice only ever
+	// runs the expensive PATH scan on the ONE invocation per window that wins
+	// the rate-limit check, so this line costs one cheap SQLite read on every
+	// other call. It never changes the rewrite decision below or this hook's
+	// exit code — only what additionalContext carries, if anything.
+	notice := staleHookVersionNotice(version)
+
 	root, matchers := trustedProjectMatchers()
 	if rewritten, ok := rewriteWithProject(cmd, root, matchers); ok {
-		writeRewrite(out, rewritten)
+		writeRewrite(out, rewritten, notice)
 		return 0
 	}
 
@@ -98,6 +106,12 @@ func runClaude(_ []string, in io.Reader, out io.Writer, version, agent string) i
 		spoolCoverageGap(seg, version)
 	} else if seg, reason, ok := declineSegment(cmd); ok {
 		spoolCoverageDecline(seg, reason, version)
+	}
+	if notice != "" {
+		// Nothing rewrote the command, but the notice is still owed — same
+		// channel and event name as the rewrite path uses, just with no
+		// updatedInput alongside it.
+		writeAdditionalContext(out, "PreToolUse", notice)
 	}
 	return 0
 }
@@ -232,16 +246,22 @@ func deriveProgram(cmd string) string {
 	return progkey.FromArgv(argv)
 }
 
-func writeRewrite(out io.Writer, rewritten string) {
-	output := map[string]any{
-		"hookSpecificOutput": map[string]any{
-			"hookEventName":            "PreToolUse",
-			"permissionDecisionReason": "sctx auto-rewrite",
-			"updatedInput": map[string]any{
-				"command": rewritten,
-			},
+// writeRewrite prints the rewrite directive, and — when notice is non-empty
+// — the stale-hook notice ALONGSIDE it in the same envelope: PreToolUse
+// allows exactly one JSON object on stdout, so a rewrite and an advisory
+// line due in the same call must share it rather than printing twice.
+func writeRewrite(out io.Writer, rewritten, notice string) {
+	hookSpecificOutput := map[string]any{
+		"hookEventName":            "PreToolUse",
+		"permissionDecisionReason": "sctx auto-rewrite",
+		"updatedInput": map[string]any{
+			"command": rewritten,
 		},
 	}
+	if notice != "" {
+		hookSpecificOutput["additionalContext"] = notice
+	}
+	output := map[string]any{"hookSpecificOutput": hookSpecificOutput}
 	encoded, err := json.Marshal(output)
 	if err != nil {
 		return

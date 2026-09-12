@@ -162,7 +162,7 @@ func RunCopilot(_ []string, in io.Reader, out io.Writer, version string) int {
 		if !ok {
 			return 0
 		}
-		writeRewrite(out, rewritten)
+		writeRewrite(out, rewritten, "")
 		return 0
 	}
 
@@ -255,7 +255,7 @@ func RunDroid(_ []string, in io.Reader, out io.Writer, version string) int {
 	if !ok {
 		return 0
 	}
-	writeRewrite(out, rewritten)
+	writeRewrite(out, rewritten, "")
 	return 0
 }
 

@@ -39,24 +39,56 @@ func isDevBuildVersion(v string) bool {
 // follows the LAST space so a "sctx " (or any other program name) prefix is
 // ignored. ok is false when that tail does not parse as all-numeric dotted
 // components (e.g. "dev", or an answer this binary never produced).
+// parseVersionNumbers extracts the dotted numeric components of a version.
+//
+// It has to tolerate THREE shapes, because the strings being compared come from
+// two independent producers: `binaries.VersionOf` returns whatever `sctx
+// version` prints ("sctx v0.9.0"), while the `main.version` ldflag is the bare
+// tag ("v0.9.0"), and a build off a tag carries a git suffix
+// ("sctx v0.8.0-1-gbb9c1f8"). Hence the last-space trim, the `v` strip, and the
+// leading-digit-run per component.
+//
+// EVERY REAL VERSION USED TO FAIL THIS PARSE. It split on "." and Atoi'd each
+// part, so "v0.9.0" produced ["v0","9","0"] and Atoi("v0") failed — every
+// comparison fell through to `a < b` on the raw strings. That is lexicographic,
+// and it is right only by luck: it orders v0.8.0 before v0.9.0 correctly and
+// orders v0.10.0 BEFORE v0.9.0, because "0.10" < "0.9" as text. So the first
+// release after v0.9 would have silently stopped every hook rewire, reporting
+// the newer binary as the older one, with nothing failing anywhere. The
+// string fallback is kept for genuinely unparseable input, where it can only
+// under-report staleness, but it must no longer be the normal path.
 func parseVersionNumbers(v string) (nums []int, ok bool) {
 	v = strings.TrimSpace(v)
 	if idx := strings.LastIndex(v, " "); idx >= 0 {
 		v = v[idx+1:]
 	}
+	v = strings.TrimPrefix(strings.TrimPrefix(v, "v"), "V")
 	if v == "" {
 		return nil, false
 	}
-	parts := strings.Split(v, ".")
-	nums = make([]int, 0, len(parts))
-	for _, p := range parts {
-		n, err := strconv.Atoi(strings.TrimSpace(p))
+	for _, p := range strings.Split(v, ".") {
+		// Only the LEADING digit run counts, so a pre-release or git suffix
+		// ("0-1-gbb9c1f8", "0-rc1") contributes its number and stops the scan
+		// rather than failing the whole parse. A component with no digits at
+		// all ends it: "1.2.beta" is [1,2], which compares sanely against
+		// [1,2,0] via the length tie-break in versionOlder.
+		end := 0
+		for end < len(p) && p[end] >= '0' && p[end] <= '9' {
+			end++
+		}
+		if end == 0 {
+			break
+		}
+		n, err := strconv.Atoi(p[:end])
 		if err != nil {
-			return nil, false
+			break
 		}
 		nums = append(nums, n)
+		if end != len(p) {
+			break
+		}
 	}
-	return nums, true
+	return nums, len(nums) > 0
 }
 
 // versionOlder reports whether a is an older release than b. Falls back to a
@@ -137,6 +169,71 @@ func StaleHookReason(wiredBinary, runningBinary, runningVersion string) (reason 
 
 // rewireMessage is the standard `--install` progress line printed whenever a
 // hook's wired binary is replaced because StaleHookReason found it stale.
+//
+// Both binaries' versions are named alongside their paths (2026-09-12): two
+// paths alone do not say WHICH one is newer or why the rewire happened, and
+// that question matters more than usual now that the target is not always
+// the binary running `setup` — see NewestOnPath. VersionOf is cheap here
+// specifically because this only runs on the rewiring path (at most once per
+// stale hook, never per invocation), not on every command.
 func rewireMessage(agentLabel, oldBinary, newBinary string) string {
-	return fmt.Sprintf("rewired %s hook: %s -> %s", agentLabel, oldBinary, newBinary)
+	return fmt.Sprintf("rewired %s hook: %s (%s) -> %s (%s)",
+		agentLabel, oldBinary, orUnknownVersion(binaries.VersionOf(oldBinary)), newBinary, orUnknownVersion(binaries.VersionOf(newBinary)))
+}
+
+// orUnknownVersion is rewireMessage's fallback for a binary VersionOf could
+// not identify (gone, timed out, not actually sctx) — never blank, since a
+// blank pair of parens in the middle of the message reads as a bug, not a
+// diagnostic.
+func orUnknownVersion(v string) string {
+	if v == "" {
+		return "version unknown"
+	}
+	return v
+}
+
+// NewestOnPath picks the binary a stale hook should be rewired to: the
+// newest non-dev copy of exeName found on pathEnv, or runningBinary itself
+// when nothing on PATH beats it.
+//
+// Before this, `--install` always rewired toward os.Executable() — the
+// binary currently RUNNING `setup`, never mind what else is on PATH. That
+// meant the one command meant to fix a stale hook could re-pin it to a
+// binary that was itself stale: a developer running `~/.local/bin/sctx`
+// (say, v0.8.0) with Homebrew's `sctx` (v0.9.0) ahead of it on PATH would
+// have every hook rewired to the v0.8.0 copy, StaleHookReason would then call
+// that "not stale" because wired == running, and `setup` would report
+// success on a machine still missing v0.9.0's improvements everywhere.
+//
+// A dev build is NEVER outranked here, deliberately the opposite of
+// StaleHookReason's own rule that a dev build always loses to a release: a
+// developer working on sctx who runs `setup --install` must install THEIR
+// OWN checkout's hooks, not be silently redirected to whatever release
+// happens to be on PATH. runningVersion itself being empty or a dev build
+// short-circuits to runningBinary for the same reason StaleHookReason's own
+// runningVersion guard exists — an untrustworthy reference must not be
+// replaced by a "newer" one it cannot correctly judge either.
+//
+// Falls back to runningBinary whenever PATH resolves nothing that beats it —
+// unreadable PATH, no copy answers a version, or the newest found IS
+// runningBinary — so this can only ever ADD a better target, never remove
+// the one that always worked.
+func NewestOnPath(pathEnv, exeName, runningBinary, runningVersion string) string {
+	if runningVersion == "" || isDevBuildVersion(runningVersion) {
+		return runningBinary
+	}
+	newest, newestVersion := runningBinary, runningVersion
+	for _, path := range binaries.OnPath(pathEnv, exeName) {
+		if samePath(path, runningBinary) {
+			continue
+		}
+		v := binaries.VersionOf(path)
+		if v == "" || isDevBuildVersion(v) {
+			continue
+		}
+		if versionOlder(newestVersion, v) {
+			newest, newestVersion = path, v
+		}
+	}
+	return newest
 }

@@ -100,6 +100,15 @@ func runSetup(cfg config.Config, args []string) int {
 	if err != nil || binary == "" {
 		binary = "sctx"
 	}
+	// Rewire toward the NEWEST non-dev sctx on PATH, not unconditionally toward
+	// this process's own path (see agentsetup.NewestOnPath). Otherwise the one
+	// command meant to fix a stale hook could re-pin it to a binary that is
+	// itself stale — e.g. running `~/.local/bin/sctx` (an older release) while
+	// Homebrew has a newer one on PATH: StaleHookReason would call the hook
+	// "not stale" because wired == running, and this rewire would happily
+	// confirm that broken state. A dev build running this is never redirected
+	// away from itself (see NewestOnPath's own runningVersion guard).
+	binary = agentsetup.NewestOnPath(os.Getenv("PATH"), sctxExeName(), binary, version)
 
 	orgs := orgSlugs(cfg)
 	orgTokens := codexOrgTokens(cfg)
@@ -158,10 +167,7 @@ func runSetup(cfg config.Config, args []string) int {
 	}
 	printSetupStatus(os.Stdout, st, cfg, install)
 	endpointOK := printMCPEndpointStatus(os.Stdout, st, cfg)
-	hooksOK := true
-	if hasAgent(st, "claude") {
-		hooksOK = printHookStatus(os.Stdout, home, binary)
-	}
+	hooksOK := printHookStatus(os.Stdout, home, st.Targets, binary)
 	if st.Complete() && hooksOK && endpointOK {
 		return 0
 	}
@@ -398,33 +404,161 @@ func minVersionFor(agentID string) string {
 	return a.MinVersion
 }
 
-// printHookStatus reports the hooks and returns whether they are all wired.
+// printHookStatus reports the hooks and plugins that auto-wrap commands, for
+// EVERY detected agent, and returns whether they are all wired and current.
+//
+// Before 2026-09-12 this inspected Claude Code alone, even though the other
+// seven agents (Gemini, Codex, Cursor, Copilot, Droid, Kilo Code, OpenCode)
+// wire the exact same way `--install` rewires them — InspectAgentHooks,
+// InspectCodexHooks, InspectCursorHooks, InspectCopilotHooks,
+// InspectDroidHooks, InspectPlugin. A stale hook on any of those seven never
+// failed `sctx setup`'s own exit code: only the one-line "command wrapping"
+// summary (printWrappingStatus) ever showed it, and that summary does not
+// feed hooksOK.
 //
 // Separate from the instruction-file status because they fail independently and
 // look identical from outside: instructions tell an agent sctx EXISTS, hooks are
 // what make it RUN. A machine can have either half and neither symptom.
-func printHookStatus(w io.Writer, home, binary string) bool {
-	path, states, err := agentsetup.InspectHooks(home, binary)
+func printHookStatus(w io.Writer, home string, targets []agentsetup.Target, binary string) bool {
+	ok := true
+	for _, t := range targets {
+		switch t.Wrapping {
+		case agentdoc.WrapHook, agentdoc.WrapPlugin:
+			if !printAgentHookStatus(w, home, t, binary) {
+				ok = false
+			}
+		}
+	}
+	return ok
+}
+
+// printAgentHookStatus reports one agent's hook or plugin wiring, dispatching
+// to whichever Inspect* function `--install` itself rewires against
+// (InstallWrapping) so this report and the remedy can never disagree about
+// what "stale" means.
+func printAgentHookStatus(w io.Writer, home string, t agentsetup.Target, binary string) bool {
+	switch t.ID {
+	case "claude", "gemini":
+		return printAgentHookStates(w, home, t, binary)
+	case "codex":
+		cs, err := agentsetup.InspectCodexHooks(home, binary)
+		if err != nil {
+			fmt.Fprintf(w, "\n%s hook (%s)\n  [error] %v\n", t.Name, cs.ConfigPath, err)
+			return false
+		}
+		if len(cs.Conflicts) > 0 {
+			// A conflict is never a remedy `--install` can apply on its own —
+			// installing beside it would wrap every command twice — so it is
+			// reported instead of falling through to the ordinary states.
+			fmt.Fprintf(w, "\n%s hook (%s)\n  [conflict] %s\n", t.Name, cs.ConfigPath, strings.Join(cs.Conflicts, ", "))
+			return false
+		}
+		// A hook that IS installed and current still needs a human to trust it
+		// once (/hooks) before Codex will ever run it — never [ok], because
+		// nothing has actually wrapped a command yet.
+		return printSimpleHookLine(w, t.Name, "hook", cs.ConfigPath, cs.Installed, cs.Stale, cs.StaleReason, cs.Missing, cs.Installed && !cs.Stale)
+	case "cursor":
+		cs, err := agentsetup.InspectCursorHooks(home, binary)
+		if err != nil {
+			fmt.Fprintf(w, "\n%s hook (%s)\n  [error] %v\n", t.Name, cs.ConfigPath, err)
+			return false
+		}
+		return printSimpleHookLine(w, t.Name, "hook", cs.ConfigPath, cs.Installed, cs.Stale, cs.StaleReason, cs.Missing, false)
+	case "copilot":
+		cs, err := agentsetup.InspectCopilotHooks(home, binary)
+		if err != nil {
+			fmt.Fprintf(w, "\n%s hook (%s)\n  [error] %v\n", t.Name, cs.ConfigPath, err)
+			return false
+		}
+		if cs.Foreign {
+			// A file of this name that sctx did not write is never rewritten —
+			// reported, never treated as ours to repair.
+			fmt.Fprintf(w, "\n%s hook (%s)\n  [foreign] a file of this name exists that sctx did not write\n", t.Name, cs.ConfigPath)
+			return false
+		}
+		return printSimpleHookLine(w, t.Name, "hook", cs.ConfigPath, cs.Installed, cs.Stale, cs.StaleReason, cs.Missing, false)
+	case "droid":
+		cs, err := agentsetup.InspectDroidHooks(home, binary)
+		if err != nil {
+			fmt.Fprintf(w, "\n%s hook (%s)\n  [error] %v\n", t.Name, cs.ConfigPath, err)
+			return false
+		}
+		return printSimpleHookLine(w, t.Name, "hook", cs.ConfigPath, cs.Installed, cs.Stale, cs.StaleReason, cs.Missing, false)
+	case "kilocode", "opencode":
+		ps, err := agentsetup.InspectPlugin(home, t.Agent, binary)
+		if err != nil {
+			fmt.Fprintf(w, "\n%s plugin (%s)\n  [error] %v\n", t.Name, ps.Path, err)
+			return false
+		}
+		if ps.Foreign {
+			fmt.Fprintf(w, "\n%s plugin (%s)\n  [foreign] a file of this name exists that sctx did not write\n", t.Name, ps.Path)
+			return false
+		}
+		return printSimpleHookLine(w, t.Name, "plugin", ps.Path, ps.Installed, ps.Stale, ps.StaleReason, ps.Missing, false)
+	}
+	return true
+}
+
+// printAgentHookStates prints one line per hook spec for the settings.json
+// clients (Claude Code, Gemini CLI) — Claude installs four independent hooks,
+// so a listing that only said "hooks: ok/missing" could not tell a developer
+// which one broke.
+func printAgentHookStates(w io.Writer, home string, t agentsetup.Target, binary string) bool {
+	path, states, err := agentsetup.InspectAgentHooks(home, t.Agent, binary)
 	if err != nil {
-		fmt.Fprintf(w, "\nhooks (%s)\n  [error] %v\n", path, err)
+		fmt.Fprintf(w, "\n%s hooks (%s)\n  [error] %v\n", t.Name, path, err)
 		return false
 	}
-	fmt.Fprintf(w, "\nhooks (%s)\n", path)
+	if len(states) == 0 {
+		return true
+	}
+	fmt.Fprintf(w, "\n%s hooks (%s)\n", t.Name, path)
 	ok := true
-	for _, st := range states {
-		// The matcher is printed, not just the event: sctx now installs TWO
+	for _, hs := range states {
+		// The matcher is printed, not just the event: Claude installs TWO
 		// PreToolUse hooks (Bash and Grep|Glob|Agent), and a status listing that
 		// names only the event shows one as installed and one as missing with no
 		// way to tell which is which.
-		label := fmt.Sprintf("%s(%s)", st.Event, st.Matcher)
-		if st.Installed {
-			fmt.Fprintf(w, "  [ok]      %-34s %s\n", label, st.Purpose)
-			continue
+		label := fmt.Sprintf("%s(%s)", hs.Event, hs.Matcher)
+		switch {
+		case hs.Installed && hs.Stale:
+			ok = false
+			fmt.Fprintf(w, "  [stale]   %-34s %s (%s)\n", label, hs.Purpose, hs.StaleReason)
+		case hs.Installed:
+			fmt.Fprintf(w, "  [ok]      %-34s %s\n", label, hs.Purpose)
+		default:
+			ok = false
+			fmt.Fprintf(w, "  [missing] %-34s %s\n", label, hs.Purpose)
 		}
-		ok = false
-		fmt.Fprintf(w, "  [missing] %-34s %s\n", label, st.Purpose)
 	}
 	return ok
+}
+
+// printSimpleHookLine renders the one-file-per-agent shape (Codex, Cursor,
+// Copilot, Droid, and the Kilo/OpenCode plugin) — a single hook or plugin,
+// rather than Claude/Gemini's list of independent specs. trusted is Codex-only:
+// installed and current, but still inert until the developer runs Codex's
+// `/hooks` once, which is reported [trust] rather than [ok] because nothing
+// has actually wrapped a command yet.
+func printSimpleHookLine(w io.Writer, agentName, kind, path string, installed, stale bool, staleReason, missing string, trusted bool) bool {
+	fmt.Fprintf(w, "\n%s %s (%s)\n", agentName, kind, path)
+	switch {
+	case !installed:
+		fmt.Fprintf(w, "  [missing] %s not wired\n", kind)
+		return false
+	case missing != "":
+		fmt.Fprintf(w, "  [stale]   the sctx it calls no longer exists: %s\n", missing)
+		return false
+	case stale:
+		fmt.Fprintf(w, "  [stale]   %s\n", staleReason)
+		return false
+	case trusted:
+		fmt.Fprintln(w, "  [trust]   installed — Codex runs it only after you trust it once: /hooks")
+		return true
+	default:
+		fmt.Fprintf(w, "  [ok]      rewrites covered commands to sctx\n")
+		return true
+	}
 }
 
 // docsFor returns the instruction documents this machine should have. SYNAPCTX.md
@@ -660,15 +794,6 @@ func pendingLine(st agentsetup.Status) string {
 		return joinAnd(names) + " has SynapCTX instructions from an older sctx"
 	}
 	return joinAnd(names) + " has not been told SynapCTX exists"
-}
-
-func hasAgent(st agentsetup.Status, id string) bool {
-	for _, t := range st.Targets {
-		if t.ID == id {
-			return true
-		}
-	}
-	return false
 }
 
 // codexOrgTokens resolves the credentials Codex must persist. Sectioned keys

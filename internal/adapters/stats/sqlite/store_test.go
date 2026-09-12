@@ -453,3 +453,77 @@ func TestRepeatedRunsTodayUsesLocalMidnightNotUTC(t *testing.T) {
 		t.Fatalf("got %+v, want only the post-local-midnight `go build ./...` x2 (a UTC-midnight cutoff would wrongly include the pre-local-midnight `gofmt -l .` rows too)", repeated)
 	}
 }
+
+// TestMarkNoticeIfDue covers the rate-limit primitive the stale-hook notice
+// (internal/adapters/hook, 2026-09-12) reuses rather than inventing a new
+// state file: due on first use, silent again immediately after, due once
+// more only after the window elapses, and never confused with a DIFFERENT
+// notice kind sharing the same store.
+func TestMarkNoticeIfDue(t *testing.T) {
+	store, err := NewStore(filepath.Join(t.TempDir(), "stats.db"))
+	if err != nil {
+		t.Fatalf("NewStore: %v", err)
+	}
+	defer store.Close()
+
+	ctx := context.Background()
+	window := 24 * time.Hour
+	t0 := time.Date(2026, 9, 12, 10, 0, 0, 0, time.UTC)
+
+	t.Run("due the first time a kind is checked", func(t *testing.T) {
+		// MUTATION CAUGHT: treating sql.ErrNoRows as "not due" would make a
+		// notice that has never fired stay silent forever.
+		due, err := store.MarkNoticeIfDue(ctx, "stale_hook", window, t0)
+		if err != nil {
+			t.Fatalf("MarkNoticeIfDue: %v", err)
+		}
+		if !due {
+			t.Fatal("want due=true on the first check")
+		}
+	})
+
+	t.Run("not due again immediately after", func(t *testing.T) {
+		// This is the exact shape of "fires once within the window and not on
+		// the next immediate invocation" from the spec.
+		due, err := store.MarkNoticeIfDue(ctx, "stale_hook", window, t0.Add(time.Minute))
+		if err != nil {
+			t.Fatalf("MarkNoticeIfDue: %v", err)
+		}
+		if due {
+			t.Fatal("want due=false immediately after the first check")
+		}
+	})
+
+	t.Run("due again once the window has fully elapsed", func(t *testing.T) {
+		due, err := store.MarkNoticeIfDue(ctx, "stale_hook", window, t0.Add(window+time.Second))
+		if err != nil {
+			t.Fatalf("MarkNoticeIfDue: %v", err)
+		}
+		if !due {
+			t.Fatal("want due=true once window has elapsed")
+		}
+	})
+
+	t.Run("not due again right after the second firing", func(t *testing.T) {
+		due, err := store.MarkNoticeIfDue(ctx, "stale_hook", window, t0.Add(window+2*time.Second))
+		if err != nil {
+			t.Fatalf("MarkNoticeIfDue: %v", err)
+		}
+		if due {
+			t.Fatal("want due=false again right after the second firing")
+		}
+	})
+
+	t.Run("a different kind is rate-limited independently", func(t *testing.T) {
+		// MUTATION CAUGHT: a query keyed on anything other than `kind` (e.g. a
+		// single unkeyed row) would make this see the "stale_hook" firing above
+		// and wrongly report not-due for an unrelated notice.
+		due, err := store.MarkNoticeIfDue(ctx, "some_other_notice", window, t0.Add(window+2*time.Second))
+		if err != nil {
+			t.Fatalf("MarkNoticeIfDue: %v", err)
+		}
+		if !due {
+			t.Fatal("want a different notice kind to be due independently")
+		}
+	})
+}

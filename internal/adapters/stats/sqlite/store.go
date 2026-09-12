@@ -40,6 +40,10 @@ CREATE TABLE IF NOT EXISTS runs (
 	anomaly TEXT NOT NULL DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS idx_runs_command ON runs(command);
+CREATE TABLE IF NOT EXISTS hook_notices (
+	kind TEXT PRIMARY KEY,
+	last_shown_at TEXT NOT NULL
+);
 `
 
 type Store struct {
@@ -355,6 +359,50 @@ func whereClause(opts stats.AggregateOptions) (string, []any) {
 		return "", nil
 	}
 	return " WHERE " + strings.Join(clauses, " AND "), args
+}
+
+// MarkNoticeIfDue reports whether a rate-limited notice identified by kind is
+// due to be shown again — last shown longer ago than window, or never — and,
+// if so, atomically records now as its new last-shown time in the SAME
+// transaction, so a caller never has to make a separate write call it might
+// forget. A caller that gets due=true is the ONLY caller who will for the
+// rest of window: the row is what makes "roughly once per session/day"
+// (e.g. the stale-hook-hint in internal/adapters/hook) hold across the many
+// separate `sctx` processes a hook fires as, none of which share memory.
+func (s *Store) MarkNoticeIfDue(ctx context.Context, kind string, window time.Duration, now time.Time) (due bool, err error) {
+	tx, err := s.db.BeginTx(ctx, nil)
+	if err != nil {
+		return false, fmt.Errorf("marking notice due: %w", err)
+	}
+	defer tx.Rollback() //nolint:errcheck // no-op once Commit has run
+
+	var lastRaw string
+	switch err := tx.QueryRowContext(ctx, `SELECT last_shown_at FROM hook_notices WHERE kind = ?`, kind).Scan(&lastRaw); {
+	case err == sql.ErrNoRows:
+		due = true
+	case err != nil:
+		return false, fmt.Errorf("reading notice %q: %w", kind, err)
+	default:
+		last, parseErr := time.Parse(time.RFC3339Nano, lastRaw)
+		// A row we cannot parse is treated as due, not as an error: it can only
+		// ever have been written by this same method, so an unparseable value
+		// means the row predates a format change, never a live race worth
+		// failing the caller's hot path over.
+		due = parseErr != nil || now.Sub(last) >= window
+	}
+	if !due {
+		return false, nil
+	}
+	if _, err := tx.ExecContext(ctx,
+		`INSERT INTO hook_notices (kind, last_shown_at) VALUES (?, ?)
+		 ON CONFLICT(kind) DO UPDATE SET last_shown_at = excluded.last_shown_at`,
+		kind, now.UTC().Format(time.RFC3339Nano)); err != nil {
+		return false, fmt.Errorf("recording notice %q: %w", kind, err)
+	}
+	if err := tx.Commit(); err != nil {
+		return false, fmt.Errorf("committing notice %q: %w", kind, err)
+	}
+	return true, nil
 }
 
 func (s *Store) Close() error {

@@ -224,6 +224,65 @@ func TestInstallCodexHooksRewiresAStaleBinary(t *testing.T) {
 	}
 }
 
+// TestNewestOnPath exercises the rewire TARGET fix: before it, a rewire
+// always pointed at runningBinary, which let a developer's own OLDER copy
+// re-pin every hook to itself even with a newer release sitting on PATH.
+func TestNewestOnPath(t *testing.T) {
+	dir := t.TempDir()
+	oldRelease := fakeSctxAt(t, dir, "old-release", "sctx 0.6.1")
+	newRelease := fakeSctxAt(t, dir, "new-release", "sctx 0.7.0")
+	devBuild := fakeSctxAt(t, dir, "dev-build", "sctx dev")
+	pathEnv := strings.Join([]string{filepath.Dir(oldRelease), filepath.Dir(newRelease), filepath.Dir(devBuild)}, string(filepath.ListSeparator))
+
+	t.Run("a newer release on PATH wins over the older running binary", func(t *testing.T) {
+		// MUTATION CAUGHT: reverting to `return runningBinary` unconditionally
+		// (the pre-fix behaviour) makes this assert oldRelease instead.
+		//
+		// Compared via samePath, not string equality: binaries.OnPath resolves
+		// symlinks (e.g. macOS's /var -> /private/var), so the PATH copy it
+		// returns is not always byte-identical to the path fakeSctxAt handed
+		// back, even though it names the same file.
+		got := NewestOnPath(pathEnv, "sctx", oldRelease, "sctx 0.6.1")
+		if !samePath(got, newRelease) {
+			t.Errorf("got %q, want the newer release %q", got, newRelease)
+		}
+	})
+
+	t.Run("running binary already the newest is returned byte-for-byte unchanged", func(t *testing.T) {
+		// This is the "existing fixtures still pass" guarantee: when nothing on
+		// PATH beats the running binary, the result must be IT, not merely an
+		// equally-current alternative.
+		got := NewestOnPath(pathEnv, "sctx", newRelease, "sctx 0.7.0")
+		if got != newRelease {
+			t.Errorf("got %q, want runningBinary %q unchanged", got, newRelease)
+		}
+	})
+
+	t.Run("a dev build never loses itself to a release on PATH", func(t *testing.T) {
+		// MUTATION CAUGHT: dropping the runningVersion dev-build guard would
+		// redirect a developer's own checkout to newRelease here.
+		got := NewestOnPath(pathEnv, "sctx", devBuild, "sctx dev")
+		if got != devBuild {
+			t.Errorf("got %q, want the dev build to install itself: %q", got, devBuild)
+		}
+	})
+
+	t.Run("an unresolvable PATH falls back to the running binary", func(t *testing.T) {
+		got := NewestOnPath("", "sctx", oldRelease, "sctx 0.6.1")
+		if got != oldRelease {
+			t.Errorf("got %q, want the running binary unchanged when PATH resolves nothing: %q", got, oldRelease)
+		}
+	})
+
+	t.Run("a dev-only PATH falls back to the running binary", func(t *testing.T) {
+		devOnlyPath := filepath.Dir(devBuild)
+		got := NewestOnPath(devOnlyPath, "sctx", oldRelease, "sctx 0.6.1")
+		if got != oldRelease {
+			t.Errorf("got %q, want the running binary unchanged when nothing on PATH is a usable release: %q", got, oldRelease)
+		}
+	})
+}
+
 func TestInstallPluginRewiresAStaleBinary(t *testing.T) {
 	home := t.TempDir()
 	a := configure(t, home, "kilocode")
@@ -244,5 +303,80 @@ func TestInstallPluginRewiresAStaleBinary(t *testing.T) {
 	got := read(t, path)
 	if strings.Contains(got, devBinary) || !strings.Contains(got, release) {
 		t.Errorf("plugin SCTX_BINARY not rewired:\n%s", got)
+	}
+}
+
+// Version comparison must work across the TWO PRODUCERS that feed it, and must
+// survive the 0.9 -> 0.10 rollover.
+//
+// The strings compared here come from different places: `binaries.VersionOf`
+// returns the CLI's own output ("sctx v0.9.0"), the `main.version` ldflag is the
+// bare tag ("v0.9.0"), and an off-tag build adds a git suffix. parseVersionNumbers
+// previously Atoi'd each dot-separated part, so the leading "v" failed the parse
+// for EVERY real version and versionOlder silently degraded to comparing raw
+// strings. That is lexicographic: correct for v0.8.0 < v0.9.0 by luck, and wrong
+// for v0.9.0 < v0.10.0, because "0.10" sorts before "0.9".
+//
+// MUTATION THIS CATCHES: dropping the "v" strip or the leading-digit-run scan.
+// Either sends every comparison back through the string fallback, where the
+// v0.10.0 row fails — i.e. the first release after v0.9 stops all hook rewiring.
+func TestVersionOlderAcrossProducerFormatsAndTheTenRollover(t *testing.T) {
+	for _, tc := range []struct {
+		name, a, b string
+		want       bool
+	}{
+		{"bare vs CLI output, the real NewestOnPath call", "v0.8.0", "sctx v0.9.0", true},
+		{"CLI output vs bare, the real StaleHookReason call", "sctx v0.8.0", "v0.9.0", true},
+		{"both bare", "v0.8.0", "v0.9.0", true},
+		{"both CLI output", "sctx v0.8.0", "sctx v0.9.0", true},
+		{"git suffix is older than its own release", "sctx v0.8.0-1-gbb9c1f8", "v0.9.0", true},
+		{"THE ROLLOVER: 0.9 is older than 0.10", "v0.9.0", "v0.10.0", true},
+		{"THE ROLLOVER, reversed: 0.10 is not older than 0.9", "v0.10.0", "v0.9.0", false},
+		{"0.9.9 is older than 0.10.0", "sctx v0.9.9", "v0.10.0", true},
+		{"1.0.0 is not older than 0.99.0", "v1.0.0", "v0.99.0", false},
+		{"equal is not older", "v0.9.0", "sctx v0.9.0", false},
+		{"patch rollover", "v0.9.9", "v0.9.10", true},
+		{"a release is newer than its own pre-release build", "v0.9.0-rc1", "v0.9.0", false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := versionOlder(tc.a, tc.b); got != tc.want {
+				t.Errorf("versionOlder(%q, %q) = %v, want %v", tc.a, tc.b, got, tc.want)
+			}
+		})
+	}
+}
+
+// The parse must actually SUCCEED on the formats we really ship, not merely
+// produce a usable answer through the string fallback.
+//
+// MUTATION THIS CATCHES: a parse that returns ok=false for real versions. That
+// is invisible in versionOlder's result for adjacent versions and catastrophic
+// at a rollover, so it is asserted directly rather than through a comparison.
+func TestParseVersionNumbersSucceedsOnTheFormatsWeShip(t *testing.T) {
+	for _, tc := range []struct {
+		in   string
+		want []int
+	}{
+		{"v0.9.0", []int{0, 9, 0}},
+		{"sctx v0.9.0", []int{0, 9, 0}},
+		{"sctx v0.8.0-1-gbb9c1f8", []int{0, 8, 0}},
+		{"v0.10.0", []int{0, 10, 0}},
+		{"0.9.0", []int{0, 9, 0}},
+		{"v1.2.beta", []int{1, 2}},
+	} {
+		t.Run(tc.in, func(t *testing.T) {
+			got, ok := parseVersionNumbers(tc.in)
+			if !ok {
+				t.Fatalf("parseVersionNumbers(%q) reported not-ok; every shipped format must parse, or comparison degrades to lexicographic", tc.in)
+			}
+			if len(got) != len(tc.want) {
+				t.Fatalf("parseVersionNumbers(%q) = %v, want %v", tc.in, got, tc.want)
+			}
+			for i := range got {
+				if got[i] != tc.want[i] {
+					t.Fatalf("parseVersionNumbers(%q) = %v, want %v", tc.in, got, tc.want)
+				}
+			}
+		})
 	}
 }
