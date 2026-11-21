@@ -1,0 +1,15 @@
+Previewing update (dev):
+
+    pulumi:pulumi:Stack demo-dev running [31mError[0m: error resolving type of resource pet: unable to find resource type "random:index:RandomPetX" in resource provider "random"
+    pulumi:pulumi:Stack demo-dev running   on Pulumi.yaml line 5:
+    pulumi:pulumi:Stack demo-dev running    5:     type: [1;4mrandom:index:RandomPetX[0m
+    pulumi:pulumi:Stack demo-dev  3 messages
+Diagnostics:
+  pulumi:pulumi:Stack (demo-dev):
+    [31mError[0m: error resolving type of resource pet: unable to find resource type "random:index:RandomPetX" in resource provider "random"
+      on Pulumi.yaml line 5:
+       5:     type: [1;4mrandom:index:RandomPetX[0m
+
+Resources:
+    1 unchanged
+

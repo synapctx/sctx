@@ -1,0 +1,2 @@
+CREATE TABLE orders(id integer primary key, customer_id integer references customers(id), status text, total real, note text);
+CREATE INDEX idx_orders_customer on orders(customer_id);

@@ -1,0 +1,7 @@
+[1/3] /usr/bin/cc   -arch arm64 -Wall -Wextra -MD -MT CMakeFiles/a.dir/src/a.c.o -MF CMakeFiles/a.dir/src/a.c.o.d -o CMakeFiles/a.dir/src/a.c.o -c /work/proj/src/a.c
+/work/proj/src/a.c:1:19: warning: unused variable 'u' [-Wunused-variable]
+    1 | int fa(int x){int u; return x;}
+      |                   ^
+1 warning generated.
+[2/3] : && /opt/homebrew/bin/cmake -E rm -f liba.a && /usr/bin/ar qc liba.a  CMakeFiles/a.dir/src/a.c.o && /usr/bin/ranlib liba.a && /opt/homebrew/bin/cmake -E touch liba.a && :
+[3/3] : && /usr/bin/cc -arch arm64 -Wl,-search_paths_first -Wl,-headerpad_max_install_names CMakeFiles/app.dir/src/main.c.o -o app  liba.a  libb.a && :

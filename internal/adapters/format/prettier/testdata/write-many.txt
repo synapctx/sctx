@@ -1,0 +1,7 @@
+src4/clean.js 11ms (unchanged)
+src4/f1.js 4ms
+src4/f2.js 1ms
+src4/f3.js 1ms
+src4/f4.js 1ms
+src4/f5.js 1ms
+src4/f6.js 1ms

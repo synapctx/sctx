@@ -1,0 +1,6 @@
+"id","customer_id","status","total","note"
+1,1,"paid",3.17,"order note 1"
+2,2,"pending",6.34,"order note 2"
+3,3,"failed",9.51,"order note 3"
+4,4,"refunded",12.68,"order note 4"
+5,5,"paid",15.85,"order note 5"

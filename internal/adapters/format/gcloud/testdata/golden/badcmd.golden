@@ -1,0 +1,14 @@
+ERROR: (gcloud.compute.instances) Invalid choice: 'nope'.
+Maybe you meant:
+  gcloud compute instance-groups
+  gcloud compute instance-templates
+  gcloud compute target-instances
+  gcloud compute instances add-access-config
+  gcloud compute instances add-iam-policy-binding
+  gcloud compute instances add-labels
+  gcloud compute instances add-metadata
+  gcloud compute instances add-resource-policies
+  …+48 more suggestions
+
+To search the help text of gcloud commands, run:
+  gcloud help -- SEARCH_TERMS

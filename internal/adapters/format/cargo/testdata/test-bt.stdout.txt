@@ -1,0 +1,83 @@
+
+running 4 tests
+test tests::adds ... ok
+test tests::bad_panic ... FAILED
+test tests::bad_sum ... FAILED
+test tests::bad_unwrap ... FAILED
+
+failures:
+
+---- tests::bad_panic stdout ----
+
+thread 'tests::bad_panic' (32582054) panicked at src/lib.rs:36:9:
+boom
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/panicking.rs:676:5
+   1: core::panicking::panic_fmt
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/panicking.rs:80:14
+   2: demo::tests::bad_panic
+             at ./src/lib.rs:36:9
+   3: demo::tests::bad_panic::{closure#0}
+             at ./src/lib.rs:35:19
+   4: <demo::tests::bad_panic::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ops/function.rs:250:5
+   5: <fn() -> core::result::Result<(), alloc::string::String> as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ops/function.rs:250:5
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+---- tests::bad_sum stdout ----
+
+thread 'tests::bad_sum' (32582055) panicked at src/lib.rs:25:9:
+assertion `left == right` failed: sum was wrong
+  left: 5
+ right: 6
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/panicking.rs:676:5
+   1: core::panicking::panic_fmt
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/panicking.rs:80:14
+   2: core::panicking::assert_failed_inner
+   3: core::panicking::assert_failed::<i32, i32>
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/panicking.rs:407:5
+   4: demo::tests::bad_sum
+             at ./src/lib.rs:25:9
+   5: demo::tests::bad_sum::{closure#0}
+             at ./src/lib.rs:24:17
+   6: <demo::tests::bad_sum::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ops/function.rs:250:5
+   7: <fn() -> core::result::Result<(), alloc::string::String> as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ops/function.rs:250:5
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+---- tests::bad_unwrap stdout ----
+
+thread 'tests::bad_unwrap' (32582056) panicked at src/lib.rs:30:28:
+called `Result::unwrap()` on an `Err` value: ParseIntError { kind: InvalidDigit }
+stack backtrace:
+   0: __rustc::rust_begin_unwind
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/std/src/panicking.rs:676:5
+   1: core::panicking::panic_fmt
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/panicking.rs:80:14
+   2: core::result::unwrap_failed
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/result.rs:1870:5
+   3: <core::result::Result<i32, core::num::error::ParseIntError>>::unwrap
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/result.rs:1232:23
+   4: demo::tests::bad_unwrap
+             at ./src/lib.rs:30:28
+   5: demo::tests::bad_unwrap::{closure#0}
+             at ./src/lib.rs:29:20
+   6: <demo::tests::bad_unwrap::{closure#0} as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ops/function.rs:250:5
+   7: <fn() -> core::result::Result<(), alloc::string::String> as core::ops::function::FnOnce<()>>::call_once
+             at /rustc/0ef1bc386059596dada8fb65b50425aab2ea637a/library/core/src/ops/function.rs:250:5
+note: Some details are omitted, run with `RUST_BACKTRACE=full` for a verbose backtrace.
+
+
+failures:
+    tests::bad_panic
+    tests::bad_sum
+    tests::bad_unwrap
+
+test result: FAILED. 1 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+

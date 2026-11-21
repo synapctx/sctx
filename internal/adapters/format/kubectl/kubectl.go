@@ -120,6 +120,8 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 		return aggressiveRollout(in, rest)
 	case "api-resources":
 		return aggressiveAPIResources(in)
+	case "config":
+		return aggressiveConfigView(in, rest)
 	case "apply", "create", "delete", "patch", "scale", "label", "annotate":
 		return aggressiveResultLines(in)
 	default:

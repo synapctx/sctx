@@ -62,7 +62,7 @@ func aggressiveTest(in format.Input) (format.Rendered, error) {
 // summary line, still surfacing any stderr content (e.g. a stray build
 // warning) so error signal is never dropped.
 func renderPassingTest(lines []string, stderr []byte, dur time.Duration) format.Rendered {
-	var okCount, notfCount, cachedCount int
+	var okCount, notfCount, cachedCount, passedTests int
 	var coverage []string
 	for _, l := range lines {
 		if cov, ok := coverageSuffix(l); ok {
@@ -76,11 +76,18 @@ func renderPassingTest(lines []string, stderr []byte, dur time.Duration) format.
 			}
 		case strings.Contains(l, "[no test files]"):
 			notfCount++
+		case strings.HasPrefix(strings.TrimLeft(l, " "), "--- PASS"):
+			passedTests++
 		}
 	}
 
 	var b strings.Builder
 	fmt.Fprintf(&b, "ok: %d packages", okCount)
+	// Only a verbose-shaped stream names its tests; a plain run prints
+	// "ok pkg" lines alone, so no count is knowable and none is invented.
+	if passedTests > 0 {
+		fmt.Fprintf(&b, ", %d tests passed", passedTests)
+	}
 	if dur > 0 {
 		fmt.Fprintf(&b, ", %s", dur.Round(time.Millisecond))
 	}
@@ -114,7 +121,7 @@ func renderPassingTest(lines []string, stderr []byte, dur time.Duration) format.
 func renderFailingTest(lines []string, stderr []byte) format.Rendered {
 	var kept []string
 	var coverage []string
-	var okOthers, notfCount int
+	var okOthers, notfCount, passedTests, progress int
 	inFailBlock := false
 
 	for _, l := range lines {
@@ -134,8 +141,14 @@ func renderFailingTest(lines []string, stderr []byte) format.Rendered {
 			kept = append(kept, l)
 		case strings.HasPrefix(l, "--- PASS"):
 			inFailBlock = false
+			passedTests++
+		case strings.HasPrefix(strings.TrimLeft(l, " "), "--- PASS"):
+			// A passing subtest. Its indented output (if any) stays: it is
+			// not attributable to pass or fail from the text alone.
+			passedTests++
 		case strings.HasPrefix(l, "=== RUN"), strings.HasPrefix(l, "=== PAUSE"), strings.HasPrefix(l, "=== CONT"):
 			// verbose progress noise, not error signal.
+			progress++
 		case strings.HasPrefix(l, "FAIL\t") || strings.HasPrefix(l, "FAIL "):
 			inFailBlock = false
 			kept = append(kept, l)
@@ -157,6 +170,17 @@ func renderFailingTest(lines []string, stderr []byte) format.Rendered {
 		}
 	}
 
+	// The marker is the contract: dropped passing detail is always counted.
+	if passedTests > 0 || progress > 0 {
+		var parts []string
+		if passedTests > 0 {
+			parts = append(parts, fmt.Sprintf("…+%d passing tests", passedTests))
+		}
+		if progress > 0 {
+			parts = append(parts, fmt.Sprintf("progress lines ×%d", progress))
+		}
+		kept = append(kept, strings.Join(parts, "; "))
+	}
 	if okOthers > 0 {
 		kept = append(kept, fmt.Sprintf("ok: %d other packages", okOthers))
 	}

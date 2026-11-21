@@ -1,0 +1,12 @@
+
+playbook: ok.yml
+
+  play #1 (local): local	TAGS: []
+    tasks:
+      Create scratch dir	TAGS: []
+      Write config files	TAGS: []
+      Show a message	TAGS: []
+      Skipped task	TAGS: []
+      Check a thing (no change)	TAGS: []
+      Run command	TAGS: []
+      Debug loop	TAGS: []

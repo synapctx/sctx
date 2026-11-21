@@ -1,0 +1,15 @@
+WARNING: Storing migrations in 'sql' is not recommended and default scanning of this location may be deprecated in a future release
+Flyway OSS Edition 11.20.3 by Redgate
+
+See release notes here: https://rd.gt/416ObMi
+Database: jdbc:postgresql://db:5432/migr (PostgreSQL 17.12)
+Schema version: 3
+
++-----------+---------+------------------+------+---------------------+---------+----------+
+| Category  | Version | Description      | Type | Installed On        | State   | Undoable |
++-----------+---------+------------------+------+---------------------+---------+----------+
+| Versioned | 1       | create customers | SQL  | 2026-11-21 02:38:01 | Success | No       |
+| Versioned | 2       | create orders    | SQL  | 2026-11-21 02:38:01 | Success | No       |
+| Versioned | 3       | add status       | SQL  | 2026-11-21 02:38:01 | Success | No       |
++-----------+---------+------------------+------+---------------------+---------+----------+
+

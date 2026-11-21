@@ -1,0 +1,25 @@
+cli/src/main/java/demo/cliSvc.java:3: warning: [rawtypes] found raw type: List
+cli/src/main/java/demo/cliSvc.java:3: warning: [rawtypes] found raw type: ArrayList
+2 warnings
+cli/src/test/java/demo/SvcTest.java:4: warning: [deprecation] v() in cliSvc has been deprecated
+1 warning
+core/src/main/java/demo/coreSvc.java:3: warning: [rawtypes] found raw type: List
+core/src/main/java/demo/coreSvc.java:3: warning: [rawtypes] found raw type: ArrayList
+2 warnings
+core/src/test/java/demo/SvcTest.java:4: warning: [deprecation] v() in coreSvc has been deprecated
+1 warning
+web/src/main/java/demo/webSvc.java:3: warning: [rawtypes] found raw type: List
+web/src/main/java/demo/webSvc.java:3: warning: [rawtypes] found raw type: ArrayList
+2 warnings
+web/src/test/java/demo/SvcTest.java:4: warning: [deprecation] v() in webSvc has been deprecated
+1 warning
+FAILED :web:test
+SvcTest > a() FAILED
+    org.opentest4j.AssertionFailedError at SvcTest.java:4
+2 tests completed, 1 failed
+What went wrong:
+Execution failed for task ':web:test'.
+> There were failing tests. See the report at: web/build/reports/tests/test/index.html
+BUILD FAILED in 2s
+12 actionable tasks: 12 executed
+…+73 lines elided (30 task lines, 38 noise, 5 help)

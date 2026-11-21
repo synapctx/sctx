@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
+	"github.com/synapctx/sctx/internal/platform/difffloor"
 )
 
 // Relaxed applies a generic blank/dupe line filter: drop blank lines and
@@ -21,6 +22,10 @@ func (f *Formatter) Relaxed(_ context.Context, in format.Input) (format.Rendered
 	}
 
 	lines := splitLines(raw)
+	if looksUnified(lines) && (!difffloor.Text(raw) || difffloor.Below(len(lines))) {
+		// A diff is edit source material: small or non-text ones go verbatim.
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	out := filterRelaxedLines(lines)
 	if len(out) == 0 {
 		// Filtering removed everything (pure noise); never emit an empty

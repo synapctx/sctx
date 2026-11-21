@@ -1,0 +1,37 @@
+Previewing update (dev):
+
+ ++ random:index:RandomPet pet create replacement [diff: ~length]
+ +- random:index:RandomPet pet replace [diff: ~length]
+ ++ random:index:RandomId id1 create replacement [diff: ~byteLength]
+ +- random:index:RandomId id1 replace [diff: ~byteLength]
+ -- random:index:RandomId id1 delete original [diff: ~byteLength]
+ -- random:index:RandomPet pet delete original [diff: ~length]
+    pulumi:pulumi:Stack demo-dev  
+Resources:
+    +-2 to replace
+    2 unchanged
+
+Updating (dev):
+
+ ++ random:index:RandomPet pet creating replacement (0s) [diff: ~length]
+ ++ random:index:RandomId id1 creating replacement (0s) [diff: ~byteLength]
+ ++ random:index:RandomPet pet created replacement (0.00s) [diff: ~length]
+ ++ random:index:RandomId id1 created replacement (0.00s) [diff: ~byteLength]
+ +- random:index:RandomPet pet replacing (0s) [diff: ~length]
+ +- random:index:RandomPet pet replaced (0.00s) [diff: ~length]
+ +- random:index:RandomId id1 replacing (0s) [diff: ~byteLength]
+ +- random:index:RandomId id1 replaced (0.00s) [diff: ~byteLength]
+ -- random:index:RandomPet pet deleting original (0s) [diff: ~length]
+ -- random:index:RandomId id1 deleting original (0s) [diff: ~byteLength]
+ -- random:index:RandomPet pet deleted original (0.00s) [diff: ~length]
+ -- random:index:RandomId id1 deleted original (0.00s) [diff: ~byteLength]
+    pulumi:pulumi:Stack demo-dev  
+Outputs:
+  ~ petName: "bursting-parrot" => "honestly-glorious-haddock"
+
+Resources:
+    +-2 replaced
+    2 unchanged
+
+Duration: 1s
+

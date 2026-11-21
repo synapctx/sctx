@@ -1,0 +1,11 @@
+==> demo
+== Compilation error in file lib/demo.ex ==
+** (MismatchedDelimiterError) mismatched delimiter found on lib/demo.ex:10:1:
+error: unexpected reserved word: end
+  7 │   def syn(x do
+    │          └ unclosed delimiter
+ 10 │ end
+    │ └ mismatched closing delimiter (expected ")")
+    └─ lib/demo.ex:10:1
+    (elixir 1.17.3) lib/kernel/parallel_compiler.ex:429: anonymous fn/5 in Kernel.ParallelCompiler.spawn_workers/8
+…+9 lines (compile progress, source excerpts, diffs, blanks)

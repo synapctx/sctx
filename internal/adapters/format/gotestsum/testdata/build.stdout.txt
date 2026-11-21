@@ -1,0 +1,16 @@
+✖  buildpkg
+✓  okpkg (cached)
+
+=== Skipped
+=== SKIP: okpkg TestSkip (0.00s)
+    ok_test.go:18: later
+
+=== Failed
+=== FAIL: buildpkg  (0.00s)
+FAIL	example.com/ts/buildpkg [build failed]
+
+=== Errors
+buildpkg/b.go:3:23: cannot use "x" (untyped string constant) as int value in return statement
+
+
+DONE 4 tests, 1 skipped, 1 failure, 1 error in 0.000s

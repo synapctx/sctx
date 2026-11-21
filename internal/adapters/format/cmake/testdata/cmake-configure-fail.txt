@@ -1,0 +1,26 @@
+-- The C compiler identification is AppleClang 21.0.0.21000401
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: /usr/bin/cc - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+CMake Error at CMakeLists.txt:3 (find_package):
+  By not providing "FindNoSuchPkg.cmake" in CMAKE_MODULE_PATH this project
+  has asked CMake to find a package configuration file provided by
+  "NoSuchPkg", but CMake did not find one.
+
+  Could not find a package configuration file provided by "NoSuchPkg" with
+  any of the following names:
+
+    NoSuchPkg.cps
+    nosuchpkg.cps
+    NoSuchPkgConfig.cmake
+    nosuchpkg-config.cmake
+
+  Add the installation prefix of "NoSuchPkg" to CMAKE_PREFIX_PATH or set
+  "NoSuchPkg_DIR" to a directory containing one of the above files.  If
+  "NoSuchPkg" provides a separate development package or SDK, be sure it has
+  been installed.
+
+
+-- Configuring incomplete, errors occurred!

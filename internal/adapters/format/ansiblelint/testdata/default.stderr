@@ -1,0 +1,16 @@
+WARNING  Listing 16 violation(s) that are fatal
+Read documentation for instructions on how to ignore specific rule violations.
+
+# Rule Violation Summary
+
+  1 command-instead-of-shell profile:basic tags:command-shell,idiom
+  2 no-free-form profile:basic tags:syntax,risk
+  3 name profile:basic tags:idiom
+  1 name profile:basic tags:idiom
+  1 name profile:basic tags:idiom
+  1 package-latest profile:basic tags:idempotency
+  1 risky-file-permissions profile:basic tags:unpredictability
+  2 no-changed-when profile:basic tags:command-shell,idempotency
+  4 fqcn profile:basic tags:formatting
+
+Failed: 16 failure(s), 0 warning(s) in 1 files processed of 1 encountered. Last profile that met the validation criteria was 'min'.

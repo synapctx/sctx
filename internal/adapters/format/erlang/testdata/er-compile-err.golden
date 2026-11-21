@@ -1,0 +1,4 @@
+===> Compiling src/demo.erl failed
+src/demo.erl:5: syntax error before:
+src/demo.erl:4: Warning: variable 'B' is unused
+…+11 lines (rebar3 chatter, progress, diagnostic box furniture, OTP frames, blanks)

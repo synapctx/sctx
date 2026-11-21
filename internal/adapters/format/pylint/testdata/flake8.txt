@@ -1,0 +1,23 @@
+pkg/core.py:1:1: F401 'os' imported but unused
+pkg/core.py:2:1: F401 'sys' imported but unused
+pkg/core.py:5:1: E302 expected 2 blank lines, found 1
+pkg/core.py:8:1: E302 expected 2 blank lines, found 1
+pkg/core.py:11:1: E302 expected 2 blank lines, found 1
+pkg/core.py:14:1: E302 expected 2 blank lines, found 1
+pkg/core.py:18:1: E305 expected 2 blank lines after class or function definition, found 1
+pkg/core.py:19:1: F821 undefined name 'undefined_fn'
+pkg/ugly.py:1:1: F401 'os' imported but unused
+pkg/ugly.py:1:1: F401 'sys' imported but unused
+pkg/ugly.py:1:7: E271 multiple spaces after keyword
+pkg/ugly.py:1:11: E401 multiple imports on one line
+pkg/ugly.py:1:11: E231 missing whitespace after ','
+pkg/ugly.py:2:1: E302 expected 2 blank lines, found 0
+pkg/ugly.py:2:7: E201 whitespace after '('
+pkg/ugly.py:2:9: E231 missing whitespace after ','
+pkg/ugly.py:2:11: E202 whitespace before ')'
+pkg/ugly.py:3:16: E231 missing whitespace after ':'
+pkg/ugly.py:4:9: E128 continuation line under-indented for visual indent
+pkg/ugly.py:4:12: E231 missing whitespace after ':'
+pkg/ugly.py:5:1: E305 expected 2 blank lines after class or function definition, found 0
+pkg/ugly.py:5:7: E231 missing whitespace after ','
+pkg/ugly.py:6:3: E128 continuation line under-indented for visual indent

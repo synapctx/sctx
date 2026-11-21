@@ -1,0 +1,4 @@
+go build ./...
+# example.com/demo
+./bad.go:2:23: cannot use "x" (untyped string constant) as int value in return statement
+error: recipe `build` failed on line 4 with exit code 1

@@ -1,0 +1,17 @@
+Computing main repo mapping: 
+Loading: 
+Loading: 0 packages loaded
+Analyzing: target //pkg:pass_test (0 packages loaded, 0 targets configured)
+Analyzing: target //pkg:pass_test (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed target //pkg:pass_test (0 packages loaded, 0 targets configured).
+INFO: Found 1 test target...
+Target //pkg:pass_test up-to-date:
+  bazel-bin/pkg/pass_test
+INFO: Elapsed time: 0.143s, Critical Path: 0.00s
+INFO: 1 process: 1 internal.
+INFO: Build completed successfully, 1 total action
+//pkg:pass_test                                                 (cached) PASSED in 0.0s
+
+Executed 0 out of 1 test: 1 test passes.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.

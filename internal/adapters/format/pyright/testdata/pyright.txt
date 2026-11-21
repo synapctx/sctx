@@ -1,0 +1,11 @@
+/work/proj/pkg/core.py
+  /work/proj/pkg/core.py:12:12 - error: Type "int" is not assignable to return type "str"
+    "int" is not assignable to "str" (reportReturnType)
+  /work/proj/pkg/core.py:16:15 - error: Cannot access attribute "bit_length" for class "None"
+    Attribute "bit_length" is unknown (reportAttributeAccessIssue)
+  /work/proj/pkg/core.py:18:15 - error: Type "str" is not assignable to declared type "int"
+    "str" is not assignable to "int" (reportAssignmentType)
+  /work/proj/pkg/core.py:19:1 - error: "undefined_fn" is not defined (reportUndefinedVariable)
+  /work/proj/pkg/core.py:20:5 - error: Argument of type "Literal['a']" cannot be assigned to parameter "a" of type "int" in function "add"
+    "Literal['a']" is not assignable to "int" (reportArgumentType)
+5 errors, 0 warnings, 0 informations

@@ -1,0 +1,36 @@
+test
++- run test 2/4 passed, 2 failed
+error: 'main.test.adds wrong' failed: expected 4, found 3
+/usr/lib/zig/std/testing.zig:93:17: 0x104e61f in expectEqualInner__anon_1051 (test)
+                return error.TestExpectedEqual;
+                ^
+/work/proj/src/main.zig:5:21: 0x104e887 in test.adds wrong (test)
+test "adds wrong" { try std.testing.expectEqual(@as(i32, 4), add(1, 2)); }
+                    ^
+error: 'main.test.slices' failed: ====== expected this output: =========
+hello␃
+
+======== instead found this: =========
+hellp␃
+
+======================================
+First difference occurs on line 1:
+expected:
+hello
+    ^ ('\x6f')
+found:
+hellp
+    ^ ('\x70')
+/usr/lib/zig/std/testing.zig:622:9: 0x104ea3b in expectEqualStrings (test)
+        return error.TestExpectedEqual;
+        ^
+/work/proj/src/main.zig:6:17: 0x104f5ef in test.slices (test)
+test "slices" { try std.testing.expectEqualStrings("hello", "hellp"); }
+                ^
+error: while executing test 'main.test.ok2', the following test command failed:
+/tmp/zl/o/12643256e8f4d3bf5022b71a098e2425/test --listen=- 
+Build Summary: 1/3 steps succeeded; 1 failed; 2/4 tests passed; 2 failed (disable with --summary none)
+test transitive failure
++- run test 2/4 passed, 2 failed
+error: the following build command failed with exit code 1:
+/tmp/zl/o/214ea9a58bc60a130f2bd8035590509c/build /usr/bin/zig /work/proj /tmp/zl /tmp/zc --seed 0x4a7f66d3 -Z06a48455db784b60 test

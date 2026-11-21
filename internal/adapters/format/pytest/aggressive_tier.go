@@ -16,6 +16,10 @@ var bannerRE = regexp.MustCompile(`^={3,}.+={3,}$`)
 // inside the FAILURES/ERRORS sections.
 var underscoreRE = regexp.MustCompile(`^_{3,}.+_{3,}$`)
 
+// plainSummaryRE matches the banner-less verdict line `pytest -q` prints:
+// "3 failed, 3 passed, 1 skipped in 0.02s" (optionally with "(0:00:01)").
+var plainSummaryRE = regexp.MustCompile(`^(\d+ [a-z]+( \(\d+\))?(, \d+ [a-z]+( \(\d+\))?)*|no tests ran) in \d+(\.\d+)?s( \(\d+:\d{2}:\d{2}\))?$`)
+
 // durationRE matches the "in 1.23s" fragment carried by the final summary
 // banner, distinguishing it from section banners like "=== FAILURES ===".
 var durationRE = regexp.MustCompile(`in \d+(\.\d+)?s`)
@@ -49,6 +53,11 @@ func aggressiveRender(in format.Input) (format.Rendered, error) {
 		return renderClean(summary, stderr), nil
 	}
 
+	if summary == "" {
+		// No final result line: an interrupted or foreign run. Rendering
+		// failure blocks without a verdict could hide why it stopped.
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	return renderWithFailures(lines, summary, summaryIdx, stderr), nil
 }
 
@@ -57,11 +66,20 @@ func aggressiveRender(in format.Input) (format.Rendered, error) {
 // the aggressive tier does not apply and the chain should degrade.
 func looksLikePytest(lines []string, stderr string) bool {
 	for _, l := range lines {
-		if bannerRE.MatchString(strings.TrimSpace(l)) {
+		if isPytestBanner(strings.TrimSpace(l)) {
 			return true
 		}
 	}
-	return bannerRE.MatchString(strings.TrimSpace(stderr))
+	for _, l := range slices.Backward(lines) {
+		if strings.TrimSpace(l) == "" {
+			continue
+		}
+		if plainSummaryRE.MatchString(strings.TrimSpace(l)) {
+			return true
+		}
+		break
+	}
+	return isPytestBanner(strings.TrimSpace(stderr))
 }
 
 // finalSummary returns the last banner line carrying a "in X.Ys" duration
@@ -73,6 +91,18 @@ func finalSummary(lines []string) (string, int) {
 		if bannerRE.MatchString(l) && durationRE.MatchString(l) {
 			return l, i
 		}
+	}
+	// -q drops the "=== ... ===" padding: the verdict is the bare last line,
+	// e.g. "3 failed, 3 passed in 0.02s".
+	for i, line := range slices.Backward(lines) {
+		l := strings.TrimSpace(line)
+		if l == "" {
+			continue
+		}
+		if plainSummaryRE.MatchString(l) {
+			return l, i
+		}
+		break
 	}
 	return "", -1
 }
@@ -129,6 +159,8 @@ func renderWithFailures(lines []string, summary string, summaryIdx int, stderr [
 	cur := sectionPreamble
 	droppedInBlock := 0
 	inBlock := false
+	skipFrame := false
+	passedRows := 0
 
 	flushDrop := func() {
 		if droppedInBlock > 0 {
@@ -170,10 +202,32 @@ func renderWithFailures(lines []string, summary string, summaryIdx int, stderr [
 			if underscoreRE.MatchString(trimmed) {
 				flushDrop()
 				inBlock = true
-				kept = append(kept, l)
+				kept = append(kept, shortHeader(trimmed))
+				skipFrame = false
 				continue
 			}
 			if !inBlock {
+				continue
+			}
+			// The interpreter's own import machinery frame ("importlib/__init__.py:88:
+			// in import_module" and its source/caret lines) is the same boilerplate
+			// in every collection error; the user's frames follow it.
+			if importlibFrameRE.MatchString(trimmed) {
+				skipFrame = true
+				droppedInBlock++
+				continue
+			}
+			if skipFrame {
+				if strings.HasPrefix(l, "    ") {
+					droppedInBlock++
+					continue
+				}
+				skipFrame = false
+			}
+			// The failing source line ("> assert add(1, 2) == 4") names the
+			// statement that failed; the E lines only give its values.
+			if strings.HasPrefix(trimmed, ">") {
+				kept = append(kept, l)
 				continue
 			}
 			if strings.HasPrefix(trimmed, "E ") || strings.HasPrefix(trimmed, "E\t") ||
@@ -181,7 +235,7 @@ func renderWithFailures(lines []string, summary string, summaryIdx int, stderr [
 				kept = append(kept, l)
 				continue
 			}
-			if cur == sectionErrors && trimmed != "" && !strings.HasPrefix(trimmed, ">") {
+			if cur == sectionErrors && trimmed != "" {
 				// Collection errors are usually short; keep the plain
 				// message lines (e.g. "ImportError: ...") verbatim.
 				kept = append(kept, l)
@@ -192,12 +246,24 @@ func renderWithFailures(lines []string, summary string, summaryIdx int, stderr [
 			}
 			droppedInBlock++
 		case sectionSummaryInfo:
+			if strings.HasPrefix(trimmed, "PASSED ") {
+				// -rA lists every passing test; the final line already counts them.
+				passedRows++
+				continue
+			}
+			if passedRows > 0 {
+				kept = append(kept, fmt.Sprintf("PASSED ×%d", passedRows))
+				passedRows = 0
+			}
 			if trimmed != "" {
 				kept = append(kept, l)
 			}
 		}
 	}
 	flushDrop()
+	if passedRows > 0 {
+		kept = append(kept, fmt.Sprintf("PASSED ×%d", passedRows))
+	}
 
 	body := strings.Join(kept, "\n")
 	if body != "" {
@@ -236,4 +302,24 @@ func isFileLineRef(trimmed string) bool {
 // returning just its inner text.
 func bannerText(line string) string {
 	return strings.TrimSpace(strings.Trim(strings.TrimSpace(line), "="))
+}
+
+// isPytestBanner reports a "=== text ===" banner that carries words; a bare
+// rule of '=' signs (unittest's separator, a Markdown heading) is not pytest.
+func isPytestBanner(l string) bool {
+	return bannerRE.MatchString(l) && strings.ContainsAny(l, "abcdefghijklmnopqrstuvwxyz")
+}
+
+// importlibFrameRE matches the "…/importlib/__init__.py:88: in import_module"
+// frame pytest prints at the top of every ImportError during collection.
+var importlibFrameRE = regexp.MustCompile(`/importlib/__init__\.py:\d+: in import_module$`)
+
+// shortHeader reduces "____ test_x ____" (padded to 80 columns) to
+// "___ test_x ___".
+func shortHeader(trimmed string) string {
+	name := strings.TrimSpace(strings.Trim(trimmed, "_"))
+	if name == "" {
+		return trimmed
+	}
+	return "___ " + name + " ___"
 }

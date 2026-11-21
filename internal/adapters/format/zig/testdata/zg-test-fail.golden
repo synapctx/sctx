@@ -1,0 +1,23 @@
+test
++- run test 2/4 passed, 2 failed
+error: 'main.test.adds wrong' failed: expected 4, found 3
+/work/proj/src/main.zig:5:21: 0x104e887 in test.adds wrong (test)
+error: 'main.test.slices' failed: ====== expected this output: =========
+hello␃
+
+======== instead found this: =========
+hellp␃
+
+======================================
+First difference occurs on line 1:
+expected:
+hello
+    ^ ('\x6f')
+found:
+hellp
+    ^ ('\x70')
+/work/proj/src/main.zig:6:17: 0x104f5ef in test.slices (test)
+error: while executing test 'main.test.ok2', the following test command failed:
+Build Summary: 1/3 steps succeeded; 1 failed; 2/4 tests passed; 2 failed (disable with --summary none)
+error: the following build command failed with exit code 1:
+…+14 lines (step tree, command lines, passing tests, std frames, source echoes)

@@ -1,0 +1,14 @@
+ERROR: (gcloud.services.list) [dev.user@example.com] does not have permission to access projects instance [acmecorp-production-0a1b2c] (or it may not exist): Permission denied to list services for consumer container [projects/acmecorp-production-0a1b2c]
+Help Token: AbCdEf0123456789ExampleTokenNotReal. This command is authenticated as dev.user@example.com which is the active account specified by the [core/account] property
+- '@type': type.googleapis.com/google.rpc.PreconditionFailure
+  violations:
+  - subject: ?error_code=110002&service=cloudresourcemanager.googleapis.com&permission=serviceusage.services.list&error_info_id=ExampleErrorInfoIdNotReal
+    type: googleapis.com
+- '@type': type.googleapis.com/google.rpc.ErrorInfo
+  domain: serviceusage.googleapis.com
+  metadata:
+    error_info_id: ExampleErrorInfoIdNotReal
+    permission: serviceusage.services.list
+    service: cloudresourcemanager.googleapis.com
+    troubleshooter_url: https://console.cloud.google.com/iam-admin/troubleshooter/summary;errorId=ExampleErrorInfoIdNotReal
+  reason: AUTH_PERMISSION_DENIED

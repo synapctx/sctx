@@ -1,0 +1,13 @@
+docs:
+d1.md
+d3.md
+d4.md
+d5.md
+d6.md
+d7.md
+d8.md
+
+logs:
+app.log
+dups.log
+events.jsonl

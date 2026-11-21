@@ -1,0 +1,5 @@
+Rocky Linux 9 - BaseOS                          5.9 MB/s | 3.3 MB     00:00    
+Rocky Linux 9 - AppStream                       9.0 MB/s |  10 MB     00:01    
+Rocky Linux 9 - Extras                           55 kB/s |  18 kB     00:00    
+No match for argument: nosuchpkg-xyz
+Error: Unable to find a match: nosuchpkg-xyz

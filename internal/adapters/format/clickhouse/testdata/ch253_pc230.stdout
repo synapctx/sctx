@@ -1,0 +1,232 @@
+     ┌──id─┬─customer_id─┬─status───┬──────────────total─┬─note───────────┐
+  1. │   1 │           1 │ paid     │               3.17 │ order note 1   │
+  2. │   2 │           2 │ pending  │               6.34 │ order note 2   │
+  3. │   3 │           3 │ failed   │               9.51 │ order note 3   │
+  4. │   4 │           4 │ refunded │              12.68 │ order note 4   │
+  5. │   5 │           5 │ paid     │              15.85 │ order note 5   │
+  6. │   6 │           6 │ pending  │              19.02 │ order note 6   │
+  7. │   7 │           7 │ failed   │ 22.189999999999998 │ ᴺᵁᴸᴸ           │
+  8. │   8 │           8 │ refunded │              25.36 │ order note 8   │
+  9. │   9 │           9 │ paid     │              28.53 │ order note 9   │
+ 10. │  10 │          10 │ pending  │               31.7 │ order note 10  │
+ 11. │  11 │          11 │ failed   │              34.87 │ order note 11  │
+ 12. │  12 │          12 │ refunded │              38.04 │ order note 12  │
+ 13. │  13 │          13 │ paid     │              41.21 │ order note 13  │
+ 14. │  14 │          14 │ pending  │ 44.379999999999995 │ ᴺᵁᴸᴸ           │
+ 15. │  15 │          15 │ failed   │              47.55 │ order note 15  │
+ 16. │  16 │          16 │ refunded │              50.72 │ order note 16  │
+ 17. │  17 │          17 │ paid     │              53.89 │ order note 17  │
+ 18. │  18 │          18 │ pending  │              57.06 │ order note 18  │
+ 19. │  19 │          19 │ failed   │              60.23 │ order note 19  │
+ 20. │  20 │          20 │ refunded │               63.4 │ order note 20  │
+ 21. │  21 │          21 │ paid     │              66.57 │ ᴺᵁᴸᴸ           │
+ 22. │  22 │          22 │ pending  │              69.74 │ order note 22  │
+ 23. │  23 │          23 │ failed   │              72.91 │ order note 23  │
+ 24. │  24 │          24 │ refunded │              76.08 │ order note 24  │
+ 25. │  25 │          25 │ paid     │              79.25 │ order note 25  │
+ 26. │  26 │          26 │ pending  │              82.42 │ order note 26  │
+ 27. │  27 │          27 │ failed   │              85.59 │ order note 27  │
+ 28. │  28 │          28 │ refunded │  88.75999999999999 │ ᴺᵁᴸᴸ           │
+ 29. │  29 │          29 │ paid     │  91.92999999999999 │ order note 29  │
+ 30. │  30 │          30 │ pending  │               95.1 │ order note 30  │
+ 31. │  31 │          31 │ failed   │              98.27 │ order note 31  │
+ 32. │  32 │          32 │ refunded │             101.44 │ order note 32  │
+ 33. │  33 │          33 │ paid     │             104.61 │ order note 33  │
+ 34. │  34 │          34 │ pending  │             107.78 │ order note 34  │
+ 35. │  35 │          35 │ failed   │             110.95 │ ᴺᵁᴸᴸ           │
+ 36. │  36 │          36 │ refunded │             114.12 │ order note 36  │
+ 37. │  37 │          37 │ paid     │ 117.28999999999999 │ order note 37  │
+ 38. │  38 │          38 │ pending  │             120.46 │ order note 38  │
+ 39. │  39 │          39 │ failed   │             123.63 │ order note 39  │
+ 40. │  40 │          40 │ refunded │              126.8 │ order note 40  │
+ 41. │  41 │          41 │ paid     │             129.97 │ order note 41  │
+ 42. │  42 │          42 │ pending  │             133.14 │ ᴺᵁᴸᴸ           │
+ 43. │  43 │          43 │ failed   │             136.31 │ order note 43  │
+ 44. │  44 │          44 │ refunded │             139.48 │ order note 44  │
+ 45. │  45 │          45 │ paid     │             142.65 │ order note 45  │
+ 46. │  46 │          46 │ pending  │             145.82 │ order note 46  │
+ 47. │  47 │          47 │ failed   │             148.99 │ order note 47  │
+ 48. │  48 │          48 │ refunded │             152.16 │ order note 48  │
+ 49. │  49 │          49 │ paid     │ 155.32999999999998 │ ᴺᵁᴸᴸ           │
+ 50. │  50 │          50 │ pending  │              158.5 │ order note 50  │
+ 51. │  51 │          51 │ failed   │             161.67 │ order note 51  │
+ 52. │  52 │          52 │ refunded │             164.84 │ order note 52  │
+ 53. │  53 │          53 │ paid     │             168.01 │ order note 53  │
+ 54. │  54 │          54 │ pending  │             171.18 │ order note 54  │
+ 55. │  55 │          55 │ failed   │             174.35 │ order note 55  │
+ 56. │  56 │          56 │ refunded │ 177.51999999999998 │ ᴺᵁᴸᴸ           │
+ 57. │  57 │          57 │ paid     │             180.69 │ order note 57  │
+ 58. │  58 │          58 │ pending  │ 183.85999999999999 │ order note 58  │
+ 59. │  59 │          59 │ failed   │             187.03 │ order note 59  │
+ 60. │  60 │          60 │ refunded │              190.2 │ order note 60  │
+ 61. │  61 │          61 │ paid     │             193.37 │ order note 61  │
+ 62. │  62 │          62 │ pending  │             196.54 │ order note 62  │
+ 63. │  63 │          63 │ failed   │             199.71 │ ᴺᵁᴸᴸ           │
+ 64. │  64 │          64 │ refunded │             202.88 │ order note 64  │
+ 65. │  65 │          65 │ paid     │ 206.04999999999998 │ order note 65  │
+ 66. │  66 │          66 │ pending  │             209.22 │ order note 66  │
+ 67. │  67 │          67 │ failed   │             212.39 │ order note 67  │
+ 68. │  68 │          68 │ refunded │             215.56 │ order note 68  │
+ 69. │  69 │          69 │ paid     │             218.73 │ order note 69  │
+ 70. │  70 │          70 │ pending  │              221.9 │ ᴺᵁᴸᴸ           │
+ 71. │  71 │          71 │ failed   │             225.07 │ order note 71  │
+ 72. │  72 │          72 │ refunded │             228.24 │ order note 72  │
+ 73. │  73 │          73 │ paid     │             231.41 │ order note 73  │
+ 74. │  74 │          74 │ pending  │ 234.57999999999998 │ order note 74  │
+ 75. │  75 │          75 │ failed   │             237.75 │ order note 75  │
+ 76. │  76 │          76 │ refunded │             240.92 │ order note 76  │
+ 77. │  77 │          77 │ paid     │             244.09 │ ᴺᵁᴸᴸ           │
+ 78. │  78 │          78 │ pending  │             247.26 │ order note 78  │
+ 79. │  79 │          79 │ failed   │             250.43 │ order note 79  │
+ 80. │  80 │          80 │ refunded │              253.6 │ order note 80  │
+ 81. │  81 │          81 │ paid     │             256.77 │ order note 81  │
+ 82. │  82 │          82 │ pending  │             259.94 │ order note 82  │
+ 83. │  83 │          83 │ failed   │             263.11 │ order note 83  │
+ 84. │  84 │          84 │ refunded │             266.28 │ ᴺᵁᴸᴸ           │
+ 85. │  85 │          85 │ paid     │             269.45 │ order note 85  │
+ 86. │  86 │          86 │ pending  │             272.62 │ order note 86  │
+ 87. │  87 │          87 │ failed   │             275.79 │ order note 87  │
+ 88. │  88 │          88 │ refunded │             278.96 │ order note 88  │
+ 89. │  89 │          89 │ paid     │             282.13 │ order note 89  │
+ 90. │  90 │          90 │ pending  │              285.3 │ order note 90  │
+ 91. │  91 │          91 │ failed   │ 288.46999999999997 │ ᴺᵁᴸᴸ           │
+ 92. │  92 │          92 │ refunded │             291.64 │ order note 92  │
+ 93. │  93 │          93 │ paid     │             294.81 │ order note 93  │
+ 94. │  94 │          94 │ pending  │             297.98 │ order note 94  │
+ 95. │  95 │          95 │ failed   │             301.15 │ order note 95  │
+ 96. │  96 │          96 │ refunded │             304.32 │ order note 96  │
+ 97. │  97 │          97 │ paid     │             307.49 │ order note 97  │
+ 98. │  98 │          98 │ pending  │ 310.65999999999997 │ ᴺᵁᴸᴸ           │
+ 99. │  99 │          99 │ failed   │             313.83 │ order note 99  │
+100. │ 100 │         100 │ refunded │                317 │ order note 100 │
+101. │ 101 │         101 │ paid     │             320.17 │ order note 101 │
+102. │ 102 │         102 │ pending  │             323.34 │ order note 102 │
+103. │ 103 │         103 │ failed   │             326.51 │ order note 103 │
+104. │ 104 │         104 │ refunded │             329.68 │ order note 104 │
+105. │ 105 │         105 │ paid     │ 332.84999999999997 │ ᴺᵁᴸᴸ           │
+106. │ 106 │         106 │ pending  │             336.02 │ order note 106 │
+107. │ 107 │         107 │ failed   │             339.19 │ order note 107 │
+108. │ 108 │         108 │ refunded │             342.36 │ order note 108 │
+109. │ 109 │         109 │ paid     │             345.53 │ order note 109 │
+110. │ 110 │         110 │ pending  │              348.7 │ order note 110 │
+111. │ 111 │         111 │ failed   │             351.87 │ order note 111 │
+112. │ 112 │         112 │ refunded │ 355.03999999999996 │ ᴺᵁᴸᴸ           │
+113. │ 113 │         113 │ paid     │             358.21 │ order note 113 │
+114. │ 114 │         114 │ pending  │             361.38 │ order note 114 │
+115. │ 115 │         115 │ failed   │             364.55 │ order note 115 │
+116. │ 116 │         116 │ refunded │ 367.71999999999997 │ order note 116 │
+117. │ 117 │         117 │ paid     │             370.89 │ order note 117 │
+118. │ 118 │         118 │ pending  │             374.06 │ order note 118 │
+119. │ 119 │         119 │ failed   │             377.23 │ ᴺᵁᴸᴸ           │
+120. │ 120 │         120 │ refunded │              380.4 │ order note 120 │
+121. │ 121 │         121 │ paid     │             383.57 │ order note 121 │
+122. │ 122 │         122 │ pending  │             386.74 │ order note 122 │
+123. │ 123 │         123 │ failed   │ 389.90999999999997 │ order note 123 │
+124. │ 124 │         124 │ refunded │             393.08 │ order note 124 │
+125. │ 125 │         125 │ paid     │             396.25 │ order note 125 │
+126. │ 126 │         126 │ pending  │             399.42 │ ᴺᵁᴸᴸ           │
+127. │ 127 │         127 │ failed   │             402.59 │ order note 127 │
+128. │ 128 │         128 │ refunded │             405.76 │ order note 128 │
+129. │ 129 │         129 │ paid     │             408.93 │ order note 129 │
+130. │ 130 │         130 │ pending  │ 412.09999999999997 │ order note 130 │
+131. │ 131 │         131 │ failed   │             415.27 │ order note 131 │
+132. │ 132 │         132 │ refunded │             418.44 │ order note 132 │
+133. │ 133 │         133 │ paid     │             421.61 │ ᴺᵁᴸᴸ           │
+134. │ 134 │         134 │ pending  │             424.78 │ order note 134 │
+135. │ 135 │         135 │ failed   │             427.95 │ order note 135 │
+136. │ 136 │         136 │ refunded │             431.12 │ order note 136 │
+137. │ 137 │         137 │ paid     │ 434.28999999999996 │ order note 137 │
+138. │ 138 │         138 │ pending  │             437.46 │ order note 138 │
+139. │ 139 │         139 │ failed   │             440.63 │ order note 139 │
+140. │ 140 │         140 │ refunded │              443.8 │ ᴺᵁᴸᴸ           │
+141. │ 141 │         141 │ paid     │ 446.96999999999997 │ order note 141 │
+142. │ 142 │         142 │ pending  │             450.14 │ order note 142 │
+143. │ 143 │         143 │ failed   │             453.31 │ order note 143 │
+144. │ 144 │         144 │ refunded │             456.48 │ order note 144 │
+145. │ 145 │         145 │ paid     │             459.65 │ order note 145 │
+146. │ 146 │         146 │ pending  │             462.82 │ order note 146 │
+147. │ 147 │         147 │ failed   │             465.99 │ ᴺᵁᴸᴸ           │
+148. │ 148 │         148 │ refunded │ 469.15999999999997 │ order note 148 │
+149. │ 149 │         149 │ paid     │             472.33 │ order note 149 │
+150. │ 150 │         150 │ pending  │              475.5 │ order note 150 │
+151. │ 151 │         151 │ failed   │             478.67 │ order note 151 │
+152. │ 152 │         152 │ refunded │             481.84 │ order note 152 │
+153. │ 153 │         153 │ paid     │             485.01 │ order note 153 │
+154. │ 154 │         154 │ pending  │             488.18 │ ᴺᵁᴸᴸ           │
+155. │ 155 │         155 │ failed   │ 491.34999999999997 │ order note 155 │
+156. │ 156 │         156 │ refunded │             494.52 │ order note 156 │
+157. │ 157 │         157 │ paid     │             497.69 │ order note 157 │
+158. │ 158 │         158 │ pending  │             500.86 │ order note 158 │
+159. │ 159 │         159 │ failed   │             504.03 │ order note 159 │
+160. │ 160 │         160 │ refunded │              507.2 │ order note 160 │
+161. │ 161 │         161 │ paid     │             510.37 │ ᴺᵁᴸᴸ           │
+162. │ 162 │         162 │ pending  │             513.54 │ order note 162 │
+163. │ 163 │         163 │ failed   │             516.71 │ order note 163 │
+164. │ 164 │         164 │ refunded │             519.88 │ order note 164 │
+165. │ 165 │         165 │ paid     │             523.05 │ order note 165 │
+166. │ 166 │         166 │ pending  │             526.22 │ order note 166 │
+167. │ 167 │         167 │ failed   │             529.39 │ order note 167 │
+168. │ 168 │         168 │ refunded │             532.56 │ ᴺᵁᴸᴸ           │
+169. │ 169 │         169 │ paid     │             535.73 │ order note 169 │
+170. │ 170 │         170 │ pending  │              538.9 │ order note 170 │
+171. │ 171 │         171 │ failed   │  542.0699999999999 │ order note 171 │
+172. │ 172 │         172 │ refunded │             545.24 │ order note 172 │
+173. │ 173 │         173 │ paid     │             548.41 │ order note 173 │
+174. │ 174 │         174 │ pending  │             551.58 │ order note 174 │
+175. │ 175 │         175 │ failed   │             554.75 │ ᴺᵁᴸᴸ           │
+176. │ 176 │         176 │ refunded │             557.92 │ order note 176 │
+177. │ 177 │         177 │ paid     │             561.09 │ order note 177 │
+178. │ 178 │         178 │ pending  │             564.26 │ order note 178 │
+179. │ 179 │         179 │ failed   │             567.43 │ order note 179 │
+180. │ 180 │         180 │ refunded │              570.6 │ order note 180 │
+181. │ 181 │         181 │ paid     │             573.77 │ order note 181 │
+182. │ 182 │         182 │ pending  │  576.9399999999999 │ ᴺᵁᴸᴸ           │
+183. │ 183 │         183 │ failed   │             580.11 │ order note 183 │
+184. │ 184 │         184 │ refunded │             583.28 │ order note 184 │
+185. │ 185 │         185 │ paid     │  586.4499999999999 │ order note 185 │
+186. │ 186 │         186 │ pending  │             589.62 │ order note 186 │
+187. │ 187 │         187 │ failed   │             592.79 │ order note 187 │
+188. │ 188 │         188 │ refunded │             595.96 │ order note 188 │
+189. │ 189 │         189 │ paid     │             599.13 │ ᴺᵁᴸᴸ           │
+190. │ 190 │         190 │ pending  │              602.3 │ order note 190 │
+191. │ 191 │         191 │ failed   │             605.47 │ order note 191 │
+192. │ 192 │         192 │ refunded │             608.64 │ order note 192 │
+193. │ 193 │         193 │ paid     │             611.81 │ order note 193 │
+194. │ 194 │         194 │ pending  │             614.98 │ order note 194 │
+195. │ 195 │         195 │ failed   │             618.15 │ order note 195 │
+196. │ 196 │         196 │ refunded │  621.3199999999999 │ ᴺᵁᴸᴸ           │
+197. │ 197 │         197 │ paid     │             624.49 │ order note 197 │
+198. │ 198 │         198 │ pending  │             627.66 │ order note 198 │
+199. │ 199 │         199 │ failed   │             630.83 │ order note 199 │
+200. │ 200 │         200 │ refunded │                634 │ order note 200 │
+201. │ 201 │           1 │ paid     │             637.17 │ order note 201 │
+202. │ 202 │           2 │ pending  │             640.34 │ order note 202 │
+203. │ 203 │           3 │ failed   │             643.51 │ ᴺᵁᴸᴸ           │
+204. │ 204 │           4 │ refunded │             646.68 │ order note 204 │
+205. │ 205 │           5 │ paid     │             649.85 │ order note 205 │
+206. │ 206 │           6 │ pending  │             653.02 │ order note 206 │
+207. │ 207 │           7 │ failed   │  656.1899999999999 │ order note 207 │
+208. │ 208 │           8 │ refunded │             659.36 │ order note 208 │
+209. │ 209 │           9 │ paid     │             662.53 │ order note 209 │
+210. │ 210 │          10 │ pending  │  665.6999999999999 │ ᴺᵁᴸᴸ           │
+211. │ 211 │          11 │ failed   │             668.87 │ order note 211 │
+212. │ 212 │          12 │ refunded │             672.04 │ order note 212 │
+213. │ 213 │          13 │ paid     │             675.21 │ order note 213 │
+214. │ 214 │          14 │ pending  │             678.38 │ order note 214 │
+215. │ 215 │          15 │ failed   │             681.55 │ order note 215 │
+216. │ 216 │          16 │ refunded │             684.72 │ order note 216 │
+217. │ 217 │          17 │ paid     │             687.89 │ ᴺᵁᴸᴸ           │
+218. │ 218 │          18 │ pending  │             691.06 │ order note 218 │
+219. │ 219 │          19 │ failed   │             694.23 │ order note 219 │
+220. │ 220 │          20 │ refunded │              697.4 │ order note 220 │
+221. │ 221 │          21 │ paid     │  700.5699999999999 │ order note 221 │
+222. │ 222 │          22 │ pending  │             703.74 │ order note 222 │
+223. │ 223 │          23 │ failed   │             706.91 │ order note 223 │
+224. │ 224 │          24 │ refunded │  710.0799999999999 │ ᴺᵁᴸᴸ           │
+225. │ 225 │          25 │ paid     │             713.25 │ order note 225 │
+226. │ 226 │          26 │ pending  │             716.42 │ order note 226 │
+227. │ 227 │          27 │ failed   │             719.59 │ order note 227 │
+228. │ 228 │          28 │ refunded │             722.76 │ order note 228 │
+229. │ 229 │          29 │ paid     │             725.93 │ order note 229 │
+230. │ 230 │          30 │ pending  │              729.1 │ order note 230 │
+     └──id─┴─customer_id─┴─status───┴──────────────total─┴─note───────────┘

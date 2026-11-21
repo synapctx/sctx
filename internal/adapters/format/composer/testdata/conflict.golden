@@ -1,0 +1,11 @@
+./composer.json has been updated
+Running composer update psr/log
+Your requirements could not be resolved to an installable set of packages.
+Problem 1
+  - Root composer.json requires psr/log ^1.0, found psr/log[1.0.0, ..., 1.1.4] but these were not loaded, likely because it conflicts with another require.
+Problem 2
+  - monolog/monolog is locked to version 3.13.0 and an update of this package was not requested.
+  - monolog/monolog 3.13.0 requires psr/log ^2.0 || ^3.0 -> found psr/log[2.0.0, 3.0.0, 3.0.1, 3.0.2] but it conflicts with your root composer.json require (^1.0).
+Use the option --with-all-dependencies (-W) to allow upgrades, downgrades and removals for packages currently locked to specific versions.
+Installation failed, reverting ./composer.json and ./composer.lock to their original content.
+…+4 lines (progress, boilerplate)

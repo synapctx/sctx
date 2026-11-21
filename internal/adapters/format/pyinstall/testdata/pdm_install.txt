@@ -1,0 +1,32 @@
+WARNING: Lockfile does not exist
+Updating the lock file...
+WARNING: Project requires a python version of >=3.10, The virtualenv is being created for you as it cannot be matched to the right version.
+INFO: python.use_venv is on, creating a virtualenv for this project...
+Virtualenv is created successfully at /work/pdmp/.venv
+Changes are written to pdm.lock.
+  0:00:01 🔒 Lock successful.  
+STATUS: Resolving packages from lockfile...
+Synchronizing working set with resolved packages: 9 to add, 0 to update, 0 to remove
+
+  ✔ Install certifi 2026.11.20 successful
+  ✔ Install mdurl 0.1.2 successful
+  ✔ Install markdown-it-py 4.3.0 successful
+  ✔ Install urllib3 2.8.0 successful
+  ✔ Install idna 3.20 successful
+  ✔ Install charset-normalizer 3.5.2 successful
+  ✔ Install requests 2.34.2 successful
+  ✔ Install rich 15.0.0 successful
+  ✔ Install pygments 2.21.0 successful
+/tmp/build-env/lib/python3.15/site-packages/setuptools/command/editable_wheel.py:354: BuildBackendWarning: Editable installation.
+!!
+
+        ********************************************************************************
+        Please be careful with folders in your working directory with the same
+        name as your package as they may take precedence during imports.
+        ********************************************************************************
+
+!!
+  with strategy, WheelFile(wheel_path, "w") as wheel_obj:
+  ✔ Install clean 0.1.0 successful
+
+  0:00:00 🎉 All complete! 9/9

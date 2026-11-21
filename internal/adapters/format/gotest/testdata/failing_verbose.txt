@@ -1,0 +1,669 @@
+=== RUN   TestPass0
+--- PASS: TestPass0 (0.00s)
+=== RUN   TestPass1
+--- PASS: TestPass1 (0.00s)
+=== RUN   TestPass2
+--- PASS: TestPass2 (0.00s)
+=== RUN   TestPass3
+--- PASS: TestPass3 (0.00s)
+=== RUN   TestPass4
+--- PASS: TestPass4 (0.00s)
+=== RUN   TestPass5
+--- PASS: TestPass5 (0.00s)
+=== RUN   TestPass6
+--- PASS: TestPass6 (0.00s)
+=== RUN   TestPass7
+--- PASS: TestPass7 (0.00s)
+=== RUN   TestPass8
+--- PASS: TestPass8 (0.00s)
+=== RUN   TestPass9
+--- PASS: TestPass9 (0.00s)
+=== RUN   TestPass10
+--- PASS: TestPass10 (0.00s)
+=== RUN   TestPass11
+--- PASS: TestPass11 (0.00s)
+=== RUN   TestPass12
+--- PASS: TestPass12 (0.00s)
+=== RUN   TestPass13
+--- PASS: TestPass13 (0.00s)
+=== RUN   TestPass14
+--- PASS: TestPass14 (0.00s)
+=== RUN   TestPass15
+--- PASS: TestPass15 (0.00s)
+=== RUN   TestPass16
+--- PASS: TestPass16 (0.00s)
+=== RUN   TestPass17
+--- PASS: TestPass17 (0.00s)
+=== RUN   TestPass18
+--- PASS: TestPass18 (0.00s)
+=== RUN   TestPass19
+--- PASS: TestPass19 (0.00s)
+=== RUN   TestPass20
+--- PASS: TestPass20 (0.00s)
+=== RUN   TestPass21
+--- PASS: TestPass21 (0.00s)
+=== RUN   TestPass22
+--- PASS: TestPass22 (0.00s)
+=== RUN   TestPass23
+--- PASS: TestPass23 (0.00s)
+=== RUN   TestPass24
+--- PASS: TestPass24 (0.00s)
+=== RUN   TestPass25
+--- PASS: TestPass25 (0.00s)
+=== RUN   TestPass26
+--- PASS: TestPass26 (0.00s)
+=== RUN   TestPass27
+--- PASS: TestPass27 (0.00s)
+=== RUN   TestPass28
+--- PASS: TestPass28 (0.00s)
+=== RUN   TestPass29
+--- PASS: TestPass29 (0.00s)
+=== RUN   TestFail0
+    fx_test.go:33: Add(0,1) = 1, want 99
+--- FAIL: TestFail0 (0.00s)
+=== RUN   TestFail1
+    fx_test.go:34: Add(1,1) = 2, want 99
+--- FAIL: TestFail1 (0.00s)
+=== RUN   TestMore0
+=== RUN   TestMore0/a
+--- PASS: TestMore0 (0.00s)
+    --- PASS: TestMore0/a (0.00s)
+=== RUN   TestMore1
+=== RUN   TestMore1/a
+--- PASS: TestMore1 (0.00s)
+    --- PASS: TestMore1/a (0.00s)
+=== RUN   TestMore2
+=== RUN   TestMore2/a
+--- PASS: TestMore2 (0.00s)
+    --- PASS: TestMore2/a (0.00s)
+=== RUN   TestMore3
+=== RUN   TestMore3/a
+--- PASS: TestMore3 (0.00s)
+    --- PASS: TestMore3/a (0.00s)
+=== RUN   TestMore4
+=== RUN   TestMore4/a
+--- PASS: TestMore4 (0.00s)
+    --- PASS: TestMore4/a (0.00s)
+=== RUN   TestMore5
+=== RUN   TestMore5/a
+--- PASS: TestMore5 (0.00s)
+    --- PASS: TestMore5/a (0.00s)
+=== RUN   TestMore6
+=== RUN   TestMore6/a
+--- PASS: TestMore6 (0.00s)
+    --- PASS: TestMore6/a (0.00s)
+=== RUN   TestMore7
+=== RUN   TestMore7/a
+--- PASS: TestMore7 (0.00s)
+    --- PASS: TestMore7/a (0.00s)
+=== RUN   TestMore8
+=== RUN   TestMore8/a
+--- PASS: TestMore8 (0.00s)
+    --- PASS: TestMore8/a (0.00s)
+=== RUN   TestMore9
+=== RUN   TestMore9/a
+--- PASS: TestMore9 (0.00s)
+    --- PASS: TestMore9/a (0.00s)
+=== RUN   TestMore10
+=== RUN   TestMore10/a
+--- PASS: TestMore10 (0.00s)
+    --- PASS: TestMore10/a (0.00s)
+=== RUN   TestMore11
+=== RUN   TestMore11/a
+--- PASS: TestMore11 (0.00s)
+    --- PASS: TestMore11/a (0.00s)
+=== RUN   TestMore12
+=== RUN   TestMore12/a
+--- PASS: TestMore12 (0.00s)
+    --- PASS: TestMore12/a (0.00s)
+=== RUN   TestMore13
+=== RUN   TestMore13/a
+--- PASS: TestMore13 (0.00s)
+    --- PASS: TestMore13/a (0.00s)
+=== RUN   TestMore14
+=== RUN   TestMore14/a
+--- PASS: TestMore14 (0.00s)
+    --- PASS: TestMore14/a (0.00s)
+=== RUN   TestMore15
+=== RUN   TestMore15/a
+--- PASS: TestMore15 (0.00s)
+    --- PASS: TestMore15/a (0.00s)
+=== RUN   TestMore16
+=== RUN   TestMore16/a
+--- PASS: TestMore16 (0.00s)
+    --- PASS: TestMore16/a (0.00s)
+=== RUN   TestMore17
+=== RUN   TestMore17/a
+--- PASS: TestMore17 (0.00s)
+    --- PASS: TestMore17/a (0.00s)
+=== RUN   TestMore18
+=== RUN   TestMore18/a
+--- PASS: TestMore18 (0.00s)
+    --- PASS: TestMore18/a (0.00s)
+=== RUN   TestMore19
+=== RUN   TestMore19/a
+--- PASS: TestMore19 (0.00s)
+    --- PASS: TestMore19/a (0.00s)
+=== RUN   TestMore20
+=== RUN   TestMore20/a
+--- PASS: TestMore20 (0.00s)
+    --- PASS: TestMore20/a (0.00s)
+=== RUN   TestMore21
+=== RUN   TestMore21/a
+--- PASS: TestMore21 (0.00s)
+    --- PASS: TestMore21/a (0.00s)
+=== RUN   TestMore22
+=== RUN   TestMore22/a
+--- PASS: TestMore22 (0.00s)
+    --- PASS: TestMore22/a (0.00s)
+=== RUN   TestMore23
+=== RUN   TestMore23/a
+--- PASS: TestMore23 (0.00s)
+    --- PASS: TestMore23/a (0.00s)
+=== RUN   TestMore24
+=== RUN   TestMore24/a
+--- PASS: TestMore24 (0.00s)
+    --- PASS: TestMore24/a (0.00s)
+=== RUN   TestMore25
+=== RUN   TestMore25/a
+--- PASS: TestMore25 (0.00s)
+    --- PASS: TestMore25/a (0.00s)
+=== RUN   TestMore26
+=== RUN   TestMore26/a
+--- PASS: TestMore26 (0.00s)
+    --- PASS: TestMore26/a (0.00s)
+=== RUN   TestMore27
+=== RUN   TestMore27/a
+--- PASS: TestMore27 (0.00s)
+    --- PASS: TestMore27/a (0.00s)
+=== RUN   TestMore28
+=== RUN   TestMore28/a
+--- PASS: TestMore28 (0.00s)
+    --- PASS: TestMore28/a (0.00s)
+=== RUN   TestMore29
+=== RUN   TestMore29/a
+--- PASS: TestMore29 (0.00s)
+    --- PASS: TestMore29/a (0.00s)
+=== RUN   TestMore30
+=== RUN   TestMore30/a
+--- PASS: TestMore30 (0.00s)
+    --- PASS: TestMore30/a (0.00s)
+=== RUN   TestMore31
+=== RUN   TestMore31/a
+--- PASS: TestMore31 (0.00s)
+    --- PASS: TestMore31/a (0.00s)
+=== RUN   TestMore32
+=== RUN   TestMore32/a
+--- PASS: TestMore32 (0.00s)
+    --- PASS: TestMore32/a (0.00s)
+=== RUN   TestMore33
+=== RUN   TestMore33/a
+--- PASS: TestMore33 (0.00s)
+    --- PASS: TestMore33/a (0.00s)
+=== RUN   TestMore34
+=== RUN   TestMore34/a
+--- PASS: TestMore34 (0.00s)
+    --- PASS: TestMore34/a (0.00s)
+=== RUN   TestMore35
+=== RUN   TestMore35/a
+--- PASS: TestMore35 (0.00s)
+    --- PASS: TestMore35/a (0.00s)
+=== RUN   TestMore36
+=== RUN   TestMore36/a
+--- PASS: TestMore36 (0.00s)
+    --- PASS: TestMore36/a (0.00s)
+=== RUN   TestMore37
+=== RUN   TestMore37/a
+--- PASS: TestMore37 (0.00s)
+    --- PASS: TestMore37/a (0.00s)
+=== RUN   TestMore38
+=== RUN   TestMore38/a
+--- PASS: TestMore38 (0.00s)
+    --- PASS: TestMore38/a (0.00s)
+=== RUN   TestMore39
+=== RUN   TestMore39/a
+--- PASS: TestMore39 (0.00s)
+    --- PASS: TestMore39/a (0.00s)
+=== RUN   TestMore40
+=== RUN   TestMore40/a
+--- PASS: TestMore40 (0.00s)
+    --- PASS: TestMore40/a (0.00s)
+=== RUN   TestMore41
+=== RUN   TestMore41/a
+--- PASS: TestMore41 (0.00s)
+    --- PASS: TestMore41/a (0.00s)
+=== RUN   TestMore42
+=== RUN   TestMore42/a
+--- PASS: TestMore42 (0.00s)
+    --- PASS: TestMore42/a (0.00s)
+=== RUN   TestMore43
+=== RUN   TestMore43/a
+--- PASS: TestMore43 (0.00s)
+    --- PASS: TestMore43/a (0.00s)
+=== RUN   TestMore44
+=== RUN   TestMore44/a
+--- PASS: TestMore44 (0.00s)
+    --- PASS: TestMore44/a (0.00s)
+=== RUN   TestMore45
+=== RUN   TestMore45/a
+--- PASS: TestMore45 (0.00s)
+    --- PASS: TestMore45/a (0.00s)
+=== RUN   TestMore46
+=== RUN   TestMore46/a
+--- PASS: TestMore46 (0.00s)
+    --- PASS: TestMore46/a (0.00s)
+=== RUN   TestMore47
+=== RUN   TestMore47/a
+--- PASS: TestMore47 (0.00s)
+    --- PASS: TestMore47/a (0.00s)
+=== RUN   TestMore48
+=== RUN   TestMore48/a
+--- PASS: TestMore48 (0.00s)
+    --- PASS: TestMore48/a (0.00s)
+=== RUN   TestMore49
+=== RUN   TestMore49/a
+--- PASS: TestMore49 (0.00s)
+    --- PASS: TestMore49/a (0.00s)
+=== RUN   TestMore50
+=== RUN   TestMore50/a
+--- PASS: TestMore50 (0.00s)
+    --- PASS: TestMore50/a (0.00s)
+=== RUN   TestMore51
+=== RUN   TestMore51/a
+--- PASS: TestMore51 (0.00s)
+    --- PASS: TestMore51/a (0.00s)
+=== RUN   TestMore52
+=== RUN   TestMore52/a
+--- PASS: TestMore52 (0.00s)
+    --- PASS: TestMore52/a (0.00s)
+=== RUN   TestMore53
+=== RUN   TestMore53/a
+--- PASS: TestMore53 (0.00s)
+    --- PASS: TestMore53/a (0.00s)
+=== RUN   TestMore54
+=== RUN   TestMore54/a
+--- PASS: TestMore54 (0.00s)
+    --- PASS: TestMore54/a (0.00s)
+=== RUN   TestMore55
+=== RUN   TestMore55/a
+--- PASS: TestMore55 (0.00s)
+    --- PASS: TestMore55/a (0.00s)
+=== RUN   TestMore56
+=== RUN   TestMore56/a
+--- PASS: TestMore56 (0.00s)
+    --- PASS: TestMore56/a (0.00s)
+=== RUN   TestMore57
+=== RUN   TestMore57/a
+--- PASS: TestMore57 (0.00s)
+    --- PASS: TestMore57/a (0.00s)
+=== RUN   TestMore58
+=== RUN   TestMore58/a
+--- PASS: TestMore58 (0.00s)
+    --- PASS: TestMore58/a (0.00s)
+=== RUN   TestMore59
+=== RUN   TestMore59/a
+--- PASS: TestMore59 (0.00s)
+    --- PASS: TestMore59/a (0.00s)
+=== RUN   TestMore60
+=== RUN   TestMore60/a
+--- PASS: TestMore60 (0.00s)
+    --- PASS: TestMore60/a (0.00s)
+=== RUN   TestMore61
+=== RUN   TestMore61/a
+--- PASS: TestMore61 (0.00s)
+    --- PASS: TestMore61/a (0.00s)
+=== RUN   TestMore62
+=== RUN   TestMore62/a
+--- PASS: TestMore62 (0.00s)
+    --- PASS: TestMore62/a (0.00s)
+=== RUN   TestMore63
+=== RUN   TestMore63/a
+--- PASS: TestMore63 (0.00s)
+    --- PASS: TestMore63/a (0.00s)
+=== RUN   TestMore64
+=== RUN   TestMore64/a
+--- PASS: TestMore64 (0.00s)
+    --- PASS: TestMore64/a (0.00s)
+=== RUN   TestMore65
+=== RUN   TestMore65/a
+--- PASS: TestMore65 (0.00s)
+    --- PASS: TestMore65/a (0.00s)
+=== RUN   TestMore66
+=== RUN   TestMore66/a
+--- PASS: TestMore66 (0.00s)
+    --- PASS: TestMore66/a (0.00s)
+=== RUN   TestMore67
+=== RUN   TestMore67/a
+--- PASS: TestMore67 (0.00s)
+    --- PASS: TestMore67/a (0.00s)
+=== RUN   TestMore68
+=== RUN   TestMore68/a
+--- PASS: TestMore68 (0.00s)
+    --- PASS: TestMore68/a (0.00s)
+=== RUN   TestMore69
+=== RUN   TestMore69/a
+--- PASS: TestMore69 (0.00s)
+    --- PASS: TestMore69/a (0.00s)
+=== RUN   TestMore70
+=== RUN   TestMore70/a
+--- PASS: TestMore70 (0.00s)
+    --- PASS: TestMore70/a (0.00s)
+=== RUN   TestMore71
+=== RUN   TestMore71/a
+--- PASS: TestMore71 (0.00s)
+    --- PASS: TestMore71/a (0.00s)
+=== RUN   TestMore72
+=== RUN   TestMore72/a
+--- PASS: TestMore72 (0.00s)
+    --- PASS: TestMore72/a (0.00s)
+=== RUN   TestMore73
+=== RUN   TestMore73/a
+--- PASS: TestMore73 (0.00s)
+    --- PASS: TestMore73/a (0.00s)
+=== RUN   TestMore74
+=== RUN   TestMore74/a
+--- PASS: TestMore74 (0.00s)
+    --- PASS: TestMore74/a (0.00s)
+=== RUN   TestMore75
+=== RUN   TestMore75/a
+--- PASS: TestMore75 (0.00s)
+    --- PASS: TestMore75/a (0.00s)
+=== RUN   TestMore76
+=== RUN   TestMore76/a
+--- PASS: TestMore76 (0.00s)
+    --- PASS: TestMore76/a (0.00s)
+=== RUN   TestMore77
+=== RUN   TestMore77/a
+--- PASS: TestMore77 (0.00s)
+    --- PASS: TestMore77/a (0.00s)
+=== RUN   TestMore78
+=== RUN   TestMore78/a
+--- PASS: TestMore78 (0.00s)
+    --- PASS: TestMore78/a (0.00s)
+=== RUN   TestMore79
+=== RUN   TestMore79/a
+--- PASS: TestMore79 (0.00s)
+    --- PASS: TestMore79/a (0.00s)
+=== RUN   TestMore80
+=== RUN   TestMore80/a
+--- PASS: TestMore80 (0.00s)
+    --- PASS: TestMore80/a (0.00s)
+=== RUN   TestMore81
+=== RUN   TestMore81/a
+--- PASS: TestMore81 (0.00s)
+    --- PASS: TestMore81/a (0.00s)
+=== RUN   TestMore82
+=== RUN   TestMore82/a
+--- PASS: TestMore82 (0.00s)
+    --- PASS: TestMore82/a (0.00s)
+=== RUN   TestMore83
+=== RUN   TestMore83/a
+--- PASS: TestMore83 (0.00s)
+    --- PASS: TestMore83/a (0.00s)
+=== RUN   TestMore84
+=== RUN   TestMore84/a
+--- PASS: TestMore84 (0.00s)
+    --- PASS: TestMore84/a (0.00s)
+=== RUN   TestMore85
+=== RUN   TestMore85/a
+--- PASS: TestMore85 (0.00s)
+    --- PASS: TestMore85/a (0.00s)
+=== RUN   TestMore86
+=== RUN   TestMore86/a
+--- PASS: TestMore86 (0.00s)
+    --- PASS: TestMore86/a (0.00s)
+=== RUN   TestMore87
+=== RUN   TestMore87/a
+--- PASS: TestMore87 (0.00s)
+    --- PASS: TestMore87/a (0.00s)
+=== RUN   TestMore88
+=== RUN   TestMore88/a
+--- PASS: TestMore88 (0.00s)
+    --- PASS: TestMore88/a (0.00s)
+=== RUN   TestMore89
+=== RUN   TestMore89/a
+--- PASS: TestMore89 (0.00s)
+    --- PASS: TestMore89/a (0.00s)
+=== RUN   TestMore90
+=== RUN   TestMore90/a
+--- PASS: TestMore90 (0.00s)
+    --- PASS: TestMore90/a (0.00s)
+=== RUN   TestMore91
+=== RUN   TestMore91/a
+--- PASS: TestMore91 (0.00s)
+    --- PASS: TestMore91/a (0.00s)
+=== RUN   TestMore92
+=== RUN   TestMore92/a
+--- PASS: TestMore92 (0.00s)
+    --- PASS: TestMore92/a (0.00s)
+=== RUN   TestMore93
+=== RUN   TestMore93/a
+--- PASS: TestMore93 (0.00s)
+    --- PASS: TestMore93/a (0.00s)
+=== RUN   TestMore94
+=== RUN   TestMore94/a
+--- PASS: TestMore94 (0.00s)
+    --- PASS: TestMore94/a (0.00s)
+=== RUN   TestMore95
+=== RUN   TestMore95/a
+--- PASS: TestMore95 (0.00s)
+    --- PASS: TestMore95/a (0.00s)
+=== RUN   TestMore96
+=== RUN   TestMore96/a
+--- PASS: TestMore96 (0.00s)
+    --- PASS: TestMore96/a (0.00s)
+=== RUN   TestMore97
+=== RUN   TestMore97/a
+--- PASS: TestMore97 (0.00s)
+    --- PASS: TestMore97/a (0.00s)
+=== RUN   TestMore98
+=== RUN   TestMore98/a
+--- PASS: TestMore98 (0.00s)
+    --- PASS: TestMore98/a (0.00s)
+=== RUN   TestMore99
+=== RUN   TestMore99/a
+--- PASS: TestMore99 (0.00s)
+    --- PASS: TestMore99/a (0.00s)
+=== RUN   TestMore100
+=== RUN   TestMore100/a
+--- PASS: TestMore100 (0.00s)
+    --- PASS: TestMore100/a (0.00s)
+=== RUN   TestMore101
+=== RUN   TestMore101/a
+--- PASS: TestMore101 (0.00s)
+    --- PASS: TestMore101/a (0.00s)
+=== RUN   TestMore102
+=== RUN   TestMore102/a
+--- PASS: TestMore102 (0.00s)
+    --- PASS: TestMore102/a (0.00s)
+=== RUN   TestMore103
+=== RUN   TestMore103/a
+--- PASS: TestMore103 (0.00s)
+    --- PASS: TestMore103/a (0.00s)
+=== RUN   TestMore104
+=== RUN   TestMore104/a
+--- PASS: TestMore104 (0.00s)
+    --- PASS: TestMore104/a (0.00s)
+=== RUN   TestMore105
+=== RUN   TestMore105/a
+--- PASS: TestMore105 (0.00s)
+    --- PASS: TestMore105/a (0.00s)
+=== RUN   TestMore106
+=== RUN   TestMore106/a
+--- PASS: TestMore106 (0.00s)
+    --- PASS: TestMore106/a (0.00s)
+=== RUN   TestMore107
+=== RUN   TestMore107/a
+--- PASS: TestMore107 (0.00s)
+    --- PASS: TestMore107/a (0.00s)
+=== RUN   TestMore108
+=== RUN   TestMore108/a
+--- PASS: TestMore108 (0.00s)
+    --- PASS: TestMore108/a (0.00s)
+=== RUN   TestMore109
+=== RUN   TestMore109/a
+--- PASS: TestMore109 (0.00s)
+    --- PASS: TestMore109/a (0.00s)
+=== RUN   TestMore110
+=== RUN   TestMore110/a
+--- PASS: TestMore110 (0.00s)
+    --- PASS: TestMore110/a (0.00s)
+=== RUN   TestMore111
+=== RUN   TestMore111/a
+--- PASS: TestMore111 (0.00s)
+    --- PASS: TestMore111/a (0.00s)
+=== RUN   TestMore112
+=== RUN   TestMore112/a
+--- PASS: TestMore112 (0.00s)
+    --- PASS: TestMore112/a (0.00s)
+=== RUN   TestMore113
+=== RUN   TestMore113/a
+--- PASS: TestMore113 (0.00s)
+    --- PASS: TestMore113/a (0.00s)
+=== RUN   TestMore114
+=== RUN   TestMore114/a
+--- PASS: TestMore114 (0.00s)
+    --- PASS: TestMore114/a (0.00s)
+=== RUN   TestMore115
+=== RUN   TestMore115/a
+--- PASS: TestMore115 (0.00s)
+    --- PASS: TestMore115/a (0.00s)
+=== RUN   TestMore116
+=== RUN   TestMore116/a
+--- PASS: TestMore116 (0.00s)
+    --- PASS: TestMore116/a (0.00s)
+=== RUN   TestMore117
+=== RUN   TestMore117/a
+--- PASS: TestMore117 (0.00s)
+    --- PASS: TestMore117/a (0.00s)
+=== RUN   TestMore118
+=== RUN   TestMore118/a
+--- PASS: TestMore118 (0.00s)
+    --- PASS: TestMore118/a (0.00s)
+=== RUN   TestMore119
+=== RUN   TestMore119/a
+--- PASS: TestMore119 (0.00s)
+    --- PASS: TestMore119/a (0.00s)
+=== RUN   TestMore120
+=== RUN   TestMore120/a
+--- PASS: TestMore120 (0.00s)
+    --- PASS: TestMore120/a (0.00s)
+=== RUN   TestMore121
+=== RUN   TestMore121/a
+--- PASS: TestMore121 (0.00s)
+    --- PASS: TestMore121/a (0.00s)
+=== RUN   TestMore122
+=== RUN   TestMore122/a
+--- PASS: TestMore122 (0.00s)
+    --- PASS: TestMore122/a (0.00s)
+=== RUN   TestMore123
+=== RUN   TestMore123/a
+--- PASS: TestMore123 (0.00s)
+    --- PASS: TestMore123/a (0.00s)
+=== RUN   TestMore124
+=== RUN   TestMore124/a
+--- PASS: TestMore124 (0.00s)
+    --- PASS: TestMore124/a (0.00s)
+=== RUN   TestMore125
+=== RUN   TestMore125/a
+--- PASS: TestMore125 (0.00s)
+    --- PASS: TestMore125/a (0.00s)
+=== RUN   TestMore126
+=== RUN   TestMore126/a
+--- PASS: TestMore126 (0.00s)
+    --- PASS: TestMore126/a (0.00s)
+=== RUN   TestMore127
+=== RUN   TestMore127/a
+--- PASS: TestMore127 (0.00s)
+    --- PASS: TestMore127/a (0.00s)
+=== RUN   TestMore128
+=== RUN   TestMore128/a
+--- PASS: TestMore128 (0.00s)
+    --- PASS: TestMore128/a (0.00s)
+=== RUN   TestMore129
+=== RUN   TestMore129/a
+--- PASS: TestMore129 (0.00s)
+    --- PASS: TestMore129/a (0.00s)
+=== RUN   TestMore130
+=== RUN   TestMore130/a
+--- PASS: TestMore130 (0.00s)
+    --- PASS: TestMore130/a (0.00s)
+=== RUN   TestMore131
+=== RUN   TestMore131/a
+--- PASS: TestMore131 (0.00s)
+    --- PASS: TestMore131/a (0.00s)
+=== RUN   TestMore132
+=== RUN   TestMore132/a
+--- PASS: TestMore132 (0.00s)
+    --- PASS: TestMore132/a (0.00s)
+=== RUN   TestMore133
+=== RUN   TestMore133/a
+--- PASS: TestMore133 (0.00s)
+    --- PASS: TestMore133/a (0.00s)
+=== RUN   TestMore134
+=== RUN   TestMore134/a
+--- PASS: TestMore134 (0.00s)
+    --- PASS: TestMore134/a (0.00s)
+=== RUN   TestMore135
+=== RUN   TestMore135/a
+--- PASS: TestMore135 (0.00s)
+    --- PASS: TestMore135/a (0.00s)
+=== RUN   TestMore136
+=== RUN   TestMore136/a
+--- PASS: TestMore136 (0.00s)
+    --- PASS: TestMore136/a (0.00s)
+=== RUN   TestMore137
+=== RUN   TestMore137/a
+--- PASS: TestMore137 (0.00s)
+    --- PASS: TestMore137/a (0.00s)
+=== RUN   TestMore138
+=== RUN   TestMore138/a
+--- PASS: TestMore138 (0.00s)
+    --- PASS: TestMore138/a (0.00s)
+=== RUN   TestMore139
+=== RUN   TestMore139/a
+--- PASS: TestMore139 (0.00s)
+    --- PASS: TestMore139/a (0.00s)
+=== RUN   TestMore140
+=== RUN   TestMore140/a
+--- PASS: TestMore140 (0.00s)
+    --- PASS: TestMore140/a (0.00s)
+=== RUN   TestMore141
+=== RUN   TestMore141/a
+--- PASS: TestMore141 (0.00s)
+    --- PASS: TestMore141/a (0.00s)
+=== RUN   TestMore142
+=== RUN   TestMore142/a
+--- PASS: TestMore142 (0.00s)
+    --- PASS: TestMore142/a (0.00s)
+=== RUN   TestMore143
+=== RUN   TestMore143/a
+--- PASS: TestMore143 (0.00s)
+    --- PASS: TestMore143/a (0.00s)
+=== RUN   TestMore144
+=== RUN   TestMore144/a
+--- PASS: TestMore144 (0.00s)
+    --- PASS: TestMore144/a (0.00s)
+=== RUN   TestMore145
+=== RUN   TestMore145/a
+--- PASS: TestMore145 (0.00s)
+    --- PASS: TestMore145/a (0.00s)
+=== RUN   TestMore146
+=== RUN   TestMore146/a
+--- PASS: TestMore146 (0.00s)
+    --- PASS: TestMore146/a (0.00s)
+=== RUN   TestMore147
+=== RUN   TestMore147/a
+--- PASS: TestMore147 (0.00s)
+    --- PASS: TestMore147/a (0.00s)
+=== RUN   TestMore148
+=== RUN   TestMore148/a
+--- PASS: TestMore148 (0.00s)
+    --- PASS: TestMore148/a (0.00s)
+=== RUN   TestMore149
+=== RUN   TestMore149/a
+--- PASS: TestMore149 (0.00s)
+    --- PASS: TestMore149/a (0.00s)
+FAIL
+FAIL	fx	0.286s
+FAIL

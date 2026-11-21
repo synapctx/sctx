@@ -1,0 +1,9 @@
+proto/demo/v1/demo.proto:7:9:Message name "getRequest" should be PascalCase, such as "GetRequest".
+proto/demo/v1/demo.proto:8:10:Field name "Id" should be lower_snake_case, such as "id".
+proto/demo/v1/demo.proto:13:8:Enum name "kind" should be PascalCase, such as "Kind".
+proto/demo/v1/demo.proto:13:15:Enum value name "A" should be prefixed with "KIND_".
+proto/demo/v1/demo.proto:13:15:Enum zero value name "A" should be suffixed with "_UNSPECIFIED".
+proto/demo/v1/demo.proto:13:22:Enum value name "B" should be prefixed with "KIND_".
+proto/demo/v1/demo.proto:16:9:Service name "Demo" should be suffixed with "Service".
+proto/demo/v1/demo.proto:17:7:RPC name "get" should be PascalCase, such as "Get".
+proto/demo/v1/demo.proto:17:11:RPC request type "getRequest" should be named "GetRequest" or "DemoGetRequest".

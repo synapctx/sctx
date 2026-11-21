@@ -1,0 +1,66 @@
+Name:             crasher
+Namespace:        default
+Priority:         0
+Service Account:  default
+Node:             sctxcov3-control-plane/172.18.0.2
+Start Time:       Sat, 21 Nov 2026 02:27:02 +0000
+Labels:           <none>
+Annotations:      <none>
+Status:           Running
+IP:               10.244.0.6
+IPs:
+  IP:  10.244.0.6
+Containers:
+  boom:
+    Container ID:  containerd://4fa08b014e1e66aa3dd81757220ce095a997391e1546b4bb4d7cacfa02dba7a4
+    Image:         busybox:1.36
+    Image ID:      docker.io/library/busybox@sha256:73aaf090f3d85aa34ee199857f03fa3a95c8ede2ffd4cc2cdb5b94e566b11662
+    Port:          <none>
+    Host Port:     <none>
+    Command:
+      sh
+      -c
+      echo starting; echo fatal: cannot open config >&2; exit 3
+    State:          Terminated
+      Reason:       Error
+      Exit Code:    3
+      Started:      Sat, 21 Nov 2026 02:27:43 +0000
+      Finished:     Sat, 21 Nov 2026 02:27:43 +0000
+    Last State:     Terminated
+      Reason:       Error
+      Exit Code:    3
+      Started:      Sat, 21 Nov 2026 02:27:20 +0000
+      Finished:     Sat, 21 Nov 2026 02:27:20 +0000
+    Ready:          False
+    Restart Count:  3
+    Environment:    <none>
+    Mounts:
+      /var/run/secrets/kubernetes.io/serviceaccount from kube-api-access-4k4bm (ro)
+Conditions:
+  Type                        Status
+  PodReadyToStartContainers   True 
+  Initialized                 True 
+  Ready                       False 
+  ContainersReady             False 
+  PodScheduled                True 
+Volumes:
+  kube-api-access-4k4bm:
+    Type:                    Projected (a volume that contains injected data from multiple sources)
+    TokenExpirationSeconds:  3607
+    ConfigMapName:           kube-root-ca.crt
+    Optional:                false
+    DownwardAPI:             true
+QoS Class:                   BestEffort
+Node-Selectors:              <none>
+Tolerations:                 node.kubernetes.io/not-ready:NoExecute op=Exists for 300s
+                             node.kubernetes.io/unreachable:NoExecute op=Exists for 300s
+Events:
+  Type     Reason     Age                From               Message
+  ----     ------     ----               ----               -------
+  Normal   Scheduled  83s                default-scheduler  Successfully assigned default/crasher to sctxcov3-control-plane
+  Normal   Pulling    82s                kubelet            spec.containers{boom}: Pulling image "busybox:1.36"
+  Normal   Pulled     80s                kubelet            spec.containers{boom}: Successfully pulled image "busybox:1.36" in 2.718s (2.719s including waiting). Image size: 1906887 bytes.
+  Normal   Created    43s (x4 over 80s)  kubelet            spec.containers{boom}: Container created
+  Normal   Pulled     43s (x3 over 78s)  kubelet            spec.containers{boom}: Container image "busybox:1.36" already present on machine and can be accessed by the pod
+  Normal   Started    42s (x4 over 80s)  kubelet            spec.containers{boom}: Container started
+  Warning  BackOff    42s (x3 over 77s)  kubelet            spec.containers{boom}: Back-off restarting failed container boom in pod crasher_default(3819f052-af72-4456-9987-2feb8afc7bcf)

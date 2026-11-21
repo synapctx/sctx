@@ -1,0 +1,38 @@
+warning: variable "y" is unused (if the variable is not meant to be used, prefix it with an underscore)
+    └─ lib/demo.ex:4:5: Demo.unused_var/1
+Running ExUnit with seed: 75191, max_cases: 12
+  1) test match (DemoTest)
+     test/demo_test.exs:20
+     match (=) failed
+     code:  assert {:ok, _} = {:error, 1}
+     left:  {:ok, _}
+     right: {:error, 1}
+     stacktrace:
+       test/demo_test.exs:21: (test)
+  2) test raises (DemoTest)
+     test/demo_test.exs:16
+     Expected exception ArgumentError but got ArithmeticError (bad argument in arithmetic expression)
+     code: assert_raise ArgumentError, fn -> Demo.add(1, nil) end
+     stacktrace:
+       :erlang.+(1, nil)
+       (demo 0.1.0) lib/demo.ex:2: Demo.add/2
+       test/demo_test.exs:17: (test)
+  3) test greets wrong (DemoTest)
+     test/demo_test.exs:8
+     Assertion with == failed
+     code:  assert Demo.greet("bob") == "hi bob"
+     left:  "hello bob"
+     right: "hi bob"
+     stacktrace:
+       test/demo_test.exs:9: (test)
+  4) test list compare (DemoTest)
+     test/demo_test.exs:12
+     Assertion with == failed
+     code:  assert [1, 2, 3] == [1, 2, 4]
+     left:  [1, 2, 3]
+     right: [1, 2, 4]
+     stacktrace:
+       test/demo_test.exs:13: (test)
+Finished in 0.04 seconds (0.00s async, 0.04s sync)
+5 tests, 4 failures
+…+20 lines (compile progress, source excerpts, diffs, blanks)

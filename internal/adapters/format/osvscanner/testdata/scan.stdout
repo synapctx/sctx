@@ -1,0 +1,128 @@
+Scanned /work/proj/py/requirements.txt file and found 9 packages
+Total 5 packages affected by 65 known vulnerabilities (9 Critical, 26 High, 26 Medium, 4 Low, 0 Unknown) from 1 ecosystem.
+65 vulnerabilities can be fixed.
+
+
++-------------------------------------+------+-----------+----------+---------+---------------+---------------------+
+| OSV URL                             | CVSS | ECOSYSTEM | PACKAGE  | VERSION | FIXED VERSION | SOURCE              |
++-------------------------------------+------+-----------+----------+---------+---------------+---------------------+
+| https://osv.dev/PYSEC-2019-10       | 6.9  | PyPI      | django   | 2.2     | 2.2.3         | py/requirements.txt |
+| https://osv.dev/GHSA-6c7v-2f49-8h26 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2019-11       | 8.7  | PyPI      | django   | 2.2     | 2.2.4         | py/requirements.txt |
+| https://osv.dev/GHSA-c4qh-4vgv-qc6g |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2019-12       | 8.7  | PyPI      | django   | 2.2     | 2.2.4         | py/requirements.txt |
+| https://osv.dev/GHSA-h5jv-4p7w-64jg |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2019-13       | 9.8  | PyPI      | django   | 2.2     | 2.2.4         | py/requirements.txt |
+| https://osv.dev/GHSA-6r97-cj55-9hrq |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2019-14       | 8.7  | PyPI      | django   | 2.2     | 2.2.4         | py/requirements.txt |
+| https://osv.dev/GHSA-v9qg-3j8p-r63v |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2019-15       | 7.1  | PyPI      | django   | 2.2     | 2.2.8         | py/requirements.txt |
+| https://osv.dev/GHSA-hvmf-r92r-27hr |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2019-16       | 9.8  | PyPI      | django   | 2.2     | 2.2.9         | py/requirements.txt |
+| https://osv.dev/GHSA-vfq6-hq5r-27r6 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2019-79       | 6.1  | PyPI      | django   | 2.2     | 2.2.2         | py/requirements.txt |
+| https://osv.dev/GHSA-7rp2-fm2h-wchj |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2020-31       | 8.2  | PyPI      | django   | 2.2     | 2.2.13        | py/requirements.txt |
+| https://osv.dev/GHSA-wpjr-j57x-wxfw |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2020-32       | 6.1  | PyPI      | django   | 2.2     | 2.2.13        | py/requirements.txt |
+| https://osv.dev/GHSA-2m34-jcjv-45xf |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2020-33       | 8.7  | PyPI      | django   | 2.2     | 2.2.16        | py/requirements.txt |
+| https://osv.dev/GHSA-m6gj-h9gm-gw44 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2020-34       | 7.5  | PyPI      | django   | 2.2     | 2.2.16        | py/requirements.txt |
+| https://osv.dev/GHSA-fr28-569j-53c4 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2020-35       | 9.8  | PyPI      | django   | 2.2     | 2.2.10        | py/requirements.txt |
+| https://osv.dev/GHSA-hmr4-m2h5-33qx |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2020-36       | 8.8  | PyPI      | django   | 2.2     | 2.2.11        | py/requirements.txt |
+| https://osv.dev/GHSA-3gh2-xw74-jmcw |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2021-439      | 7.3  | PyPI      | django   | 2.2     | 2.2.25        | py/requirements.txt |
+| https://osv.dev/GHSA-v6rh-hp5x-86rv |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2021-6        | 6.9  | PyPI      | django   | 2.2     | 2.2.20        | py/requirements.txt |
+| https://osv.dev/GHSA-xgxc-v2qg-chmh |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2021-7        | 8.7  | PyPI      | django   | 2.2     | 2.2.21        | py/requirements.txt |
+| https://osv.dev/GHSA-rxjp-mfm9-w4wr |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2021-8        | 6.1  | PyPI      | django   | 2.2     | 2.2.22        | py/requirements.txt |
+| https://osv.dev/GHSA-qm57-vhq3-3fwf |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2021-9        | 6.9  | PyPI      | django   | 2.2     | 2.2.18        | py/requirements.txt |
+| https://osv.dev/GHSA-fvgf-6h6h-3322 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2021-98       | 6.9  | PyPI      | django   | 2.2     | 2.2.24        | py/requirements.txt |
+| https://osv.dev/GHSA-68w8-qjq3-2gfm |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2021-99       | 8.7  | PyPI      | django   | 2.2     | 2.2.24        | py/requirements.txt |
+| https://osv.dev/GHSA-p99v-5w3c-jqq9 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2022-1        | 8.7  | PyPI      | django   | 2.2     | 2.2.26        | py/requirements.txt |
+| https://osv.dev/GHSA-53qw-q765-4fww |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2022-19       | 6.1  | PyPI      | django   | 2.2     | 2.2.27        | py/requirements.txt |
+| https://osv.dev/GHSA-95rw-fx8r-36v6 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2022-190      | 9.8  | PyPI      | django   | 2.2     | 2.2.28        | py/requirements.txt |
+| https://osv.dev/GHSA-2gwj-7jmv-h26r |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2022-191      | 9.8  | PyPI      | django   | 2.2     | 2.2.28        | py/requirements.txt |
+| https://osv.dev/GHSA-w24h-v9qh-8gxj |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2022-2        | 8.7  | PyPI      | django   | 2.2     | 2.2.26        | py/requirements.txt |
+| https://osv.dev/GHSA-8c5j-9r9f-c6w8 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2022-20       | 8.7  | PyPI      | django   | 2.2     | 2.2.27        | py/requirements.txt |
+| https://osv.dev/GHSA-6cw3-g6wv-c2xv |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2022-3        | 6.9  | PyPI      | django   | 2.2     | 2.2.26        | py/requirements.txt |
+| https://osv.dev/GHSA-jrh2-hc4r-7jwx |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-1297     | 6.3  | PyPI      | django   | 2.2     | 4.2.16        | py/requirements.txt |
+| https://osv.dev/GHSA-rrqc-c2jx-6jgv |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-3717     | 6.9  | PyPI      | django   | 2.2     | 5.2.17        | py/requirements.txt |
+| https://osv.dev/GHSA-q238-5cxm-5c9h |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-4035     | 8.8  | PyPI      | django   | 2.2     | 5.2.17        | py/requirements.txt |
+| https://osv.dev/GHSA-wvqv-fj8w-qmhm |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-628      | 6.1  | PyPI      | django   | 2.2     | 2.2.2         | py/requirements.txt |
+| https://osv.dev/GHSA-6c3j-c64m-qhgq |      |           |          |         |               |                     |
+| https://osv.dev/GHSA-3h9f-r86x-qvjx | 3.1  | PyPI      | django   | 2.2     | 5.2.16        | py/requirements.txt |
+| https://osv.dev/GHSA-6w2r-r2m5-xq5w | 7.1  | PyPI      | django   | 2.2     | 4.2.24        | py/requirements.txt |
+| https://osv.dev/GHSA-7xr5-9hcq-chf9 | 4.0  | PyPI      | django   | 2.2     | 4.2.22        | py/requirements.txt |
+| https://osv.dev/GHSA-8cjm-8mp7-r2xf | 3.1  | PyPI      | django   | 2.2     | 5.2.15        | py/requirements.txt |
+| https://osv.dev/GHSA-8qcx-xf44-272x | 6.1  | PyPI      | django   | 2.2     | 5.2.16        | py/requirements.txt |
+| https://osv.dev/GHSA-8x94-hmjh-97hq | 8.8  | PyPI      | django   | 2.2     | 3.2.15        | py/requirements.txt |
+| https://osv.dev/GHSA-923m-gv2p-w5qp | 3.1  | PyPI      | django   | 2.2     | 5.2.15        | py/requirements.txt |
+| https://osv.dev/GHSA-crhf-3pfg-w68w | 6.3  | PyPI      | django   | 2.2     | 5.2.16        | py/requirements.txt |
+| https://osv.dev/GHSA-frmv-pr5f-9mcr | 9.1  | PyPI      | django   | 2.2     | 4.2.26        | py/requirements.txt |
+| https://osv.dev/GHSA-h7pc-vwp9-298g | 3.1  | PyPI      | django   | 2.2     | 5.2.15        | py/requirements.txt |
+| https://osv.dev/GHSA-qw25-v68c-qjf3 | 7.5  | PyPI      | django   | 2.2     | 4.2.26        | py/requirements.txt |
+| https://osv.dev/PYSEC-2024-60       | 7.5  | PyPI      | idna     | 2.7     | 3.7           | py/requirements.txt |
+| https://osv.dev/GHSA-jjg7-2v4v-x38h |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-215      | 6.9  | PyPI      | idna     | 2.7     | 3.15          | py/requirements.txt |
+| https://osv.dev/GHSA-65pc-fj4g-8rjx |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2020-176      | 9.8  | PyPI      | pyyaml   | 5.1     | 5.2b1         | py/requirements.txt |
+| https://osv.dev/GHSA-3pqx-4fqf-j49f |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2020-96       | 9.8  | PyPI      | pyyaml   | 5.1     | 5.3.1         | py/requirements.txt |
+| https://osv.dev/GHSA-6757-jp84-gxfx |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2021-142      | 9.8  | PyPI      | pyyaml   | 5.1     | 5.4           | py/requirements.txt |
+| https://osv.dev/GHSA-8q59-q68h-6hv4 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2018-28       | 7.5  | PyPI      | requests | 2.19.0  | 2.20.0        | py/requirements.txt |
+| https://osv.dev/GHSA-x84v-xcm2-53pg |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2023-74       | 6.1  | PyPI      | requests | 2.19.0  | 2.31.0        | py/requirements.txt |
+| https://osv.dev/GHSA-j8r2-6x86-q33q |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-1872     | 5.3  | PyPI      | requests | 2.19.0  | 2.32.4        | py/requirements.txt |
+| https://osv.dev/GHSA-9hjg-9r4m-mvj7 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-1873     | 5.6  | PyPI      | requests | 2.19.0  | 2.32.0        | py/requirements.txt |
+| https://osv.dev/GHSA-9wx4-h78v-vm56 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-2275     | 5.5  | PyPI      | requests | 2.19.0  | 2.33.0        | py/requirements.txt |
+| https://osv.dev/GHSA-gc5v-m9x4-r6x2 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2019-132      | 6.1  | PyPI      | urllib3  | 1.23    | 1.24.3        | py/requirements.txt |
+| https://osv.dev/GHSA-r64q-w8jr-g9qp |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2019-133      | 8.7  | PyPI      | urllib3  | 1.23    | 1.24.2        | py/requirements.txt |
+| https://osv.dev/GHSA-mh33-7rrq-662w |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2020-148      | 6.9  | PyPI      | urllib3  | 1.23    | 1.25.9        | py/requirements.txt |
+| https://osv.dev/GHSA-wqvq-5m8c-6g24 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2023-192      | 8.1  | PyPI      | urllib3  | 1.23    | 1.26.17       | py/requirements.txt |
+| https://osv.dev/GHSA-v845-jxx5-vc9f |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2023-207      | 6.1  | PyPI      | urllib3  | 1.23    | 1.24.2        | py/requirements.txt |
+| https://osv.dev/GHSA-gwvm-45gx-3cf8 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2023-212      | 5.7  | PyPI      | urllib3  | 1.23    | 1.26.18       | py/requirements.txt |
+| https://osv.dev/GHSA-g4mx-q9vg-27p4 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-141      | 8.2  | PyPI      | urllib3  | 1.23    | 2.7.0         | py/requirements.txt |
+| https://osv.dev/GHSA-qccp-gfcp-xxvc |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-1994     | 8.9  | PyPI      | urllib3  | 1.23    | 2.6.0         | py/requirements.txt |
+| https://osv.dev/GHSA-2xpw-w6gg-jr37 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-1995     | 4.4  | PyPI      | urllib3  | 1.23    | 1.26.19       | py/requirements.txt |
+| https://osv.dev/GHSA-34jh-p97f-mpxf |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-1996     | 8.9  | PyPI      | urllib3  | 1.23    | 2.6.3         | py/requirements.txt |
+| https://osv.dev/GHSA-38jv-5279-wg99 |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-1999     | 5.3  | PyPI      | urllib3  | 1.23    | 2.5.0         | py/requirements.txt |
+| https://osv.dev/GHSA-pq67-6m6q-mj2v |      |           |          |         |               |                     |
+| https://osv.dev/PYSEC-2026-4177     | 8.9  | PyPI      | urllib3  | 1.23    | 2.8.0         | py/requirements.txt |
+| https://osv.dev/GHSA-vxq7-64xx-v4gw |      |           |          |         |               |                     |
++-------------------------------------+------+-----------+----------+---------+---------------+---------------------+

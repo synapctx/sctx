@@ -1,0 +1,38 @@
+1 error:
+1) BadTest::testDivZero
+DivisionByZeroError: Division by zero
+src/Calc.php:5
+tests/BadTest.php:6
+3 failures:
+1) BadTest::testAddWrong
+Failed asserting that 3 is identical to 4.
+tests/BadTest.php:5
+2) BadTest::testArray
+Failed asserting that two arrays are equal.
+--- Expected
++++ Actual
+@@ @@
+     'b' => Array (
+         0 => 1
+         1 => 2
+-        2 => 3
++        2 => 4
+     )
+ )
+tests/BadTest.php:7
+3) BadTest::testString
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+ 'line1
+-line2
++lineX
+ line3'
+tests/BadTest.php:8
+1 risky test:
+1) BadTest::testRisky
+This test did not perform any assertions
+tests/BadTest.php:10
+ERRORS! Tests: 9, Assertions: 6, Errors: 1, Failures: 3, Skipped: 1, Risky: 1.
+…+5 lines (banner, progress)

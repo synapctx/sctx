@@ -1,0 +1,13 @@
+Previewing update (dev):
+
+ +  pulumi:pulumi:Stack demo-dev create 
+ +  random:index:RandomId id1 create 
+ +  random:index:RandomPet pet create 
+ +  random:index:RandomPassword pw create 
+ +  pulumi:pulumi:Stack demo-dev create 
+Outputs:
+    petName: [unknown]
+
+Resources:
+    + 4 to create
+

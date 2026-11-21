@@ -1,0 +1,9 @@
+synt/bad.py
+  synt/bad.py:1:6 - error: "(" was not closed
+  synt/bad.py:1:7 - error: Expected parameter name
+  synt/bad.py:1:7 - error: Position-only parameter separator not allowed as first parameter
+  synt/bad.py:2:3 - error: Expected expression
+  synt/bad.py:4:1 - error: Expected ":"
+  synt/bad.py:4:1 - error: Expected expression
+  synt/bad.py:4:1 - error: Statements must be separated by newlines or semicolons
+7 errors, 0 warnings, 0 informations

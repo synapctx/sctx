@@ -1,0 +1,162 @@
+[
+  {
+    _id: 1,
+    name: 'user1',
+    status: 'idle',
+    score: 1.5,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:01.000Z')
+  },
+  {
+    _id: 2,
+    name: 'user2',
+    status: 'banned',
+    score: 3,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:02.000Z')
+  },
+  {
+    _id: 3,
+    name: 'user3',
+    status: 'active',
+    score: 4.5,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:03.000Z')
+  },
+  {
+    _id: 4,
+    name: 'user4',
+    status: 'idle',
+    score: 6,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:04.000Z')
+  },
+  {
+    _id: 5,
+    name: 'user5',
+    status: 'banned',
+    score: 7.5,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:05.000Z')
+  },
+  {
+    _id: 6,
+    name: 'user6',
+    status: 'active',
+    score: 9,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:06.000Z')
+  },
+  {
+    _id: 7,
+    name: 'user7',
+    status: 'idle',
+    score: 10.5,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:07.000Z')
+  },
+  {
+    _id: 8,
+    name: 'user8',
+    status: 'banned',
+    score: 12,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:08.000Z')
+  },
+  {
+    _id: 9,
+    name: 'user9',
+    status: 'active',
+    score: 13.5,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:09.000Z')
+  },
+  {
+    _id: 10,
+    name: 'user10',
+    status: 'idle',
+    score: 15,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:10.000Z')
+  },
+  {
+    _id: 11,
+    name: 'user11',
+    status: 'banned',
+    score: 16.5,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:11.000Z')
+  },
+  {
+    _id: 12,
+    name: 'user12',
+    status: 'active',
+    score: 18,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:12.000Z')
+  },
+  {
+    _id: 13,
+    name: 'user13',
+    status: 'idle',
+    score: 19.5,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:13.000Z')
+  },
+  {
+    _id: 14,
+    name: 'user14',
+    status: 'banned',
+    score: 21,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:14.000Z')
+  },
+  {
+    _id: 15,
+    name: 'user15',
+    status: 'active',
+    score: 22.5,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:15.000Z')
+  },
+  {
+    _id: 16,
+    name: 'user16',
+    status: 'idle',
+    score: 24,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:16.000Z')
+  },
+  {
+    _id: 17,
+    name: 'user17',
+    status: 'banned',
+    score: 25.5,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:17.000Z')
+  },
+  {
+    _id: 18,
+    name: 'user18',
+    status: 'active',
+    score: 27,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:18.000Z')
+  },
+  {
+    _id: 19,
+    name: 'user19',
+    status: 'idle',
+    score: 28.5,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:19.000Z')
+  },
+  {
+    _id: 20,
+    name: 'user20',
+    status: 'banned',
+    score: 30,
+    tags: [ 'a', 'b' ],
+    created: ISODate('2026-01-01T00:00:20.000Z')
+  }
+]

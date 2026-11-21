@@ -1,6 +1,7 @@
 // This file delegates the region of `make`'s output that came from a
-// recognisable inner tool — `go test`/`go vet`/`go build`, or `golangci-lint
-// run` — to that tool's own formatter, reusing its parser rather than
+// recognisable inner tool — `go test`/`go vet`/`go build`, `golangci-lint
+// run`, or a bare C/C++ compiler driver (`gcc`/`g++`/`cc`/`c++`/`clang`/
+// `clang++`) — to that tool's own formatter, reusing its parser rather than
 // forking it. `make` alone was measured at 734 runs and 1.4% saved: 343 runs
 // rendered "clean" (no dir-noise or repeated-echo collapse) yet barely
 // shrank, because the inner `go test`/`go vet`/`golangci-lint` stream was
@@ -17,6 +18,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/synapctx/sctx/internal/adapters/format/cc"
 	"github.com/synapctx/sctx/internal/adapters/format/golangcilint"
 	"github.com/synapctx/sctx/internal/adapters/format/gotest"
 	"github.com/synapctx/sctx/internal/domain/format"
@@ -34,6 +36,12 @@ import (
 // formatter decides on its own whether it can parse what follows.
 var recipeEcho = regexp.MustCompile(`^(?:cd\s+\S+\s*&&\s*)?(go\s+(test|vet|build)\b|golangci-lint\s+run\b)[^|;&<>` + "`" + `]*$`)
 
+// ccEcho is recipeEcho for a bare compiler driver invocation. The program name
+// and its arguments are captured so the cc formatter sees the real argv (it
+// declines -E, -M, -v and the other flags whose output is the payload). A
+// recipe that pipes, chains or redirects declines for the same reason as above.
+var ccEcho = regexp.MustCompile(`^(?:cd\s+\S+\s*&&\s*)?(gcc|g\+\+|cc|c\+\+|clang\+\+|clang)(\s[^|;&<>` + "`" + `]*)$`)
+
 // makeErrorBanner matches make's own failure summary line, e.g.
 // "make: *** [Makefile:10: test] Error 1" or "make[1]: *** [...] Error 2".
 // It always ends a delegated block: it is make's line, not the inner tool's.
@@ -48,12 +56,16 @@ const (
 	innerGoVet
 	innerGoBuild
 	innerGolangci
+	innerCC
 )
 
 // classifyRecipe reports which inner tool, if any, line is a recipe echo for.
 func classifyRecipe(line string) innerKind {
 	m := recipeEcho.FindStringSubmatch(line)
 	if m == nil {
+		if ccEcho.MatchString(line) {
+			return innerCC
+		}
 		return innerNone
 	}
 	if strings.Contains(m[0], "golangci-lint") {
@@ -104,7 +116,8 @@ func splitDelegatableSegments(lines []string, exitCode int) []segment {
 			continue
 		}
 
-		raw = append(raw, lines[i]) // the echo line itself: always make-owned
+		echo := lines[i]
+		raw = append(raw, echo) // the echo line itself: always make-owned
 		i++
 
 		start := i
@@ -122,7 +135,7 @@ func splitDelegatableSegments(lines []string, exitCode int) []segment {
 		}
 		block := lines[start:i]
 
-		if body, ok := delegateBlock(kind, block, exitCode); ok {
+		if body, ok := delegateBlock(kind, echo, block, exitCode); ok {
 			flushRaw()
 			segs = append(segs, segment{delegated: true, body: body})
 		} else {
@@ -139,7 +152,7 @@ func splitDelegatableSegments(lines []string, exitCode int) []segment {
 // formatter declines at both tiers, or the render is not actually smaller —
 // the caller then keeps the block as make-owned lines, unchanged from
 // before delegation existed.
-func delegateBlock(kind innerKind, block []string, exitCode int) (string, bool) {
+func delegateBlock(kind innerKind, echo string, block []string, exitCode int) (string, bool) {
 	if len(block) == 0 {
 		return "", false
 	}
@@ -157,6 +170,20 @@ func delegateBlock(kind innerKind, block []string, exitCode int) (string, bool) 
 		fm, argv, command = gotest.New(), []string{"go", "build"}, "go build"
 	case innerGolangci:
 		fm, argv, command = golangcilint.New(), []string{"golangci-lint", "run"}, "golangci-lint run"
+	case innerCC:
+		m := ccEcho.FindStringSubmatch(echo)
+		if m == nil {
+			return "", false
+		}
+		for _, f := range cc.All() {
+			if f.Descriptor().Command == m[1] {
+				fm = f
+			}
+		}
+		if fm == nil {
+			return "", false
+		}
+		argv, command = append([]string{m[1]}, strings.Fields(m[2])...), m[1]
 	default:
 		return "", false
 	}

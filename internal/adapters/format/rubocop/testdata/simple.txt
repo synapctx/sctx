@@ -1,0 +1,30 @@
+== lib/calc.rb ==
+C:  1:  1: Style/Documentation: Missing top-level documentation comment for class Calc.
+C:  1:  1: [Correctable] Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+C:  2: 11: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+C:  2: 14: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+C:  3:  3: [Correctable] Layout/EmptyLineBetweenDefs: Expected 1 empty line between method definitions; found 0.
+C:  3: 11: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+C:  3: 14: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+C:  6:  3: [Correctable] Layout/EmptyLineBetweenDefs: Expected 1 empty line between method definitions; found 0.
+C:  7:  5: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+== lib/messy.rb ==
+C:  1:  1: Style/Documentation: Missing top-level documentation comment for class Messy.
+C:  1:  1: [Correctable] Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+C:  2: 11: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+C:  2: 12: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+C:  2: 13: [Correctable] Layout/SpaceAfterComma: Space missing after comma.
+C:  2: 14: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+C:  2: 15: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+W:  3:  5: [Correctable] Lint/UselessAssignment: Useless assignment to variable - x.
+C:  4:  5: [Correctable] Style/IfUnlessModifier: Favor modifier if usage when having a single-line body. Another good alternative is the usage of control flow &&/||.
+C:  4: 15: [Correctable] Style/MultilineIfThen: Do not use then for multi-line if.
+C:  5: 12: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+C:  7:  5: [Correctable] Style/RedundantReturn: Redundant return detected.
+C:  9:  3: [Correctable] Layout/EmptyLineBetweenDefs: Expected 1 empty line between method definitions; found 0.
+== lib/messy2.rb ==
+C:  1:  1: [Correctable] Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+C:  1:  9: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+C:  2: 16: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
+
+3 files inspected, 25 offenses detected, 16 offenses autocorrectable

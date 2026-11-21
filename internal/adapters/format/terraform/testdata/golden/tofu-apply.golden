@@ -1,0 +1,82 @@
+…+35 lines (progress ×8, completed ×8, legend ×4, blank ×15)
+[1m  # local_file.f["alpha"][0m will be created
+[0m  [32m+[0m[0m resource "local_file" "f" {
+      [32m+[0m[0m directory_permission = "0777"
+      [32m+[0m[0m file_permission      = "0777"
+      [32m+[0m[0m filename             = "./out/alpha.txt"
+      …+8 known after apply
+    }
+[1m  # local_file.f["beta"][0m will be created
+[0m  [32m+[0m[0m resource "local_file" "f" {
+      [32m+[0m[0m directory_permission = "0777"
+      [32m+[0m[0m file_permission      = "0777"
+      [32m+[0m[0m filename             = "./out/beta.txt"
+      …+8 known after apply
+    }
+[1m  # local_file.f["gamma"][0m will be created
+[0m  [32m+[0m[0m resource "local_file" "f" {
+      [32m+[0m[0m directory_permission = "0777"
+      [32m+[0m[0m file_permission      = "0777"
+      [32m+[0m[0m filename             = "./out/gamma.txt"
+      …+8 known after apply
+    }
+[1m  # null_resource.n[0m will be created
+[0m  [32m+[0m[0m resource "null_resource" "n" {
+      [32m+[0m[0m triggers = {
+          [32m+[0m[0m "v" = "1"
+        }
+      …+1 known after apply
+    }
+[1m  # random_password.pw[0m will be created
+[0m  [32m+[0m[0m resource "random_password" "pw" {
+      [32m+[0m[0m bcrypt_hash = (sensitive value)
+      [32m+[0m[0m length      = 16
+      [32m+[0m[0m lower       = true
+      [32m+[0m[0m min_lower   = 0
+      [32m+[0m[0m min_numeric = 0
+      [32m+[0m[0m min_special = 0
+      [32m+[0m[0m min_upper   = 0
+      [32m+[0m[0m number      = true
+      [32m+[0m[0m numeric     = true
+      [32m+[0m[0m result      = (sensitive value)
+      [32m+[0m[0m special     = true
+      [32m+[0m[0m upper       = true
+      …+1 known after apply
+    }
+[1m  # random_pet.p["alpha"][0m will be created
+[0m  [32m+[0m[0m resource "random_pet" "p" {
+      [32m+[0m[0m length    = 2
+      [32m+[0m[0m separator = "-"
+      …+1 known after apply
+    }
+[1m  # random_pet.p["beta"][0m will be created
+[0m  [32m+[0m[0m resource "random_pet" "p" {
+      [32m+[0m[0m length    = 2
+      [32m+[0m[0m separator = "-"
+      …+1 known after apply
+    }
+[1m  # random_pet.p["gamma"][0m will be created
+[0m  [32m+[0m[0m resource "random_pet" "p" {
+      [32m+[0m[0m length    = 2
+      [32m+[0m[0m separator = "-"
+      …+1 known after apply
+    }
+[1mPlan:[0m 8 to add, 0 to change, 0 to destroy.
+Changes to Outputs:
+  [32m+[0m[0m pets = {
+      [32m+[0m[0m alpha = (known after apply)
+      [32m+[0m[0m beta  = (known after apply)
+      [32m+[0m[0m gamma = (known after apply)
+    }
+  [32m+[0m[0m pw   = (sensitive value)
+[0m[1mnull_resource.n: Provisioning with 'local-exec'...[0m[0m
+[0m[1mnull_resource.n (local-exec):[0m [0mExecuting: ["/bin/sh" "-c" "echo hi"]
+[0m[1mnull_resource.n (local-exec):[0m [0mhi
+Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
+Outputs:
+[0mpets = {
+  "alpha" = "fast-skunk"
+  "beta" = "inviting-beetle"
+  "gamma" = "champion-wahoo"
+}
+pw = <sensitive>

@@ -66,9 +66,12 @@ type matchLine struct {
 
 // Aggressive re-renders recognizable match-line output grouped by file. It
 // returns format.ErrTierInapplicable for empty output or output that isn't
-// match-line shaped (e.g. grep -l file lists, grep -c counts), which are
-// already compact.
+// match-line shaped (e.g. grep -c counts), which is already compact. A bare
+// -l/-L file list is regrouped by directory (see renderFileList).
 func (f *formatter) Aggressive(_ context.Context, in format.Input) (format.Rendered, error) {
+	if machineOutput(in.Argv) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	raw, err := io.ReadAll(in.Stdout)
 	if err != nil {
 		return format.Rendered{}, err
@@ -77,12 +80,26 @@ func (f *formatter) Aggressive(_ context.Context, in format.Input) (format.Rende
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
+	if listsFiles(in.Argv) {
+		body, n, ok := renderFileList(raw)
+		if !ok {
+			return format.Rendered{}, format.ErrTierInapplicable
+		}
+		return format.Rendered{Body: body, Note: fmt.Sprintf("%d %s", n, pluralize(n, "file", "files"))}, nil
+	}
+
+	if hasContextFlags(in.Argv) {
+		// -A/-B/-C add context lines the grouped renderer has no row for;
+		// dropping them silently would hide what the caller asked to see.
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+
 	groups, total, ok := parseMatches(raw, in.Argv)
 	if !ok {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
-	body := renderGroups(groups, total)
+	body := renderGroups(groups, total, patternRegexp(in.Argv))
 	if len(body) == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
@@ -101,6 +118,9 @@ func (f *formatter) Aggressive(_ context.Context, in format.Input) (format.Rende
 // caps the total number of lines emitted. Stderr is left untouched by this
 // tier (FoldStderr is false) since permission-denied warnings matter.
 func (f *formatter) Relaxed(_ context.Context, in format.Input) (format.Rendered, error) {
+	if machineOutput(in.Argv) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 	raw, err := io.ReadAll(in.Stdout)
 	if err != nil {
 		return format.Rendered{}, err
@@ -178,7 +198,7 @@ func parseMatches(raw []byte, argv []string) ([]*fileGroup, int, bool) {
 	}
 
 	if nPathLine == 0 && nLine == 0 {
-		return nil, 0, false
+		return parsePathContent(lines, argv)
 	}
 
 	var mode string
@@ -189,6 +209,12 @@ func parseMatches(raw []byte, argv []string) ([]*fileGroup, int, bool) {
 		mode = "flatPathLine"
 	default:
 		mode = "flatLine"
+	}
+	if nHead > 0 && mode != "grouped" {
+		// Lines that are neither matches nor file headers are diagnostics
+		// ("grep: dir: Is a directory") from a stream merged with 2>&1; the
+		// flat renderers would drop them, so leave the output alone.
+		return nil, 0, false
 	}
 
 	var order []string
@@ -258,7 +284,7 @@ func parseMatches(raw []byte, argv []string) ([]*fileGroup, int, bool) {
 // renderGroups renders groups grouped-by-file, capped at maxFiles files and
 // maxMatchesPerFile matches per file, with explicit "+N more" markers
 // whenever anything is elided.
-func renderGroups(groups []*fileGroup, total int) []byte {
+func renderGroups(groups []*fileGroup, total int, re *regexp.Regexp) []byte {
 	var b strings.Builder
 	shown := 0
 	for _, g := range groups {
@@ -268,7 +294,7 @@ func renderGroups(groups []*fileGroup, total int) []byte {
 		if shown > 0 {
 			b.WriteByte('\n')
 		}
-		writeFileGroup(&b, g)
+		writeFileGroup(&b, g, re)
 		shown++
 	}
 	if len(groups) > maxFiles {
@@ -290,7 +316,7 @@ type collapsedRow struct {
 	count   int
 }
 
-func writeFileGroup(b *strings.Builder, g *fileGroup) {
+func writeFileGroup(b *strings.Builder, g *fileGroup, re *regexp.Regexp) {
 	count := len(g.matches)
 	if g.path != "" {
 		fmt.Fprintf(b, "%s (%d)\n", g.path, count)
@@ -299,7 +325,7 @@ func writeFileGroup(b *strings.Builder, g *fileGroup) {
 	var rows []*collapsedRow
 	byContent := map[string]*collapsedRow{}
 	for _, m := range g.matches {
-		content := truncate(strings.TrimLeft(m.content, " \t"), maxContentLen)
+		content := truncateAround(strings.TrimLeft(m.content, " \t"), maxContentLen, re)
 		if r, ok := byContent[content]; ok {
 			r.lineNos = append(r.lineNos, m.lineNo)
 			r.count++
@@ -316,9 +342,14 @@ func writeFileGroup(b *strings.Builder, g *fileGroup) {
 		if shown >= maxMatchesPerFile {
 			break
 		}
-		if r.count > 1 {
+		switch {
+		case r.lineNos[0] == "" && r.count > 1:
+			fmt.Fprintf(b, "  %s ×%d\n", r.content, r.count)
+		case r.lineNos[0] == "":
+			fmt.Fprintf(b, "  %s\n", r.content)
+		case r.count > 1:
 			fmt.Fprintf(b, "  %s: %s ×%d\n", strings.Join(r.lineNos, ","), r.content, r.count)
-		} else {
+		default:
 			fmt.Fprintf(b, "  %s: %s\n", r.lineNos[0], r.content)
 		}
 		matchesShown += r.count

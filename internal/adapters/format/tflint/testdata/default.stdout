@@ -1,0 +1,43 @@
+6 issue(s) found:
+
+Warning: terraform "required_version" attribute is required (terraform_required_version)
+
+  on tf/main.tf line 1:
+
+Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.13.0/docs/rules/terraform_required_version.md
+
+Warning: Missing version constraint for provider "aws" in `required_providers` (terraform_required_providers)
+
+  on tf/main.tf line 31:
+  31: resource "aws_db_instance" "db" {
+
+Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.13.0/docs/rules/terraform_required_providers.md
+
+Notice: `unused` variable has no description (terraform_documented_variables)
+
+  on tf/main.tf line 42:
+  42: variable "unused" {
+
+Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.13.0/docs/rules/terraform_documented_variables.md
+
+Warning: [Fixable] variable "unused" is declared but not used (terraform_unused_declarations)
+
+  on tf/main.tf line 42:
+  42: variable "unused" {
+
+Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.13.0/docs/rules/terraform_unused_declarations.md
+
+Warning: variable "unused" should be moved from tf/main.tf to variables.tf (terraform_standard_module_structure)
+
+  on tf/main.tf line 42:
+  42: variable "unused" {
+
+Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.13.0/docs/rules/terraform_standard_module_structure.md
+
+Warning: Module should include an empty outputs.tf file (terraform_standard_module_structure)
+
+  on tf/outputs.tf line 1:
+   (source code not available)
+
+Reference: https://github.com/terraform-linters/tflint-ruleset-terraform/blob/v0.13.0/docs/rules/terraform_standard_module_structure.md
+

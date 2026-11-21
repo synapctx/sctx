@@ -1,0 +1,18 @@
+Timing is on.
+ id |  status  
+----+----------
+  1 | pending
+  2 | failed
+  3 | refunded
+  4 | paid
+  5 | pending
+  6 | failed
+  7 | refunded
+  8 | paid
+  9 | pending
+ 10 | failed
+ 11 | refunded
+ 12 | paid
+(12 rows)
+
+Time: 1.245 ms

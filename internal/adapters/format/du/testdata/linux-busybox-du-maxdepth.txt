@@ -1,0 +1,19 @@
+du: unrecognized option: max-depth=1
+BusyBox v1.36.1 (2025-11-23 14:32:18 UTC) multi-call binary.
+
+Usage: du [-aHLdclsxhmk] [FILE]...
+
+Summarize disk space used for FILEs (or directories)
+
+	-a	Show file sizes too
+	-b	Apparent size (including holes)
+	-L	Follow all symlinks
+	-H	Follow symlinks on command line
+	-d N	Limit output to directories (and files with -a) of depth < N
+	-c	Show grand total
+	-l	Count sizes many times if hard linked
+	-s	Display only a total for each argument
+	-x	Skip directories on different filesystems
+	-h	Sizes in human readable format (e.g., 1K 243M 2G)
+	-m	Sizes in megabytes
+	-k	Sizes in kilobytes (default)

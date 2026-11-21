@@ -3,6 +3,8 @@ package mongosh
 import (
 	"context"
 	"errors"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -97,15 +99,15 @@ func TestAggressive(t *testing.T) {
 		if strings.Contains(body, "Current Mongosh Log ID") || strings.Contains(body, "Connecting to:") {
 			t.Errorf("banner not stripped from JSON body: %q", body)
 		}
-		if !strings.Contains(body, "more items") && !strings.Contains(body, "…") {
-			t.Errorf("expected an elision marker from jsoncompact array capping, got: %q", body)
+		if !strings.Contains(body, "more items") && !strings.Contains(body, "…") && !strings.HasPrefix(body, "T[12]{") {
+			t.Errorf("expected an elision marker or a lossless table from jsoncompact, got: %q", body)
 		}
 		if len(out.Body) >= len(jsonRelaxedFixture) {
 			t.Errorf("expected compaction, got body len %d >= input len %d", len(out.Body), len(jsonRelaxedFixture))
 		}
 	})
 
-	t.Run("default shell-object array: banner stripped, N more documents marker", func(t *testing.T) {
+	t.Run("default shell-object array: banner stripped, every document kept under the cap", func(t *testing.T) {
 		in := format.Input{
 			Argv:   []string{"mongosh", "--eval", "db.users.find().toArray()"},
 			Stdout: strings.NewReader(shellObjectFixture),
@@ -118,11 +120,11 @@ func TestAggressive(t *testing.T) {
 		if strings.Contains(body, "Current Mongosh Log ID") || strings.Contains(body, "Connecting to:") {
 			t.Errorf("banner not stripped from shell-object body: %q", body)
 		}
-		if !strings.Contains(body, "…+2 more documents") {
-			t.Errorf("expected '…+2 more documents' marker, got: %q", body)
+		if strings.Contains(body, "…+") || out.Elided {
+			t.Errorf("5 documents are under the cap and must all be kept: %q", body)
 		}
-		if strings.Count(body, "ObjectId(") != 3 {
-			t.Errorf("expected exactly 3 kept documents, got body: %q", body)
+		if strings.Count(body, "ObjectId(") != 5 {
+			t.Errorf("expected all 5 documents, got body: %q", body)
 		}
 		if len(out.Body) >= len(shellObjectFixture) {
 			t.Errorf("expected compaction, got body len %d >= input len %d", len(out.Body), len(shellObjectFixture))
@@ -228,5 +230,75 @@ func TestDescriptor(t *testing.T) {
 	}
 	if len(got.Subcommands) != 0 {
 		t.Errorf("Descriptor().Subcommands = %v, want none (mongosh's action is in --eval)", got.Subcommands)
+	}
+}
+
+func fixture(t *testing.T, name string) string {
+	t.Helper()
+	raw, err := os.ReadFile(filepath.Join("testdata", name))
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(raw)
+}
+
+func TestRealMongo8Output(t *testing.T) {
+	for _, tc := range []struct {
+		file    string
+		wantAll []string
+		marker  string
+		elided  bool
+	}{
+		{"mongo8_find240.stdout", []string{"_id: 1,", "_id: 150,", "_id: 191,", "_id: 240,"}, "…+40 more documents", true},
+		{"mongo8_find240.json", []string{`"_id":1,`, `"_id":150`, `"_id":191`, `"_id":240`}, "…+40 more documents", true},
+		{"mongo8_find20.stdout", []string{"_id: 1,", "_id: 20,", "ISODate('2026-01-01T00:00:20.000Z')"}, "", false},
+		{"mongo8_findone.stdout", []string{"_id: 7,", "name: 'user7'"}, "", false},
+	} {
+		t.Run(tc.file, func(t *testing.T) {
+			raw := fixture(t, tc.file)
+			out, err := New().Aggressive(context.Background(), format.Input{Stdout: strings.NewReader(raw)})
+			if err != nil {
+				t.Fatal(err)
+			}
+			body := string(out.Body)
+			if len(body) >= len(raw) {
+				t.Fatalf("not smaller: %d >= %d", len(body), len(raw))
+			}
+			for _, w := range tc.wantAll {
+				if !strings.Contains(body, w) {
+					t.Errorf("missing %q", w)
+				}
+			}
+			if tc.marker != "" && !strings.Contains(body, tc.marker) {
+				t.Errorf("missing marker %q", tc.marker)
+			}
+			if tc.marker == "" && strings.Contains(body, "…+") {
+				t.Error("unexpected elision under the cap")
+			}
+			if out.Elided != tc.elided {
+				t.Errorf("Elided = %v, want %v", out.Elided, tc.elided)
+			}
+			if tc.marker != "" && strings.Contains(body, "_id: 151,") {
+				t.Error("middle document retained")
+			}
+		})
+	}
+}
+
+func TestFailedRunsKeepErrorText(t *testing.T) {
+	for _, name := range []string{"mongo8_refused.stderr", "mongo8_authfail.stderr", "mongo8_syntax.stderr"} {
+		t.Run(name, func(t *testing.T) {
+			raw := fixture(t, name)
+			in := func() format.Input {
+				return format.Input{Stdout: strings.NewReader(""), Stderr: strings.NewReader(raw), ExitCode: 1}
+			}
+			if _, err := New().Aggressive(context.Background(), in()); !errors.Is(err, format.ErrTierInapplicable) {
+				t.Fatalf("aggressive must decline on failure, got %v", err)
+			}
+			out, err := New().Relaxed(context.Background(), in())
+			if err == nil && !strings.Contains(string(out.Body), strings.SplitN(strings.TrimSpace(raw), "\n", 2)[0]) {
+				t.Errorf("error line lost: %q", out.Body)
+			}
+		})
 	}
 }

@@ -1,0 +1,23 @@
+Row 1:
+──────
+id:          1
+customer_id: 1
+status:      paid
+total:       3.17
+note:        order note 1
+
+Row 2:
+──────
+id:          2
+customer_id: 2
+status:      pending
+total:       6.34
+note:        order note 2
+
+Row 3:
+──────
+id:          3
+customer_id: 3
+status:      failed
+total:       9.51
+note:        order note 3

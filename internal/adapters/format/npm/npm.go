@@ -62,6 +62,8 @@ var runSubcommands = map[string]bool{
 	"run":  true,
 	"test": true,
 	"exec": true,
+	// pnpm and yarn run a package binary directly (`pnpm vitest`, `yarn jest`).
+	"jest": true, "vitest": true, "tsc": true, "eslint": true,
 }
 
 // subcommand returns the first non-flag argument after argv[0], which is

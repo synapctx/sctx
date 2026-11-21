@@ -1,0 +1,2 @@
+# get https://proxy.golang.org/golang.org/x/text/@v/v0.3.0.info
+# get https://proxy.golang.org/golang.org/x/text/@v/v0.3.0.info: 200 OK (0.089s)

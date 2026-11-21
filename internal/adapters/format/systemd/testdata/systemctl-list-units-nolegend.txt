@@ -1,0 +1,27 @@
+  app.service                              loaded active running Demo app with varied logs
+● broken.service                           loaded failed failed  Demo broken worker
+  dbus.service                             loaded active running D-Bus System Message Bus
+  getty@tty1.service                       loaded active running Getty on tty1
+  ldconfig.service                         loaded active exited  Rebuild Dynamic Linker Cache
+  oneshot.service                          loaded active exited  Demo oneshot
+  pool.service                             loaded active running Demo prefork server
+  ssh.service                              loaded active running OpenBSD Secure Shell server
+  sysstat.service                          loaded active exited  Resets System Activity Logs
+  systemd-binfmt.service                   loaded active exited  Set Up Additional Binary Formats
+  systemd-journal-catalog-update.service   loaded active exited  Rebuild Journal Catalog
+  systemd-journal-flush.service            loaded active exited  Flush Journal to Persistent Storage
+  systemd-journald.service                 loaded active running Journal Service
+  systemd-logind.service                   loaded active running User Login Management
+  systemd-modules-load.service             loaded active exited  Load Kernel Modules
+  systemd-remount-fs.service               loaded active exited  Remount Root and Kernel File Systems
+  systemd-resolved.service                 loaded active running Network Name Resolution
+  systemd-sysctl.service                   loaded active exited  Apply Kernel Variables
+  systemd-sysusers.service                 loaded active exited  Create System Users
+  systemd-tmpfiles-setup-dev-early.service loaded active exited  Create Static Device Nodes in /dev gracefully
+  systemd-tmpfiles-setup-dev.service       loaded active exited  Create Static Device Nodes in /dev
+  systemd-tmpfiles-setup.service           loaded active exited  Create Volatile Files and Directories
+  systemd-update-done.service              loaded active exited  Update is Completed
+  systemd-update-utmp.service              loaded active exited  Record System Boot/Shutdown in UTMP
+  systemd-user-sessions.service            loaded active exited  Permit User Sessions
+  ufw.service                              loaded active exited  Uncomplicated firewall
+  web.service                              loaded active running Demo web service

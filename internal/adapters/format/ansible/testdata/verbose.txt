@@ -1,0 +1,43 @@
+No config file found; using defaults
+
+PLAY [local] *******************************************************************
+
+TASK [Create scratch dir] ******************************************************
+ok: [localhost] => {"ansible_facts": {"discovered_interpreter_python": "/usr/bin/python3"}, "changed": false, "gid": 0, "group": "wheel", "mode": "0755", "owner": "user", "path": "./scratch", "size": 160, "state": "directory", "uid": 501}
+
+TASK [Write config files] ******************************************************
+ok: [localhost] => (item=a) => {"ansible_loop_var": "item", "changed": false, "checksum": "b1ca8fa0534fbfa49d5ceec61b38c7b5d5264588", "dest": "./scratch/a.conf", "gid": 20, "group": "staff", "item": "a", "mode": "0644", "owner": "user", "path": "./scratch/a.conf", "size": 4, "state": "file", "uid": 501}
+ok: [localhost] => (item=b) => {"ansible_loop_var": "item", "changed": false, "checksum": "b1ec2ff702da077df49ee448734ddd10c22a79d6", "dest": "./scratch/b.conf", "gid": 20, "group": "staff", "item": "b", "mode": "0644", "owner": "user", "path": "./scratch/b.conf", "size": 4, "state": "file", "uid": 501}
+ok: [localhost] => (item=c) => {"ansible_loop_var": "item", "changed": false, "checksum": "c39da8d16a1a0250ce4e369a7d265c70790aa075", "dest": "./scratch/c.conf", "gid": 20, "group": "staff", "item": "c", "mode": "0644", "owner": "user", "path": "./scratch/c.conf", "size": 4, "state": "file", "uid": 501}
+
+TASK [Show a message] **********************************************************
+ok: [localhost] => {
+    "msg": "hello"
+}
+
+TASK [Skipped task] ************************************************************
+skipping: [localhost] => {"false_condition": false}
+
+TASK [Check a thing (no change)] ***********************************************
+ok: [localhost] => {"changed": false, "stat": {"atime": 1795226938.3148332, "attr_flags": "", "attributes": [], "birthtime": 1795226938.3148332, "block_size": 4096, "blocks": 0, "charset": "binary", "ctime": 1795226940.605692, "dev": 16777232, "device_type": 0, "disk_usage_bytes": 0, "executable": true, "exists": true, "flags": 0, "generation": 0, "gid": 0, "gr_name": "wheel", "inode": 412152323, "isblk": false, "ischr": false, "isdir": true, "isfifo": false, "isgid": false, "islnk": false, "isreg": false, "issock": false, "isuid": false, "mimetype": "inode/directory", "mode": "0755", "mtime": 1795226940.605692, "nlink": 5, "path": "./scratch", "pw_name": "user", "readable": true, "rgrp": true, "roth": true, "rusr": true, "size": 160, "uid": 501, "version": null, "wgrp": false, "woth": false, "writeable": true, "wusr": true, "xgrp": true, "xoth": true, "xusr": true}}
+
+TASK [Run command] *************************************************************
+ok: [localhost] => {"changed": false, "changed_when_result": false, "cmd": ["echo", "hi"], "delta": "0:00:00.005116", "end": "2026-11-21 02:09:13.812000", "msg": "", "rc": 0, "start": "2026-11-21 02:09:13.806884", "stderr": "", "stderr_lines": [], "stdout": "hi", "stdout_lines": ["hi"]}
+
+TASK [Debug loop] **************************************************************
+ok: [localhost] => (item=1) => {
+    "msg": "item 1"
+}
+ok: [localhost] => (item=2) => {
+    "msg": "item 2"
+}
+ok: [localhost] => (item=3) => {
+    "msg": "item 3"
+}
+ok: [localhost] => (item=4) => {
+    "msg": "item 4"
+}
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=6    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+

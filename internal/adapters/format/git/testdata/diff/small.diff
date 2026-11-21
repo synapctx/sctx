@@ -1,0 +1,13 @@
+diff --git a/small.txt b/small.txt
+index 0ff3bbb..694af38 100644
+--- a/small.txt
++++ b/small.txt
+@@ -7,7 +7,7 @@
+ 7
+ 8
+ 9
+-10
++TEN
+ 11
+ 12
+ 13

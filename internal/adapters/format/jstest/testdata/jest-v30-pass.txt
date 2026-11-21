@@ -1,0 +1,5 @@
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        0.246 s
+Ran all test suites matching src/ok.test.js.

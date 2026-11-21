@@ -1,0 +1,19 @@
+error:
+       … while checking flake output 'packages'
+         at /nix/store/mn0zghd1blxx9qhjrqhmgpzln6vqaxds-source/flake.nix:3:5:
+            2|   outputs = { self }: {
+            3|     packages.aarch64-linux.default = throw "this output is broken";
+             |     ^
+            4|     checks.aarch64-linux.t1 = builtins.derivation { name = "t1"; system = "aarch64-linux"; builder = "/bin/sh"; args = [ "-c" "echo failing check >&2; exit 1" ]; };
+
+       … while checking the derivation 'packages.aarch64-linux.default'
+         at /nix/store/mn0zghd1blxx9qhjrqhmgpzln6vqaxds-source/flake.nix:3:5:
+            2|   outputs = { self }: {
+            3|     packages.aarch64-linux.default = throw "this output is broken";
+             |     ^
+            4|     checks.aarch64-linux.t1 = builtins.derivation { name = "t1"; system = "aarch64-linux"; builder = "/bin/sh"; args = [ "-c" "echo failing check >&2; exit 1" ]; };
+
+       (stack trace truncated; use '--show-trace' to show the full, detailed trace)
+
+       error: this output is broken
+…+3 evaluation/check progress rows

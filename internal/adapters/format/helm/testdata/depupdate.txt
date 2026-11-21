@@ -1,0 +1,12 @@
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "repo-a" chart repository
+...Successfully got an update from the "repo-b" chart repository
+...Successfully got an update from the "repo-c" chart repository
+...Successfully got an update from the "repo-d" chart repository
+...Successfully got an update from the "bitnami" chart repository
+Update Complete. ⎈Happy Helming!⎈
+Saving 1 charts
+Downloading common from repo https://charts.bitnami.com/bitnami
+Pulled: registry-1.docker.io/bitnamicharts/common:2.41.0
+Digest: sha256:669301594ad66a7401a47d26c6f0b763b95e44af667c57228e552920eb8feb66
+Deleting outdated charts

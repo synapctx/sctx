@@ -1,0 +1,19 @@
+Starting local Bazel server and connecting to it...
+Computing main repo mapping: 
+Computing main repo mapping: 
+Computing main repo mapping: 
+Loading: 
+Loading: 0 packages loaded
+Analyzing: target //pkg:bad (1 packages loaded, 0 targets configured)
+Analyzing: target //pkg:bad (1 packages loaded, 0 targets configured)
+
+INFO: Analyzed target //pkg:bad (6 packages loaded, 9 targets configured).
+ERROR: /work/proj/pkg/BUILD:1:8: Executing genrule //pkg:bad failed: (Exit 3): bash failed: error executing Genrule command (from target //pkg:bad) /bin/bash -c 'source external/bazel_tools/tools/genrule/genrule-setup.sh; echo oops >&2; exit 3'
+
+Use --sandbox_debug to see verbose messages from the sandbox and retain the sandbox build root for debugging
+oops
+Target //pkg:bad failed to build
+Use --verbose_failures to see the command lines of failed build steps.
+INFO: Elapsed time: 4.771s, Critical Path: 0.04s
+INFO: 2 processes: 2 internal.
+ERROR: Build did NOT complete successfully

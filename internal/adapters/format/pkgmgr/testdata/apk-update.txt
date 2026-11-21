@@ -1,0 +1,5 @@
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/main/aarch64/APKINDEX.tar.gz
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/community/aarch64/APKINDEX.tar.gz
+v3.20.10-123-g162aaa7b431 [https://dl-cdn.alpinelinux.org/alpine/v3.20/main]
+v3.20.10-120-gef6cf7f0ba5 [https://dl-cdn.alpinelinux.org/alpine/v3.20/community]
+OK: 24053 distinct packages available

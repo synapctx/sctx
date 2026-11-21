@@ -1,0 +1,11 @@
+[error] -- [E006] Not Found Error: /work/proj/src/main/scala/Demo.scala:2:37 ----------
+[error]   |                                     Not found: c
+[error] -- [E007] Type Mismatch Error: /work/proj/src/main/scala/Demo.scala:3:18 ------
+[error]   |                  Found:    (42 : Int)
+[error]   |                  Required: String
+[error] -- [E006] Not Found Error: /work/proj/src/main/scala/Demo.scala:4:18 ----------
+[error]   |                  Not found: undefinedThing
+[error] three errors found
+[error] (Compile / compileIncremental) Compilation failed
+[error] Total time: 5 s, completed Nov 21, 2026, 2:32:13 AM
+…+18 lines (sbt chatter, passing tests, source echoes, framework frames)

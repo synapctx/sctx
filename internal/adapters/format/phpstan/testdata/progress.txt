@@ -1,0 +1,34 @@
+Note: Using configuration file /app/phpstan.neon.
+ 0/1 [░░░░░░░░░░░░░░░░░░░░░░░░░░░░]   0%
+ 1/1 [▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓] 100%
+
+Instructions for interpreting errors
+---------
+
+Each error has an associated identifier, like `argument.type`
+or `return.missing`.
+
+Each error identifier has documentation at URL https://phpstan.org/error-identifiers/<identifier>
+This page contains code example, explanation why is this an error
+and instruction how to fix it.
+Before fixing the error, fetch the documentation page for its identifier.
+
+The error usually indicates a real bug or incorrect type in the code. Fix the underlying cause, do not just make the error go away.
+Do not add `@phpstan-ignore` comments, `@phpstan-ignore-next-line` comments, or baseline entries to suppress the error.
+Do not use assert() or inline @var PHPDoc tag to override PHPStan's inferred type.
+Do not add type casts just to silence errors.
+Do not widen parameter or return types just to make the error go away.
+ ------ --------------------------------------------------------------- 
+  Line   Calc.php                                                       
+ ------ --------------------------------------------------------------- 
+  7      Method App\Calc::bad() should return int but returns string.   
+         🪪  return.type                                                
+  8      Method App\Calc::undefinedUse() has no return type specified.  
+         🪪  missingType.return                                         
+  8      Undefined variable: $nope                                      
+         🪪  variable.undefined                                         
+ ------ --------------------------------------------------------------- 
+
+
+ [ERROR] Found 3 errors                                                         
+

@@ -1,0 +1,33 @@
+[96mnode_modules/ulid/dist/index.d.cts[0m:[93m1[0m:[93m73[0m - [91merror[0m[90m TS1479: [0mThe current file is a CommonJS module whose imports will produce 'require' calls; however, the referenced file is an ECMAScript module and cannot be imported with 'require'. Consider writing a dynamic 'import("./ulid.js")' call instead.
+
+[7m1[0m export { decodeTime, encodeTime, isValid, monotonicFactory, ulid } from "./ulid.js";
+[7m [0m [91m                                                                        ~~~~~~~~~~~[0m
+
+[96mnode_modules/ulid/dist/index.d.cts[0m:[93m2[0m:[93m40[0m - [91merror[0m[90m TS1479: [0mThe current file is a CommonJS module whose imports will produce 'require' calls; however, the referenced file is an ECMAScript module and cannot be imported with 'require'. Consider writing a dynamic 'import("./uuid.js")' call instead.
+
+[7m2[0m export { ulidToUUID, uuidToULID } from "./uuid.js";
+[7m [0m [91m                                       ~~~~~~~~~~~[0m
+
+[96mnode_modules/ulid/dist/index.d.cts[0m:[93m3[0m:[93m48[0m - [91merror[0m[90m TS1479: [0mThe current file is a CommonJS module whose imports will produce 'require' calls; however, the referenced file is an ECMAScript module and cannot be imported with 'require'. Consider writing a dynamic 'import("./crockford.js")' call instead.
+
+[7m3[0m export { fixULIDBase32, incrementBase32 } from "./crockford.js";
+[7m [0m [91m                                               ~~~~~~~~~~~~~~~~[0m
+
+[96mnode_modules/ulid/dist/index.d.cts[0m:[93m4[0m:[93m42[0m - [91merror[0m[90m TS1479: [0mThe current file is a CommonJS module whose imports will produce 'require' calls; however, the referenced file is an ECMAScript module and cannot be imported with 'require'. Consider writing a dynamic 'import("./error.js")' call instead.
+
+[7m4[0m export { ULIDError, ULIDErrorCode } from "./error.js";
+[7m [0m [91m                                         ~~~~~~~~~~~~[0m
+
+[96mnode_modules/ulid/dist/index.d.cts[0m:[93m5[0m:[93m56[0m - [91merror[0m[90m TS1479: [0mThe current file is a CommonJS module whose imports will produce 'require' calls; however, the referenced file is an ECMAScript module and cannot be imported with 'require'. Consider writing a dynamic 'import("./constants.js")' call instead.
+
+[7m5[0m export { MAX_ULID, MIN_ULID, TIME_LEN, TIME_MAX } from "./constants.js";
+[7m [0m [91m                                                       ~~~~~~~~~~~~~~~~[0m
+
+[96mnode_modules/ulid/dist/index.d.cts[0m:[93m6[0m:[93m15[0m - [91merror[0m[90m TS1479: [0mThe current file is a CommonJS module whose imports will produce 'require' calls; however, the referenced file is an ECMAScript module and cannot be imported with 'require'. Consider writing a dynamic 'import("./types.js")' call instead.
+
+[7m6[0m export * from "./types.js";
+[7m [0m [91m              ~~~~~~~~~~~~[0m
+
+
+Found 6 errors in the same file, starting at: node_modules/ulid/dist/index.d.cts[90m:1[0m
+

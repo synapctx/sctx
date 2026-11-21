@@ -2,6 +2,7 @@ package makefmt
 
 import (
 	"context"
+	"os"
 	"strings"
 	"testing"
 
@@ -168,5 +169,65 @@ func TestNonDelegatableRecipeStillCollapsesAsBefore(t *testing.T) {
 	}
 	if !strings.Contains(string(out.Body), "×3") {
 		t.Errorf("expected make's own duplicate-line collapse, got: %q", out.Body)
+	}
+}
+
+// TestAggressiveDelegatesCompilerRegionToCC feeds make output captured from a
+// real `gcc` recipe (the cc package's GNU make fixture: recipe echo, error and
+// warning diagnostics with source excerpts, make's own error banner) and checks
+// the region is rendered by the cc formatter: diagnostics and make's banner stay,
+// the excerpt and caret lines go, and the drop is counted.
+func TestAggressiveDelegatesCompilerRegionToCC(t *testing.T) {
+	raw, err := os.ReadFile("../cc/testdata/make-bad.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	in := format.Input{
+		Argv:     []string{"make", "bad"},
+		Stdout:   strings.NewReader(string(raw)),
+		ExitCode: 2,
+	}
+	out, err := New().Aggressive(context.Background(), in)
+	if err != nil {
+		t.Fatalf("Aggressive() error = %v", err)
+	}
+	body := string(out.Body)
+	for _, want := range []string{
+		"gcc -Wall -Wextra -o bad err.c",
+		"err.c:2:36: error: 'undefined_var' undeclared",
+		"make: *** [Makefile:9: bad] Error 1",
+	} {
+		if !strings.Contains(body, want) {
+			t.Errorf("render lost %q:\n%s", want, body)
+		}
+	}
+	if strings.Contains(body, "    2 | int add(int a, int b)") {
+		t.Errorf("source excerpt survived delegation:\n%s", body)
+	}
+	if len(out.Body) >= len(raw) {
+		t.Errorf("not smaller: %d -> %d", len(raw), len(out.Body))
+	}
+	t.Logf("make (gcc recipe): %d -> %d bytes", len(raw), len(out.Body))
+}
+
+// TestCompilerRecipeThatPipesIsNotDelegated: a recipe that pipes the compiler's
+// output is no longer the compiler's own stream.
+func TestCompilerRecipeThatPipesIsNotDelegated(t *testing.T) {
+	for _, line := range []string{
+		"gcc -c a.c 2>&1 | tee log",
+		"gcc -c a.c && ./a.out",
+		"gcc -c a.c > out.txt",
+		"gcc",
+		"gcc-12 -c a.c",
+		"ccache gcc -c a.c",
+	} {
+		if got := classifyRecipe(line); got != innerNone {
+			t.Errorf("classifyRecipe(%q) = %v, want none", line, got)
+		}
+	}
+	for _, line := range []string{"gcc -c a.c", "g++ -O2 -o x x.cc", "cc -c a.c", "clang++ -c a.cc", "cd sub && gcc -c a.c"} {
+		if got := classifyRecipe(line); got != innerCC {
+			t.Errorf("classifyRecipe(%q) = %v, want innerCC", line, got)
+		}
 	}
 }

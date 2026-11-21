@@ -1,0 +1,10 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Lib -> /work/dn-ok/Lib/bin/Debug/net11.0/Lib.dll
+  Lib.Tests -> /work/dn-ok/Lib.Tests/bin/Debug/net11.0/Lib.Tests.dll
+
+Build succeeded.
+    0 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:01.64

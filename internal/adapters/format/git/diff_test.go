@@ -20,6 +20,13 @@ index b3c5a95..cf92929 100644
 +CHANGED
  line4
  line5
+ line6
+ line7
+ line8
+ line9
+ line10
+ line11
+ line12
 `
 
 const showFixture = `commit 850a31286280cca0ad505602acf6a4f3469153c2
@@ -44,7 +51,7 @@ index 0000000..b3c5a95
 func TestAggressiveDiff(t *testing.T) {
 	f := New()
 
-	t.Run("drops unchanged context, keeps headers and changed lines", func(t *testing.T) {
+	t.Run("trims context to one anchor line, keeps headers and changed lines", func(t *testing.T) {
 		in := format.Input{
 			Argv:   []string{"git", "diff"},
 			Stdout: strings.NewReader(diffWithContext),
@@ -59,13 +66,16 @@ func TestAggressiveDiff(t *testing.T) {
 				t.Errorf("body missing %q, got: %q", want, body)
 			}
 		}
-		for _, unwanted := range []string{"\n line1\n", "\n line2\n", "\n line4\n", "\n line5\n"} {
+		// One context line adjacent to the change stays as an edit anchor.
+		for _, anchor := range []string{"\n line2\n-line3", "+CHANGED\n line4\n"} {
+			if !strings.Contains(body, anchor) {
+				t.Errorf("body lost the 1-line context anchor %q: %q", anchor, body)
+			}
+		}
+		for _, unwanted := range []string{"\n line1\n", "\n line5\n"} {
 			if strings.Contains(body, unwanted) {
 				t.Errorf("body still contains unchanged context %q: %q", unwanted, body)
 			}
-		}
-		if len(out.Body) >= len(diffWithContext) {
-			t.Errorf("body not smaller than raw: %d >= %d", len(out.Body), len(diffWithContext))
 		}
 	})
 

@@ -1,0 +1,2 @@
+go: downloading golang.org/x/text v0.3.8
+go: upgraded golang.org/x/text v0.3.0 => v0.3.8

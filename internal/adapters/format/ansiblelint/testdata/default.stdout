@@ -1,0 +1,48 @@
+name[play]: All plays should be named.
+ans/play.yml:1:3
+
+command-instead-of-shell: Use shell only when shell functionality is required.
+ans/play.yml:3 Task/Handler: shell echo hi
+
+fqcn[action-core]: Use FQCN for builtin module actions (shell).
+ans/play.yml:3:7 Use `ansible.builtin.shell` or `ansible.legacy.shell` instead.
+
+name[missing]: All tasks should be named.
+ans/play.yml:3 Task/Handler: shell echo hi
+
+no-changed-when: Commands should not change things if nothing needs doing.
+ans/play.yml:3 Task/Handler: shell echo hi
+
+fqcn[action-core]: Use FQCN for builtin module actions (command).
+ans/play.yml:4:7 Use `ansible.builtin.command` or `ansible.legacy.command` instead.
+
+name[missing]: All tasks should be named.
+ans/play.yml:4 Task/Handler: command ls
+
+no-changed-when: Commands should not change things if nothing needs doing.
+ans/play.yml:4 Task/Handler: command ls
+
+name[casing]: All names should start with an uppercase letter.
+ans/play.yml:5:13 Task/Handler: copy
+
+no-free-form: Avoid using free-form when calling module actions. (copy)
+ans/play.yml:5 Task/Handler: copy
+
+risky-file-permissions: File permissions unset or incorrect.
+ans/play.yml:5 Task/Handler: copy
+
+fqcn[action-core]: Use FQCN for builtin module actions (copy).
+ans/play.yml:6:7 Use `ansible.builtin.copy` or `ansible.legacy.copy` instead.
+
+fqcn[action-core]: Use FQCN for builtin module actions (apt).
+ans/play.yml:7:7 Use `ansible.builtin.apt` or `ansible.legacy.apt` instead.
+
+name[missing]: All tasks should be named.
+ans/play.yml:7 Task/Handler: apt name=git state=latest
+
+no-free-form: Avoid using free-form when calling module actions. (apt)
+ans/play.yml:7 Task/Handler: apt name=git state=latest
+
+package-latest: Package installs should not use latest.
+ans/play.yml:7 Task/Handler: apt name=git state=latest
+

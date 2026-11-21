@@ -1,0 +1,31 @@
+####################################################
+##   _     _             _ _                      ##
+##  | |   (_)           (_) |                     ##
+##  | |    _  __ _ _   _ _| |__   __ _ ___  ___   ##
+##  | |   | |/ _` | | | | | '_ \ / _` / __|/ _ \  ##
+##  | |___| | (_| | |_| | | |_) | (_| \__ \  __/  ##
+##  \_____/_|\__, |\__,_|_|_.__/ \__,_|___/\___|  ##
+##              | |                               ##
+##              |_|                               ##
+##                                                ## 
+##  Get documentation at docs.liquibase.com       ##
+##  Get certified courses at learn.liquibase.com  ## 
+##                                                ##
+####################################################
+Starting Liquibase at 02:39:24 using Java 17.0.14 (version 4.31.1 #6739 built at 2025-02-13 13:46+0000)
+Liquibase Version: 4.31.1
+Liquibase Open Source 4.31.1 by Liquibase
+Running Changeset: bad.xml::9::dev
+ERROR: Exception Details
+ERROR: Exception Primary Class:  PSQLException
+ERROR: Exception Primary Reason:  ERROR: relation "nosuch" does not exist
+ERROR: Exception Primary Source:  PostgreSQL 17.12 (Debian 17.12-1.pgdg13+1)
+ERROR: Exception Details
+ERROR: Exception Primary Class:  PSQLException
+ERROR: Exception Primary Reason:  ERROR: relation "nosuch" does not exist
+ERROR: Exception Primary Source:  PostgreSQL 17.12 (Debian 17.12-1.pgdg13+1)
+
+Unexpected error running Liquibase: Migration failed for changeset bad.xml::9::dev:
+     Reason: liquibase.exception.DatabaseException: ERROR: relation "nosuch" does not exist [Failed SQL: (0) ALTER TABLE nosuch ADD COLUMN x int]
+
+For more information, please use the --log-level flag

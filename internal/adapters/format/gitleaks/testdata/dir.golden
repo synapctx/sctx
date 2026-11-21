@@ -1,0 +1,10 @@
+gitleaks: 4 leaks in 2 files (aws-access-token=1 generic-api-key=1 github-pat=1 slack-bot-token=1)
+secrets/app.env (2)
+  1 aws-access-token
+  2 generic-api-key
+secrets/config.py (2)
+  2 github-pat
+  3 slack-bot-token
+…+16 lines withheld (secret/match values, entropy, author, email, date, fingerprint)
+INF scanned ~278 bytes (278 bytes) in 40.6ms
+WRN leaks found: 4

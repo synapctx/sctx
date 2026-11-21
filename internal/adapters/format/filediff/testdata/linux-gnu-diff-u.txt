@@ -1,0 +1,13 @@
+--- src/pkg/api/h1.go	2026-11-21 02:39:09.929995684 +0000
++++ src/pkg/api/h2.go	2026-11-21 02:39:08.893234858 +0000
+@@ -2,7 +2,6 @@
+ 
+ import "fmt"
+ 
+-// Handler1 serves.
+-func Handler1() { fmt.Println("TODO handler 1") }
+-// change 1
+-// wip
++// Handler2 serves.
++func Handler2() { fmt.Println("TODO handler 2") }
++// change 2

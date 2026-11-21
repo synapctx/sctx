@@ -1,0 +1,18 @@
+Current stack is dev:
+    Managed by host.example
+    Last updated: now (2026-11-21 02:01:29.442307 +0000 GMT)
+    Pulumi version used: v3.277.0
+    Secrets provider: passphrase
+Current stack resources (5):
+    TYPE                                           NAME
+    pulumi:pulumi:Stack                            demo-dev
+    ├─ random:index/randomPet:RandomPet            pet
+    ├─ random:index/randomId:RandomId              id1
+    ├─ random:index/randomPassword:RandomPassword  pw
+    └─ pulumi:providers:random                     default
+
+Current stack outputs (1):
+    OUTPUT   VALUE
+    petName  bursting-parrot
+
+Use `pulumi stack select` to change stack; `pulumi stack ls` lists known ones

@@ -1,0 +1,46 @@
+NAME   MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+ram0     1:0    0     4M  0 disk 
+ram1     1:1    0     4M  0 disk 
+ram2     1:2    0     4M  0 disk 
+ram3     1:3    0     4M  0 disk 
+ram4     1:4    0     4M  0 disk 
+ram5     1:5    0     4M  0 disk 
+ram6     1:6    0     4M  0 disk 
+ram7     1:7    0     4M  0 disk 
+ram8     1:8    0     4M  0 disk 
+ram9     1:9    0     4M  0 disk 
+ram10    1:10   0     4M  0 disk 
+ram11    1:11   0     4M  0 disk 
+ram12    1:12   0     4M  0 disk 
+ram13    1:13   0     4M  0 disk 
+ram14    1:14   0     4M  0 disk 
+ram15    1:15   0     4M  0 disk 
+loop0    7:0    0     0B  0 loop 
+loop1    7:1    0     0B  0 loop 
+loop2    7:2    0     0B  0 loop 
+loop3    7:3    0     0B  0 loop 
+loop4    7:4    0     0B  0 loop 
+loop5    7:5    0     0B  0 loop 
+loop6    7:6    0     0B  0 loop 
+loop7    7:7    0     0B  0 loop 
+nbd0    43:0    0     0B  0 disk 
+nbd1    43:32   0     0B  0 disk 
+nbd2    43:64   0     0B  0 disk 
+nbd3    43:96   0     0B  0 disk 
+nbd4    43:128  0     0B  0 disk 
+nbd5    43:160  0     0B  0 disk 
+nbd6    43:192  0     0B  0 disk 
+nbd7    43:224  0     0B  0 disk 
+vda    254:0    0   512G  0 disk 
+`-vda1 254:1    0   512G  0 part /etc/resolv.conf
+                                 /etc/hosts
+                                 /etc/hostname
+vdb    254:16   0 539.8M  1 disk 
+nbd8    43:256  0     0B  0 disk 
+nbd9    43:288  0     0B  0 disk 
+nbd10   43:320  0     0B  0 disk 
+nbd11   43:352  0     0B  0 disk 
+nbd12   43:384  0     0B  0 disk 
+nbd13   43:416  0     0B  0 disk 
+nbd14   43:448  0     0B  0 disk 
+nbd15   43:480  0     0B  0 disk 

@@ -1,0 +1,12 @@
+total 8
+drwxr-xr-x 11 root root 352 Nov 21 02:39 .
+drwxr-xr-x  8 root root 256 Nov 21 02:39 ..
+drwxr-xr-x 13 root root 416 Nov 21 02:39 .git
+-rw-r--r--  1 root root  21 Nov 21 02:39 .gitignore
+-rw-r--r--  1 root root   7 Nov 21 02:39 README.md
+drwxr-xr-x  3 root root  96 Nov 21 02:39 build
+drwxr-xr-x  9 root root 288 Nov 21 02:39 docs
+drwxr-xr-x  5 root root 160 Nov 21 02:39 logs
+drwxr-xr-x  4 root root 128 Nov 21 02:39 node_modules
+drwxr-xr-x  6 root root 192 Nov 21 02:39 src
+drwxr-xr-x  3 root root  96 Nov 21 02:39 vendor

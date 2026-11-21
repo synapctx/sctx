@@ -1,0 +1,2 @@
+00531B0502000000:error:10080002:BIO routines:BIO_lookup_ex:system lib:crypto/bio/bio_addr.c:773:nodename nor servname provided, or not known
+connect:errno=0

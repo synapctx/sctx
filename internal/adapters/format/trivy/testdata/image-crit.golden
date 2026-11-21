@@ -1,0 +1,255 @@
+trivy:
+  python:3.7-slim (debian 12.1) (debian): vulnerabilities=199
+  usr/local/lib/python3.7/site-packages/setuptools-57.5.0.dist-info/METADATA (python-pkg): vulnerabilities=3
+  usr/local/lib/python3.7/site-packages/wheel-0.41.2.dist-info/METADATA (python-pkg): vulnerabilities=1
+  clean (1): usr/local/lib/python3.7/site-packages/pip-23.0.1.dist-info/METADATA
+python:3.7-slim (debian 12.1)
+Total: 199 (HIGH: 184, CRITICAL: 15)
+  apt 2.6.1
+    CVE-2026-109518 HIGH -> 2.6.2
+  bsdutils 1:2.38.1-5+b1
+    CVE-2026-53613 HIGH (affected)
+    CVE-2026-53615 HIGH (affected)
+    CVE-2026-78410 HIGH (affected)
+  gpgv 2.2.40-1.1
+    CVE-2025-68973 HIGH -> 2.2.40-1.1+deb12u2
+  gzip 1.12-1
+    CVE-2026-41992 HIGH (fix_deferred)
+  libacl1 2.3.1-3
+    CVE-2026-54369 HIGH (fix_deferred)
+  libapt-pkg6.0 2.6.1
+    CVE-2026-109518 HIGH -> 2.6.2
+  libblkid1 2.38.1-5+b1
+    CVE-2026-53613 HIGH (affected)
+    CVE-2026-53615 HIGH (affected)
+    CVE-2026-78410 HIGH (affected)
+  libc-bin 2.36-9+deb12u1
+    CVE-2023-4911 HIGH -> 2.36-9+deb12u3
+    CVE-2023-6246 HIGH -> 2.36-9+deb12u4
+    CVE-2023-6779 HIGH -> 2.36-9+deb12u4
+    CVE-2024-2961 HIGH -> 2.36-9+deb12u6
+    CVE-2024-33599 HIGH -> 2.36-9+deb12u7
+  libc6 2.36-9+deb12u1
+    CVE-2023-4911 HIGH -> 2.36-9+deb12u3
+    CVE-2023-6246 HIGH -> 2.36-9+deb12u4
+    CVE-2023-6779 HIGH -> 2.36-9+deb12u4
+    CVE-2024-2961 HIGH -> 2.36-9+deb12u6
+    CVE-2024-33599 HIGH -> 2.36-9+deb12u7
+  libcap2 1:2.66-4
+    CVE-2026-4878 HIGH -> 1:2.66-4+deb12u3
+  libexpat1 2.5.0-1
+    CVE-2024-45491 CRITICAL -> 2.5.0-1+deb12u1
+    CVE-2024-45492 CRITICAL -> 2.5.0-1+deb12u1
+    CVE-2023-52425 HIGH -> 2.5.0-1+deb12u2
+    CVE-2024-28757 HIGH -> 2.5.0-1+deb12u4
+    CVE-2024-45490 HIGH -> 2.5.0-1+deb12u1
+    CVE-2025-59375 HIGH -> 2.5.0-1+deb12u5
+    CVE-2026-113351 HIGH (fix_deferred)
+    CVE-2026-115506 HIGH (fix_deferred)
+    CVE-2026-117610 HIGH (affected)
+    CVE-2026-118370 HIGH (affected)
+    CVE-2026-25210 HIGH -> 2.5.0-1+deb12u4
+    CVE-2026-45186 HIGH -> 2.5.0-1+deb12u4
+    CVE-2026-66046 HIGH -> 2.5.0-1+deb12u4
+    CVE-2026-76957 HIGH -> 2.5.0-1+deb12u3
+    CVE-2026-77214 HIGH -> 2.5.0-1+deb12u5
+    CVE-2026-93990 HIGH -> 2.5.0-1+deb12u4
+  libgnutls30 3.7.9-2
+    CVE-2026-33845 CRITICAL -> 3.7.9-2+deb12u7
+    CVE-2026-42010 CRITICAL -> 3.7.9-2+deb12u7
+    CVE-2024-0553 HIGH -> 3.7.9-2+deb12u2
+    CVE-2024-0567 HIGH -> 3.7.9-2+deb12u2
+    CVE-2025-32988 HIGH -> 3.7.9-2+deb12u5
+    CVE-2025-32990 HIGH -> 3.7.9-2+deb12u5
+    CVE-2026-33846 HIGH -> 3.7.9-2+deb12u7
+    CVE-2026-3833 HIGH -> 3.7.9-2+deb12u7
+    CVE-2026-42009 HIGH -> 3.7.9-2+deb12u7
+  libgssapi-krb5-2 1.20.1-2
+    CVE-2024-37371 CRITICAL -> 1.20.1-2+deb12u2
+    CVE-2024-37370 HIGH -> 1.20.1-2+deb12u2
+    CVE-2026-107364 HIGH (affected)
+    CVE-2026-112315 HIGH (affected)
+    CVE-2026-112316 HIGH (affected)
+    CVE-2026-112317 HIGH (affected)
+    CVE-2026-112318 HIGH (affected)
+    CVE-2026-112319 HIGH (affected)
+    CVE-2026-112320 HIGH (affected)
+    CVE-2026-112321 HIGH (affected)
+    CVE-2026-112322 HIGH (affected)
+    CVE-2026-112323 HIGH (affected)
+    CVE-2026-118380 HIGH (affected)
+    CVE-2026-119079 HIGH (affected)
+    CVE-2026-40355 HIGH -> 1.20.1-2+deb12u5
+    CVE-2026-40356 HIGH -> 1.20.1-2+deb12u5
+    CVE-2026-71199 HIGH (affected)
+    CVE-2026-71200 HIGH (affected)
+  libk5crypto3 1.20.1-2
+    CVE-2024-37371 CRITICAL -> 1.20.1-2+deb12u2
+    CVE-2024-37370 HIGH -> 1.20.1-2+deb12u2
+    CVE-2026-107364 HIGH (affected)
+    CVE-2026-112315 HIGH (affected)
+    CVE-2026-112316 HIGH (affected)
+    CVE-2026-112317 HIGH (affected)
+    CVE-2026-112318 HIGH (affected)
+    CVE-2026-112319 HIGH (affected)
+    CVE-2026-112320 HIGH (affected)
+    CVE-2026-112321 HIGH (affected)
+    CVE-2026-112322 HIGH (affected)
+    CVE-2026-112323 HIGH (affected)
+    CVE-2026-118380 HIGH (affected)
+    CVE-2026-119079 HIGH (affected)
+    CVE-2026-40355 HIGH -> 1.20.1-2+deb12u5
+    CVE-2026-40356 HIGH -> 1.20.1-2+deb12u5
+    CVE-2026-71199 HIGH (affected)
+    CVE-2026-71200 HIGH (affected)
+  libkrb5-3 1.20.1-2
+    CVE-2024-37371 CRITICAL -> 1.20.1-2+deb12u2
+    CVE-2024-37370 HIGH -> 1.20.1-2+deb12u2
+    CVE-2026-107364 HIGH (affected)
+    CVE-2026-112315 HIGH (affected)
+    CVE-2026-112316 HIGH (affected)
+    CVE-2026-112317 HIGH (affected)
+    CVE-2026-112318 HIGH (affected)
+    CVE-2026-112319 HIGH (affected)
+    CVE-2026-112320 HIGH (affected)
+    CVE-2026-112321 HIGH (affected)
+    CVE-2026-112322 HIGH (affected)
+    CVE-2026-112323 HIGH (affected)
+    CVE-2026-118380 HIGH (affected)
+    CVE-2026-119079 HIGH (affected)
+    CVE-2026-40355 HIGH -> 1.20.1-2+deb12u5
+    CVE-2026-40356 HIGH -> 1.20.1-2+deb12u5
+    CVE-2026-71199 HIGH (affected)
+    CVE-2026-71200 HIGH (affected)
+  libkrb5support0 1.20.1-2
+    CVE-2024-37371 CRITICAL -> 1.20.1-2+deb12u2
+    CVE-2024-37370 HIGH -> 1.20.1-2+deb12u2
+    CVE-2026-107364 HIGH (affected)
+    CVE-2026-112315 HIGH (affected)
+    CVE-2026-112316 HIGH (affected)
+    CVE-2026-112317 HIGH (affected)
+    CVE-2026-112318 HIGH (affected)
+    CVE-2026-112319 HIGH (affected)
+    CVE-2026-112320 HIGH (affected)
+    CVE-2026-112321 HIGH (affected)
+    CVE-2026-112322 HIGH (affected)
+    CVE-2026-112323 HIGH (affected)
+    CVE-2026-118380 HIGH (affected)
+    CVE-2026-119079 HIGH (affected)
+    CVE-2026-40355 HIGH -> 1.20.1-2+deb12u5
+    CVE-2026-40356 HIGH -> 1.20.1-2+deb12u5
+    CVE-2026-71199 HIGH (affected)
+    CVE-2026-71200 HIGH (affected)
+  liblzma5 5.4.1-0.2
+    CVE-2025-31115 HIGH -> 5.4.1-1
+  libmount1 2.38.1-5+b1
+    CVE-2026-53613 HIGH (affected)
+    CVE-2026-53615 HIGH (affected)
+    CVE-2026-78410 HIGH (affected)
+  libncursesw6 6.4-4
+    CVE-2025-69720 HIGH (affected)
+  libpam-modules 1.5.2-6
+    CVE-2025-6020 HIGH (affected)
+  libpam-modules-bin 1.5.2-6
+    CVE-2025-6020 HIGH (affected)
+  libpam-runtime 1.5.2-6
+    CVE-2025-6020 HIGH (affected)
+  libpam0g 1.5.2-6
+    CVE-2025-6020 HIGH (affected)
+  libpcre2-8-0 10.42-1
+    CVE-2026-103111 HIGH -> 10.42-1+deb12u2
+    CVE-2026-86145 HIGH -> 10.42-1+deb12u1
+    CVE-2026-89157 HIGH -> 10.42-1+deb12u1
+    CVE-2026-89161 HIGH -> 10.42-1+deb12u1
+  libsmartcols1 2.38.1-5+b1
+    CVE-2026-53613 HIGH (affected)
+    CVE-2026-53615 HIGH (affected)
+    CVE-2026-78410 HIGH (affected)
+  libsqlite3-0 3.40.1-2
+    CVE-2025-7458 CRITICAL (affected)
+    CVE-2023-7104 HIGH -> 3.40.1-2+deb12u1
+    CVE-2025-6965 HIGH -> 3.40.1-2+deb12u2
+    CVE-2026-11822 HIGH (fix_deferred)
+    CVE-2026-11824 HIGH (fix_deferred)
+    CVE-2026-119373 HIGH (affected)
+    CVE-2026-119374 HIGH (affected)
+    CVE-2026-119379 HIGH (affected)
+  libssl3 3.0.9-1
+    CVE-2026-31789 CRITICAL -> 3.0.19-1~deb12u2
+    CVE-2023-5363 HIGH -> 3.0.11-1~deb12u2
+    CVE-2024-6119 HIGH -> 3.0.14-1~deb12u2
+    CVE-2025-15467 HIGH -> 3.0.18-1~deb12u2
+    CVE-2025-69421 HIGH -> 3.0.18-1~deb12u2
+    CVE-2026-28387 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-28388 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-28389 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-28390 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-45447 HIGH -> 3.0.20-1~deb12u2
+    CVE-2026-84782 HIGH -> 3.0.22-1~deb12u2
+  libsystemd0 252.12-1~deb12u1
+    CVE-2023-50387 HIGH -> 252.23-1~deb12u1
+    CVE-2023-50868 HIGH -> 252.23-1~deb12u1
+    CVE-2026-16742 HIGH (fix_deferred)
+  libtinfo6 6.4-4
+    CVE-2025-69720 HIGH (affected)
+  libudev1 252.12-1~deb12u1
+    CVE-2023-50387 HIGH -> 252.23-1~deb12u1
+    CVE-2023-50868 HIGH -> 252.23-1~deb12u1
+    CVE-2026-16742 HIGH (fix_deferred)
+  libuuid1 2.38.1-5+b1
+    CVE-2026-53613 HIGH (affected)
+    CVE-2026-53615 HIGH (affected)
+    CVE-2026-78410 HIGH (affected)
+  mount 2.38.1-5+b1
+    CVE-2026-53613 HIGH (affected)
+    CVE-2026-53615 HIGH (affected)
+    CVE-2026-78410 HIGH (affected)
+  ncurses-base 6.4-4
+    CVE-2025-69720 HIGH (affected)
+  ncurses-bin 6.4-4
+    CVE-2025-69720 HIGH (affected)
+  openssl 3.0.9-1
+    CVE-2026-31789 CRITICAL -> 3.0.19-1~deb12u2
+    CVE-2023-5363 HIGH -> 3.0.11-1~deb12u2
+    CVE-2024-6119 HIGH -> 3.0.14-1~deb12u2
+    CVE-2025-15467 HIGH -> 3.0.18-1~deb12u2
+    CVE-2025-69421 HIGH -> 3.0.18-1~deb12u2
+    CVE-2026-28387 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-28388 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-28389 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-28390 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-45447 HIGH -> 3.0.20-1~deb12u2
+    CVE-2026-84782 HIGH -> 3.0.22-1~deb12u2
+  perl-base 5.36.0-7
+    CVE-2026-13221 CRITICAL -> 5.36.0-7+deb12u4
+    CVE-2026-42496 CRITICAL -> 5.36.0-7+deb12u4
+    CVE-2026-8376 CRITICAL -> 5.36.0-7+deb12u4
+    CVE-2023-31484 HIGH -> 5.36.0-7+deb12u3
+    CVE-2023-47038 HIGH -> 5.36.0-7+deb12u1
+    CVE-2024-56406 HIGH -> 5.36.0-7+deb12u2
+    CVE-2026-42497 HIGH -> 5.36.0-7+deb12u4
+    CVE-2026-48962 HIGH -> 5.36.0-7+deb12u4
+    CVE-2026-57432 HIGH -> 5.36.0-7+deb12u4
+    CVE-2026-57433 HIGH -> 5.36.0-7+deb12u4
+    CVE-2026-9538 HIGH (fix_deferred)
+  util-linux 2.38.1-5+b1
+    CVE-2026-53613 HIGH (affected)
+    CVE-2026-53615 HIGH (affected)
+    CVE-2026-78410 HIGH (affected)
+  util-linux-extra 2.38.1-5+b1
+    CVE-2026-53613 HIGH (affected)
+    CVE-2026-53615 HIGH (affected)
+    CVE-2026-78410 HIGH (affected)
+  zlib1g 1:1.2.13.dfsg-1
+    CVE-2023-45853 CRITICAL (will_not_fix)
+    CVE-2026-85091 HIGH (affected)
+Python (python-pkg)
+Total: 4 (HIGH: 4, CRITICAL: 0)
+  setuptools (METADATA) 57.5.0
+    CVE-2022-40897 HIGH -> 65.5.1
+    CVE-2024-6345 HIGH -> 70.0.0
+    CVE-2025-47273 HIGH -> 78.1.1
+  wheel (METADATA) 0.41.2
+    CVE-2026-24049 HIGH -> 0.46.2
+WARN Using severities from other vendors for some vulnerabilities. Read https://trivy.dev/v0.67/docs/scanner/vulnerability#severity-selection for details.
+…+12 stderr lines (progress, INFO logs, update notice)

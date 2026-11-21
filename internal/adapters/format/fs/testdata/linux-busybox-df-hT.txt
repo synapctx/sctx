@@ -1,0 +1,15 @@
+Filesystem           Type            Size      Used Available Use% Mounted on
+overlay              overlay       503.6G    139.7G    338.3G  29% /
+tmpfs                tmpfs          64.0M         0     64.0M   0% /dev
+shm                  tmpfs          64.0M         0     64.0M   0% /dev/shm
+grpcfuse             fuse.grpcfuse
+                                   926.4G    820.5G    105.8G  89% /work
+/dev/vda1            ext4          503.6G    139.7G    338.3G  29% /etc/hostname
+/dev/vda1            ext4          503.6G    139.7G    338.3G  29% /etc/hosts
+/dev/vda1            ext4          503.6G    139.7G    338.3G  29% /etc/resolv.conf
+tmpfs                tmpfs          64.0M         0     64.0M   0% /proc/interrupts
+tmpfs                tmpfs          64.0M         0     64.0M   0% /proc/kcore
+tmpfs                tmpfs          64.0M         0     64.0M   0% /proc/keys
+tmpfs                tmpfs           4.0K         0      4.0K   0% /proc/scsi
+tmpfs                tmpfs          64.0M         0     64.0M   0% /proc/timer_list
+tmpfs                tmpfs           4.0K         0      4.0K   0% /sys/firmware

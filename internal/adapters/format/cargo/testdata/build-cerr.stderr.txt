@@ -1,0 +1,41 @@
+    Updating crates.io index
+     Locking 1 package to highest compatible version
+   Compiling itoa v1.0.19
+   Compiling demo v0.1.0 (/work/rs-cerr)
+error[E0425]: cannot find value `c` in this scope
+ --> src/lib.rs:3:9
+  |
+3 |     a + c
+  |         ^ not found in this scope
+  |
+help: a local variable with a similar name exists
+  |
+3 -     a + c
+3 +     a + a
+  |
+
+error[E0308]: mismatched types
+ --> src/lib.rs:7:18
+  |
+7 |     let x: i32 = "hello";
+  |            ---   ^^^^^^^ expected `i32`, found `&str`
+  |            |
+  |            expected due to this
+
+error[E0308]: mismatched types
+ --> src/lib.rs:8:5
+  |
+6 | pub fn name() -> String {
+  |                  ------ expected `String` because of return type
+7 |     let x: i32 = "hello";
+8 |     x
+  |     ^ expected `String`, found `i32`
+  |
+help: try using a conversion method
+  |
+8 |     x.to_string()
+  |      ++++++++++++
+
+Some errors have detailed explanations: E0308, E0425.
+For more information about an error, try `rustc --explain E0308`.
+error: could not compile `demo` (lib) due to 3 previous errors

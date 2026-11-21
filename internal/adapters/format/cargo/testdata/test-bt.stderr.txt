@@ -1,0 +1,5 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.06s
+     Running unittests src/lib.rs (target/debug/build/demo/7809a55094760de5/out/demo-7809a55094760de5)
+error: test failed, to rerun pass `--lib`
+error: 1 target failed:
+    `--lib`

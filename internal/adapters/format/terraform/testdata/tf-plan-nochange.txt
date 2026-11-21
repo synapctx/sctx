@@ -1,0 +1,13 @@
+[0m[1mnull_resource.n: Refreshing state... [id=4646943268596394830][0m
+[0m[1mrandom_pet.p["gamma"]: Refreshing state... [id=engaged-mako][0m
+[0m[1mrandom_pet.p["beta"]: Refreshing state... [id=cosmic-reindeer][0m
+[0m[1mrandom_password.pw: Refreshing state... [id=none][0m
+[0m[1mrandom_pet.p["alpha"]: Refreshing state... [id=bold-gecko][0m
+[0m[1mlocal_file.f["beta"]: Refreshing state... [id=9aafb03ea6af86d94850a56c731fac6e52d043bf][0m
+[0m[1mlocal_file.f["alpha"]: Refreshing state... [id=943b98459f0a7f0d44fd44ccc88633af2afa427a][0m
+[0m[1mlocal_file.f["gamma"]: Refreshing state... [id=7d76bfd182d5fa1c9031ab27706e5bf97e5d8dee][0m
+
+[0m[1m[32mNo changes.[0m[1m Your infrastructure matches the configuration.[0m
+
+[0mTerraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.

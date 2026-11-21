@@ -1,0 +1,13 @@
+WARNING: Storing migrations in 'sql' is not recommended and default scanning of this location may be deprecated in a future release
+Flyway OSS Edition 11.20.3 by Redgate
+
+See release notes here: https://rd.gt/416ObMi
+Database: jdbc:postgresql://db:5432/migr (PostgreSQL 17.12)
+Schema history table "public"."flyway_schema_history" does not exist yet
+Successfully validated 3 migrations (execution time 00:00.021s)
+Creating Schema History table "public"."flyway_schema_history" ...
+Current version of schema "public": << Empty Schema >>
+Migrating schema "public" to version "1 - create customers"
+Migrating schema "public" to version "2 - create orders"
+Migrating schema "public" to version "3 - add status"
+Successfully applied 3 migrations to schema "public", now at version v3 (execution time 00:00.007s)

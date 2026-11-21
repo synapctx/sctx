@@ -1,0 +1,16 @@
+KubeLinter 0.8.3
+
+/work/proj/k8s/deploy.yaml: (object: <no namespace>/web apps/v1, Kind=Deployment) The container "web" is using an invalid container image, "nginx:latest". Please use images that are not blocked by the `BlockList` criteria : [".*:(latest)$" "^[^:]*$" "(.*/[^:]+)$"] (check: latest-tag, remediation: Use a container image with a specific tag other than latest.)
+
+/work/proj/k8s/deploy.yaml: (object: <no namespace>/web apps/v1, Kind=Deployment) container "web" does not have a read-only root file system (check: no-read-only-root-fs, remediation: Set readOnlyRootFilesystem to true in the container securityContext.)
+
+/work/proj/k8s/deploy.yaml: (object: <no namespace>/web apps/v1, Kind=Deployment) container "web" is Privileged hence allows privilege escalation. (check: privilege-escalation-container, remediation: Ensure containers do not allow privilege escalation by setting allowPrivilegeEscalation=false, privileged=false and removing CAP_SYS_ADMIN capability. See https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for more details.)
+
+/work/proj/k8s/deploy.yaml: (object: <no namespace>/web apps/v1, Kind=Deployment) container "web" is privileged (check: privileged-container, remediation: Do not run your container as privileged unless it is required.)
+
+/work/proj/k8s/deploy.yaml: (object: <no namespace>/web apps/v1, Kind=Deployment) container "web" is not set to runAsNonRoot (check: run-as-non-root, remediation: Set runAsUser to a non-zero number and runAsNonRoot to true in your pod or container securityContext. Refer to https://kubernetes.io/docs/tasks/configure-pod-container/security-context/ for details.)
+
+/work/proj/k8s/deploy.yaml: (object: <no namespace>/web apps/v1, Kind=Deployment) container "web" has cpu request 0 (check: unset-cpu-requirements, remediation: Set CPU requests for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.)
+
+/work/proj/k8s/deploy.yaml: (object: <no namespace>/web apps/v1, Kind=Deployment) container "web" has memory limit 0 (check: unset-memory-requirements, remediation: Set memory limits for your container based on its requirements. Refer to https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#requests-and-limits for details.)
+

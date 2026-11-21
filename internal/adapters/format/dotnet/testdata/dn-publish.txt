@@ -1,0 +1,4 @@
+  Determining projects to restore...
+  Restored /work/dn-ok/Lib/Lib.csproj (in 1 ms).
+  Lib -> /work/dn-ok/Lib/bin/Release/net11.0/Lib.dll
+  Lib -> /work/dn-ok/Lib/bin/Release/net11.0/publish/

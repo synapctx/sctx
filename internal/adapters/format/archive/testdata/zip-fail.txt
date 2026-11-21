@@ -1,0 +1,3 @@
+	zip warning: name not matched: nonexistdir
+
+zip error: Nothing to do! (try: zip -r nodir.zip . -i nonexistdir)

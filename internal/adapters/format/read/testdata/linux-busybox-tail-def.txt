@@ -1,0 +1,10 @@
+2026-11-21T10:00:31 INFO request id=391 path=/api/v1/items status=200 dur=391ms
+2026-11-21T10:00:32 INFO request id=392 path=/api/v1/items status=200 dur=392ms
+2026-11-21T10:00:33 INFO request id=393 path=/api/v1/items status=200 dur=393ms
+2026-11-21T10:00:34 INFO request id=394 path=/api/v1/items status=200 dur=394ms
+2026-11-21T10:00:35 INFO request id=395 path=/api/v1/items status=200 dur=395ms
+2026-11-21T10:00:36 INFO request id=396 path=/api/v1/items status=200 dur=396ms
+2026-11-21T10:00:37 INFO request id=397 path=/api/v1/items status=200 dur=397ms
+2026-11-21T10:00:38 INFO request id=398 path=/api/v1/items status=200 dur=398ms
+2026-11-21T10:00:39 INFO request id=399 path=/api/v1/items status=200 dur=399ms
+2026-11-21T10:01:00 ERROR db timeout id=7

@@ -1,0 +1,79 @@
+warning: unused dependency `itoa`
+ --> Cargo.toml:7:1
+  |
+7 | itoa = "1"
+  | ^^^^^^^^^^
+  |
+  = note: `cargo::unused_dependencies` is set to `warn` by default
+help: consider removing the dependency on `itoa`
+warning: `demo` (manifest) generated 1 warning
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+────────────
+ Nextest run ID f7ce7638-d928-471a-b7be-623da76dc6db with nextest profile: default
+    Starting 4 tests across 2 binaries
+        FAIL [   0.011s] (1/4) demo tests::bad_sum
+  stdout ───
+
+    running 1 test
+    test tests::bad_sum ... FAILED
+
+    failures:
+
+    failures:
+        tests::bad_sum
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+  stderr ───
+
+    thread 'tests::bad_sum' (32569328) panicked at src/lib.rs:25:9:
+    assertion `left == right` failed: sum was wrong
+      left: 5
+     right: 6
+    note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+        FAIL [   0.012s] (2/4) demo tests::bad_panic
+  stdout ───
+
+    running 1 test
+    test tests::bad_panic ... FAILED
+
+    failures:
+
+    failures:
+        tests::bad_panic
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+  stderr ───
+
+    thread 'tests::bad_panic' (32569327) panicked at src/lib.rs:36:9:
+    boom
+    note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+        PASS [   0.013s] (3/4) demo tests::adds
+        FAIL [   0.014s] (4/4) demo tests::bad_unwrap
+  stdout ───
+
+    running 1 test
+    test tests::bad_unwrap ... FAILED
+
+    failures:
+
+    failures:
+        tests::bad_unwrap
+
+    test result: FAILED. 0 passed; 1 failed; 0 ignored; 0 measured; 3 filtered out; finished in 0.00s
+
+  stderr ───
+
+    thread 'tests::bad_unwrap' (32569333) panicked at src/lib.rs:30:28:
+    called `Result::unwrap()` on an `Err` value: ParseIntError { kind: InvalidDigit }
+    note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+────────────
+     Summary [   0.014s] 4 tests run: 1 passed, 3 failed, 0 skipped
+        FAIL [   0.011s] (1/4) demo tests::bad_sum
+        FAIL [   0.012s] (2/4) demo tests::bad_panic
+        FAIL [   0.014s] (4/4) demo tests::bad_unwrap
+error: test run failed

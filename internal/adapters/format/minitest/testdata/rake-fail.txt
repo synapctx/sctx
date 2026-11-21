@@ -1,0 +1,48 @@
+Run options: --seed 56532
+
+# Running:
+
+EF.FFF
+
+Finished in 0.013933s, 430.6323 runs/s, 358.8603 assertions/s.
+
+  1) Error:
+BadTest#test_div_zero:
+ZeroDivisionError: divided by 0
+    lib/calc.rb:4:in 'Integer#/'
+    lib/calc.rb:4:in 'Calc#div'
+    test/bad_test.rb:5:in 'BadTest#test_div_zero'
+
+  2) Failure:
+BadTest#test_text [test/bad_test.rb:11]:
+--- expected
++++ actual
+@@ -1,4 +1,4 @@
+ "line1
+-line2
++lineX
+ line3
+ "
+
+
+  3) Failure:
+BadTest#test_nil [test/bad_test.rb:9]:
+Expected "x" to be nil.
+
+  4) Failure:
+BadTest#test_multi [test/bad_test.rb:7]:
+Expected: {a: 1, b: [1, 2, 3]}
+  Actual: {a: 1, b: [1, 2, 4]}
+
+  5) Failure:
+BadTest#test_add_wrong [test/bad_test.rb:4]:
+Expected: 4
+  Actual: 3
+
+6 runs, 5 assertions, 4 failures, 1 errors, 0 skips
+rake aborted!
+Command failed with status (1)
+/app/vendor/bundle/ruby/4.0.0/gems/rake-13.4.2/exe/rake:27:in '<top (required)>'
+/opt/homebrew/opt/ruby/bin/bundle:25:in '<main>'
+Tasks: TOP => test
+(See full trace by running task with --trace)

@@ -1,0 +1,25 @@
+*************************** 1. row ***************************
+     id: 1
+   name: Customer 1
+  email: user1@example.com
+country: DE
+*************************** 2. row ***************************
+     id: 2
+   name: Customer 2
+  email: user2@example.com
+country: FR
+*************************** 3. row ***************************
+     id: 3
+   name: Customer 3
+  email: user3@example.com
+country: ES
+*************************** 4. row ***************************
+     id: 4
+   name: Customer 4
+  email: user4@example.com
+country: JP
+*************************** 5. row ***************************
+     id: 5
+   name: Customer 5
+  email: user5@example.com
+country: US

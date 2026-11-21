@@ -1,0 +1,13 @@
+==> jason
+Compiling 10 files (.ex)
+Generated jason app
+==> demo
+Compiling 2 files (.ex)
+    warning: variable "y" is unused (if the variable is not meant to be used, prefix it with an underscore)
+    │
+  4 │     y = 1
+    │     ~
+    │
+    └─ lib/demo.ex:4:5: Demo.unused_var/1
+
+Generated demo app

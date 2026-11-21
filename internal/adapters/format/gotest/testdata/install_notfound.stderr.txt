@@ -1,0 +1,1 @@
+go: example.invalid/nothing@latest: unrecognized import path "example.invalid/nothing": https fetch: Get "https://example.invalid/nothing?go-get=1": dial tcp: lookup example.invalid: no such host

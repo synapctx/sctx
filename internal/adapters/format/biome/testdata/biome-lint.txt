@@ -1,0 +1,132 @@
+src/a.js:1:7 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! This variable x is unused.
+  
+  > 1 │ const x = 1
+      │       ^
+    2 │ function foo( a,b ){ var unused = 3; if(a == b){ console.log("hi") }
+    3 │   return a+b }
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend x with an underscore.
+  
+    1   │ - const·x·=·1
+      1 │ + const·_x·=·1
+    2 2 │   function foo( a,b ){ var unused = 3; if(a == b){ console.log("hi") }
+    3 3 │     return a+b }
+  
+
+src/a.js:2:26 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! This variable unused is unused.
+  
+    1 │ const x = 1
+  > 2 │ function foo( a,b ){ var unused = 3; if(a == b){ console.log("hi") }
+      │                          ^^^^^^
+    3 │   return a+b }
+    4 │ debugger
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend unused with an underscore.
+  
+    1 1 │   const x = 1
+    2   │ - function·foo(·a,b·){·var·unused·=·3;·if(a·==·b){·console.log("hi")·}
+      2 │ + function·foo(·a,b·){·var·_unused·=·3;·if(a·==·b){·console.log("hi")·}
+    3 3 │     return a+b }
+    4 4 │   debugger
+  
+
+src/b.ts:2:1 lint/style/useConst  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! This let declares a variable that is only assigned once.
+  
+    1 │ export const y: number = 'str'.length;
+  > 2 │ let z = 1;
+      │ ^^^
+    3 │ 
+  
+  i 'z' is never reassigned.
+  
+    1 │ export const y: number = 'str'.length;
+  > 2 │ let z = 1;
+      │     ^
+    3 │ 
+  
+  i A variable that is never reassigned is clearer as const, because it prevents the binding from being reassigned.
+  
+  i Safe fix: Use const instead.
+  
+    1 1 │   export const y: number = 'str'.length;
+    2   │ - let·z·=·1;
+      2 │ + const·z·=·1;
+    3 3 │   
+  
+
+src/b.ts:2:5 lint/correctness/noUnusedVariables  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  ! This variable z is unused.
+  
+    1 │ export const y: number = 'str'.length;
+  > 2 │ let z = 1;
+      │     ^
+    3 │ 
+  
+  i Unused variables are often the result of typos, incomplete refactors, or other sources of bugs.
+  
+  i Unsafe fix: If this is intentional, prepend z with an underscore.
+  
+    1 1 │   export const y: number = 'str'.length;
+    2   │ - let·z·=·1;
+      2 │ + let·_z·=·1;
+    3 3 │   
+  
+
+src/a.js:2:43 lint/suspicious/noDoubleEquals  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Using == may be unsafe if you are relying on type coercion.
+  
+    1 │ const x = 1
+  > 2 │ function foo( a,b ){ var unused = 3; if(a == b){ console.log("hi") }
+      │                                           ^^
+    3 │   return a+b }
+    4 │ debugger
+  
+  i == is only allowed when comparing against null.
+  
+  i Unsafe fix: Use === instead.
+  
+    2 │ function·foo(·a,b·){·var·unused·=·3;·if(a·===·b){·console.log("hi")·}
+      │                                             +                        
+
+src/a.js:4:1 lint/suspicious/noDebugger  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × This is an unexpected use of the debugger statement.
+  
+    2 │ function foo( a,b ){ var unused = 3; if(a == b){ console.log("hi") }
+    3 │   return a+b }
+  > 4 │ debugger
+      │ ^^^^^^^^
+    5 │ export default foo
+    6 │ 
+  
+  i A debugger statement pauses the program when a debugger is open. It is meant for debugging only, and it should not be left in code that is shipped.
+  
+  i Unsafe fix: Remove debugger statement
+  
+    2 2 │   function foo( a,b ){ var unused = 3; if(a == b){ console.log("hi") }
+    3 3 │     return a+b }
+    4   │ - debugger
+    5 4 │   export default foo
+    6 5 │   
+  
+
+Checked 3 files in 35ms. No fixes applied.
+Found 2 errors.
+Found 4 warnings.
+lint ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  × Some errors were emitted while running checks.
+  
+

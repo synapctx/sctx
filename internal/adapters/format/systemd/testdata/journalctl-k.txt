@@ -1,0 +1,80 @@
+Nov 21 02:41:30 af8069ba3d96 kernel: veth3f68758 (unregistering): left allmulticast mode
+Nov 21 02:41:30 af8069ba3d96 kernel: veth3f68758 (unregistering): left promiscuous mode
+Nov 21 02:41:30 af8069ba3d96 kernel: docker0: port 3(veth3f68758) entered disabled state
+Nov 21 02:41:31 af8069ba3d96 kernel: br-672c2b1f4a34: port 6(vethf66f35e) entered disabled state
+Nov 21 02:41:31 af8069ba3d96 kernel: veth72c0cd7: renamed from eth0
+Nov 21 02:41:31 af8069ba3d96 kernel: br-672c2b1f4a34: port 6(vethf66f35e) entered disabled state
+Nov 21 02:41:31 af8069ba3d96 kernel: vethf66f35e (unregistering): left allmulticast mode
+Nov 21 02:41:31 af8069ba3d96 kernel: vethf66f35e (unregistering): left promiscuous mode
+Nov 21 02:41:31 af8069ba3d96 kernel: br-672c2b1f4a34: port 6(vethf66f35e) entered disabled state
+Nov 21 02:41:32 af8069ba3d96 kernel: br-672c2b1f4a34: port 6(veth5cb56a5) entered blocking state
+Nov 21 02:41:32 af8069ba3d96 kernel: br-672c2b1f4a34: port 6(veth5cb56a5) entered disabled state
+Nov 21 02:41:32 af8069ba3d96 kernel: veth5cb56a5: entered allmulticast mode
+Nov 21 02:41:32 af8069ba3d96 kernel: veth5cb56a5: entered promiscuous mode
+Nov 21 02:41:32 af8069ba3d96 kernel: eth0: renamed from vethc08fe63
+Nov 21 02:41:32 af8069ba3d96 kernel: br-672c2b1f4a34: port 6(veth5cb56a5) entered blocking state
+Nov 21 02:41:32 af8069ba3d96 kernel: br-672c2b1f4a34: port 6(veth5cb56a5) entered forwarding state
+Nov 21 02:41:34 af8069ba3d96 kernel: br-672c2b1f4a34: port 6(veth5cb56a5) entered disabled state
+Nov 21 02:41:34 af8069ba3d96 kernel: vethc08fe63: renamed from eth0
+Nov 21 02:41:34 af8069ba3d96 kernel: br-672c2b1f4a34: port 6(veth5cb56a5) entered disabled state
+Nov 21 02:41:34 af8069ba3d96 kernel: veth5cb56a5 (unregistering): left allmulticast mode
+Nov 21 02:41:34 af8069ba3d96 kernel: veth5cb56a5 (unregistering): left promiscuous mode
+Nov 21 02:41:34 af8069ba3d96 kernel: br-672c2b1f4a34: port 6(veth5cb56a5) entered disabled state
+Nov 21 02:42:01 af8069ba3d96 kernel: docker0: port 2(vethff272de) entered disabled state
+Nov 21 02:42:01 af8069ba3d96 kernel: veth0013ed2: renamed from eth0
+Nov 21 02:42:01 af8069ba3d96 kernel: docker0: port 2(vethff272de) entered disabled state
+Nov 21 02:42:01 af8069ba3d96 kernel: vethff272de (unregistering): left allmulticast mode
+Nov 21 02:42:01 af8069ba3d96 kernel: vethff272de (unregistering): left promiscuous mode
+Nov 21 02:42:01 af8069ba3d96 kernel: docker0: port 2(vethff272de) entered disabled state
+Nov 21 02:43:00 af8069ba3d96 kernel: docker0: port 2(veth7f2c367) entered blocking state
+Nov 21 02:43:00 af8069ba3d96 kernel: docker0: port 2(veth7f2c367) entered disabled state
+Nov 21 02:43:00 af8069ba3d96 kernel: veth7f2c367: entered allmulticast mode
+Nov 21 02:43:00 af8069ba3d96 kernel: veth7f2c367: entered promiscuous mode
+Nov 21 02:43:00 af8069ba3d96 kernel: eth0: renamed from vethf8e8f4e
+Nov 21 02:43:00 af8069ba3d96 kernel: docker0: port 2(veth7f2c367) entered blocking state
+Nov 21 02:43:00 af8069ba3d96 kernel: docker0: port 2(veth7f2c367) entered forwarding state
+Nov 21 02:43:00 af8069ba3d96 kernel: docker0: port 2(veth7f2c367) entered disabled state
+Nov 21 02:43:00 af8069ba3d96 kernel: vethf8e8f4e: renamed from eth0
+Nov 21 02:43:00 af8069ba3d96 kernel: docker0: port 2(veth7f2c367) entered disabled state
+Nov 21 02:43:00 af8069ba3d96 kernel: veth7f2c367 (unregistering): left allmulticast mode
+Nov 21 02:43:00 af8069ba3d96 kernel: veth7f2c367 (unregistering): left promiscuous mode
+Nov 21 02:43:00 af8069ba3d96 kernel: docker0: port 2(veth7f2c367) entered disabled state
+Nov 21 02:43:01 af8069ba3d96 kernel: docker0: port 2(vetha40c0d0) entered blocking state
+Nov 21 02:43:01 af8069ba3d96 kernel: docker0: port 2(vetha40c0d0) entered disabled state
+Nov 21 02:43:01 af8069ba3d96 kernel: vetha40c0d0: entered allmulticast mode
+Nov 21 02:43:01 af8069ba3d96 kernel: vetha40c0d0: entered promiscuous mode
+Nov 21 02:43:01 af8069ba3d96 kernel: eth0: renamed from vethfd04580
+Nov 21 02:43:01 af8069ba3d96 kernel: docker0: port 2(vetha40c0d0) entered blocking state
+Nov 21 02:43:01 af8069ba3d96 kernel: docker0: port 2(vetha40c0d0) entered forwarding state
+Nov 21 02:43:01 af8069ba3d96 kernel: docker0: port 2(vetha40c0d0) entered disabled state
+Nov 21 02:43:01 af8069ba3d96 kernel: vethfd04580: renamed from eth0
+Nov 21 02:43:01 af8069ba3d96 kernel: docker0: port 2(vetha40c0d0) entered disabled state
+Nov 21 02:43:01 af8069ba3d96 kernel: vetha40c0d0 (unregistering): left allmulticast mode
+Nov 21 02:43:01 af8069ba3d96 kernel: vetha40c0d0 (unregistering): left promiscuous mode
+Nov 21 02:43:01 af8069ba3d96 kernel: docker0: port 2(vetha40c0d0) entered disabled state
+Nov 21 02:43:01 af8069ba3d96 kernel: docker0: port 2(veth78362ae) entered blocking state
+Nov 21 02:43:01 af8069ba3d96 kernel: docker0: port 2(veth78362ae) entered disabled state
+Nov 21 02:43:01 af8069ba3d96 kernel: veth78362ae: entered allmulticast mode
+Nov 21 02:43:01 af8069ba3d96 kernel: veth78362ae: entered promiscuous mode
+Nov 21 02:43:01 af8069ba3d96 kernel: eth0: renamed from veth058ffd4
+Nov 21 02:43:01 af8069ba3d96 kernel: docker0: port 2(veth78362ae) entered blocking state
+Nov 21 02:43:01 af8069ba3d96 kernel: docker0: port 2(veth78362ae) entered forwarding state
+Nov 21 02:43:02 af8069ba3d96 kernel: docker0: port 2(veth78362ae) entered disabled state
+Nov 21 02:43:02 af8069ba3d96 kernel: veth058ffd4: renamed from eth0
+Nov 21 02:43:02 af8069ba3d96 kernel: docker0: port 2(veth78362ae) entered disabled state
+Nov 21 02:43:02 af8069ba3d96 kernel: veth78362ae (unregistering): left allmulticast mode
+Nov 21 02:43:02 af8069ba3d96 kernel: veth78362ae (unregistering): left promiscuous mode
+Nov 21 02:43:02 af8069ba3d96 kernel: docker0: port 2(veth78362ae) entered disabled state
+Nov 21 02:43:02 af8069ba3d96 kernel: docker0: port 2(vethf1c3688) entered blocking state
+Nov 21 02:43:02 af8069ba3d96 kernel: docker0: port 2(vethf1c3688) entered disabled state
+Nov 21 02:43:02 af8069ba3d96 kernel: vethf1c3688: entered allmulticast mode
+Nov 21 02:43:02 af8069ba3d96 kernel: vethf1c3688: entered promiscuous mode
+Nov 21 02:43:02 af8069ba3d96 kernel: eth0: renamed from veth5a14ea9
+Nov 21 02:43:02 af8069ba3d96 kernel: docker0: port 2(vethf1c3688) entered blocking state
+Nov 21 02:43:02 af8069ba3d96 kernel: docker0: port 2(vethf1c3688) entered forwarding state
+Nov 21 02:43:03 af8069ba3d96 kernel: docker0: port 2(vethf1c3688) entered disabled state
+Nov 21 02:43:03 af8069ba3d96 kernel: veth5a14ea9: renamed from eth0
+Nov 21 02:43:03 af8069ba3d96 kernel: docker0: port 2(vethf1c3688) entered disabled state
+Nov 21 02:43:03 af8069ba3d96 kernel: vethf1c3688 (unregistering): left allmulticast mode
+Nov 21 02:43:03 af8069ba3d96 kernel: vethf1c3688 (unregistering): left promiscuous mode
+Nov 21 02:43:03 af8069ba3d96 kernel: docker0: port 2(vethf1c3688) entered disabled state

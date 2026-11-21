@@ -12,13 +12,23 @@ import (
 // verbatim from an audit report before eliding the rest.
 const maxAdvisoryBlocks = 3
 
+// maxAuditPlainLines bounds the non-error lines kept when an audit produced
+// no vulnerability summary (a failed run); error lines are never counted
+// against it.
+const maxAuditPlainLines = 20
+
 // vulnerabilitySummaryRe matches npm/pnpm/yarn audit's terse result line,
-// e.g. "5 vulnerabilities (2 moderate, 3 high)" or "found 0 vulnerabilities".
-var vulnerabilitySummaryRe = regexp.MustCompile(`(?i)\bvulnerabilit(y|ies)\b`)
+// e.g. "5 vulnerabilities (2 moderate, 3 high)", "2 critical severity
+// vulnerabilities" or "found 0 vulnerabilities". It is anchored on the count
+// because advisory titles ("... Prototype Pollution Vulnerability in ...")
+// also contain the word.
+var vulnerabilitySummaryRe = regexp.MustCompile(`(?i)^(found\s+)?\d+\s.*\bvulnerabilit(y|ies)\b`)
 
 // aggressiveAudit collapses `audit` output to the vulnerability summary
-// line plus a capped list of per-advisory paragraphs; a genuine failure
-// (network error, no summary produced) keeps the error block verbatim.
+// line plus a capped list of per-advisory paragraphs. Without a summary (a
+// failed audit: network error, registry refusal) every error line is kept
+// and whatever else is dropped is counted in a marker — a non-zero exit never
+// loses lines silently.
 func aggressiveAudit(in format.Input) (format.Rendered, error) {
 	rawOut := readAll(in.Stdout)
 	rawErr := readAll(in.Stderr)
@@ -26,39 +36,50 @@ func aggressiveAudit(in format.Input) (format.Rendered, error) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
-	var errorLines []string
 	var summaryLine string
-	for _, l := range append(splitLines(rawOut), splitLines(rawErr)...) {
-		t := strings.TrimSpace(l)
-		if t == "" {
-			continue
-		}
-		if isErrorLine(t) {
-			errorLines = append(errorLines, t)
-			continue
-		}
-		if summaryLine == "" && vulnerabilitySummaryRe.MatchString(t) {
-			summaryLine = t
+	var outErrors []string
+	var allLines []string // every non-blank line, stdout then stderr
+	hasError := false
+	scan := func(raw []byte, isStdout bool) {
+		for _, l := range splitLines(raw) {
+			t := strings.TrimSpace(l)
+			if t == "" {
+				continue
+			}
+			allLines = append(allLines, t)
+			if isErrorLine(t) {
+				hasError = true
+				if isStdout {
+					outErrors = append(outErrors, t)
+				}
+				continue
+			}
+			if summaryLine == "" && vulnerabilitySummaryRe.MatchString(t) {
+				summaryLine = t
+			}
 		}
 	}
+	scan(rawOut, true)
+	stdoutLines := len(allLines)
+	scan(rawErr, false)
 
 	if summaryLine == "" {
-		if len(errorLines) == 0 {
+		if !hasError && in.ExitCode == 0 {
 			return format.Rendered{}, format.ErrTierInapplicable
 		}
-		return format.Rendered{
-			Body:       []byte(strings.Join(errorLines, "\n")),
-			FoldStderr: len(rawErr) > 0,
-		}, nil
+		return keepAuditLines(allLines, stdoutLines, len(rawErr) > 0), nil
 	}
 
 	blocks := paragraphBlocks(rawOut)
 	var advisories []string
+	hints := 0
 	for _, blk := range blocks {
-		if strings.Contains(blk, summaryLine) {
+		trimmed := strings.TrimSpace(blk)
+		switch {
+		case strings.Contains(blk, summaryLine), strings.HasPrefix(trimmed, "#"):
 			continue
-		}
-		if strings.HasPrefix(strings.TrimSpace(blk), "#") {
+		case strings.HasPrefix(trimmed, "To address"):
+			hints++
 			continue
 		}
 		advisories = append(advisories, blk)
@@ -75,11 +96,48 @@ func aggressiveAudit(in format.Input) (format.Rendered, error) {
 		b.WriteString("\n\n")
 		b.WriteString(blk)
 	}
+	for _, l := range outErrors {
+		b.WriteByte('\n')
+		b.WriteString(l)
+	}
 	if extra > 0 {
 		fmt.Fprintf(&b, "\n…+%d more advisories", extra)
 	}
+	if hints > 0 {
+		fmt.Fprintf(&b, "\n…+%d fix-hint blocks", hints)
+	}
 
-	return format.Rendered{Body: []byte(b.String())}, nil
+	return format.Rendered{Body: []byte(b.String()), Elided: extra > 0 || hints > 0}, nil
+}
+
+// keepAuditLines renders a summary-less audit: every error line survives, other
+// STDOUT lines up to maxAuditPlainLines, and the rest is counted. Every stderr
+// line (lines[stdoutLines:]) is kept: stderr is folded into the body, so a
+// stderr line dropped here would be lost entirely, and it is where npm puts the
+// reason a failed audit failed. Stderr is folded only when it was present.
+func keepAuditLines(lines []string, stdoutLines int, foldStderr bool) format.Rendered {
+	var kept []string
+	plain, dropped := 0, 0
+	for i, t := range lines {
+		if i >= stdoutLines || isErrorLine(t) {
+			kept = append(kept, t)
+			continue
+		}
+		if plain < maxAuditPlainLines {
+			plain++
+			kept = append(kept, t)
+			continue
+		}
+		dropped++
+	}
+	if dropped > 0 {
+		kept = append(kept, fmt.Sprintf("…+%d lines", dropped))
+	}
+	return format.Rendered{
+		Body:       []byte(strings.Join(kept, "\n")),
+		FoldStderr: foldStderr,
+		Elided:     dropped > 0,
+	}
 }
 
 // paragraphBlocks splits raw output into blocks of consecutive non-blank

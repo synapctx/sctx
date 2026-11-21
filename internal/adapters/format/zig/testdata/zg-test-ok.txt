@@ -1,0 +1,4 @@
+Build Summary: 3/3 steps succeeded; 1/1 tests passed
+test success
++- run test 1 passed 1ms MaxRSS:1M
+   +- zig test Debug native success 1s MaxRSS:242M

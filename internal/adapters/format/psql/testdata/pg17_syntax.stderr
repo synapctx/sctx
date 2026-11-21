@@ -1,0 +1,3 @@
+ERROR:  syntax error at or near "selec"
+LINE 1: selec 1
+        ^

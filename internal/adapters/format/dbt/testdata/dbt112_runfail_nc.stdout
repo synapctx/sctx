@@ -1,0 +1,52 @@
+02:41:26  Running with dbt=1.12.7
+02:41:26  Registered adapter: postgres=1.9.1
+02:41:27  Found 16 models, 5 data tests, 476 macros
+02:41:27  
+02:41:27  Concurrency: 4 threads (target='dev')
+02:41:27  
+02:41:27  1 of 16 START sql table model dbt_dev.broken ................................... [RUN]
+02:41:27  2 of 16 START sql view model dbt_dev.stg_customers_1 ........................... [RUN]
+02:41:27  3 of 16 START sql view model dbt_dev.stg_customers_10 .......................... [RUN]
+02:41:27  4 of 16 START sql view model dbt_dev.stg_customers_11 .......................... [RUN]
+02:41:27  1 of 16 ERROR creating sql table model dbt_dev.broken .......................... [ERROR in 0.15s]
+02:41:27  5 of 16 START sql view model dbt_dev.stg_customers_12 .......................... [RUN]
+02:41:27  3 of 16 OK created sql view model dbt_dev.stg_customers_10 ..................... [CREATE VIEW in 0.22s]
+02:41:27  6 of 16 START sql view model dbt_dev.stg_customers_2 ........................... [RUN]
+02:41:27  4 of 16 OK created sql view model dbt_dev.stg_customers_11 ..................... [CREATE VIEW in 0.23s]
+02:41:27  7 of 16 START sql view model dbt_dev.stg_customers_3 ........................... [RUN]
+02:41:27  2 of 16 OK created sql view model dbt_dev.stg_customers_1 ...................... [CREATE VIEW in 0.25s]
+02:41:27  8 of 16 START sql view model dbt_dev.stg_customers_4 ........................... [RUN]
+02:41:27  5 of 16 OK created sql view model dbt_dev.stg_customers_12 ..................... [CREATE VIEW in 0.14s]
+02:41:27  9 of 16 START sql view model dbt_dev.stg_customers_5 ........................... [RUN]
+02:41:27  6 of 16 OK created sql view model dbt_dev.stg_customers_2 ...................... [CREATE VIEW in 0.16s]
+02:41:27  7 of 16 OK created sql view model dbt_dev.stg_customers_3 ...................... [CREATE VIEW in 0.16s]
+02:41:27  10 of 16 START sql view model dbt_dev.stg_customers_6 .......................... [RUN]
+02:41:27  11 of 16 START sql view model dbt_dev.stg_customers_7 .......................... [RUN]
+02:41:27  8 of 16 OK created sql view model dbt_dev.stg_customers_4 ...................... [CREATE VIEW in 0.15s]
+02:41:27  12 of 16 START sql view model dbt_dev.stg_customers_8 .......................... [RUN]
+02:41:27  9 of 16 OK created sql view model dbt_dev.stg_customers_5 ...................... [CREATE VIEW in 0.14s]
+02:41:28  13 of 16 START sql view model dbt_dev.stg_customers_9 .......................... [RUN]
+02:41:28  10 of 16 OK created sql view model dbt_dev.stg_customers_6 ..................... [CREATE VIEW in 0.13s]
+02:41:28  11 of 16 OK created sql view model dbt_dev.stg_customers_7 ..................... [CREATE VIEW in 0.14s]
+02:41:28  14 of 16 START sql view model dbt_dev.stg_orders ............................... [RUN]
+02:41:28  15 of 16 SKIP relation dbt_dev.downstream ...................................... [SKIP]
+02:41:28  12 of 16 OK created sql view model dbt_dev.stg_customers_8 ..................... [CREATE VIEW in 0.15s]
+02:41:28  13 of 16 OK created sql view model dbt_dev.stg_customers_9 ..................... [CREATE VIEW in 0.11s]
+02:41:28  14 of 16 OK created sql view model dbt_dev.stg_orders .......................... [CREATE VIEW in 0.07s]
+02:41:28  16 of 16 START sql table model dbt_dev.revenue_by_country ...................... [RUN]
+02:41:28  16 of 16 OK created sql table model dbt_dev.revenue_by_country ................. [SELECT 5 in 0.06s]
+02:41:28  
+02:41:28  Finished running 3 table models, 13 view models in 0 hours 0 minutes and 0.91 seconds (0.91s).
+02:41:28  
+02:41:28  Completed with 1 error, 0 partial successes, and 0 warnings:
+02:41:28  
+02:41:28  [ERROR]: in model broken (models/marts/broken.sql)
+02:41:28    Database Error in model broken (models/marts/broken.sql)
+  relation "public.nosuch_tbl" does not exist
+  LINE 12:     select * from public.nosuch_tbl
+                             ^
+  compiled code at target/run/shop/models/marts/broken.sql
+02:41:28  
+02:41:28    compiled code at target/compiled/shop/models/marts/broken.sql
+02:41:28  
+02:41:28  Done. PASS=14 WARN=0 ERROR=1 SKIP=1 NO-OP=0 REUSED=0 TOTAL=16

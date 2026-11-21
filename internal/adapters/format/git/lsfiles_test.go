@@ -36,3 +36,40 @@ func TestAggressiveLsFiles(t *testing.T) {
 		}
 	})
 }
+
+func TestAggressiveLsTree(t *testing.T) {
+	sha := strings.Repeat("a1", 20)
+	var lines []string
+	for i := range 14 {
+		lines = append(lines, fmt.Sprintf("100644 blob %s\tinternal/pkg/file%02d.go", sha, i))
+	}
+	lines = append(lines,
+		fmt.Sprintf("100755 blob %s\tscripts/run.sh", sha),
+		fmt.Sprintf("120000 blob %s\tscripts/link", sha),
+		fmt.Sprintf("160000 commit %s\tthird_party/lib", sha),
+		fmt.Sprintf("100644 blob %s\tgo.mod", sha))
+	raw := strings.Join(lines, "\n") + "\n"
+	out, err := New().Aggressive(context.Background(), format.Input{Argv: []string{"git", "ls-tree", "-r", "HEAD"}, Stdout: strings.NewReader(raw)})
+	if err != nil {
+		t.Fatalf("Aggressive() error = %v", err)
+	}
+	body := string(out.Body)
+	for _, want := range []string{"internal/pkg/ (14)", "run.sh*", "link@", "lib!", "go.mod", "object ids and mode omitted"} {
+		if !strings.Contains(body, want) {
+			t.Errorf("body missing %q: %q", want, body)
+		}
+	}
+	if strings.Contains(body, sha) {
+		t.Errorf("object ids leaked: %q", body)
+	}
+
+	t.Run("tree entries and long format decline", func(t *testing.T) {
+		tree := fmt.Sprintf("040000 tree %s\tsrc\n", sha)
+		if _, err := New().Aggressive(context.Background(), format.Input{Argv: []string{"git", "ls-tree", "HEAD"}, Stdout: strings.NewReader(tree)}); err != format.ErrTierInapplicable {
+			t.Errorf("tree entries: err = %v, want ErrTierInapplicable", err)
+		}
+		if _, err := New().Aggressive(context.Background(), format.Input{Argv: []string{"git", "ls-tree", "-l", "HEAD"}, Stdout: strings.NewReader(raw)}); err != format.ErrTierInapplicable {
+			t.Errorf("-l: err = %v, want ErrTierInapplicable", err)
+		}
+	})
+}

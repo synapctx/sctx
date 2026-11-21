@@ -1,0 +1,2 @@
+svn: E170013: Unable to connect to a repository at URL 'file:///nonexistent'
+svn: E180001: Unable to open repository 'file:///nonexistent'

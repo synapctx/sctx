@@ -72,9 +72,13 @@ func aggressiveReport(in format.Input) (format.Rendered, error) {
 			summary = line
 			continue
 		}
-		// Unrecognized non-blank line (e.g. continuation of a multiline
-		// message): ignored — not counted as signal loss since it carries no
-		// file:line diagnostic identity of its own.
+		// A non-blank line this parser does not model (--pretty wrapping and
+		// snippets, --show-error-context headers, "mypy: can't read file"):
+		// ignoring it would silently truncate a message, so decline and let
+		// the relaxed tier keep it.
+		if strings.TrimSpace(line) != "" {
+			return format.Rendered{}, format.ErrTierInapplicable
+		}
 	}
 
 	if len(diags) == 0 && summary == "" {

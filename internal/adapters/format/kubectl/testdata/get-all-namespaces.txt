@@ -1,0 +1,39 @@
+NAMESPACE            NAME                                                 READY   STATUS             RESTARTS      AGE
+default              pod/badimage                                         0/1     ImagePullBackOff   0             83s
+default              pod/crasher                                          0/1     Error              3 (65s ago)   83s
+default              pod/failjob-mgmlg                                    0/1     Error              0             64s
+default              pod/failjob-ttmcf                                    0/1     Error              0             83s
+default              pod/web-7c4dbf5f6-2hslv                              1/1     Running            0             83s
+default              pod/web-7c4dbf5f6-hks2p                              1/1     Running            0             83s
+default              pod/web-7c4dbf5f6-xbfrv                              1/1     Running            0             83s
+kube-system          pod/coredns-559f6c778d-5vdhs                         1/1     Running            0             2m32s
+kube-system          pod/coredns-559f6c778d-mvxjn                         1/1     Running            0             2m32s
+kube-system          pod/etcd-sctxcov3-control-plane                      1/1     Running            0             2m42s
+kube-system          pod/kindnet-glcfc                                    1/1     Running            0             2m33s
+kube-system          pod/kube-apiserver-sctxcov3-control-plane            1/1     Running            0             2m39s
+kube-system          pod/kube-controller-manager-sctxcov3-control-plane   1/1     Running            0             2m38s
+kube-system          pod/kube-proxy-w5xzc                                 1/1     Running            0             2m33s
+kube-system          pod/kube-scheduler-sctxcov3-control-plane            1/1     Running            0             2m38s
+local-path-storage   pod/local-path-provisioner-75f7fc7dc5-xjmcb          1/1     Running            0             2m32s
+
+NAMESPACE     NAME                 TYPE        CLUSTER-IP    EXTERNAL-IP   PORT(S)                  AGE
+default       service/kubernetes   ClusterIP   10.96.0.1     <none>        443/TCP                  2m40s
+default       service/web          ClusterIP   10.96.3.179   <none>        80/TCP                   83s
+kube-system   service/kube-dns     ClusterIP   10.96.0.10    <none>        53/UDP,53/TCP,9153/TCP   2m39s
+
+NAMESPACE     NAME                        DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR            AGE
+kube-system   daemonset.apps/kindnet      1         1         1       1            1           kubernetes.io/os=linux   2m36s
+kube-system   daemonset.apps/kube-proxy   1         1         1       1            1           kubernetes.io/os=linux   2m39s
+
+NAMESPACE            NAME                                     READY   UP-TO-DATE   AVAILABLE   AGE
+default              deployment.apps/web                      3/3     3            3           83s
+kube-system          deployment.apps/coredns                  2/2     2            2           2m39s
+local-path-storage   deployment.apps/local-path-provisioner   1/1     1            1           2m35s
+
+NAMESPACE            NAME                                                DESIRED   CURRENT   READY   AGE
+default              replicaset.apps/web-7c4dbf5f6                       3         3         3       83s
+kube-system          replicaset.apps/coredns-559f6c778d                  2         2         2       2m33s
+local-path-storage   replicaset.apps/local-path-provisioner-75f7fc7dc5   1         1         1       2m33s
+
+NAMESPACE   NAME                STATUS   COMPLETIONS   DURATION   AGE
+default     job.batch/failjob   Failed   0/1           83s        83s

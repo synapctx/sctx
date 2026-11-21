@@ -1,0 +1,50 @@
+  Determining projects to restore...
+  Restored /work/dn-fail/Lib/Lib.csproj (in 45 ms).
+  Restored /work/dn-fail/Lib.Tests/Lib.Tests.csproj (in 168 ms).
+  Lib -> /work/dn-fail/Lib/bin/Debug/net11.0/Lib.dll
+  Lib.Tests -> /work/dn-fail/Lib.Tests/bin/Debug/net11.0/Lib.Tests.dll
+Test run for /work/dn-fail/Lib.Tests/bin/Debug/net11.0/Lib.Tests.dll (.NETCoreApp,Version=v11.0)
+A total of 1 test files matched the specified pattern.
+[xUnit.net 00:00:00.11]     Lib.Tests.CalcTests.Skipped [SKIP]
+[xUnit.net 00:00:00.12]     Lib.Tests.CalcTests.Positive(x: -2) [FAIL]
+[xUnit.net 00:00:00.12]     Lib.Tests.CalcTests.Adds [FAIL]
+[xUnit.net 00:00:00.13]     Lib.Tests.CalcTests.Strs [FAIL]
+[xUnit.net 00:00:00.13]     Lib.Tests.CalcTests.Divs [FAIL]
+  Skipped Lib.Tests.CalcTests.Skipped [1 ms]
+  Failed Lib.Tests.CalcTests.Positive(x: -2) [< 1 ms]
+  Error Message:
+   x must be positive
+  Stack Trace:
+     at Lib.Tests.CalcTests.Positive(Int32 x) in /work/dn-fail/Lib.Tests/UnitTest1.cs:line 6
+   at InvokeStub_CalcTests.Positive(Object, Span`1)
+   at System.Reflection.MethodBaseInvoker.InvokeWithOneArg(Object obj, BindingFlags invokeAttr, Binder binder, Object[] parameters, CultureInfo culture)
+  Failed Lib.Tests.CalcTests.Adds [3 ms]
+  Error Message:
+   Assert.Equal() Failure: Values differ
+Expected: 6
+Actual:   5
+  Stack Trace:
+     at Lib.Tests.CalcTests.Adds() in /work/dn-fail/Lib.Tests/UnitTest1.cs:line 4
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  Failed Lib.Tests.CalcTests.Strs [1 ms]
+  Error Message:
+   Assert.Equal() Failure: Strings differ
+                 ↓ (pos 6)
+Expected: "hello world"
+Actual:   "hello there"
+                 ↑ (pos 6)
+  Stack Trace:
+     at Lib.Tests.CalcTests.Strs() in /work/dn-fail/Lib.Tests/UnitTest1.cs:line 7
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+  Failed Lib.Tests.CalcTests.Divs [< 1 ms]
+  Error Message:
+   System.DivideByZeroException : Attempted to divide by zero.
+  Stack Trace:
+     at Lib.Calc.Div(Int32 a, Int32 b) in /work/dn-fail/Lib/Class1.cs:line 5
+   at Lib.Tests.CalcTests.Divs() in /work/dn-fail/Lib.Tests/UnitTest1.cs:line 5
+   at System.Reflection.MethodBaseInvoker.InterpretedInvoke_Method(Object obj, IntPtr* args)
+   at System.Reflection.MethodBaseInvoker.InvokeWithNoArgs(Object obj, BindingFlags invokeAttr)
+
+Failed!  - Failed:     4, Passed:     2, Skipped:     1, Total:     7, Duration: 19 ms - Lib.Tests.dll (net11.0)

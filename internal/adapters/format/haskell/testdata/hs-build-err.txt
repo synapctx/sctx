@@ -1,0 +1,23 @@
+Resolving dependencies...
+Build profile: -w ghc-9.10.3 -O1
+In order, the following will be built (use -v for more details):
+ - demo-0.1.0.0 (lib) (first run)
+Configuring library for demo-0.1.0.0...
+Preprocessing library for demo-0.1.0.0...
+Building library for demo-0.1.0.0...
+[1 of 1] Compiling Demo             ( src/Demo.hs, dist-newstyle/build/aarch64-linux/ghc-9.10.3/demo-0.1.0.0/build/Demo.o, dist-newstyle/build/aarch64-linux/ghc-9.10.3/demo-0.1.0.0/build/Demo.dyn_o )
+src/Demo.hs:4:15: error: [GHC-88464]
+    Variable not in scope: c :: Int
+  |
+4 | add a b = a + c
+  |               ^
+
+src/Demo.hs:10:7: error: [GHC-88464]
+    Variable not in scope: undefinedThing :: Int -> Int
+   |
+10 | f x = undefinedThing x
+   |       ^^^^^^^^^^^^^^
+
+Error: [Cabal-7125]
+Failed to build demo-0.1.0.0.
+

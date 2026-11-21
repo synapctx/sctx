@@ -1,0 +1,27 @@
+invalid-syntax: Expected a parameter or the end of the parameter list
+ --> bad.py:1:7
+  |
+1 | def f(:
+  |       ^
+2 |   pass
+3 | x = = 1
+  |
+
+invalid-syntax: Expected `)`, found newline
+ --> bad.py:1:8
+  |
+1 | def f(:
+  |        ^
+2 |   pass
+3 | x = = 1
+  |
+
+invalid-syntax: Expected an expression
+ --> bad.py:3:5
+  |
+1 | def f(:
+2 |   pass
+3 | x = = 1
+  |     ^
+
+Found 3 errors.

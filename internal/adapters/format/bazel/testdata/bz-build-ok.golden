@@ -1,0 +1,5 @@
+Target //pkg:gen2 up-to-date:
+  bazel-bin/pkg/gen2.txt
+INFO: Elapsed time: 5.646s, Critical Path: 0.05s
+INFO: Build completed successfully, 3 total actions
+…+13 lines (progress rows, banners, advice, blanks)

@@ -30,7 +30,7 @@ Dockerfile.fail:3
    4 |     
 --------------------
 ERROR: failed to build: failed to solve: process "/bin/sh -c echo \"FAILING_LAYER_SENTINEL\" && exit 17" did not complete successfully: exit code: 17
-17344 v0.35.0-desktop.2 /Users/sebastiangogoasa/.docker/cli-plugins/docker-buildx buildx build --progress=plain -f /private/tmp/sctx-docker-fixtures/Dockerfile.fail /private/tmp/sctx-docker-fixtures
+17344 v0.35.0-desktop.2 /home/dev/.docker/cli-plugins/docker-buildx buildx build --progress=plain -f /work/proj/sctx-docker-fixtures/Dockerfile.fail /work/proj/sctx-docker-fixtures
 github.com/docker/buildx/commands.runBuildWithOptions
 	github.com/docker/buildx/commands/build.go:504
 github.com/docker/buildx/commands.runBuild
@@ -76,7 +76,7 @@ sync.(*Once).Do
 runtime.goexit
 	/usr/local/go/src/runtime/asm_arm64.s:1447
 
-17344 v0.35.0-desktop.2 /Users/sebastiangogoasa/.docker/cli-plugins/docker-buildx buildx build --progress=plain -f /private/tmp/sctx-docker-fixtures/Dockerfile.fail /private/tmp/sctx-docker-fixtures
+17344 v0.35.0-desktop.2 /home/dev/.docker/cli-plugins/docker-buildx buildx build --progress=plain -f /work/proj/sctx-docker-fixtures/Dockerfile.fail /work/proj/sctx-docker-fixtures
 google.golang.org/grpc.(*ClientConn).Invoke
 	google.golang.org/grpc@v1.81.1/call.go:35
 github.com/moby/buildkit/api/services/control.(*controlClient).Solve
@@ -96,7 +96,7 @@ github.com/moby/buildkit/solver/internal/pipe.NewWithFunction[...].func2
 runtime.goexit
 	/usr/local/go/src/runtime/asm_arm64.s:1447
 
-17344 v0.35.0-desktop.2 /Users/sebastiangogoasa/.docker/cli-plugins/docker-buildx buildx build --progress=plain -f /private/tmp/sctx-docker-fixtures/Dockerfile.fail /private/tmp/sctx-docker-fixtures
+17344 v0.35.0-desktop.2 /home/dev/.docker/cli-plugins/docker-buildx buildx build --progress=plain -f /work/proj/sctx-docker-fixtures/Dockerfile.fail /work/proj/sctx-docker-fixtures
 github.com/moby/buildkit/client.(*Client).solve.func2
 	github.com/moby/buildkit@v0.31.0/client/solve.go:339
 golang.org/x/sync/errgroup.(*Group).Go.func1

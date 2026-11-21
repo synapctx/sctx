@@ -1,0 +1,6 @@
+Warning (Code 1264): Out of range value for column 'a' at row 1
++------+
+| a    |
++------+
+|  127 |
++------+

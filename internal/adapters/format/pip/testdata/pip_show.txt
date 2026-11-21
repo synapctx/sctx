@@ -1,0 +1,10 @@
+Name: requests
+Version: 2.34.2
+Summary: Python HTTP for Humans.
+Home-page: 
+Author: 
+Author-email: Kenneth Reitz <me@kennethreitz.org>
+License: Apache-2.0
+Location: /work/pipvenv/lib/python3.15/site-packages
+Requires: certifi, charset_normalizer, idna, urllib3
+Required-by: 

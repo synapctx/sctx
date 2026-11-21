@@ -1,0 +1,64 @@
+PHPUnit 11.5.58 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 8.6.0
+Configuration: /app/phpunit.xml
+
+FEFF.R..S                                                           9 / 9 (100%)
+
+Time: 00:00.010, Memory: 8.00 MB
+
+There was 1 error:
+
+1) BadTest::testDivZero
+DivisionByZeroError: Division by zero
+
+/app/src/Calc.php:5
+/app/tests/BadTest.php:6
+
+--
+
+There were 3 failures:
+
+1) BadTest::testAddWrong
+Failed asserting that 3 is identical to 4.
+
+/app/tests/BadTest.php:5
+
+2) BadTest::testArray
+Failed asserting that two arrays are equal.
+--- Expected
++++ Actual
+@@ @@
+     'b' => Array (
+         0 => 1
+         1 => 2
+-        2 => 3
++        2 => 4
+     )
+ )
+
+/app/tests/BadTest.php:7
+
+3) BadTest::testString
+Failed asserting that two strings are identical.
+--- Expected
++++ Actual
+@@ @@
+ 'line1
+-line2
++lineX
+ line3'
+
+/app/tests/BadTest.php:8
+
+--
+
+There was 1 risky test:
+
+1) BadTest::testRisky
+This test did not perform any assertions
+
+/app/tests/BadTest.php:10
+
+ERRORS!
+Tests: 9, Assertions: 6, Errors: 1, Failures: 3, Skipped: 1, Risky: 1.

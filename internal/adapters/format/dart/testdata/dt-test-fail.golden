@@ -1,0 +1,27 @@
+00:00 +1 -1: test/demo_test.dart: adds wrong [E]
+  Expected: <4>
+    Actual: <3>
+  test/demo_test.dart 8:28  main.<fn>
+To run this test again: dart test test/demo_test.dart -p vm --plain-name 'adds wrong'
+00:00 +1 -2: test/demo_test.dart: greets [E]
+  Expected: 'hi bob'
+    Actual: 'hello bob'
+     Which: is different.
+            Expected: hi bob
+              Actual: hello bob
+                       ^
+             Differ at offset 1
+  test/demo_test.dart 9:24  main.<fn>
+To run this test again: dart test test/demo_test.dart -p vm --plain-name 'greets'
+00:00 +1 -3: test/demo_test.dart: list [E]
+  Expected: [1, 2, 4]
+    Actual: [1, 2, 3]
+     Which: at location [2] is <3> instead of <4>
+  test/demo_test.dart 10:22  main.<fn>
+To run this test again: dart test test/demo_test.dart -p vm --plain-name 'list'
+00:00 +1 -4: test/demo_test.dart: throws [E]
+  Bad state: boom
+  test/demo_test.dart 11:24  main.<fn>
+To run this test again: dart test test/demo_test.dart -p vm --plain-name 'throws'
+00:00 +2 -4: Some tests failed.
+…+31 lines (progress rows, blanks, framework frames, package list)

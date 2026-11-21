@@ -1,0 +1,9 @@
+Installing 28: laravel/pint v1.32.3, phpstan/phpstan 2.3.7, staabm/side-effects-detector 1.0.5, sebastian/version 7.1.0, sebastian/type 7.0.2, sebastian/recursion-context 8.0.1, sebastian/object-enumerator 8.1.0, sebastian/object-reflector 6.1.0, sebastian/global-state 9.0.1, sebastian/git-state 1.1.0, sebastian/file-filter 1.0.0, sebastian/exporter 8.2.1, sebastian/environment 9.3.3, sebastian/diff 9.0.1, sebastian/comparator 8.4.0, sebastian/cli-parser 5.0.1, phpunit/php-timer 9.0.0, phpunit/php-text-template 6.0.1, phpunit/php-invoker 7.0.0, phpunit/php-file-iterator 7.0.2, nikic/php-parser v5.9.0, sebastian/lines-of-code 5.0.2, sebastian/complexity 6.0.0, phpunit/php-code-coverage 14.5.2, phar-io/version 3.2.1, phar-io/manifest 2.0.4, myclabs/deep-copy 1.14.0, phpunit/phpunit 13.4.8
+./composer.json has been updated
+Running composer update phpunit/phpunit phpstan/phpstan laravel/pint
+Lock file operations: 28 installs, 0 updates, 0 removals
+Package operations: 28 installs, 0 updates, 0 removals
+Using version ^13.4 for phpunit/phpunit
+Using version ^2.3 for phpstan/phpstan
+Using version ^1.32 for laravel/pint
+…+51 lines (progress, boilerplate)

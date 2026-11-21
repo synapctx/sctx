@@ -1,0 +1,9 @@
+semgrep: 3 findings in 1 files
+py/app.py (3)
+  4 warning py.no-shell-true subprocess call with shell=True allows command injection
+  16 warning py.no-verify-false TLS verification disabled
+  19 error py.no-eval Avoid eval on untrusted input
+…+3 code excerpt/details/autofix lines dropped
+Findings: 3 (3 blocking)
+Ran 3 rules on 1 file: 3 findings.
+…+14 stderr banner lines dropped

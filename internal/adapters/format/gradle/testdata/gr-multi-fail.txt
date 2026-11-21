@@ -1,0 +1,120 @@
+
+> Task :cli:compileJava
+/work/gr-multi/cli/src/main/java/demo/cliSvc.java:3: warning: [rawtypes] found raw type: List
+public class cliSvc { @Deprecated public int v() { return 1; } public List raw() { return new ArrayList(); } }
+                                                                      ^
+  missing type arguments for generic class List<E>
+  where E is a type-variable:
+    E extends Object declared in interface List
+/work/gr-multi/cli/src/main/java/demo/cliSvc.java:3: warning: [rawtypes] found raw type: ArrayList
+public class cliSvc { @Deprecated public int v() { return 1; } public List raw() { return new ArrayList(); } }
+                                                                                              ^
+  missing type arguments for generic class ArrayList<E>
+  where E is a type-variable:
+    E extends Object declared in class ArrayList
+2 warnings
+
+> Task :cli:processResources NO-SOURCE
+> Task :cli:classes
+> Task :cli:jar
+> Task :cli:assemble
+
+> Task :cli:compileTestJava
+/work/gr-multi/cli/src/test/java/demo/SvcTest.java:4: warning: [deprecation] v() in cliSvc has been deprecated
+class SvcTest { @Test void a() { assertEquals(1, new cliSvc().v()); } @Test void b() { assertTrue(true); } }
+                                                             ^
+1 warning
+
+> Task :cli:processTestResources NO-SOURCE
+> Task :cli:testClasses
+> Task :cli:test
+> Task :cli:check
+> Task :cli:build
+
+> Task :core:compileJava
+/work/gr-multi/core/src/main/java/demo/coreSvc.java:3: warning: [rawtypes] found raw type: List
+public class coreSvc { @Deprecated public int v() { return 1; } public List raw() { return new ArrayList(); } }
+                                                                       ^
+  missing type arguments for generic class List<E>
+  where E is a type-variable:
+    E extends Object declared in interface List
+/work/gr-multi/core/src/main/java/demo/coreSvc.java:3: warning: [rawtypes] found raw type: ArrayList
+public class coreSvc { @Deprecated public int v() { return 1; } public List raw() { return new ArrayList(); } }
+                                                                                               ^
+  missing type arguments for generic class ArrayList<E>
+  where E is a type-variable:
+    E extends Object declared in class ArrayList
+2 warnings
+
+> Task :core:processResources NO-SOURCE
+> Task :core:classes
+> Task :core:jar
+> Task :core:assemble
+
+> Task :core:compileTestJava
+/work/gr-multi/core/src/test/java/demo/SvcTest.java:4: warning: [deprecation] v() in coreSvc has been deprecated
+class SvcTest { @Test void a() { assertEquals(1, new coreSvc().v()); } @Test void b() { assertTrue(true); } }
+                                                              ^
+1 warning
+
+> Task :core:processTestResources NO-SOURCE
+> Task :core:testClasses
+> Task :core:test
+> Task :core:check
+> Task :core:build
+
+> Task :web:compileJava
+/work/gr-multi/web/src/main/java/demo/webSvc.java:3: warning: [rawtypes] found raw type: List
+public class webSvc { @Deprecated public int v() { return 1; } public List raw() { return new ArrayList(); } }
+                                                                      ^
+  missing type arguments for generic class List<E>
+  where E is a type-variable:
+    E extends Object declared in interface List
+/work/gr-multi/web/src/main/java/demo/webSvc.java:3: warning: [rawtypes] found raw type: ArrayList
+public class webSvc { @Deprecated public int v() { return 1; } public List raw() { return new ArrayList(); } }
+                                                                                              ^
+  missing type arguments for generic class ArrayList<E>
+  where E is a type-variable:
+    E extends Object declared in class ArrayList
+2 warnings
+
+> Task :web:processResources NO-SOURCE
+> Task :web:classes
+> Task :web:jar
+> Task :web:assemble
+
+> Task :web:compileTestJava
+/work/gr-multi/web/src/test/java/demo/SvcTest.java:4: warning: [deprecation] v() in webSvc has been deprecated
+class SvcTest { @Test void a() { assertEquals(2, new webSvc().v()); } @Test void b() { assertTrue(true); } }
+                                                             ^
+1 warning
+
+> Task :web:processTestResources NO-SOURCE
+> Task :web:testClasses
+
+> Task :web:test FAILED
+
+SvcTest > a() FAILED
+    org.opentest4j.AssertionFailedError at SvcTest.java:4
+
+2 tests completed, 1 failed
+
+[Incubating] Problems report is available at: file:///work/gr-multi/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':web:test'.
+> There were failing tests. See the report at: file:///work/gr-multi/web/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.9.2/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 2s
+12 actionable tasks: 12 executed

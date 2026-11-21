@@ -1,0 +1,24 @@
+lib/calc.rb (9)
+  1:1 C Style/Documentation: Missing top-level documentation comment for class Calc.
+  1:1 C fixable Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+  2:11,2:14,3:11,3:14 C Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  3:3,6:3 C fixable Layout/EmptyLineBetweenDefs: Expected 1 empty line between method definitions; found 0.
+  7:5 C fixable Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+lib/messy.rb (13)
+  1:1 C Style/Documentation: Missing top-level documentation comment for class Messy.
+  1:1 C fixable Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+  2:11,2:15 C fixable Layout/SpaceInsideParens: Space inside parentheses detected.
+  2:12,2:14 C Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  2:13 C fixable Layout/SpaceAfterComma: Space missing after comma.
+  3:5 W fixable Lint/UselessAssignment: Useless assignment to variable - x.
+  4:5 C fixable Style/IfUnlessModifier: Favor modifier if usage when having a single-line body. Another good alternative is the usage of control flow &&/||.
+  4:15 C fixable Style/MultilineIfThen: Do not use then for multi-line if.
+  5:12 C fixable Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+  7:5 C fixable Style/RedundantReturn: Redundant return detected.
+  9:3 C fixable Layout/EmptyLineBetweenDefs: Expected 1 empty line between method definitions; found 0.
+lib/messy2.rb (3)
+  1:1 C fixable Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+  1:9 C Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  2:16 C fixable Layout/TrailingWhitespace: Trailing whitespace detected.
+cops: Naming/MethodParameterName×7, Layout/EmptyLineBetweenDefs×3, Style/FrozenStringLiteralComment×3, Layout/SpaceInsideParens×2, Style/Documentation×2, Style/StringLiterals×2, …+6 more cops
+3 files inspected, 25 offenses detected, 16 offenses autocorrectable

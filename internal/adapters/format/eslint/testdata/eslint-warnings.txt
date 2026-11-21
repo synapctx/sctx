@@ -1,0 +1,24 @@
+
+/work/proj/src/AIProviderManager.ts
+   68:58  warning  Expected { after 'if' condition  curly
+  101:58  warning  Expected { after 'if' condition  curly
+
+/work/proj/src/AutonomousOrchestrator.ts
+  133:37  warning  Expected { after 'if' condition  curly
+  177:37  warning  Expected { after 'if' condition  curly
+
+/work/proj/src/EnhancedAutonomousOrchestrator.ts
+  746:42  warning  Expected { after 'if' condition  curly
+  752:53  warning  Expected { after 'if' condition  curly
+
+/work/proj/src/MultiProjectMemoryManager.ts
+  260:29  warning  Expected { after 'if' condition  curly
+  261:30  warning  Expected { after 'if' condition  curly
+  262:29  warning  Expected { after 'if' condition  curly
+  263:25  warning  Expected { after 'if' condition  curly
+  264:31  warning  Expected { after 'if' condition  curly
+  288:24  warning  Expected { after 'if' condition  curly
+
+✖ 12 problems (0 errors, 12 warnings)
+  0 errors and 12 warnings potentially fixable with the `--fix` option.
+

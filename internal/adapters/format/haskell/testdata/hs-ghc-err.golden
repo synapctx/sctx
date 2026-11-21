@@ -1,0 +1,6 @@
+ghcbad.hs:2:18: error: [GHC-39999]
+    • No instance for ‘Num String’ arising from the literal ‘1’
+    • In the first argument of ‘(+)’, namely ‘1’
+      In the first argument of ‘putStrLn’, namely ‘(1 + "x")’
+      In the expression: putStrLn (1 + "x")
+…+4 lines (build chatter, source echoes, blanks, passing-test tree)

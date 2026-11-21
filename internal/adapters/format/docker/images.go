@@ -77,8 +77,9 @@ func aggressiveImages(in format.Input) (format.Rendered, error) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
-	var out []string
+	var out []imageEntry
 	dangling := 0
+	shortened := false
 	for _, line := range lines[1:] {
 		if strings.TrimSpace(line) == "" {
 			continue
@@ -94,7 +95,9 @@ func aggressiveImages(in format.Input) (format.Rendered, error) {
 			dangling++
 			continue
 		}
-		out = append(out, fmt.Sprintf("%s %s", ref, size))
+		ref, cut := shortDigest(ref)
+		shortened = shortened || cut
+		out = append(out, imageEntry{ref: ref, size: size})
 	}
 
 	count := len(out) + dangling
@@ -105,12 +108,85 @@ func aggressiveImages(in format.Input) (format.Rendered, error) {
 	firstLine := fmt.Sprintf("%d images", count)
 	var b strings.Builder
 	b.WriteString(firstLine)
-	for _, l := range out {
+	for _, l := range groupImages(out) {
 		b.WriteString("\n")
 		b.WriteString(l)
 	}
 	if dangling > 0 {
 		fmt.Fprintf(&b, "\n+%d dangling", dangling)
 	}
+	if shortened {
+		b.WriteString("\n(digests shortened to 12 hex chars = IMAGE ID)")
+	}
 	return format.Rendered{Body: []byte(b.String())}, nil
+}
+
+// imageEntry is one named image: its reference and displayed size.
+type imageEntry struct{ ref, size string }
+
+// digestRe matches a repo@sha256:<64 hex> reference.
+var digestRe = regexp.MustCompile(`@sha256:([0-9a-f]{64})$`)
+
+// shortDigest shortens a full sha256 digest reference to its first 12 hex
+// characters, which is exactly the IMAGE ID docker accepts for rm/inspect.
+// The second result reports whether anything was cut.
+func shortDigest(ref string) (string, bool) {
+	m := digestRe.FindStringSubmatchIndex(ref)
+	if m == nil {
+		return ref, false
+	}
+	return ref[:m[2]+12], true
+}
+
+// splitRef splits "repo:tag" at the tag colon (one after the last slash). A
+// digest reference or a tagless one has no tag and is never grouped.
+func splitRef(ref string) (repo, tag string, ok bool) {
+	if strings.Contains(ref, "@") {
+		return "", "", false
+	}
+	i := strings.LastIndex(ref, ":")
+	if i < 0 || i < strings.LastIndex(ref, "/") {
+		return "", "", false
+	}
+	return ref[:i], ref[i+1:], true
+}
+
+// groupImages folds consecutive-or-not images that share a repository into
+// one "repo: tag size, tag size" line, in first-seen order. A repository with
+// a single tag, and digest references, stay "ref size" lines. Every tag and
+// size is kept; only the repeated repository prefix is folded.
+func groupImages(entries []imageEntry) []string {
+	type group struct {
+		repo string
+		tags []string
+		one  string
+	}
+	var groups []*group
+	byRepo := map[string]*group{}
+	for _, e := range entries {
+		repo, tag, ok := splitRef(e.ref)
+		if !ok {
+			groups = append(groups, &group{one: e.ref + " " + e.size})
+			continue
+		}
+		g := byRepo[repo]
+		if g == nil {
+			g = &group{repo: repo}
+			byRepo[repo] = g
+			groups = append(groups, g)
+		}
+		g.tags = append(g.tags, tag+" "+e.size)
+	}
+	lines := make([]string, 0, len(groups))
+	for _, g := range groups {
+		switch {
+		case g.one != "":
+			lines = append(lines, g.one)
+		case len(g.tags) == 1:
+			lines = append(lines, g.repo+":"+g.tags[0])
+		default:
+			lines = append(lines, g.repo+": "+strings.Join(g.tags, ", "))
+		}
+	}
+	return lines
 }

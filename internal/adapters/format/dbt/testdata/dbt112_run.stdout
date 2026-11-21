@@ -1,0 +1,53 @@
+[0m02:40:52  Running with dbt=1.12.7
+[0m02:40:52  Registered adapter: postgres=1.9.1
+[0m02:40:52  Unable to do partial parsing because saved manifest not found. Starting full parse.
+[0m02:40:53  [[33mWARNING[0m][MissingArgumentsPropertyInGenericTestDeprecation]: Deprecated
+functionality
+Found top-level arguments to test `accepted_values` defined on 'stg_orders' in
+package 'shop' (models/staging/schema.yml). Arguments to generic tests should be
+nested under the `arguments` property.
+[0m02:40:53  Found 14 models, 5 data tests, 476 macros
+[0m02:40:53  
+[0m02:40:53  Concurrency: 4 threads (target='dev')
+[0m02:40:53  
+[0m02:40:53  1 of 14 START sql view model dbt_dev.stg_customers_1 ........................... [RUN]
+[0m02:40:53  2 of 14 START sql view model dbt_dev.stg_customers_10 .......................... [RUN]
+[0m02:40:53  3 of 14 START sql view model dbt_dev.stg_customers_11 .......................... [RUN]
+[0m02:40:53  4 of 14 START sql view model dbt_dev.stg_customers_12 .......................... [RUN]
+[0m02:40:54  1 of 14 OK created sql view model dbt_dev.stg_customers_1 ...................... [[32mCREATE VIEW[0m in 0.19s]
+[0m02:40:54  4 of 14 OK created sql view model dbt_dev.stg_customers_12 ..................... [[32mCREATE VIEW[0m in 0.20s]
+[0m02:40:54  5 of 14 START sql view model dbt_dev.stg_customers_2 ........................... [RUN]
+[0m02:40:54  3 of 14 OK created sql view model dbt_dev.stg_customers_11 ..................... [[32mCREATE VIEW[0m in 0.21s]
+[0m02:40:54  2 of 14 OK created sql view model dbt_dev.stg_customers_10 ..................... [[32mCREATE VIEW[0m in 0.22s]
+[0m02:40:54  6 of 14 START sql view model dbt_dev.stg_customers_3 ........................... [RUN]
+[0m02:40:54  7 of 14 START sql view model dbt_dev.stg_customers_4 ........................... [RUN]
+[0m02:40:54  8 of 14 START sql view model dbt_dev.stg_customers_5 ........................... [RUN]
+[0m02:40:54  5 of 14 OK created sql view model dbt_dev.stg_customers_2 ...................... [[32mCREATE VIEW[0m in 0.11s]
+[0m02:40:54  6 of 14 OK created sql view model dbt_dev.stg_customers_3 ...................... [[32mCREATE VIEW[0m in 0.11s]
+[0m02:40:54  9 of 14 START sql view model dbt_dev.stg_customers_6 ........................... [RUN]
+[0m02:40:54  7 of 14 OK created sql view model dbt_dev.stg_customers_4 ...................... [[32mCREATE VIEW[0m in 0.12s]
+[0m02:40:54  10 of 14 START sql view model dbt_dev.stg_customers_7 .......................... [RUN]
+[0m02:40:54  8 of 14 OK created sql view model dbt_dev.stg_customers_5 ...................... [[32mCREATE VIEW[0m in 0.11s]
+[0m02:40:54  11 of 14 START sql view model dbt_dev.stg_customers_8 .......................... [RUN]
+[0m02:40:54  12 of 14 START sql view model dbt_dev.stg_customers_9 .......................... [RUN]
+[0m02:40:54  9 of 14 OK created sql view model dbt_dev.stg_customers_6 ...................... [[32mCREATE VIEW[0m in 0.16s]
+[0m02:40:54  10 of 14 OK created sql view model dbt_dev.stg_customers_7 ..................... [[32mCREATE VIEW[0m in 0.16s]
+[0m02:40:54  11 of 14 OK created sql view model dbt_dev.stg_customers_8 ..................... [[32mCREATE VIEW[0m in 0.15s]
+[0m02:40:54  13 of 14 START sql view model dbt_dev.stg_orders ............................... [RUN]
+[0m02:40:54  12 of 14 OK created sql view model dbt_dev.stg_customers_9 ..................... [[32mCREATE VIEW[0m in 0.16s]
+[0m02:40:54  13 of 14 OK created sql view model dbt_dev.stg_orders .......................... [[32mCREATE VIEW[0m in 0.07s]
+[0m02:40:54  14 of 14 START sql table model dbt_dev.revenue_by_country ...................... [RUN]
+[0m02:40:54  14 of 14 OK created sql table model dbt_dev.revenue_by_country ................. [[32mSELECT 5[0m in 0.11s]
+[0m02:40:54  
+[0m02:40:54  Finished running 1 table model, 13 view models in 0 hours 0 minutes and 0.90 seconds (0.90s).
+[0m02:40:54  
+[0m02:40:54  [32mCompleted successfully[0m
+[0m02:40:54  
+[0m02:40:54  Done. PASS=14 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=14
+[0m02:40:54  [[33mWARNING[0m][DeprecationsSummary]: Deprecated functionality
+Summary of encountered deprecations:
+- MissingArgumentsPropertyInGenericTestDeprecation: 1 occurrence
+To see all deprecation instances instead of just the first occurrence of each,
+run command again with the `--show-all-deprecations` flag. You may also need to
+run with `--no-partial-parse` as some deprecations are only encountered during
+parsing.

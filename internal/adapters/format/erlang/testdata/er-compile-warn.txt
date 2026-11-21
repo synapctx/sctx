@@ -1,0 +1,19 @@
+===> Verifying dependencies...
+===> Analyzing applications...
+===> Compiling demo
+   ┌─ src/demo.erl:
+   │
+ 6 │  unused_fn() -> ok.
+   │  ╰── Warning: function unused_fn/0 is unused
+
+   ┌─ src/demo.erl:
+   │
+ 7 │  shadow(X) -> Y = 1, X.
+   │  ╰── Warning: function shadow/1 is unused
+
+   ┌─ src/demo.erl:
+   │
+ 7 │  shadow(X) -> Y = 1, X.
+   │               ╰── Warning: variable 'Y' is unused
+
+

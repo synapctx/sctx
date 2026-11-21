@@ -1,0 +1,3 @@
+Parse error in 2nd command line argument: near "selec": syntax error
+  selec 1
+  ^--- error here

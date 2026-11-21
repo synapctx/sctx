@@ -1,0 +1,26 @@
+src/AIProviderManager.ts(33,17): error TS6138: Property 'openaiApiKey' is declared but its value is never read.
+src/AIProviderManager.ts(293,65): error TS6133: 'key' is declared but its value is never read.
+src/AutonomousOrchestrator.ts(1,29): error TS6133: 'PlanningResult' is declared but its value is never read.
+src/AutonomousOrchestrator.ts(1,45): error TS6133: 'ExecutionResult' is declared but its value is never read.
+src/AutonomousOrchestrator.ts(4,1): error TS6133: 'ulid' is declared but its value is never read.
+src/AutonomousOrchestrator.ts(268,42): error TS6133: 'stepIndex' is declared but its value is never read.
+src/AutonomousOrchestrator.ts(324,53): error TS6133: 'execution' is declared but its value is never read.
+src/EnhancedAutonomousOrchestrator.ts(213,84): error TS6133: 'config' is declared but its value is never read.
+src/EnhancedAutonomousOrchestrator.ts(724,35): error TS6133: 'goal' is declared but its value is never read.
+src/EnhancedAutonomousOrchestrator.ts(725,15): error TS6133: 'workspaceAnalysis' is declared but its value is never read.
+src/EnhancedMemory.ts(1,32): error TS6133: 'SessionRecord' is declared but its value is never read.
+src/EnhancedMemory.ts(1,47): error TS6133: 'TaskRecord' is declared but its value is never read.
+src/EnhancedMemory.ts(300,57): error TS6133: 'language' is declared but its value is never read.
+src/EnhancedOrchestratorViewProvider.ts(4,37): error TS6133: 'ChatMessage' is declared but its value is never read.
+src/EnhancedOrchestratorViewProvider.ts(12,13): error TS6133: '_aiManager' is declared but its value is never read.
+src/EnhancedOrchestratorViewProvider.ts(16,13): error TS6133: '_isExecuting' is declared but its value is never read.
+src/EnhancedOrchestratorViewProvider.ts(132,9): error TS6133: 'context' is declared but its value is never read.
+src/EnhancedOrchestratorViewProvider.ts(133,9): error TS6133: 'token' is declared but its value is never read.
+src/EnhancedOrchestratorViewProvider.ts(175,52): error TS6133: 'config' is declared but its value is never read.
+src/MultiProjectMemoryManager.ts(210,15): error TS6133: 'projectContext' is declared but its value is never read.
+src/MultiProjectMemoryManager.ts(354,13): error TS6133: 'db' is declared but its value is never read.
+src/MultiProjectMemoryManager.ts(361,13): error TS6133: 'tasks' is declared but its value is never read.
+src/MultiProjectMemoryManager.ts(363,13): error TS6133: 'projectContext' is declared but its value is never read.
+src/OrchestratorViewProvider.ts(30,34): error TS6138: Property 'context' is declared but its value is never read.
+src/OrchestratorViewProvider.ts(36,9): error TS6133: 'context' is declared but its value is never read.
+src/OrchestratorViewProvider.ts(279,13): error TS6133: '_getOrCreateSharedTerminal' is declared but its value is never read.

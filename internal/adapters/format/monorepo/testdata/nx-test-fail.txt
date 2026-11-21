@@ -1,0 +1,13 @@
+
+ NX   6 tasks: 5 succeeded, 3 cached, 1 failed
+
+
+✖ nx run @m/b:test
+  full log: /repo/.nx/cache/terminalOutputs/16092707175883092453
+
+Re-run with --output-style=static to inline logs.
+
+  Run duration:      550ms
+  Cache:             3/5 hit (60%)
+  Critical path:     544ms (2 tasks)
+  Recoverable time:  <1ms

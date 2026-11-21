@@ -1,0 +1,599 @@
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	﻿2026-11-18T08:06:33.9426472Z Current runner version: '2.338.2'
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9458124Z ##[group]Runner Image Provisioner
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9458989Z Hosted Compute Agent
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9459465Z Version: 20261111.635
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9460016Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9460627Z Build Date: 2026-11-11T01:49:01Z
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9461210Z Worker ID: {bb773380-6a71-4737-879c-96b78a4f0b4e}
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9461791Z Region: northcentralus
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9462239Z Cloud: Azure
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9462668Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9464636Z ##[group]Operating System
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9465217Z Microsoft Windows 11
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9465684Z 10.0.26200
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9466099Z Enterprise
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9466526Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9466972Z ##[group]Runner Image
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9467477Z Image: windows-11-vs2026-arm64
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9467978Z Version: 20261112.217.1
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9469621Z Included Software: https://github.com/actions/runner-images/blob/win11-vs2026-arm64/20261112.217/images/windows/Windows11-VS2026-Arm64-Readme.md
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9471169Z Image Release: https://github.com/actions/runner-images/releases/tag/win11-vs2026-arm64%2F20261112.217
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9472037Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9473150Z ##[group]GITHUB_TOKEN Permissions
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9475938Z Attestations: write
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9476443Z Contents: write
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9476869Z Metadata: read
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9477354Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9480050Z Secret source: Actions
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9480830Z Cache mode: write
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:33.9481748Z Prepare workflow directory
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:34.0112143Z Prepare all required actions
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:34.0164255Z Getting action download info
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:34.2562276Z Download action repository 'actions/checkout@v7.0.1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:34.5544712Z Download action repository 'msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e' (SHA:ec48f7c5447b3140e2b088413ae3a55687bccb6e)
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:34.7815041Z Download action repository 'dtolnay/rust-toolchain@stable' (SHA:39008827e6b4319a349e9a42dfc90579dd25f1ca)
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:34.9108659Z Download action repository 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:35.2058285Z Download action repository 'actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6' (SHA:1e69f48acb82d1966a394da916b4c1698aa569d6)
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:35.5855922Z Download action repository 'softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64' (SHA:efb35369e0ad2afab669f228072c1b0d510eae64)
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.0874998Z Complete job name: aarch64-pc-windows-gnullvm (windows-11-arm)
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2474936Z ##[group]Run actions/checkout@v7.0.1
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2476257Z with:
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2476572Z   persist-credentials: false
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2476880Z   repository: sharkdp/fd
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2479975Z   token: ***
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2480233Z   ssh-strict: true
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2480483Z   ssh-user: git
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2480718Z   clean: true
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2480980Z   sparse-checkout-cone-mode: true
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2481287Z   fetch-depth: 1
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2481538Z   fetch-tags: false
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2481795Z   show-progress: true
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2482080Z   lfs: false
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2482315Z   submodules: false
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2482575Z   set-safe-directory: true
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2482878Z   allow-unsafe-pr-checkout: false
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2483623Z env:
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2483916Z   CICD_INTERMEDIATES_DIR: _cicd-intermediates
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2484269Z   MSRV_FEATURES: --all-features
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2484618Z   BUILD_CMD: cargo
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2484899Z   target: aarch64-pc-windows-gnullvm
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2485197Z   name: fd
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.2485422Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.5114836Z Syncing repository: sharkdp/fd
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.5116481Z ##[group]Getting Git version info
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.5116857Z Working directory is 'C:\a\fd\fd'
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.6167183Z [command]"C:\Program Files\Git\bin\git.exe" version
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.9613026Z git version 2.56.1.windows.1
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.9673676Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.9712984Z Temporarily overriding HOME='C:\a\_temp\8e42aeb0-c533-420b-a637-d500a80ce549' before making global git config changes
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.9713760Z Adding repository directory to the temporary git global config as a safe directory
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:36.9723921Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory C:\a\fd\fd
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.0495452Z Deleting the contents of 'C:\a\fd\fd'
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.0503984Z ##[group]Determining repository object format
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.0506054Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.0506865Z ##[group]Initializing the repository
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.0516436Z [command]"C:\Program Files\Git\bin\git.exe" init C:\a\fd\fd
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.1769579Z Initialized empty Git repository in C:/a/fd/fd/.git/
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.1834171Z [command]"C:\Program Files\Git\bin\git.exe" remote add origin https://github.com/sharkdp/fd
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.2507538Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.2508856Z ##[group]Disabling automatic garbage collection
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.2516555Z [command]"C:\Program Files\Git\bin\git.exe" config --local gc.auto 0
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.3072247Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.3072674Z ##[group]Setting up auth
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.3073711Z Removing SSH command configuration
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.3085984Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:37.3640595Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:39.6131161Z Removing HTTP extra header
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:39.6133362Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:39.6702946Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:40.9562087Z Removing includeIf entries pointing to credentials config files
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:40.9562723Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:41.0111558Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:42.3176859Z [command]"C:\Program Files\Git\bin\git.exe" config --file C:\a\_temp\git-credentials-e78b19e8-ea8a-422a-a1bc-94df8dcae020.config http.https://github.com/.extraheader "AUTHORIZATION: basic ***"
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:42.3746755Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:C:/a/fd/fd/.git.path C:\a\_temp\git-credentials-e78b19e8-ea8a-422a-a1bc-94df8dcae020.config
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:42.4303123Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:C:/a/fd/fd/.git/worktrees/*.path C:\a\_temp\git-credentials-e78b19e8-ea8a-422a-a1bc-94df8dcae020.config
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:42.4861243Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-e78b19e8-ea8a-422a-a1bc-94df8dcae020.config
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:42.5444828Z [command]"C:\Program Files\Git\bin\git.exe" config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-e78b19e8-ea8a-422a-a1bc-94df8dcae020.config
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:42.5989223Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:42.5989615Z ##[group]Fetching the repository
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:42.6002863Z [command]"C:\Program Files\Git\bin\git.exe" -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +b80cd53e65615060a62a5ea349a0d78b65d7029e:refs/remotes/origin/master
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.0629519Z From https://github.com/sharkdp/fd
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.0630110Z  * [new ref]         b80cd53e65615060a62a5ea349a0d78b65d7029e -> origin/master
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.0699983Z [command]"C:\Program Files\Git\bin\git.exe" branch --list --remote origin/master
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.1271853Z   origin/master
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.1334620Z [command]"C:\Program Files\Git\bin\git.exe" rev-parse refs/remotes/origin/master
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.1883596Z b80cd53e65615060a62a5ea349a0d78b65d7029e
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.1934244Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.1934676Z ##[group]Determining the checkout info
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.1935604Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.1954690Z [command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.2653634Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.3209378Z ##[group]Checking out the ref
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.3220704Z [command]"C:\Program Files\Git\bin\git.exe" checkout --progress --force -B master refs/remotes/origin/master
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.4945598Z Reset branch 'master'
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.5034655Z branch 'master' set up to track 'origin/master'.
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.5094382Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.5904862Z [command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.6473030Z b80cd53e65615060a62a5ea349a0d78b65d7029e
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.6539923Z ##[group]Removing auth
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.6540243Z Removing SSH command configuration
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.6550749Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:44.7080770Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:46.0722828Z Removing HTTP extra header
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:46.0732724Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:46.1288532Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.4499453Z Removing includeIf entries pointing to credentials config files
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.4510001Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.4997831Z includeif.gitdir:C:/a/fd/fd/.git.path
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.4998385Z includeif.gitdir:C:/a/fd/fd/.git/worktrees/*.path
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.4999005Z includeif.gitdir:/github/workspace/.git.path
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.4999461Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.5055593Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:C:/a/fd/fd/.git.path
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.5588808Z C:\a\_temp\git-credentials-e78b19e8-ea8a-422a-a1bc-94df8dcae020.config
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.5646729Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:C:/a/fd/fd/.git.path C\:\\a\\_temp\\git\-credentials\-e78b19e8\-ea8a\-422a\-a1bc\-94df8dcae020\.config
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.6226994Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:C:/a/fd/fd/.git/worktrees/*.path
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.6730571Z C:\a\_temp\git-credentials-e78b19e8-ea8a-422a-a1bc-94df8dcae020.config
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.6794339Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:C:/a/fd/fd/.git/worktrees/*.path C\:\\a\\_temp\\git\-credentials\-e78b19e8\-ea8a\-422a\-a1bc\-94df8dcae020\.config
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.7379880Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git.path
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.7871396Z /github/runner_temp/git-credentials-e78b19e8-ea8a-422a-a1bc-94df8dcae020.config
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.7931333Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-e78b19e8\-ea8a\-422a\-a1bc\-94df8dcae020\.config
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.8551050Z [command]"C:\Program Files\Git\bin\git.exe" config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.9087433Z /github/runner_temp/git-credentials-e78b19e8-ea8a-422a-a1bc-94df8dcae020.config
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.9157460Z [command]"C:\Program Files\Git\bin\git.exe" config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-e78b19e8\-ea8a\-422a\-a1bc\-94df8dcae020\.config
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:47.9784494Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.3808123Z Removing credentials config 'C:\a\_temp\git-credentials-e78b19e8-ea8a-422a-a1bc-94df8dcae020.config'
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.3829734Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4339533Z ##[group]Run msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4340036Z with:
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4340212Z   msystem: CLANGARM64
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4340398Z   update: true
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4340588Z   install: mingw-w64-clang-aarch64-clang
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4340832Z   path-type: minimal
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4341018Z   release: true
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4341208Z   platform-check-severity: fatal
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4341457Z   cache: true
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4341618Z env:
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4341803Z   CICD_INTERMEDIATES_DIR: _cicd-intermediates
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4342072Z   MSRV_FEATURES: --all-features
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4342312Z   BUILD_CMD: cargo
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4342500Z   target: aarch64-pc-windows-gnullvm
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4342723Z   name: fd
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.4342877Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:49.7023953Z ##[group]Downloading MSYS2...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:50.6972240Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:50.6972696Z ##[group]Extracting MSYS2...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:50.6994413Z [command]C:\hostedtoolcache\windows\msys2-installer\0.0.20260927\x64\base.exe -y
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.0804045Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.0805001Z 7-Zip SFX 26.02 ZS v1.5.7 R1 (x64) : Copyright (c) 1999- Igor Pavlov, 2016- Tino Reichardt, 2022- Sergey G. Brester : 2026-06-27
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.0805645Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.0806001Z Extracting archive: C:\hostedtoolcache\windows\msys2-installer\0.0.20260927\x64\base.exe
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.0815458Z --
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.0815978Z Path = C:\hostedtoolcache\windows\msys2-installer\0.0.20260927\x64\base.exe
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.0817194Z Type = 7z
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.0817519Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.2875913Z   0%
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.2876454Z     
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.4849553Z   0% 116 - msys64\usr\lib\terminfo\76
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.4849849Z                                      
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.6869804Z   0% 233 - msys64\usr\share\locale\cy\LC_MESSAGES
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.6870189Z                                                  
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.8933474Z   0% 473 - msys64\usr\share\terminfo\31
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:51.8934078Z                                        
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:52.0940679Z   0% 696 - msys64\autorebase.bat
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:52.0940969Z                                 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:52.2961691Z   0% 912 - msys64\usr\lib\terminfo\50\P8-W
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:52.2962019Z                                           
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:52.5037894Z   1% 1116 - msys64\usr\lib\terminfo\61\apollo
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:52.5038220Z                                              
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:52.7162742Z   1% 1331 - msys64\usr\lib\terminfo\63\cbblit
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:52.7163589Z                                              
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:52.9150094Z   1% 1469 - msys64\usr\lib\terminfo\64\d220-dg
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:52.9150850Z                                               
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:53.1139094Z   1% 1621 - msys64\usr\lib\terminfo\64\darwin-m-f2
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:53.1139473Z                                                   
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:53.3188642Z   1% 1798 - msys64\usr\lib\terminfo\67\gator-52t
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:53.3188980Z                                                 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:53.5215545Z   1% 1977 - msys64\usr\lib\terminfo\68\hpsub
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:53.5216340Z                                             
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:53.7206919Z   1% 2161 - msys64\usr\lib\terminfo\6d\mac
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:53.7207251Z                                           
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:53.9225750Z   1% 2335 - msys64\usr\lib\terminfo\6e\ndr9500-nl
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:53.9226126Z                                                  
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:54.1338535Z   1% 2446 - msys64\usr\lib\terminfo\6e\nwp512
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:54.1338855Z                                              
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:54.3320915Z   1% 2572 - msys64\usr\lib\terminfo\70\pcvt25-color
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:54.3321258Z                                                    
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:54.5316409Z   1% 2707 - msys64\usr\lib\terminfo\72\regent20
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:54.5316983Z                                                
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:54.7366291Z   1% 2786 - msys64\usr\lib\terminfo\73\screen.putty-256color
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:54.7366675Z                                                             
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:54.9438268Z   1% 2869 - msys64\usr\lib\terminfo\74\t3700
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:54.9442822Z                                             
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:55.1428967Z   1% 3010 - msys64\usr\lib\terminfo\74\tty5420-w-rv
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:55.1429576Z                                                    
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:55.3449240Z   2% 3149 - msys64\usr\lib\terminfo\76\vc203
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:55.3449740Z                                             
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:55.5928064Z   2% 3269 - msys64\usr\lib\terminfo\76\vt330
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:55.5928396Z                                             
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:55.7825511Z   2% 3366 - msys64\usr\lib\terminfo\77\wy325-w
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:55.7826176Z                                               
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:56.0075739Z   2% 3514 - msys64\usr\lib\terminfo\77\wyse520-pc-24
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:56.0076106Z                                                     
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:56.5247421Z   2% 3692 - msys64\usr\lib\terminfo\78\xterm-nic
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:56.5248014Z                                                 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:56.8267740Z   2% 3693 - msys64\usr\lib\terminfo\78\xterm-noapp
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:56.8268108Z                                                   
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:57.0217606Z   2% 3694 - msys64\usr\lib\terminfo\78\xterm-old
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:57.0218240Z                                                 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:57.2262345Z   2% 3812 - msys64\usr\share\bash-completion\completions\flock
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:57.2263037Z                                                               
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:57.4223895Z   2% 3916 - msys64\usr\share\bash-completion\completions-core\badblocks.bash
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:57.4224483Z                                                                             
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:57.6438618Z   2% 3999 - msys64\usr\share\bash-completi . etions-core\dnssec-keygen.bash
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:57.6439331Z                                                                            
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:57.8494112Z   2% 4052 - msys64\usr\share\bash-completion\completions-core\fusermount.bash
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:57.8496503Z                                                                              
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:58.0569438Z   2% 4131 - msys64\usr\share\bash-completion\completions-core\hunspell.bash
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:58.0569893Z                                                                            
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:58.2632864Z   2% 4205 - msys64\usr\share\bash-completion\completions-core\lisp.bash
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:58.2633288Z                                                                        
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:58.4540523Z   3% 4301 - msys64\usr\share\bash-completion\completions-core\mysql.bash
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:58.4540990Z                                                                         
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:58.6625371Z   3% 4390 - msys64\usr\share\bash-completion\completions-core\pwgen.bash
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:58.6625804Z                                                                         
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:58.9310385Z   3% 4626 - msys64\usr\share\bash-completion\completions-core\ypcat.bash
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:58.9310822Z                                                                         
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:59.1247872Z   3% 4696 - msys64\usr\share\bash-completion\completions-fallback\devspace.bash
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:59.1248757Z                                                                                
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:59.3412401Z   3% 4898 - msys64\usr\share\bash-completi . etions-fallback\syncthing.bash
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:59.3412850Z                                                                            
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:59.5626530Z   5% 5102 - msys64\usr\share\doc\libunistring\libunistring_3.html
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:59.5628242Z                                                                  
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:59.7501470Z   6% 5275 - msys64\usr\share\gtk-doc\html\p11-kit\devel-building-style.html
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:59.7501909Z                                                                            
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:59.9522887Z   8% 5443 - msys64\usr\share\locale\be\LC_MESSAGES\findutils.mo
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:06:59.9523343Z                                                                
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:00.1612829Z  12% 5552 - msys64\usr\share\locale\de\LC_MESSAGES\libidn2.mo
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:00.1613266Z                                                              
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:00.3602868Z  15% 5687 - msys64\usr\share\locale\fi\LC_MESSAGES\p11-kit.mo
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:00.3603248Z                                                              
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:00.5663672Z  20% 5866 - msys64\usr\share\locale\ja\LC_MESSAGES\pacman-scripts.mo
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:00.5664263Z                                                                     
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:00.7825279Z  24% 6024 - msys64\usr\share\locale\pt\LC_MESSAGES\gettext-tools.mo
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:00.7825871Z                                                                    
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:00.9857616Z  27% 6089 - msys64\usr\share\locale\ru\LC_MESSAGES\gettext-runtime.mo
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:00.9858644Z                                                                      
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:02.0665614Z  31% 6220 - msys64\usr\share\locale\tr\LC_MESSAGES\sed.mo
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:02.0666036Z                                                          
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:02.3069373Z  35% 6322 - msys64\usr\share\makepkg\buildenv\buildflags.sh
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:02.3069876Z                                                            
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:02.5004541Z  35% 6386 - msys64\usr\share\makepkg\source\svn.sh
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:02.5005272Z                                                   
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:02.7037084Z  36% 6579 - msys64\usr\share\man\man1\cut.1.gz
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:02.7037743Z                                               
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:02.9572229Z  36% 6745 - msys64\usr\share\man\man1\msggrep.1.gz
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:02.9583123Z                                                   
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:03.1564936Z  36% 6829 - msys64\usr\share\man\man1\pinky.1.gz
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:03.1565277Z                                                 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:03.3663491Z  36% 7066 - msys64\usr\share\man\man3\attr_set.3x.gz
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:03.3663864Z                                                     
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:03.5634643Z  36% 7306 - msys64\usr\share\man\man3\CURLOPT_HSTSREADDATA.3.gz
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:03.5635548Z                                                                
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:03.7658367Z  36% 7558 - msys64\usr\share\man\man3\curl_easy_strerror.3.gz
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:03.7658753Z                                                              
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:03.9693609Z  37% 7738 - msys64\usr\share\man\man3\dynamic_field_info.3x.gz
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:03.9694034Z                                                               
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:04.1718085Z  37% 7993 - msys64\usr\share\man\man3\legacy_coding.3x.gz
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:04.1718804Z                                                          
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:04.3784905Z  37% 8248 - msys64\usr\share\man\man3\menu_term.3x.gz
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:04.3785256Z                                                      
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:04.5782615Z  38% 8515 - msys64\usr\share\man\man3\set_menu_mark.3x.gz
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:04.5783004Z                                                          
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:04.7807795Z  38% 8756 - msys64\usr\share\man\man3\wtimeout.3x.gz
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:04.7808186Z                                                     
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:04.9848304Z  39% 8967 - msys64\usr\share\mintty\lang\sv.po
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:04.9848640Z                                               
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:05.3888464Z  44% 9192 - msys64\usr\share\terminfo\61\adm1
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:05.3889203Z                                              
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:05.5788745Z  44% 9207 - msys64\usr\share\terminfo\61\adm42
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:05.5789082Z                                               
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:05.7822007Z  44% 9439 - msys64\usr\share\terminfo\61\att6386
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:05.7822355Z                                                 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:05.9866768Z  44% 9678 - msys64\usr\share\terminfo\64\d230-dg
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:05.9867549Z                                                 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:06.1871497Z  44% 9904 - msys64\usr\share\terminfo\64\dm80w
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:06.1871818Z                                               
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:06.7219890Z  44% 10135 - msys64\usr\share\terminfo\68\hp2624-10p
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:06.7220242Z                                                     
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:07.3173596Z  45% 10328 - msys64\usr\share\terminfo\6b\kterm-color
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:07.3174179Z                                                      
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:07.5165505Z  45% 10336 - msys64\usr\share\terminfo\6c\linux+decid
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:07.5166250Z                                                      
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:07.9040365Z  45% 10560 - msys64\usr\share\terminfo\6e\news-old-unk
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:07.9041163Z                                                       
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:08.0944160Z  45% 10795 - msys64\usr\share\terminfo\70\pe1251
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:08.0944737Z                                                 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:08.2968513Z  45% 11010 - msys64\usr\share\terminfo\73\scrhp
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:08.2968999Z                                                
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:08.5015534Z  45% 11217 - msys64\usr\share\terminfo\74\tty5420-w-rv
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:08.5016893Z                                                       
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:08.7023662Z  45% 11414 - msys64\usr\share\terminfo\76\vt100+noapp+pc
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:08.7024148Z                                                         
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:08.9091599Z  45% 11599 - msys64\usr\share\terminfo\77\wy520-36pc
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:08.9091949Z                                                     
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:09.2380806Z  45% 11814 - msys64\usr\share\terminfo\78\xnuppc-80x30-m
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:09.2381253Z                                                         
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:09.4535349Z  45% 11999 - msys64\usr\share\zoneinfo\Africa\Libreville
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:09.4535702Z                                                         
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:09.6572974Z  45% 12154 - msys64\usr\share\zoneinfo\America\Puerto_Rico
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:09.6573334Z                                                           
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:09.8745327Z  46% 12387 - msys64\usr\share\zoneinfo\Etc\GMT-9
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:09.8745903Z                                                 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:10.0618586Z  46% 12576 - msys64\usr\share\zoneinfo\posix\Africa\Libreville
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:10.0618962Z                                                               
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:10.2677398Z  46% 12780 - msys64\usr\share\zoneinfo\posix\Asia\Aden
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:10.2677744Z                                                       
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:10.5483021Z  46% 12975 - msys64\usr\share\zoneinfo\posix\Europe\Belfast
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:10.5483393Z                                                            
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:10.7496461Z  46% 13177 - msys64\usr\share\zoneinfo\right\Africa\Libreville
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:10.7496843Z                                                               
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:10.9528503Z  46% 13365 - msys64\usr\share\zoneinfo\right\America\Winnipeg
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:10.9528878Z                                                              
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:11.1639081Z  46% 13562 - msys64\usr\share\zoneinfo\right\Etc\GMT-6
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:11.1639565Z                                                       
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:11.3598459Z  46% 13732 - msys64\usr\share\zoneinfo\right\US\Eastern
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:11.3599555Z                                                        
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:11.5668101Z  46% 13976 - msys64\var\lib\pacman\local\mintty-1~3.8.3-1\files
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:11.5668491Z                                                                
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:11.7667968Z  49% 14120 - msys64\usr\bin\bunzip2.exe
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:11.7668287Z                                        
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:11.9721151Z  56% 14262 - msys64\usr\bin\msgcmp.exe
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:11.9721446Z                                       
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:12.1745629Z  70% 14335 - msys64\usr\bin\msys-ssl-3.dll
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:12.1745938Z                                           
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:12.6250164Z  91% 14434 - msys64\usr\bin\tee.exe
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:12.6250518Z                                    
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:12.7085577Z  91% 14504 - msys64\usr\lib\gettext\hostname.exe
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:12.7091355Z                                                 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:12.7091720Z Everything is Ok
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:12.7197911Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:12.7198712Z ##[group]Disable Key Refresh...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:12.7216547Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:12.7249037Z ##[group]Restoring package cache...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:13.0444806Z Cache hit for restore-key: msys2-pkgs-upd:true-conf:524ff6e7-files:530424107bcb314a3faecf379911106d96ff9a45cc46892dceb846dba22bd6d2
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:14.2492570Z Received 71303168 of 151246716 (47.1%), 62.0 MBs/sec
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:16.6730112Z Received 134217728 of 151246716 (88.7%), 36.4 MBs/sec
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:16.9226579Z Received 151246716 of 151246716 (100.0%), 38.2 MBs/sec
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:16.9231047Z Cache Size: ~144 MB (151246716 B)
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:16.9291049Z [command]"C:\Program Files\Git\usr\bin\tar.exe" -xf C:/a/_temp/ecc97649-af3b-46ab-9136-e2e0770029cd/cache.tzst -P -C C:/a/fd/fd --force-local --use-compress-program "zstd -d"
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:17.5973812Z Cache restored successfully
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:17.6128939Z Cache restore for msys2-pkgs-upd:true-conf:524ff6e7, got msys2-pkgs-upd:true-conf:524ff6e7-files:530424107bcb314a3faecf379911106d96ff9a45cc46892dceb846dba22bd6d2
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:17.6135474Z Cache restore for msys2-pkgs-upd:true-conf:524ff6e7, got msys2-pkgs-upd:true-conf:524ff6e7-files:530424107bcb314a3faecf379911106d96ff9a45cc46892dceb846dba22bd6d2
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:17.6136678Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:17.6137821Z ##[group]Starting MSYS2 for the first time...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:17.7279179Z [command]C:\Windows\system32\cmd.exe /D /S /C C:\a\_temp\setup-msys2\msys2.cmd -c "'uname' '-a'"
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:18.1035271Z ^[[1;32mMSYS2 is starting for the first time. Executing the initial setup.^[[1;0m
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:18.6272165Z Copying skeleton files.
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:18.6273058Z These files are for the users to personalise their msys2 experience.
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:18.6273329Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:18.6273467Z They will never be overwritten nor automatically updated.
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:18.6273698Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:19.4893251Z './.bashrc' -> '/home/runneradmin/.bashrc'
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:19.5831947Z './.bash_profile' -> '/home/runneradmin/.bash_profile'
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:19.6779142Z './.profile' -> '/home/runneradmin/.profile'
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:19.9857603Z 'C:\Windows\system32\drivers\etc\hosts' -> '/etc/hosts'
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:20.2641703Z 'C:\Windows\system32\drivers\etc\protocol' -> '/etc/protocols'
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:20.5399673Z 'C:\Windows\system32\drivers\etc\services' -> '/etc/services'
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:20.8114496Z 'C:\Windows\system32\drivers\etc\networks' -> '/etc/networks'
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:22.3148012Z gpg: /etc/pacman.d/gnupg/trustdb.gpg: trustdb created
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:22.3213088Z gpg: no ultimately trusted keys found
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:24.0782995Z gpg: starting migration from earlier GnuPG versions
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:24.2754787Z gpg: porting secret keys from '/etc/pacman.d/gnupg/secring.gpg' to gpg-agent
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:24.2769476Z gpg: migration succeeded
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:24.4043975Z ==> Generating pacman master key. This may take some time.
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:24.4981996Z gpg: Generating pacman keyring master key...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:25.5905153Z gpg: directory '/etc/pacman.d/gnupg/openpgp-revocs.d' created
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:25.6383790Z gpg: revocation certificate stored as '/etc/pacman.d/gnupg/openpgp-revocs.d/A47D5A8D71361EC89B4159BB68F8BCE74F619F5D.rev'
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:25.6385073Z gpg: Done
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:25.7346117Z ==> Updating trust database...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:25.8593850Z gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:25.8602673Z gpg: depth: 0  valid:   1  signed:   0  trust: 0-, 0q, 0n, 0m, 0f, 1u
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:26.4952263Z ==> Appending keys from msys2.gpg...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:29.2964597Z ==> Locally signing trusted keys in keyring...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:31.1181656Z   -> Locally signed 5 keys.
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:31.2144057Z ==> Importing owner trust values...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:31.3085570Z gpg: setting ownertrust to 4
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:31.3085979Z gpg: setting ownertrust to 4
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:31.3086374Z gpg: setting ownertrust to 4
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:31.3086630Z gpg: setting ownertrust to 4
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:31.3086856Z gpg: setting ownertrust to 4
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:31.4189981Z ==> Disabling revoked keys in keyring...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:32.4328749Z   -> Disabled 4 keys.
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:32.5278277Z ==> Updating trust database...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:32.6545248Z gpg: marginals needed: 3  completes needed: 1  trust model: pgp
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:32.6625920Z gpg: depth: 0  valid:   1  signed:   5  trust: 0-, 0q, 0n, 0m, 0f, 1u
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:32.6712266Z gpg: depth: 1  valid:   5  signed:   7  trust: 0-, 0q, 0n, 5m, 0f, 0u
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:32.6742740Z gpg: depth: 2  valid:   4  signed:   2  trust: 4-, 0q, 0n, 0m, 0f, 0u
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:32.6760790Z gpg: next trustdb check due at 2027-02-10
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:32.8634305Z pacman-key (pacman) 6.1.0
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:32.8634752Z Copyright (c) 2010-2024 Pacman Development Team <pacman-dev@lists.archlinux.org>.
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:32.8635065Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:32.9587827Z This is free software; see the source for copying conditions.
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:32.9588248Z There is NO WARRANTY, to the extent permitted by law.
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:34.0436679Z ^[[1;32mInitial setup complete. MSYS2 is now ready to use.^[[1;0m
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:34.0988169Z MINGW64_NT-10.0-26200-ARM64 runnervm42qc2 3.6.10-c770e1b9.x86_64 2026-09-26 06:38 UTC x86_64 Msys
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:34.1103380Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:34.1104388Z ##[group]Disable CheckSpace...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:34.2148373Z [command]C:\Windows\system32\cmd.exe /D /S /C C:\a\_temp\setup-msys2\msys2.cmd -c "'sed' '-i' 's/^CheckSpace/#CheckSpace/g' '/etc/pacman.conf'"
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:34.9159821Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:34.9161782Z ##[group]Updating packages...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:35.0261241Z [command]C:\Windows\system32\cmd.exe /D /S /C C:\a\_temp\setup-msys2\msys2.cmd -c "'pacman' '--noconfirm' '-Syuu' '--overwrite' '*'"
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:37.4320575Z :: Synchronizing package databases...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:38.4610517Z  clangarm64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:38.4610864Z  mingw32 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:38.4611067Z  mingw64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:38.4611263Z  ucrt64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:38.4611462Z  clang64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:38.4611656Z  msys downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:39.7950009Z :: Starting core system upgrade...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:40.1393993Z warning: terminate other MSYS2 programs before proceeding
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:40.1394868Z resolving dependencies...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:40.1567869Z looking for conflicting packages...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:40.1640262Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:40.1640637Z Packages (4) bash-5.3.20-3  filesystem-2026.10.18-3  msys2-runtime-3.6.12-1  pacman-6.1.0-29
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:40.1641025Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:40.1641117Z Total Installed Size:  54.05 MiB
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:40.1641365Z Net Upgrade Size:      -0.14 MiB
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:40.1641515Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:40.1657810Z :: Proceed with installation? [Y/n] 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:40.1658057Z checking keyring...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:40.2821832Z checking package integrity...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:41.4753786Z loading package files...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:41.4966472Z checking for file conflicts...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:41.4972045Z :: Processing package changes...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:41.4973398Z upgrading bash...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:41.7722110Z upgrading filesystem...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:41.8962018Z upgrading msys2-runtime...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:42.2050077Z upgrading pacman...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:42.9204216Z :: To complete this update all MSYS2 processes including this terminal will be closed. Confirm to proceed [Y/n] 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:43.8287429Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:43.8294217Z ##[group]Killing remaining tasks...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:43.9368842Z [command]C:\Windows\system32\taskkill.exe /F /FI "MODULES eq msys-2.0.dll"
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:44.0764108Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:44.0764595Z INFO: No tasks running with the specified criteria.
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:44.0818010Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:44.0818378Z ##[group]Final system upgrade...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:44.1905422Z [command]C:\Windows\system32\cmd.exe /D /S /C C:\a\_temp\setup-msys2\msys2.cmd -c "'pacman' '--noconfirm' '-Syuu' '--overwrite' '*'"
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:46.4713987Z :: Synchronizing package databases...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:47.3038770Z  clangarm64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:47.3039056Z  mingw32 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:47.3039258Z  mingw64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:47.3039458Z  ucrt64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:47.3039657Z  clang64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:47.3039856Z  msys downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:48.6969394Z :: Starting core system upgrade...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.0219282Z  there is nothing to do
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.0220088Z :: Starting full system upgrade...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.0864946Z resolving dependencies...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.1003576Z looking for conflicting packages...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.1243626Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.1245767Z Packages (32) brotli-1.2.1-1  bsdtar-3.8.11-3  ca-certificates-20260816-4  coreutils-9.0-1  curl-8.23.0-2  dash-0.5.13.5-1  file-5.48-2  gcc-libs-16.2.0-1  libcurl-8.23.0-2  libexpat-2.10.0-1  libffi-3.8.1-1  liblz4-1.11.1-1  libnghttp2-1.71.0-2  libnghttp3-1.19.0-1  libngtcp2-1.26.0-2  libopenssl-4.1.0-1  libp11-kit-0.26.6-1  libpcre2_8-10.49-1  libpsl-0.23.2-2  libreadline-8.3.006-2  libsqlite-3.54.1-1  libssh2-1.11.1-2  libutil-linux-2.42.4-1  nano-9.3-1  openssl-4.1.0-1  p11-kit-0.26.6-1  pacman-contrib-1.13.1-1  sed-4.10-1  tzcode-2026f-1  util-linux-2.42.4-1  wget-1.25.0-6  zlib-1.4-1
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.1247825Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.1247914Z Total Download Size:    8.77 MiB
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.1248149Z Total Installed Size:  97.14 MiB
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.1248381Z Net Upgrade Size:       3.57 MiB
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.1248970Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.1304432Z :: Proceed with installation? [Y/n] 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.1304691Z :: Retrieving packages...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.8162118Z  pacman-contrib-1.13.1-1-x86_64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.8162467Z  util-linux-2.42.4-1-x86_64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.8162738Z  wget-1.25.0-6-x86_64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.8163010Z  p11-kit-0.26.6-1-x86_64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.8163268Z  bsdtar-3.8.11-3-x86_64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.8163527Z  libutil-linux-2.42.4-1-x86_64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.8163802Z  libp11-kit-0.26.6-1-x86_64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.8164058Z  sed-4.10-1-x86_64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.8164292Z  libffi-3.8.1-1-x86_64 downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.8164525Z checking keyring...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:49.9407487Z checking package integrity...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:58.5566286Z loading package files...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:58.6817992Z checking for file conflicts...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:58.6976416Z :: Running pre-transaction hooks...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:58.6976850Z (1/1) Removing old entries from the info directory file...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:59.2533133Z :: Processing package changes...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:59.2534130Z upgrading gcc-libs...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:59.2949920Z upgrading brotli...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:59.3172341Z upgrading liblz4...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:59.3258503Z upgrading libopenssl...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:59.3790720Z upgrading zlib...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:59.3925664Z upgrading bsdtar...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:59.4062865Z upgrading openssl...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:07:59.6086708Z upgrading coreutils...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:00.1764321Z upgrading sed...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:00.2984210Z upgrading libffi...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:00.3182085Z upgrading libpcre2_8...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:00.3273349Z upgrading libp11-kit...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:00.3392178Z upgrading p11-kit...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:00.6352560Z upgrading ca-certificates...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:02.2231181Z upgrading libnghttp3...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:02.2350823Z upgrading libngtcp2...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:02.2506398Z upgrading libnghttp2...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:02.2626625Z upgrading libpsl...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:02.2825911Z upgrading libssh2...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:02.5737996Z upgrading libcurl...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:02.5850026Z upgrading curl...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:03.4243445Z upgrading dash...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:03.7319663Z upgrading file...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:03.7884586Z upgrading libexpat...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:03.7973439Z upgrading libreadline...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:04.0272740Z upgrading libsqlite...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:04.0436683Z upgrading libutil-linux...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:04.0595259Z upgrading nano...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:04.2722665Z upgrading pacman-contrib...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:04.3869492Z New optional dependencies for pacman-contrib
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:04.3869819Z     diffutils: for pacdiff
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:04.3870036Z upgrading tzcode...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:08.7042866Z upgrading util-linux...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:09.0939732Z upgrading wget...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:09.3101123Z :: Running post-transaction hooks...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:09.3101500Z (1/1) Updating the info directory file...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:11.1215983Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:11.1216479Z ##[group]Installing additional packages through pacman...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:11.2311577Z [command]C:\Windows\system32\cmd.exe /D /S /C C:\a\_temp\setup-msys2\msys2.cmd -c "'pacman' '--noconfirm' '-S' '--needed' '--overwrite' '*' 'mingw-w64-clang-aarch64-clang'"
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:13.4152467Z resolving dependencies...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:13.6412375Z looking for conflicting packages...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:13.6459727Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:13.6462844Z Packages (17) mingw-w64-clang-aarch64-clang-libs-23.1.5-1  mingw-w64-clang-aarch64-compiler-rt-23.1.5-1  mingw-w64-clang-aarch64-crt-14.0.0.r598.ge3d18511f-1  mingw-w64-clang-aarch64-headers-14.0.0.r598.ge3d18511f-1  mingw-w64-clang-aarch64-libc++-23.1.5-1  mingw-w64-clang-aarch64-libffi-3.8.1-1  mingw-w64-clang-aarch64-libiconv-1.19.1-1  mingw-w64-clang-aarch64-libunwind-23.1.5-1  mingw-w64-clang-aarch64-libwinpthread-14.0.0.r598.ge3d18511f-1  mingw-w64-clang-aarch64-libxml2-2.15.4-3  mingw-w64-clang-aarch64-lld-23.1.5-1  mingw-w64-clang-aarch64-llvm-libs-23.1.5-1  mingw-w64-clang-aarch64-llvm-tools-23.1.5-1  mingw-w64-clang-aarch64-winpthreads-14.0.0.r598.ge3d18511f-1  mingw-w64-clang-aarch64-zlib-1.4-2  mingw-w64-clang-aarch64-zstd-1.5.7-2  mingw-w64-clang-aarch64-clang-23.1.5-1
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:13.6466217Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:13.6466306Z Total Download Size:     0.05 MiB
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:13.6466546Z Total Installed Size:  813.32 MiB
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:13.6466696Z 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:13.6497898Z :: Proceed with installation? [Y/n] 
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:13.6498158Z :: Retrieving packages...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:14.1235108Z  mingw-w64-clang-aarch64-libffi-3.8.1-1-any downloading...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:14.1235807Z checking keyring...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:14.2408490Z checking package integrity...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:21.8580883Z loading package files...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:21.9595509Z checking for file conflicts...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:22.2837066Z :: Processing package changes...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:22.2837692Z installing mingw-w64-clang-aarch64-libunwind...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:22.3053012Z installing mingw-w64-clang-aarch64-libc++...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:25.1854312Z installing mingw-w64-clang-aarch64-libffi...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:25.2079710Z installing mingw-w64-clang-aarch64-libiconv...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:25.2501200Z installing mingw-w64-clang-aarch64-zlib...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:25.3091671Z installing mingw-w64-clang-aarch64-libxml2...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:26.0942323Z Optional dependencies for mingw-w64-clang-aarch64-libxml2
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:26.0942754Z     mingw-w64-clang-aarch64-python: Python bindings
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:26.0943069Z installing mingw-w64-clang-aarch64-zstd...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:26.1306388Z installing mingw-w64-clang-aarch64-llvm-libs...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:26.5005899Z installing mingw-w64-clang-aarch64-clang-libs...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:26.7615461Z installing mingw-w64-clang-aarch64-compiler-rt...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:26.7860921Z installing mingw-w64-clang-aarch64-lld...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:27.1784838Z installing mingw-w64-clang-aarch64-llvm-tools...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:27.5979009Z installing mingw-w64-clang-aarch64-headers...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:30.4496239Z installing mingw-w64-clang-aarch64-crt...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:31.8562263Z installing mingw-w64-clang-aarch64-libwinpthread...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:31.8639163Z installing mingw-w64-clang-aarch64-winpthreads...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:31.8817316Z installing mingw-w64-clang-aarch64-clang...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:35.1732513Z Optional dependencies for mingw-w64-clang-aarch64-clang
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:35.1732898Z     mingw-w64-clang-aarch64-llvm=23.1.5
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:35.2870813Z ##[endgroup]
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:35.2871184Z ##[group]Saving package cache...
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:35.4050587Z [command]C:\Windows\system32\cmd.exe /D /S /C C:\a\_temp\setup-msys2\msys2.cmd -c "'paccache' '-r' '-f' '-u' '-k0'"
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:38.0530935Z ##[error]Error: The process 'C:\Windows\system32\cmd.exe' failed with exit code 127
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:38.1249670Z Post job cleanup.
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:38.4625860Z [command]"C:\Program Files\Git\bin\git.exe" version
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:38.5176009Z git version 2.56.1.windows.1
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:38.5264211Z Temporarily overriding HOME='C:\a\_temp\6acadc5d-7fc5-4647-8236-7c76d181942d' before making global git config changes
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:38.5264980Z Adding repository directory to the temporary git global config as a safe directory
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:38.5290525Z [command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory C:\a\fd\fd
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:38.5890149Z Removing SSH command configuration
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:38.5903891Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:38.6480955Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:40.0057599Z Removing HTTP extra header
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:40.0068966Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:40.0627376Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:41.3667086Z Removing includeIf entries pointing to credentials config files
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:41.3678958Z [command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:41.4238486Z [command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+aarch64-pc-windows-gnullvm (windows-11-arm)	UNKNOWN STEP	2026-11-18T08:08:42.7629699Z Cleaning up orphan processes

@@ -1,0 +1,67 @@
+docs/d8.md:TODO write
+docs/d4.md:TODO write
+docs/d7.md:TODO write
+docs/d3.md:TODO write
+docs/d6.md:TODO write
+docs/d1.md:TODO write
+docs/d5.md:TODO write
+src/pkg/api/h35.go:func Handler35() { fmt.Println("TODO handler 35") }
+src/pkg/api/h49.go:func Handler49() { fmt.Println("TODO handler 49") }
+src/pkg/api/h9.go:func Handler9() { fmt.Println("TODO handler 9") }
+src/pkg/api/h48.go:func Handler48() { fmt.Println("TODO handler 48") }
+src/pkg/api/h8.go:func Handler8() { fmt.Println("TODO handler 8") }
+src/pkg/api/h47.go:func Handler47() { fmt.Println("TODO handler 47") }
+src/pkg/api/h34.go:func Handler34() { fmt.Println("TODO handler 34") }
+src/pkg/api/h7.go:func Handler7() { fmt.Println("TODO handler 7") }
+src/pkg/api/h46.go:func Handler46() { fmt.Println("TODO handler 46") }
+src/pkg/api/h33.go:func Handler33() { fmt.Println("TODO handler 33") }
+src/pkg/api/h6.go:func Handler6() { fmt.Println("TODO handler 6") }
+src/pkg/api/h45.go:func Handler45() { fmt.Println("TODO handler 45") }
+src/pkg/api/h59.go:func Handler59() { fmt.Println("TODO handler 59") }
+src/pkg/api/h32.go:func Handler32() { fmt.Println("TODO handler 32") }
+src/pkg/api/h44.go:func Handler44() { fmt.Println("TODO handler 44") }
+src/pkg/api/h58.go:func Handler58() { fmt.Println("TODO handler 58") }
+src/pkg/api/h31.go:func Handler31() { fmt.Println("TODO handler 31") }
+src/pkg/api/h43.go:func Handler43() { fmt.Println("TODO handler 43") }
+src/pkg/api/h57.go:func Handler57() { fmt.Println("TODO handler 57") }
+src/pkg/api/h30.go:func Handler30() { fmt.Println("TODO handler 30") }
+src/pkg/api/h42.go:func Handler42() { fmt.Println("TODO handler 42") }
+src/pkg/api/h56.go:func Handler56() { fmt.Println("TODO handler 56") }
+src/pkg/api/h3.go:func Handler3() { fmt.Println("TODO handler 3") }
+src/pkg/api/h41.go:func Handler41() { fmt.Println("TODO handler 41") }
+src/pkg/api/h55.go:func Handler55() { fmt.Println("TODO handler 55") }
+src/pkg/api/h29.go:func Handler29() { fmt.Println("TODO handler 29") }
+src/pkg/api/h40.go:func Handler40() { fmt.Println("TODO handler 40") }
+src/pkg/api/h54.go:func Handler54() { fmt.Println("TODO handler 54") }
+src/pkg/api/h28.go:func Handler28() { fmt.Println("TODO handler 28") }
+src/pkg/api/h4.go:func Handler4() { fmt.Println("TODO handler 4") }
+src/pkg/api/h53.go:func Handler53() { fmt.Println("TODO handler 53") }
+src/pkg/api/h27.go:func Handler27() { fmt.Println("TODO handler 27") }
+src/pkg/api/h39.go:func Handler39() { fmt.Println("TODO handler 39") }
+src/pkg/api/h52.go:func Handler52() { fmt.Println("TODO handler 52") }
+src/pkg/api/h38.go:func Handler38() { fmt.Println("TODO handler 38") }
+src/pkg/api/h26.go:func Handler26() { fmt.Println("TODO handler 26") }
+src/pkg/api/h51.go:func Handler51() { fmt.Println("TODO handler 51") }
+src/pkg/api/h25.go:func Handler25() { fmt.Println("TODO handler 25") }
+src/pkg/api/h37.go:func Handler37() { fmt.Println("TODO handler 37") }
+src/pkg/api/h50.go:func Handler50() { fmt.Println("TODO handler 50") }
+src/pkg/api/h36.go:func Handler36() { fmt.Println("TODO handler 36") }
+src/pkg/api/h24.go:func Handler24() { fmt.Println("TODO handler 24") }
+src/pkg/api/h5.go:func Handler5() { fmt.Println("TODO handler 5") }
+src/pkg/api/h23.go:func Handler23() { fmt.Println("TODO handler 23") }
+src/pkg/api/h22.go:func Handler22() { fmt.Println("TODO handler 22") }
+src/pkg/api/h21.go:func Handler21() { fmt.Println("TODO handler 21") }
+src/pkg/api/h20.go:func Handler20() { fmt.Println("TODO handler 20") }
+src/pkg/api/h2.go:func Handler2() { fmt.Println("TODO handler 2") }
+src/pkg/api/h19.go:func Handler19() { fmt.Println("TODO handler 19") }
+src/pkg/api/h18.go:func Handler18() { fmt.Println("TODO handler 18") }
+src/pkg/api/h17.go:func Handler17() { fmt.Println("TODO handler 17") }
+src/pkg/api/h12.go:func Handler12() { fmt.Println("TODO handler 12") }
+src/pkg/api/h1.go:func Handler1() { fmt.Println("TODO handler 1") }
+src/pkg/api/h16.go:func Handler16() { fmt.Println("TODO handler 16") }
+src/pkg/api/h0.go:func Handler0() { fmt.Println("TODO handler 0") }
+src/pkg/api/h11.go:func Handler11() { fmt.Println("TODO handler 11") }
+src/pkg/api/h15.go:func Handler15() { fmt.Println("TODO handler 15") }
+src/pkg/api/h14.go:func Handler14() { fmt.Println("TODO handler 14") }
+src/pkg/api/h10.go:func Handler10() { fmt.Println("TODO handler 10") }
+src/pkg/api/h13.go:func Handler13() { fmt.Println("TODO handler 13") }

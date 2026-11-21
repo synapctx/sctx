@@ -1,0 +1,1 @@
+ps: bad -o argument 'pcpu', supported arguments: user,group,comm,args,pid,ppid,pgid,etime,nice,rgroup,ruser,time,tty,vsz,sid,stat,rss

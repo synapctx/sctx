@@ -1,0 +1,7 @@
+  Installing demo v0.1.0 (/work/rs-ok)
+    Updating crates.io index
+   Compiling demo v0.1.0 (/work/rs-ok)
+    Finished `release` profile [optimized] target(s) in 0.45s
+  Installing /work/inst-root/bin/demo
+   Installed package `demo v0.1.0 (/work/rs-ok)` (executable `demo`)
+warning: be sure to add `/work/inst-root/bin` to your PATH to be able to run the installed binaries

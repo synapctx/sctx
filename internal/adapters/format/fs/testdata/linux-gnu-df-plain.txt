@@ -1,0 +1,7 @@
+Filesystem     1K-blocks      Used Available Use% Mounted on
+overlay        528111992 156553260 344698872  32% /
+tmpfs              65536         0     65536   0% /dev
+shm                65536         0     65536   0% /dev/shm
+grpcfuse       971350180 870285532 101064648  90% /work
+/dev/vda1      528111992 156553260 344698872  32% /etc/hosts
+tmpfs                  4         0         4   0% /proc/scsi

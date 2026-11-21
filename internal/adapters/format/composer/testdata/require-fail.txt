@@ -1,0 +1,11 @@
+Composer could not detect the root package (scratch/app) version, defaulting to '1.0.0'. See https://getcomposer.org/root-version
+
+In PackageDiscoveryTrait.php line 421:
+                                                                               
+  Could not find a matching version of package nonexistent-vendor/nope-xyz. C  
+  heck the package spelling, your version constraint and that the package is   
+  available in a stability which matches your minimum-stability (stable).      
+                                                                               
+
+require [--dev] [--dry-run] [--prefer-source] [--prefer-dist] [--prefer-install PREFER-INSTALL] [--fixed] [--no-suggest] [--no-progress] [--no-update] [--no-install] [--no-audit] [--audit-format AUDIT-FORMAT] [--no-security-blocking] [--no-blocking] [--no-cooldown] [--update-no-dev] [-w|--update-with-dependencies] [-W|--update-with-all-dependencies] [--with-dependencies] [--with-all-dependencies] [--ignore-platform-req IGNORE-PLATFORM-REQ] [--ignore-platform-reqs] [--prefer-stable] [--prefer-lowest] [-m|--minimal-changes] [--sort-packages] [-o|--optimize-autoloader] [-a|--classmap-authoritative] [--apcu-autoloader] [--apcu-autoloader-prefix APCU-AUTOLOADER-PREFIX] [--] [<packages>...]
+

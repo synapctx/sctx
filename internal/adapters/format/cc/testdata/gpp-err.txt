@@ -1,0 +1,28 @@
+t.cpp: In function 'int main()':
+t.cpp:5:13: error: no matching function for call to 'S::f(const char [2], int)'
+    5 |     S s; s.f("a", 2);
+      |          ~~~^~~~~~~~
+t.cpp:3:17: note: candidate: 'void S::f(int)'
+    3 | struct S { void f(int); };
+      |                 ^
+t.cpp:3:17: note:   candidate expects 1 argument, 2 provided
+t.cpp:6:36: error: no matching function for call to 'std::vector<int>::push_back(std::string)'
+    6 |     std::vector<int> v; v.push_back(std::string("x"));
+      |                         ~~~~~~~~~~~^~~~~~~~~~~~~~~~~~
+In file included from /usr/local/include/c++/14.4.0/vector:66,
+                 from t.cpp:1:
+/usr/local/include/c++/14.4.0/bits/stl_vector.h:1296:7: note: candidate: 'void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = int; _Alloc = std::allocator<int>; value_type = int]'
+ 1296 |       push_back(const value_type& __x)
+      |       ^~~~~~~~~
+/usr/local/include/c++/14.4.0/bits/stl_vector.h:1296:35: note:   no known conversion for argument 1 from 'std::string' {aka 'std::__cxx11::basic_string<char>'} to 'const std::vector<int>::value_type&' {aka 'const int&'}
+ 1296 |       push_back(const value_type& __x)
+      |                 ~~~~~~~~~~~~~~~~~~^~~
+/usr/local/include/c++/14.4.0/bits/stl_vector.h:1313:7: note: candidate: 'void std::vector<_Tp, _Alloc>::push_back(value_type&&) [with _Tp = int; _Alloc = std::allocator<int>; value_type = int]'
+ 1313 |       push_back(value_type&& __x)
+      |       ^~~~~~~~~
+/usr/local/include/c++/14.4.0/bits/stl_vector.h:1313:30: note:   no known conversion for argument 1 from 'std::string' {aka 'std::__cxx11::basic_string<char>'} to 'std::vector<int>::value_type&&' {aka 'int&&'}
+ 1313 |       push_back(value_type&& __x)
+      |                 ~~~~~~~~~~~~~^~~
+t.cpp:7:5: error: 'undefined_fn' was not declared in this scope
+    7 |     undefined_fn(1);
+      |     ^~~~~~~~~~~~

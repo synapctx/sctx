@@ -1,0 +1,11 @@
+✖  ./nonexist
+
+=== Failed
+=== FAIL: ./nonexist  (0.00s)
+FAIL	./nonexist [setup failed]
+
+=== Errors
+stat /work/go-ts/nonexist: directory not found
+
+
+DONE 0 tests, 1 failure, 1 error in 0.000s

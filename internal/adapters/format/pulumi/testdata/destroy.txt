@@ -1,0 +1,29 @@
+Previewing destroy (dev):
+
+ -  random:index:RandomId id1 delete 
+ -  random:index:RandomPet pet delete 
+ -  random:index:RandomPassword pw delete 
+ -  pulumi:pulumi:Stack demo-dev delete 
+ -  pulumi:pulumi:Stack demo-dev delete 
+    pulumi:pulumi:Stack demo-dev  
+Resources:
+    - 4 to delete
+
+Destroying (dev):
+
+ -  random:index:RandomPet pet deleting (0s) 
+ -  random:index:RandomPassword pw deleting (0s) 
+ -  random:index:RandomId id1 deleting (0s) 
+ -  random:index:RandomPet pet deleted (0.00s) 
+ -  random:index:RandomPassword pw deleted (0.00s) 
+ -  random:index:RandomId id1 deleted (0.00s) 
+ -  pulumi:pulumi:Stack demo-dev deleting (0s) 
+ -  pulumi:pulumi:Stack demo-dev deleted (0.00s) 
+    pulumi:pulumi:Stack demo-dev  
+Resources:
+    - 4 deleted
+
+Duration: 1s
+
+The resources in the stack have been deleted, but the history and configuration associated with the stack are still maintained. 
+If you want to remove the stack completely, run `pulumi stack rm dev`.

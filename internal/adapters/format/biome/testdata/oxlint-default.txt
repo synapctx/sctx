@@ -1,0 +1,40 @@
+
+  ! eslint(no-unused-vars): Variable 'x' is declared but never used. Unused variables should start with a '_'.
+   ,-[src/a.js:1:7]
+ 1 | const x = 1
+   :       |
+   :       `-- 'x' is declared here
+ 2 | function foo( a,b ){ var unused = 3; if(a == b){ console.log("hi") }
+   `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'unused' is declared but never used. Unused variables should start with a '_'.
+   ,-[src/a.js:2:26]
+ 1 | const x = 1
+ 2 | function foo( a,b ){ var unused = 3; if(a == b){ console.log("hi") }
+   :                          ^^^|^^
+   :                             `-- 'unused' is declared here
+ 3 |   return a+b }
+   `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-debugger): `debugger` statement is not allowed
+   ,-[src/a.js:4:1]
+ 3 |   return a+b }
+ 4 | debugger
+   : ^^^^^^^^
+ 5 | export default foo
+   `----
+  help: Remove the debugger statement
+
+  ! eslint(no-unused-vars): Variable 'z' is declared but never used. Unused variables should start with a '_'.
+   ,-[src/b.ts:2:5]
+ 1 | export const y: number = 'str'.length;
+ 2 | let z = 1;
+   :     |
+   :     `-- 'z' is declared here
+   `----
+  help: Consider removing this declaration.
+
+Found 4 warnings and 0 errors.
+Finished in 6ms on 3 files with 96 rules using 10 threads.

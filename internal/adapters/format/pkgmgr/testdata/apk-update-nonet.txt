@@ -1,0 +1,5 @@
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/main/aarch64/APKINDEX.tar.gz
+WARNING: updating and opening https://dl-cdn.alpinelinux.org/alpine/v3.20/main: temporary error (try again later)
+fetch https://dl-cdn.alpinelinux.org/alpine/v3.20/community/aarch64/APKINDEX.tar.gz
+WARNING: updating and opening https://dl-cdn.alpinelinux.org/alpine/v3.20/community: temporary error (try again later)
+4 unavailable, 0 stale; 14 distinct packages available

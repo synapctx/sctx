@@ -1,0 +1,30 @@
+NAME: rel
+LAST DEPLOYED: Sat Nov 21 02:03:11 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+RESOURCES:
+==> v1/Pod(related)
+NAME                     READY   STATUS    RESTARTS   AGE
+rel-web-8dfb5dc4-4t88p   1/1     Running   0          5s
+
+==> v1/ServiceAccount
+NAME      AGE
+rel-web   5s
+
+==> v1/Service
+NAME      TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+rel-web   ClusterIP   10.96.169.15   <none>        80/TCP    5s
+
+==> v1/Deployment
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+rel-web   1/1     1            1           5s
+
+
+NOTES:
+1. Get the application URL by running these commands:
+  export POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=web,app.kubernetes.io/instance=rel" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace default $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace default port-forward $POD_NAME 8080:$CONTAINER_PORT

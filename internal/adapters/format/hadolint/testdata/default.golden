@@ -1,0 +1,12 @@
+hadolint: 10 findings in 1 file (DL3003=1 DL3006=1 DL3008=1 DL3009=1 DL3013=1 DL3015=1 DL3020=1 DL3025=1 DL3042=1 DL3047=1)
+Dockerfile (10)
+  1 warning DL3006 Always tag the version of an image explicitly
+  2 info DL3015 Avoid additional packages by specifying `--no-install-recommends`
+  2 info DL3009 Delete the apt lists (/var/lib/apt/lists) after installing something
+  2 warning DL3008 Pin versions in apt get install. Instead of `apt-get install <package>` use `apt-get install <package>=<version>`
+  3 warning DL3003 Use WORKDIR to switch to a directory
+  3 info DL3047 Avoid use of wget without progress bar. Use `wget --progress=dot:giga <url>`. Or consider using `-q` or `-nv` (shorthands for `--quiet` or `--no-verbose`).
+  4 error DL3020 Use COPY instead of ADD for files and folders
+  5 warning DL3042 Avoid use of cache directory with pip. Use `pip install --no-cache-dir <package>`
+  5 warning DL3013 Pin versions in pip. Instead of `pip install <package>` use `pip install <package>==<version>` or `pip install --requirement <requirements file>`
+  7 warning DL3025 Use arguments JSON notation for CMD and ENTRYPOINT arguments

@@ -1,0 +1,22 @@
+[0m02:41:08  Running with dbt=1.12.7
+[0m02:41:09  Registered adapter: postgres=1.9.1
+[0m02:41:09  Found 14 models, 5 data tests, 476 macros
+shop.marts.revenue_by_country
+shop.staging.stg_customers_1
+shop.staging.stg_customers_10
+shop.staging.stg_customers_11
+shop.staging.stg_customers_12
+shop.staging.stg_customers_2
+shop.staging.stg_customers_3
+shop.staging.stg_customers_4
+shop.staging.stg_customers_5
+shop.staging.stg_customers_6
+shop.staging.stg_customers_7
+shop.staging.stg_customers_8
+shop.staging.stg_customers_9
+shop.staging.stg_orders
+shop.staging.accepted_values_stg_orders_status__paid__pending
+shop.staging.not_null_stg_customers_1_id
+shop.staging.not_null_stg_orders_id
+shop.staging.unique_stg_customers_1_id
+shop.staging.unique_stg_orders_id

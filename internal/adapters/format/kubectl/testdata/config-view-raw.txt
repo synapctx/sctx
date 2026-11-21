@@ -1,0 +1,22 @@
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUEKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    server: https://127.0.0.1:53026
+  name: kind-demo
+contexts:
+- context:
+    cluster: kind-demo
+    user: kind-demo
+  name: kind-demo
+current-context: kind-demo
+kind: Config
+preferences: {}
+users:
+- name: kind-demo
+  user:
+    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUEKLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
+    client-key-data: LS0tLS1CRUdJTiBFQyBQUklWQVRFIEtFWS0tLS0tCkZBS0VLRVlGQUtFS0VZRkFLRUtFWUZBS0VLRVlGQUtFS0VZRkFLRUtFWUZBS0VLRVlGQUtFS0VZRkFLRUtFWQotLS0tLUVORCBFQyBQUklWQVRFIEtFWS0tLS0tCg==
+- name: token-user
+  user:
+    token: fake-demo-token-0123456789abcdef

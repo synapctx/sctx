@@ -1,0 +1,12 @@
+× broken.service - Demo broken worker
+     Loaded: loaded (/etc/systemd/system/broken.service; static)
+     Active: failed (Result: exit-code) since Sat 2026-11-21 02:43:03 UTC; 2s ago
+   Duration: 1ms
+    Process: 2425 ExecStart=/bin/sh -c echo "connecting to db 192.0.2.10:5432"; echo "FATAL: password authentication failed for user app" >&2; exit 1 (code=exited, status=1/FAILURE)
+   Main PID: 2425 (code=exited, status=1/FAILURE)
+        CPU: 1ms
+
+Nov 21 02:43:03 af8069ba3d96 systemd[1]: broken.service: Scheduled restart job, restart counter is at 4.
+Nov 21 02:43:03 af8069ba3d96 systemd[1]: broken.service: Start request repeated too quickly.
+Nov 21 02:43:03 af8069ba3d96 systemd[1]: broken.service: Failed with result 'exit-code'.
+Nov 21 02:43:03 af8069ba3d96 systemd[1]: Failed to start broken.service - Demo broken worker.

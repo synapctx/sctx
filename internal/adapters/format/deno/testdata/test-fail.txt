@@ -1,0 +1,103 @@
+[0m[32mDownload[0m https://jsr.io/@std/assert/meta.json
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19_meta.json
+[0m[32mDownload[0m https://jsr.io/@std/internal/meta.json
+[0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14_meta.json
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/mod.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/almost_equals.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/array_includes.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/equals.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/exists.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/false.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/greater_or_equal.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/greater.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/instance_of.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/is_error.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/less_or_equal.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/less.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/match.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/not_equals.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/not_instance_of.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/not_match.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/not_strict_equals.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/object_match.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/rejects.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/strict_equals.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/string_includes.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/throws.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/assert.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/assertion_error.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/equal.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/fail.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/unimplemented.ts
+[0m[32mDownload[0m https://jsr.io/@std/assert/1.0.19/unreachable.ts
+[0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14/format.ts
+[0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14/build_message.ts
+[0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14/diff.ts
+[0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14/diff_str.ts
+[0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14/styles.ts
+[0m[32mDownload[0m https://jsr.io/@std/internal/1.0.14/types.ts
+[0m[32mCheck[0m a_test.ts
+[0m[32mCheck[0m ok_test.ts
+[0m[38;5;245mrunning 5 tests from ./a_test.ts[0m
+adds ... [0m[32mok[0m [0m[38;5;245m(509µs)[0m
+adds wrong ... [0m[31mFAILED[0m [0m[38;5;245m(33ms)[0m
+obj ... [0m[31mFAILED[0m [0m[38;5;245m(1ms)[0m
+skipped ... [0m[33mignored[0m [0m[38;5;245m(0ms)[0m
+throws ... [0m[31mFAILED[0m [0m[38;5;245m(339µs)[0m
+[0m[38;5;245mrunning 2 tests from ./ok_test.ts[0m
+ok1 ... [0m[32mok[0m [0m[38;5;245m(12ms)[0m
+ok2 ... [0m[32mok[0m [0m[38;5;245m(8ms)[0m
+
+[0m[1m[37m[41m ERRORS [0m
+
+adds wrong [0m[38;5;245m=> ./a_test.ts:3:6[0m
+[0m[1m[31merror[0m: AssertionError: Values are not equal.
+
+
+    [90m[1m[Diff][22m[39m [31m[1mActual[22m[39m / [32m[1mExpected[22m[39m
+
+
+[31m[1m-   3[22m[39m
+[32m[1m+   4[22m[39m
+
+  throw new AssertionError(message);
+[0m[31m        ^[0m
+    at [0m[1m[3massertEquals[0m ([0m[36mhttps://jsr.io/@std/assert/1.0.19/equals.ts[0m:[0m[33m67[0m:[0m[33m9[0m)
+    at [0m[2m[38;5;245mfile:///repo/[0m[0m[36ma_test.ts[0m:[0m[33m3[0m:[0m[33m33[0m
+
+obj [0m[38;5;245m=> ./a_test.ts:4:6[0m
+[0m[1m[31merror[0m: AssertionError: Values are not equal.
+
+
+    [90m[1m[Diff][22m[39m [31m[1mActual[22m[39m / [32m[1mExpected[22m[39m
+
+
+[37m    {[39m
+[37m      a: 1,[39m
+[37m      b: [[39m
+[37m        1,[39m
+[31m[1m-       2,[22m[39m
+[32m[1m+       3,[22m[39m
+[37m      ],[39m
+[37m    }[39m
+
+  throw new AssertionError(message);
+[0m[31m        ^[0m
+    at [0m[1m[3massertEquals[0m ([0m[36mhttps://jsr.io/@std/assert/1.0.19/equals.ts[0m:[0m[33m67[0m:[0m[33m9[0m)
+    at [0m[2m[38;5;245mfile:///repo/[0m[0m[36ma_test.ts[0m:[0m[33m4[0m:[0m[33m26[0m
+
+throws [0m[38;5;245m=> ./a_test.ts:6:6[0m
+[0m[1m[31merror[0m: TypeError: kaboom
+Deno.test("throws", () => { throw new TypeError("kaboom"); });
+[0m[31m                                  ^[0m
+    at [0m[2m[38;5;245mfile:///repo/[0m[0m[36ma_test.ts[0m:[0m[33m6[0m:[0m[33m35[0m
+
+[0m[1m[37m[41m FAILURES [0m
+
+adds wrong [0m[38;5;245m=> ./a_test.ts:3:6[0m
+obj [0m[38;5;245m=> ./a_test.ts:4:6[0m
+throws [0m[38;5;245m=> ./a_test.ts:6:6[0m
+
+[0m[31mFAILED[0m | 3 passed | 3 failed | 1 ignored [0m[38;5;245m(255ms)[0m
+
+[0m[1m[31merror[0m: Test failed

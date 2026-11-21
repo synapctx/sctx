@@ -1,0 +1,17 @@
+bad.c:6:16: error: use of undeclared identifier 'undefined_var'
+    6 |     return a + undefined_var;
+      |                ^~~~~~~~~~~~~
+bad.c:9:9: error: incompatible pointer to integer conversion initializing 'int' with an expression of type 'char[4]' [-Wint-conversion]
+    9 |     int x = "str";
+      |         ^   ~~~~~
+bad.c:10:20: error: use of undeclared identifier 'y'
+   10 |     printf("%d\n", y);
+      |                    ^
+bad.c:11:5: error: call to undeclared function 'foo'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+   11 |     foo(3);
+      |     ^
+bad.c:12:24: error: expected ';' at end of declaration
+   12 |     char *p = malloc(4)
+      |                        ^
+      |                        ;
+5 errors generated.

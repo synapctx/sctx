@@ -1,0 +1,20 @@
+Computing main repo mapping: 
+Loading: 
+Loading: 0 packages loaded
+Analyzing: 4 targets (0 packages loaded, 0 targets configured)
+Analyzing: 4 targets (0 packages loaded, 0 targets configured)
+
+Analyzing: 4 targets (79 packages loaded, 385 targets configured)
+[1 / 1] no actions running
+INFO: Analyzed 4 targets (84 packages loaded, 414 targets configured).
+FAIL: //pkg:fail_test (see /home/user/.cache/bazel/_bazel_root/0123456789abcdef0123456789abcdef/execroot/_main/bazel-out/aarch64-fastbuild/testlogs/pkg/fail_test/test.log)
+INFO: Found 2 targets and 2 test targets...
+INFO: Elapsed time: 1.696s, Critical Path: 0.06s
+INFO: 11 processes: 7 internal, 4 processwrapper-sandbox.
+INFO: Build completed, 1 test FAILED, 11 total actions
+//pkg:pass_test                                                          PASSED in 0.0s
+//pkg:fail_test                                                          FAILED in 0.0s
+  /home/user/.cache/bazel/_bazel_root/0123456789abcdef0123456789abcdef/execroot/_main/bazel-out/aarch64-fastbuild/testlogs/pkg/fail_test/test.log
+
+Executed 2 out of 2 tests: 1 test passes and 1 fails locally.
+There were tests whose specified size is too big. Use the --test_verbose_timeout_warnings command line option to see which ones these are.

@@ -1,0 +1,19 @@
+Chain PREROUTING (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 DOCKER     0    --  *      *       0.0.0.0/0            0.0.0.0/0            ADDRTYPE match dst-type LOCAL
+
+Chain INPUT (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain OUTPUT (policy ACCEPT 0 packets, 0 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+
+Chain POSTROUTING (policy ACCEPT 83 packets, 5004 bytes)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 MASQUERADE  0    --  *      !br0    10.0.1.0/16        0.0.0.0/0           
+
+Chain DOCKER (1 references)
+ pkts bytes target     prot opt in     out     source               destination         
+    0     0 DNAT       6    --  !br0   *       0.0.0.0/0            0.0.0.0/0            tcp dpt:80 to:10.0.1.82:80
+    0     0 DNAT       6    --  !br0   *       0.0.0.0/0            0.0.0.0/0            tcp dpt:443 to:10.0.1.45:443
+    0     0 DNAT       6    --  !br0   *       0.0.0.0/0            0.0.0.0/0            tcp dpt:5432 to:10.0.1.34:5432

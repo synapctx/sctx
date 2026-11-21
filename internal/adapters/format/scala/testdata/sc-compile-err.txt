@@ -1,0 +1,28 @@
+[info] welcome to sbt 1.10.5 (Eclipse Adoptium Java 17.0.13)
+[info] loading project definition from /work/proj/project
+[info] loading settings for project scbad from build.sbt ...
+[info] set current project to demo (in build file:/work/proj/)
+[info] Executing in batch mode. For better performance use sbt's shell
+[info] compiling 1 Scala source to /work/proj/target/scala-3.5.2/classes ...
+[error] -- [E006] Not Found Error: /work/proj/src/main/scala/Demo.scala:2:37 ----------
+[error] 2 |  def add(a: Int, b: Int): Int = a + c
+[error]   |                                     ^
+[error]   |                                     Not found: c
+[error]   |
+[error]   | longer explanation available when compiling with `-explain`
+[error] -- [E007] Type Mismatch Error: /work/proj/src/main/scala/Demo.scala:3:18 ------
+[error] 3 |  def s: String = 42
+[error]   |                  ^^
+[error]   |                  Found:    (42 : Int)
+[error]   |                  Required: String
+[error]   |
+[error]   | longer explanation available when compiling with `-explain`
+[error] -- [E006] Not Found Error: /work/proj/src/main/scala/Demo.scala:4:18 ----------
+[error] 4 |  def f(x: Int) = undefinedThing(x)
+[error]   |                  ^^^^^^^^^^^^^^
+[error]   |                  Not found: undefinedThing
+[error]   |
+[error]   | longer explanation available when compiling with `-explain`
+[error] three errors found
+[error] (Compile / compileIncremental) Compilation failed
+[error] Total time: 5 s, completed Nov 21, 2026, 2:32:13 AM

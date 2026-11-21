@@ -12,6 +12,9 @@ var (
 	aheadRe    = regexp.MustCompile(`ahead of .* by (\d+) commit`)
 	behindRe   = regexp.MustCompile(`behind .* by (\d+) commit`)
 	divergedRe = regexp.MustCompile(`have (\d+) and (\d+) different commits`)
+	// upstreamRe captures the tracking ref git names in the "Your branch ..."
+	// line (up to date / ahead / behind / diverged / gone).
+	upstreamRe = regexp.MustCompile(`^Your branch (?:is (?:up to date with|ahead of|behind|based on) |and )'([^']+)'`)
 )
 
 // statusEntry status-word prefixes used inside "Changes to be committed" and
@@ -61,6 +64,7 @@ func aggressiveStatus(in format.Input, args []string) (format.Rendered, error) {
 
 	branch := "HEAD"
 	ahead, behind := 0, 0
+	upstream, upstreamGone := "", false
 
 	var staged, modified, untracked, ignored, conflicted []string
 	var operation string
@@ -106,6 +110,10 @@ func aggressiveStatus(in format.Input, args []string) (format.Rendered, error) {
 			continue
 		}
 
+		if m := upstreamRe.FindStringSubmatch(trimmed); m != nil {
+			upstream = m[1]
+			upstreamGone = strings.Contains(trimmed, "upstream is gone")
+		}
 		if m := divergedRe.FindStringSubmatch(trimmed); m != nil {
 			fmt.Sscanf(m[1], "%d", &ahead)
 			fmt.Sscanf(m[2], "%d", &behind)
@@ -150,6 +158,13 @@ func aggressiveStatus(in format.Input, args []string) (format.Rendered, error) {
 	}
 
 	head := branch
+	if upstream != "" {
+		if upstreamGone {
+			head += " (upstream " + upstream + " gone)"
+		} else {
+			head += "..." + upstream
+		}
+	}
 	switch {
 	case ahead > 0 && behind > 0:
 		head += fmt.Sprintf(" (ahead %d, behind %d)", ahead, behind)
@@ -239,6 +254,11 @@ func statusPorcelainV2(args []string) bool {
 func statusFile(trimmed string) string {
 	for _, prefix := range statusWordPrefixes {
 		if after, ok := strings.CutPrefix(trimmed, prefix); ok {
+			// Grouped under "modified"/"staged", a deletion would otherwise
+			// read as an edit.
+			if prefix == "deleted:" {
+				return strings.TrimSpace(after) + " (deleted)"
+			}
 			return strings.TrimSpace(after)
 		}
 	}
@@ -271,10 +291,10 @@ func aggressiveStatusShort(raw []byte, lines []string) (format.Rendered, error) 
 			conflicted = append(conflicted, path)
 		default:
 			if x != ' ' {
-				staged = append(staged, path)
+				staged = append(staged, shortDeleted(path, x))
 			}
 			if y != ' ' && y != '?' {
-				modified = append(modified, path)
+				modified = append(modified, shortDeleted(path, y))
 			}
 		}
 	}
@@ -304,6 +324,14 @@ func aggressiveStatusShort(raw []byte, lines []string) (format.Rendered, error) 
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 	return format.Rendered{Body: []byte(body)}, nil
+}
+
+// shortDeleted marks a deletion so it does not read as an edit once grouped.
+func shortDeleted(path string, code byte) string {
+	if code == 'D' {
+		return path + " (deleted)"
+	}
+	return path
 }
 
 func statusGroupIfAny(name string, files []string) string {

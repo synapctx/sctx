@@ -1,0 +1,23 @@
+
+ NX   Running target build for 3 projects:
+
+- @m/a
+- @m/b
+- @m/c
+
+
+✔  nx run @m/b:build
+✔  nx run @m/a:build
+✔  nx run @m/c:build
+
+
+
+ NX   Successfully ran target build for 3 projects
+
+
+Output of 3 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      1.6s
+  Cache:             0/3 hit (0%)
+  Critical path:     1.6s (2 tasks)
+  Recoverable time:  <1ms

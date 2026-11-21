@@ -1,0 +1,91 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number:
+            9e:0f:1c:98:cf:08:83:84:10:4c:d0:45:10:35:79:26
+        Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=US, O=Google Trust Services, CN=WR3
+        Validity
+            Not Before: Nov 11 22:57:52 2026 GMT
+            Not After : Dec 26 23:47:23 2026 GMT
+        Subject: CN=go.dev
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    a0:34:3d:9d:cf:94:ee:dd:3b:bf:3c:74:c3:72:4a:45:
+                    73:95:60:e6:bb:43:76:71:5d:3f:01:15:34:cf:4e:e2:
+                    88:1f:5e:c9:ae:c0:05:d3:ed:57:7a:44:73:2a:c9:00:
+                    79:ae:62:df:b9:39:d8:f4:d6:5c:34:de:18:49:87:4b:
+                    f2:a1:ba:0e:02:44:bf:65:1f:50:ba:09:21:13:1b:75:
+                    6c:03:67:93:cc:08:1a:df:c7:46:80:41:a2:7b:53:fe:
+                    4b:0e:e2:88:a0:94:1c:11:7d:da:bf:cb:3a:80:7a:ca:
+                    6b:bc:9c:98:4d:21:aa:b2:01:c9:a8:ed:02:76:34:46:
+                    64:cd:81:5a:94:49:e1:1f:66:23:f7:93:0a:d9:25:82:
+                    2f:47:ea:64:0c:b5:99:ad:63:03:09:9e:78:7d:42:5e:
+                    82:d5:d1:fd:63:2b:96:62:32:50:07:c3:0b:af:57:49:
+                    95:78:cb:fa:5c:7f:94:b0:e3:fa:1a:1e:56:54:23:47:
+                    5d:d4:fe:6b:6a:88:a2:60:b0:31:06:c2:9d:43:6c:98:
+                    23:a0:7c:31:75:33:69:f1:be:3a:12:9b:21:9f:62:cc:
+                    31:86:22:7c:c8:70:82:6c:3f:fc:ed:d5:ac:6d:0e:b8:
+                    0d:04:3b:43:5b:74:b0:5d:73:72:9f:4d:ba:42:0c:87
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Key Usage: critical
+                Digital Signature, Key Encipherment
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Basic Constraints: critical
+                CA:FALSE
+            X509v3 Subject Key Identifier: 
+                C2:8E:36:DB:75:F4:C7:6E:84:38:9C:50:D2:C6:01:7B:2F:6B:D7:71
+            X509v3 Authority Key Identifier: 
+                C7:81:F5:FD:8E:88:D9:00:3C:4D:63:A2:50:31:24:A0:CE:23:FE:23
+            Authority Information Access: 
+                CA Issuers - URI:http://i.pki.goog/wr3.crt
+            X509v3 Subject Alternative Name: 
+                DNS:go.dev
+            X509v3 Certificate Policies: 
+                Policy: 192.0.2.1.2.1
+            X509v3 CRL Distribution Points: 
+                Full Name:
+                  URI:http://c.pki.goog/wr3/d2ZFk07UT-s.crl
+
+            CT Precertificate SCTs: 
+                Signed Certificate Timestamp:
+                    Version   : v1 (0x0)
+                    Log ID    : 25:B7:EF:DE:A1:13:01:93:ED:93:07:97:70:AA:32:2A:
+                                26:62:0D:E3:5A:C8:AA:7C:75:19:7D:E0:B1:A9:E0:65
+                    Timestamp : Nov 11 23:57:53.175 2026 GMT
+                    Extensions: none
+                    Signature : ecdsa-with-SHA256
+                                30:44:02:20:0F:EB:2A:DC:29:E5:DB:6C:3A:8D:E2:37:
+                                B4:5D:AB:BC:54:46:20:F6:24:4C:ED:34:5B:34:D1:5E:
+                                29:91:44:A8:02:20:21:F7:22:21:AB:C8:FA:A1:09:BD:
+                                9C:C9:7D:7E:74:29:14:48:2E:E8:D8:32:07:4A:BC:63:
+                                F0:BB:60:CA:6A:F0
+                Signed Certificate Timestamp:
+                    Version   : v1 (0x0)
+                    Log ID    : A2:81:00:18:73:4E:17:6E:1D:47:E0:95:40:F3:81:BA:
+                                54:66:97:CD:63:A8:43:50:71:6E:B8:09:4E:DA:F1:0D
+                    Timestamp : Nov 11 23:57:53.307 2026 GMT
+                    Extensions: 00:00:05:00:42:0D:EC:5A
+                    Signature : ecdsa-with-SHA256
+                                30:44:02:20:24:F4:39:4F:CB:39:2B:4D:AB:9B:20:FA:
+                                44:61:1F:97:5C:2E:5C:6B:8A:7E:7B:9F:8D:A9:0D:43:
+                                C1:C8:E1:60:02:20:6A:13:59:E0:29:E0:55:8D:11:E7:
+                                85:F4:51:68:A8:35:9D:F7:83:44:5A:70:36:33:EF:26:
+                                E8:5B:96:5F:26:2A
+    Signature Algorithm: sha256WithRSAEncryption
+    Signature Value:
+        58:fa:ed:28:40:16:f7:90:6f:df:f8:d6:c5:80:54:26:56:60:49:43:a7:89:2a:5a:
+        75:0c:b6:79:3a:25:25:89:b5:6a:20:6e:38:65:99:40:9d:0a:46:b0:87:68:7c:5d:
+        82:e3:b2:e8:96:7b:19:97:a9:3d:f4:a5:25:0d:11:45:42:5c:ba:98:93:83:79:27:
+        b3:00:b5:08:a4:53:a9:df:50:ba:9c:49:6c:cf:1e:8d:94:bc:8c:14:fa:f0:4d:ac:
+        9e:2f:89:50:1d:df:5e:74:53:7f:90:d7:fc:dd:77:3f:c7:0f:eb:db:f2:74:e7:2b:
+        f2:fc:51:e1:42:dc:b0:ec:cb:aa:0b:11:2a:e5:fd:d7:6f:fb:89:aa:b6:d5:2b:a1:
+        80:89:e7:80:d9:3d:12:6c:cb:5a:9e:72:37:d5:fc:4f:f2:04:43:5d:34:1a:61:0c:
+        cf:87:8c:67:85:a2:77:18:a5:1e:d3:41:d7:90:f4:c9:c5:94:47:c4:c0:71:38:f3:
+        fa:80:1f:df:0d:c9:2c:67:b8:6a:b2:fa:55:25:5d:84:8b:19:8f:c9:85:ce:3a:65:
+        80:d7:74:c1:9c:b4:30:59:0c:28:41:2d:0f:3a:c0:da:fb:56:73:a4:56:13:3d:4a:
+        93:bb:52:de:1b:4f:53:76:8e:b3:c8:27:71:e2:8f:68

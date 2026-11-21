@@ -1,0 +1,11 @@
+PASS okpkg.TestAdd/pos (0.00s)
+PASS okpkg.TestAdd/neg (0.00s)
+PASS okpkg.TestAdd (0.00s)
+SKIP okpkg.TestSkip (0.00s)
+PASS okpkg (cached)
+
+=== Skipped
+=== SKIP: okpkg TestSkip (0.00s)
+    ok_test.go:18: later
+
+DONE 4 tests, 1 skipped in 0.000s

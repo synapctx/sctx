@@ -1,0 +1,7 @@
+ERROR: /work/proj/pkg/BUILD:1:8: Executing genrule //pkg:bad failed: (Exit 3): bash failed: error executing Genrule command (from target //pkg:bad)
+oops
+Target //pkg:bad failed to build
+INFO: Elapsed time: 4.771s, Critical Path: 0.04s
+ERROR: Build did NOT complete successfully
+…+14 lines (progress rows, banners, advice, blanks)
+…+97 chars (embedded command lines)

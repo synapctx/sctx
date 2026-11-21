@@ -1,0 +1,6 @@
+==> demo
+error: undefined function undefined_fn/1 (expected Demo to define such a function or for it to be imported, but none are available)
+    └─ lib/demo.ex:4:5: Demo.broken/0
+== Compilation error in file lib/demo.ex ==
+** (CompileError) lib/demo.ex: cannot compile module Demo (errors have been logged)
+…+10 lines (compile progress, source excerpts, diffs, blanks)

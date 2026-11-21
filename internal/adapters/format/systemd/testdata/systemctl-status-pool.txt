@@ -1,0 +1,26 @@
+● pool.service - Demo prefork server
+     Loaded: loaded (/etc/systemd/system/pool.service; disabled; preset: enabled)
+     Active: active (running) since Sat 2026-11-21 02:42:50 UTC; 15s ago
+       Docs: man:pool(8)
+             https://example.com/docs/pool
+   Main PID: 2350 (sh)
+      Tasks: 13 (limit: 28836)
+     Memory: 2.2M (peak: 3.9M)
+        CPU: 7ms
+     CGroup: /docker/af8069ba3d967671390204e0a03f6e04a7bd8a4df772e5daa169062604654fcb/system.slice/pool.service
+             ├─2350 /bin/sh -c "for i in 1 2 3 4 5 6 7 8 9 10 11 12; do sleep 100000 & done; echo \"pool master ready\"; wait"
+             ├─2352 sleep 100000
+             ├─2353 sleep 100000
+             ├─2354 sleep 100000
+             ├─2355 sleep 100000
+             ├─2356 sleep 100000
+             ├─2357 sleep 100000
+             ├─2358 sleep 100000
+             ├─2359 sleep 100000
+             ├─2360 sleep 100000
+             ├─2361 sleep 100000
+             ├─2362 sleep 100000
+             └─2363 sleep 100000
+
+Nov 21 02:42:50 af8069ba3d96 systemd[1]: Started pool.service - Demo prefork server.
+Nov 21 02:42:50 af8069ba3d96 sh[2350]: pool master ready

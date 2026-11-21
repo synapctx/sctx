@@ -1,0 +1,61 @@
+ERROR: (gcloud.compute.instances) Invalid choice: 'nope'.
+Maybe you meant:
+  gcloud compute instance-groups
+  gcloud compute instance-templates
+  gcloud compute target-instances
+  gcloud compute instances add-access-config
+  gcloud compute instances add-iam-policy-binding
+  gcloud compute instances add-labels
+  gcloud compute instances add-metadata
+  gcloud compute instances add-resource-policies
+  gcloud compute instances add-tags
+  gcloud compute instances attach-disk
+  gcloud compute instances bulk
+  gcloud compute instances create
+  gcloud compute instances create-with-container
+  gcloud compute instances delete
+  gcloud compute instances delete-access-config
+  gcloud compute instances describe
+  gcloud compute instances detach-disk
+  gcloud compute instances export
+  gcloud compute instances get-guest-attributes
+  gcloud compute instances get-iam-policy
+  gcloud compute instances get-screenshot
+  gcloud compute instances get-serial-port-output
+  gcloud compute instances get-shielded-identity
+  gcloud compute instances import
+  gcloud compute instances list
+  gcloud compute instances list-referrers
+  gcloud compute instances network-interfaces
+  gcloud compute instances ops-agents
+  gcloud compute instances os-inventory
+  gcloud compute instances perform-maintenance
+  gcloud compute instances remove-iam-policy-binding
+  gcloud compute instances remove-labels
+  gcloud compute instances remove-metadata
+  gcloud compute instances remove-resource-policies
+  gcloud compute instances remove-tags
+  gcloud compute instances report-host-as-faulty
+  gcloud compute instances reset
+  gcloud compute instances resume
+  gcloud compute instances send-diagnostic-interrupt
+  gcloud compute instances set-disk-auto-delete
+  gcloud compute instances set-iam-policy
+  gcloud compute instances set-machine-resources
+  gcloud compute instances set-machine-type
+  gcloud compute instances set-name
+  gcloud compute instances set-scheduling
+  gcloud compute instances set-service-account
+  gcloud compute instances simulate-maintenance-event
+  gcloud compute instances start
+  gcloud compute instances stop
+  gcloud compute instances suspend
+  gcloud compute instances tail-serial-port-output
+  gcloud compute instances test-iam-permissions
+  gcloud compute instances update
+  gcloud compute instances update-access-config
+  gcloud compute instances update-container
+  gcloud compute instances update-from-file
+
+To search the help text of gcloud commands, run:
+  gcloud help -- SEARCH_TERMS

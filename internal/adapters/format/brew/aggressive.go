@@ -10,7 +10,9 @@ import (
 
 // progressBarRe matches brew's curl-style download progress lines, e.g.
 // "######################################################################## 100.0%".
-var progressBarRe = regexp.MustCompile(`^#+\s*[\d.]+%$`)
+// Current brew restarts the bar with curl's spinner glyphs ("#=#=#  ... 100.0%"),
+// so only the leading '#' and the trailing percentage are required.
+var progressBarRe = regexp.MustCompile(`^#.*[\d.]+%$`)
 
 // alreadyInstalledRe matches brew's no-op "already installed" advisory,
 // e.g. "Warning: wget 1.21.4 is already installed and up-to-date.".
@@ -57,8 +59,21 @@ func isNoiseLine(line string) bool {
 		return true
 	case strings.HasPrefix(line, "==> Summary"):
 		return true
+	case strings.HasPrefix(trimmed, "✔"):
+		// "✔︎ Bottle gmp (6.3.0)" / "✔︎ JSON API ...": per-item fetch results.
+		return true
+	case strings.HasPrefix(line, "==> Updating Homebrew"):
+		return true
 	}
 	return false
+}
+
+// isAdvisoryHeader reports whether line opens a multi-line marketing/analytics
+// notice that runs until the next blank line or ==> header.
+func isAdvisoryHeader(line string) bool {
+	return strings.HasPrefix(line, "==> Homebrew has enabled") ||
+		strings.HasPrefix(line, "==> Homebrew's analytics") ||
+		strings.HasPrefix(line, "==> Homebrew is run entirely")
 }
 
 // collapseNoOp detects brew's "already installed and up-to-date" no-op
@@ -135,13 +150,9 @@ func aggressiveInstallUpgrade(in format.Input) (format.Rendered, error) {
 	inAnalyticsBlock := false
 	noiseRun := 0
 
-	flushNoise := func() {
-		if noiseRun > 0 {
-			out = append(out, fmt.Sprintf("…+%d", noiseRun))
-			transforms++
-			noiseRun = 0
-		}
-	}
+	// Noise is counted across the whole run and reported once at the end:
+	// install output interleaves one noise line per dependency, and a marker
+	// after each would cost more than the line it replaces.
 
 	for i := 0; i < len(lines); i++ {
 		line := lines[i]
@@ -156,6 +167,11 @@ func aggressiveInstallUpgrade(in format.Input) (format.Rendered, error) {
 		if inErrorBlock {
 			if strings.HasPrefix(trimmed, "==>") {
 				inErrorBlock = false
+			} else if strings.HasPrefix(trimmed, "✔") {
+				// A one-line Warning is not followed by a prose block here:
+				// brew prints per-item fetch results straight after it.
+				noiseRun++
+				continue
 			} else {
 				out = append(out, line)
 				continue
@@ -172,14 +188,12 @@ func aggressiveInstallUpgrade(in format.Input) (format.Rendered, error) {
 		}
 
 		if isErrorSignal(line) {
-			flushNoise()
 			out = append(out, line)
 			inErrorBlock = true
 			continue
 		}
 
 		if trimmed == "==> Caveats" {
-			flushNoise()
 			block, next := captureCaveats(lines, i)
 			out = append(out, block...)
 			transforms++
@@ -188,13 +202,11 @@ func aggressiveInstallUpgrade(in format.Input) (format.Rendered, error) {
 		}
 
 		if strings.HasPrefix(trimmed, "🍺") {
-			flushNoise()
 			out = append(out, line)
 			continue
 		}
 
-		if strings.HasPrefix(line, "==> Homebrew has enabled") {
-			flushNoise()
+		if isAdvisoryHeader(line) {
 			transforms++
 			inAnalyticsBlock = true
 			continue
@@ -205,10 +217,12 @@ func aggressiveInstallUpgrade(in format.Input) (format.Rendered, error) {
 			continue
 		}
 
-		flushNoise()
 		out = append(out, line)
 	}
-	flushNoise()
+	if noiseRun > 0 {
+		out = append(out, fmt.Sprintf("…+%d fetch/progress lines", noiseRun))
+		transforms++
+	}
 
 	if transforms == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable

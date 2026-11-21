@@ -1,0 +1,8 @@
+{
+  _id: 7,
+  name: 'user7',
+  status: 'idle',
+  score: 10.5,
+  tags: [ 'a', 'b' ],
+  created: ISODate('2026-01-01T00:00:07.000Z')
+}

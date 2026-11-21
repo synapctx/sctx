@@ -133,14 +133,19 @@ func TestAggressiveBuild(t *testing.T) {
 		}
 	})
 
-	t.Run("non-zero exit degrades and preserves ERROR verbatim via relaxed", func(t *testing.T) {
+	t.Run("non-zero exit condenses progress and preserves ERROR", func(t *testing.T) {
 		failed := buildKitPlainFixture + "#4 ERROR: process \"/bin/sh -c npm install\" did not complete successfully: exit code 1\n"
 		f := New()
 		in := format.Input{Argv: []string{"docker", "build", "-t", "myapp", "."}, Stdout: strings.NewReader(failed), ExitCode: 1}
-		if _, err := f.Aggressive(context.Background(), in); err != format.ErrTierInapplicable {
-			t.Fatalf("Aggressive() error = %v, want ErrTierInapplicable", err)
+		out, err := f.Aggressive(context.Background(), in)
+		if err != nil {
+			t.Fatalf("Aggressive() error = %v", err)
+		}
+		if !strings.Contains(string(out.Body), "ERROR: process \"/bin/sh -c npm install\" did not complete successfully: exit code 1") {
+			t.Fatalf("ERROR line lost: %q", out.Body)
 		}
 
+		// Relaxed still keeps non-zero exits verbatim.
 		in2 := format.Input{Argv: []string{"docker", "build", "-t", "myapp", "."}, Stdout: strings.NewReader(failed), ExitCode: 1}
 		if _, err := f.Relaxed(context.Background(), in2); err != format.ErrTierInapplicable {
 			t.Fatalf("Relaxed() error = %v, want verbatim fallback", err)

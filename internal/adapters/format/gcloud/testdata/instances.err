@@ -1,0 +1,13 @@
+ERROR: (gcloud.compute.instances.list) PERMISSION_DENIED: Compute Engine API has not been used in project acmecorp-production-0a1b2c before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=acmecorp-production-0a1b2c then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry. This command is authenticated as dev.user@example.com which is the active account specified by the [core/account] property.
+Compute Engine API has not been used in project acmecorp-production-0a1b2c before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=acmecorp-production-0a1b2c then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.
+Google developers console API activation
+https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=acmecorp-production-0a1b2c
+- '@type': type.googleapis.com/google.rpc.ErrorInfo
+  domain: googleapis.com
+  metadata:
+    activationUrl: https://console.developers.google.com/apis/api/compute.googleapis.com/overview?project=acmecorp-production-0a1b2c
+    consumer: projects/acmecorp-production-0a1b2c
+    containerInfo: acmecorp-production-0a1b2c
+    service: compute.googleapis.com
+    serviceTitle: Compute Engine API
+  reason: SERVICE_DISABLED

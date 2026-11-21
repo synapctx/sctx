@@ -1,0 +1,4 @@
+trivy:
+  no targets scanned
+WARN [report] Supported files for scanner(s) not found. scanners=[vuln]
+…+6 stderr lines (progress, INFO logs, update notice)

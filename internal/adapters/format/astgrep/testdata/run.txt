@@ -1,0 +1,3 @@
+a.js:2:  console.log("a", x);
+a.js:3:  if (x) { console.log("b"); }
+a.js:6:const g = () => { console.log("deep"); };

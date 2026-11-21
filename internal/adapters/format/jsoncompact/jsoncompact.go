@@ -12,8 +12,30 @@ import (
 	"io"
 	"reflect"
 
+	"github.com/synapctx/sctx/internal/adapters/format/jsonpack"
 	"github.com/synapctx/sctx/internal/domain/format"
 )
+
+// maxPackInput bounds the input size the packer will parse and self-check.
+const maxPackInput = 16 << 20
+
+// packLossless returns the jsonpack form of raw, or nil. Pack self-verifies
+// by decoding its own output, so a non-nil result carries exactly the input
+// data.
+func packLossless(raw []byte) []byte {
+	if len(raw) > maxPackInput {
+		return nil
+	}
+	tree, err := jsonpack.Parse(raw)
+	if err != nil {
+		return nil
+	}
+	s, ok := jsonpack.Pack(tree)
+	if !ok {
+		return nil
+	}
+	return []byte(s)
+}
 
 // maxStringLen is the threshold above which string values are truncated in
 // the aggressive tier.
@@ -73,6 +95,14 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
+	// The aggressive tier keeps its sampling: measured 2026-11-21, a lossless
+	// table was LARGER than the sampled render on every real fixture (gh pr list
+	// --json 609 B sampled vs 5.7 KB packed; big.json 290 B vs 60 KB). Packing
+	// only replaces the body when sampling dropped nothing, where both are
+	// lossless and the smaller one wins. The relaxed tier (the
+	// LosslessFallback) is where packing pays off.
+	packed := packLossless(raw)
+
 	elided := elide(doc)
 
 	body, err := json.Marshal(elided, json.Deterministic(true))
@@ -82,6 +112,11 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 	if len(body) == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
+	isElided := !reflect.DeepEqual(doc, elided)
+	if packed != nil && !isElided && len(packed) < len(body) {
+		// Nothing was sampled away, so the packed form is the better lossless one.
+		body = packed
+	}
 	if len(body) >= len(raw) {
 		// Elision bought nothing (e.g. tiny payload); don't pad, degrade.
 		return format.Rendered{}, format.ErrTierInapplicable
@@ -90,7 +125,7 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 	return format.Rendered{
 		Body:   body,
 		Note:   fmt.Sprintf("%s json → %s", humanBytes(len(raw)), humanBytes(len(body))),
-		Elided: !reflect.DeepEqual(doc, elided),
+		Elided: isElided,
 	}, nil
 }
 
@@ -111,6 +146,10 @@ func (f *Formatter) Relaxed(ctx context.Context, in format.Input) (format.Render
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 	body := []byte(compact)
+	// Lossless, so it belongs in this tier too (it is the LosslessFallback).
+	if packed := packLossless(raw); packed != nil && len(packed) < len(body) {
+		body = packed
+	}
 
 	if len(body) == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable

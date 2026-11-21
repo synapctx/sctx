@@ -3,6 +3,7 @@ package fs
 import (
 	"context"
 	"fmt"
+	"path"
 	"regexp"
 	"sort"
 	"strings"
@@ -18,7 +19,7 @@ func (f *lsFormatter) Descriptor() format.Match {
 
 // permRe matches the 10-column permission string ls -l prints, e.g.
 // "drwxr-xr-x" or "-rw-r--r--@" (macOS xattr marker).
-var permRe = regexp.MustCompile(`^[bcdlpsD-]([r-][w-][xsS-]){3}[+@]?$`)
+var permRe = regexp.MustCompile(`^[bcdlpsD-]([r-][w-][xsStT-]){3}[+@]?$`)
 
 type lsLongEntry struct {
 	name     string
@@ -54,6 +55,20 @@ func (f *lsFormatter) Aggressive(_ context.Context, in format.Input) (format.Ren
 	content := nonEmptyLines(splitLines(raw))
 	if len(content) <= 3 {
 		return format.Rendered{}, format.ErrTierInapplicable
+	}
+
+	recursive := lsRecursive(in.Argv)
+	if recursive || lsMultiOperand(in.Argv) {
+		if body, note, ok := renderLsRecursive(splitLines(raw), lsRoots(in.Argv)); ok && shrunk(raw, body) {
+			return format.Rendered{Body: []byte(body), Note: note}, nil
+		}
+		// A recursive listing that does not parse as sections must never be
+		// flattened by the plain renderer (it would mix headers with names).
+		// Several operands may still be a flat file list (`ls *.go`), which
+		// the plain renderers below handle.
+		if recursive || hasLsSectionHeader(splitLines(raw)) {
+			return format.Rendered{}, format.ErrTierInapplicable
+		}
 	}
 
 	var dataLines []string
@@ -147,4 +162,42 @@ func renderLsPlain(lines []string) (body string, note string) {
 
 func (f *lsFormatter) Relaxed(ctx context.Context, in format.Input) (format.Rendered, error) {
 	return relaxedRender(ctx, in)
+}
+
+// hasLsSectionHeader reports whether any line looks like a "dir:" header.
+func hasLsSectionHeader(lines []string) bool {
+	for i, l := range lines {
+		if strings.HasSuffix(l, ":") && (i == 0 || lines[i-1] == "") {
+			return true
+		}
+	}
+	return false
+}
+
+// lsMultiOperand reports whether argv names two or more operands, in which
+// case ls prints each directory under a "dir:" header even without -R.
+func lsMultiOperand(argv []string) bool {
+	n := 0
+	for _, a := range argv[min(1, len(argv)):] {
+		if a == "--" || !strings.HasPrefix(a, "-") {
+			n++
+		}
+	}
+	return n >= 2
+}
+
+// lsRoots returns the directory operands of an ls argv (non-option args),
+// cleaned, defaulting to ".".
+func lsRoots(argv []string) []string {
+	var roots []string
+	for _, a := range argv[min(1, len(argv)):] {
+		if strings.HasPrefix(a, "-") {
+			continue
+		}
+		roots = append(roots, path.Clean(a))
+	}
+	if len(roots) == 0 {
+		roots = []string{"."}
+	}
+	return roots
 }

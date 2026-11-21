@@ -1,0 +1,22 @@
+Failures:
+  test/Spec.hs:8:31:
+  1) add adds wrong
+       expected: 4
+        but got: 3
+  To rerun use: --match "/add/adds wrong/" --seed 1865642868
+  test/Spec.hs:10:31:
+  2) greet greets
+       expected: "hi bob"
+        but got: "hello bob"
+  To rerun use: --match "/greet/greets/" --seed 1865642868
+  test/Spec.hs:11:32:
+  3) greet list
+       expected: [1,2,4]
+        but got: [1,2,3]
+  To rerun use: --match "/greet/list/" --seed 1865642868
+4 examples, 3 failures
+Test suite spec: FAIL
+0 of 1 test suites (0 of 1 test cases) passed.
+Error: [Cabal-7125]
+Tests failed for test:spec from demo-0.1.0.0.
+…+128 lines (build chatter, source echoes, blanks, passing-test tree)

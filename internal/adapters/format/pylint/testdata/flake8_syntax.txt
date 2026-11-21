@@ -1,0 +1,1 @@
+bad.py:1:8: E999 SyntaxError: invalid syntax

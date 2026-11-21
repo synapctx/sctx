@@ -1,0 +1,9 @@
+pre-commit: 2 failed, ×5 passed, ×1 skipped
+FAILED check-json [exit 1]
+  b.json: Failed to json decode (Expecting property name enclosed in double quotes: line 1 column 2 (char 1))
+FAILED shellcheck-local [exit 1]
+  shellcheck: 2 findings in 1 file (SC2086=1 SC2148=1)
+  a.sh (2)
+    1:1 error SC2148 Tips depend on target shell and yours is unknown. Add a shebang or a 'shell' directive.
+    1:6 info SC2086 Double quote to prevent globbing and word splitting.
+  …dropped: 1 fix suggestions, 1 source excerpts, 2 wiki links

@@ -1,0 +1,400 @@
+Nov 21 02:30:23 af8069ba3d96 systemd-journald[23]: Journal started
+Nov 21 02:30:23 af8069ba3d96 systemd-journald[23]: Runtime Journal (/run/log/journal/cbd5e2e2c3334d3882be0a2f26e3d642) is 8.0M, max 1.1G, 1.1G free.
+Nov 21 02:30:23 af8069ba3d96 systemd-journald[23]: Missed 57 kernel messages
+Nov 21 02:30:23 af8069ba3d96 kernel: clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x588fe9dc0, max_idle_ns: 440795202592 ns
+Nov 21 02:30:23 af8069ba3d96 kernel: sched_clock: 56 bits at 24MHz, resolution 41ns, wraps every 4398046511097ns
+Nov 21 02:30:23 af8069ba3d96 kernel: Console: colour dummy device 80x25
+Nov 21 02:30:23 af8069ba3d96 kernel: Calibrating delay loop (skipped), value calculated using timer frequency.. 48.00 BogoMIPS (lpj=24000)
+Nov 21 02:30:23 af8069ba3d96 kernel: pid_max: default: 32768 minimum: 301
+Nov 21 02:30:23 af8069ba3d96 kernel: LSM support for eBPF active
+Nov 21 02:30:23 af8069ba3d96 kernel: landlock: Up and running.
+Nov 21 02:30:23 af8069ba3d96 kernel: Mount-cache hash table entries: 65536 (order: 7, 524288 bytes, linear)
+Nov 21 02:30:23 af8069ba3d96 kernel: Mountpoint-cache hash table entries: 65536 (order: 7, 524288 bytes, linear)
+Nov 21 02:30:23 af8069ba3d96 kernel: VFS: Finished mounting rootfs on nullfs
+Nov 21 02:30:23 af8069ba3d96 kernel: rcu: Hierarchical SRCU implementation.
+Nov 21 02:30:23 af8069ba3d96 kernel: rcu:         Max phase no-delay instances is 400.
+Nov 21 02:30:23 af8069ba3d96 kernel: Timer migration: 1 hierarchy levels; 8 children per group; 1 crossnode level
+Nov 21 02:30:23 af8069ba3d96 kernel: smp: Bringing up secondary CPUs ...
+Nov 21 02:30:23 af8069ba3d96 kernel: Detected PIPT I-cache on CPU1
+Nov 21 02:30:23 af8069ba3d96 kernel: GICv3: CPU1: found redistributor 1 region 0:0x0000000010030000
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU1: Booted secondary processor 0x0000000001 [0x610f0000]
+Nov 21 02:30:23 af8069ba3d96 kernel: Detected PIPT I-cache on CPU2
+Nov 21 02:30:23 af8069ba3d96 kernel: GICv3: CPU2: found redistributor 2 region 0:0x0000000010050000
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU2: Booted secondary processor 0x0000000002 [0x610f0000]
+Nov 21 02:30:23 af8069ba3d96 kernel: Detected PIPT I-cache on CPU3
+Nov 21 02:30:23 af8069ba3d96 kernel: GICv3: CPU3: found redistributor 3 region 0:0x0000000010070000
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU3: Booted secondary processor 0x0000000003 [0x610f0000]
+Nov 21 02:30:23 af8069ba3d96 kernel: Detected PIPT I-cache on CPU4
+Nov 21 02:30:23 af8069ba3d96 kernel: GICv3: CPU4: found redistributor 4 region 0:0x0000000010090000
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU4: Booted secondary processor 0x0000000004 [0x610f0000]
+Nov 21 02:30:23 af8069ba3d96 kernel: Detected PIPT I-cache on CPU5
+Nov 21 02:30:23 af8069ba3d96 kernel: GICv3: CPU5: found redistributor 5 region 0:0x00000000100b0000
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU5: Booted secondary processor 0x0000000005 [0x610f0000]
+Nov 21 02:30:23 af8069ba3d96 kernel: smp: Brought up 1 node, 6 CPUs
+Nov 21 02:30:23 af8069ba3d96 kernel: SMP: Total of 6 processors activated.
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU: All CPU(s) started at EL1
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: ARMv8.4 Translation Table Level
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: Data cache clean to the PoU not required for I/D coherence
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: Common not Private translations
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: CRC32 instructions
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: Data cache clean to Point of Deep Persistence
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: Data cache clean to Point of Persistence
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: Data independent timing control (DIT)
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: E0PD
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: Generic authentication (IMP DEF algorithm)
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: RCpc load-acquire (LDAPR)
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: LSE atomic instructions
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: Privileged Access Never
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: RAS Extension Support
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: Speculation barrier (SB)
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: TLB range maintenance instructions
+Nov 21 02:30:23 af8069ba3d96 kernel: CPU features: detected: XNX
+Nov 21 02:30:23 af8069ba3d96 kernel: alternatives: applying system-wide alternatives
+Nov 21 02:30:23 af8069ba3d96 kernel: Memory: 24561544K/25165824K available (21376K kernel code, 2954K rwdata, 11528K rodata, 2304K init, 704K bss, 597788K reserved, 0K cma-reserved)
+Nov 21 02:30:23 af8069ba3d96 kernel: devtmpfs: initialized
+Nov 21 02:30:23 af8069ba3d96 kernel: posixtimers hash table entries: 4096 (order: 4, 65536 bytes, linear)
+Nov 21 02:30:23 af8069ba3d96 kernel: futex hash table entries: 2048 (131072 bytes on 1 NUMA nodes, total 128 KiB, linear).
+Nov 21 02:30:23 af8069ba3d96 kernel: 23008 pages in range for non-PLT usage
+Nov 21 02:30:23 af8069ba3d96 kernel: 514528 pages in range for PLT usage
+Nov 21 02:30:23 af8069ba3d96 kernel: NET: Registered PF_NETLINK/PF_ROUTE protocol family
+Nov 21 02:30:23 af8069ba3d96 kernel: DMA: preallocated 4096 KiB GFP_KERNEL pool for atomic allocations
+Nov 21 02:30:23 af8069ba3d96 kernel: DMA: preallocated 4096 KiB GFP_KERNEL|GFP_DMA pool for atomic allocations
+Nov 21 02:30:23 af8069ba3d96 kernel: audit: initializing netlink subsys (disabled)
+Nov 21 02:30:23 af8069ba3d96 kernel: audit: type=2000 audit(0.007:1): state=initialized audit_enabled=0 res=1
+Nov 21 02:30:23 af8069ba3d96 kernel: cpuidle: using governor menu
+Nov 21 02:30:23 af8069ba3d96 kernel: hw-breakpoint: found 6 breakpoint and 4 watchpoint registers.
+Nov 21 02:30:23 af8069ba3d96 kernel: ASID allocator initialised with 256 entries
+Nov 21 02:30:23 af8069ba3d96 kernel: Serial: AMBA PL011 UART driver
+Nov 21 02:30:23 af8069ba3d96 kernel: HugeTLB: registered 1.00 GiB page size, pre-allocated 0 pages
+Nov 21 02:30:23 af8069ba3d96 kernel: HugeTLB: 0 KiB vmemmap can be freed for a 1.00 GiB page
+Nov 21 02:30:23 af8069ba3d96 kernel: HugeTLB: registered 32.0 MiB page size, pre-allocated 0 pages
+Nov 21 02:30:23 af8069ba3d96 kernel: HugeTLB: 0 KiB vmemmap can be freed for a 32.0 MiB page
+Nov 21 02:30:23 af8069ba3d96 kernel: HugeTLB: registered 2.00 MiB page size, pre-allocated 0 pages
+Nov 21 02:30:23 af8069ba3d96 kernel: HugeTLB: 0 KiB vmemmap can be freed for a 2.00 MiB page
+Nov 21 02:30:23 af8069ba3d96 kernel: HugeTLB: registered 64.0 KiB page size, pre-allocated 0 pages
+Nov 21 02:30:23 af8069ba3d96 kernel: HugeTLB: 0 KiB vmemmap can be freed for a 64.0 KiB page
+Nov 21 02:30:23 af8069ba3d96 kernel: raid6: skipped pq benchmark and selected neonx8
+Nov 21 02:30:23 af8069ba3d96 kernel: raid6: using neon recovery algorithm
+Nov 21 02:30:23 af8069ba3d96 kernel: SCSI subsystem initialized
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver usbfs
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver hub
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new device driver usb
+Nov 21 02:30:23 af8069ba3d96 kernel: pps_core: LinuxPPS API ver. 1 registered
+Nov 21 02:30:23 af8069ba3d96 kernel: pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+Nov 21 02:30:23 af8069ba3d96 kernel: vgaarb: loaded
+Nov 21 02:30:23 af8069ba3d96 kernel: clocksource: Switched to clocksource arch_sys_counter
+Nov 21 02:30:23 af8069ba3d96 kernel: VFS: Disk quotas dquot_6.6.0
+Nov 21 02:30:23 af8069ba3d96 kernel: VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+Nov 21 02:30:23 af8069ba3d96 kernel: netfs: FS-Cache loaded
+Nov 21 02:30:23 af8069ba3d96 kernel: CacheFiles: Loaded
+Nov 21 02:30:23 af8069ba3d96 kernel: NET: Registered PF_INET protocol family
+Nov 21 02:30:23 af8069ba3d96 kernel: IP idents hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+Nov 21 02:30:23 af8069ba3d96 kernel: tcp_listen_portaddr_hash hash table entries: 16384 (order: 6, 262144 bytes, linear)
+Nov 21 02:30:23 af8069ba3d96 kernel: Table-perturb hash table entries: 65536 (order: 6, 262144 bytes, linear)
+Nov 21 02:30:23 af8069ba3d96 kernel: TCP established hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+Nov 21 02:30:23 af8069ba3d96 kernel: TCP bind hash table entries: 65536 (order: 9, 2097152 bytes, linear)
+Nov 21 02:30:23 af8069ba3d96 kernel: TCP: Hash tables configured (established 262144 bind 65536)
+Nov 21 02:30:23 af8069ba3d96 kernel: UDP hash table entries: 16384 (order: 8, 1048576 bytes, linear)
+Nov 21 02:30:23 af8069ba3d96 kernel: UDP-Lite hash table entries: 16384 (order: 8, 1048576 bytes, linear)
+Nov 21 02:30:23 af8069ba3d96 kernel: NET: Registered PF_UNIX/PF_LOCAL protocol family
+Nov 21 02:30:23 af8069ba3d96 kernel: RPC: Registered named UNIX socket transport module.
+Nov 21 02:30:23 af8069ba3d96 kernel: RPC: Registered udp transport module.
+Nov 21 02:30:23 af8069ba3d96 kernel: RPC: Registered tcp transport module.
+Nov 21 02:30:23 af8069ba3d96 kernel: RPC: Registered tcp-with-tls transport module.
+Nov 21 02:30:23 af8069ba3d96 kernel: RPC: Registered tcp NFSv4.1 backchannel transport module.
+Nov 21 02:30:23 af8069ba3d96 kernel: NET: Registered PF_XDP protocol family
+Nov 21 02:30:23 af8069ba3d96 kernel: PCI: CLS 0 bytes, default 64
+Nov 21 02:30:23 af8069ba3d96 kernel: workingset: timestamp_bits=46 max_order=23 bucket_order=0
+Nov 21 02:30:23 af8069ba3d96 kernel: squashfs: version 4.0 (2009/01/31) Phillip Lougher
+Nov 21 02:30:23 af8069ba3d96 kernel: NFS: Registering the id_resolver key type
+Nov 21 02:30:23 af8069ba3d96 kernel: Key type id_resolver registered
+Nov 21 02:30:23 af8069ba3d96 kernel: Key type id_legacy registered
+Nov 21 02:30:23 af8069ba3d96 kernel: nfs4filelayout_init: NFSv4 File Layout Driver Registering...
+Nov 21 02:30:23 af8069ba3d96 kernel: nfs4flexfilelayout_init: NFSv4 Flexfile Layout Driver Registering...
+Nov 21 02:30:23 af8069ba3d96 kernel: Key type cifs.idmap registered
+Nov 21 02:30:23 af8069ba3d96 kernel: fuse: init (API version 7.45)
+Nov 21 02:30:23 af8069ba3d96 kernel: SGI XFS with security attributes, no debug enabled
+Nov 21 02:30:23 af8069ba3d96 kernel: 9p: Installing v9fs 9p2000 file system support
+Nov 21 02:30:23 af8069ba3d96 kernel: NET: Registered PF_ALG protocol family
+Nov 21 02:30:23 af8069ba3d96 kernel: xor: measuring software checksum speed
+Nov 21 02:30:23 af8069ba3d96 kernel:    8regs           : 45779 MB/sec
+Nov 21 02:30:23 af8069ba3d96 kernel:    32regs          : 47292 MB/sec
+Nov 21 02:30:23 af8069ba3d96 kernel:    arm64_neon      : 50638 MB/sec
+Nov 21 02:30:23 af8069ba3d96 kernel: xor: using function: arm64_neon (50638 MB/sec)
+Nov 21 02:30:23 af8069ba3d96 kernel: Key type asymmetric registered
+Nov 21 02:30:23 af8069ba3d96 kernel: Asymmetric key parser 'x509' registered
+Nov 21 02:30:23 af8069ba3d96 kernel: Block layer SCSI generic (bsg) driver version 0.4 loaded (major 248)
+Nov 21 02:30:23 af8069ba3d96 kernel: io scheduler mq-deadline registered
+Nov 21 02:30:23 af8069ba3d96 kernel: io scheduler kyber registered
+Nov 21 02:30:23 af8069ba3d96 kernel: pl061_gpio 20060000.pl061: PL061 GPIO chip registered
+Nov 21 02:30:23 af8069ba3d96 kernel: pci-host-generic 40000000.pci: host bridge /pci ranges:
+Nov 21 02:30:23 af8069ba3d96 kernel: pci-host-generic 40000000.pci:       IO 0x006fff0000..0x006fffffff -> 0x0000000000
+Nov 21 02:30:23 af8069ba3d96 kernel: pci-host-generic 40000000.pci:      MEM 0x0050000000..0x006ffdffff -> 0x0050000000
+Nov 21 02:30:23 af8069ba3d96 kernel: pci-host-generic 40000000.pci:      MEM 0x0680000000..0x0a7fffffff -> 0x0680000000
+Nov 21 02:30:23 af8069ba3d96 kernel: pci-host-generic 40000000.pci: Memory resource size exceeds max for 32 bits
+Nov 21 02:30:23 af8069ba3d96 kernel: pci-host-generic 40000000.pci: ECAM at [mem 0x40000000-0x4fffffff] for [bus 00-ff]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci-host-generic 40000000.pci: PCI host bridge to bus 0000:00
+Nov 21 02:30:23 af8069ba3d96 kernel: pci_bus 0000:00: root bus resource [bus 00-ff]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci_bus 0000:00: root bus resource [io  0x0000-0xffff]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci_bus 0000:00: root bus resource [mem 0x50000000-0x6ffdffff]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci_bus 0000:00: root bus resource [mem 0x680000000-0xa7fffffff]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:00.0: [106b:1a05] type 00 class 0x060000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:01.0: [1af4:1041] type 00 class 0x020000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:01.0: BAR 0 [mem 0x00000000-0x0000ffff 64bit]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:01.0: BAR 2 [mem 0x00000000-0x0000003f]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:05.0: [1af4:1043] type 00 class 0x078000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:05.0: BAR 0 [mem 0x00000000-0x0000ffff 64bit]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:05.0: BAR 2 [mem 0x00000000-0x0000007f]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:06.0: [1af4:1042] type 00 class 0x018000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:06.0: BAR 0 [mem 0x00000000-0x0000ffff 64bit]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:06.0: BAR 2 [mem 0x00000000-0x0000003f]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:07.0: [1af4:1042] type 00 class 0x018000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:07.0: BAR 0 [mem 0x00000000-0x0000ffff 64bit]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:07.0: BAR 2 [mem 0x00000000-0x0000003f]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:08.0: [1af4:105a] type 00 class 0x018000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:08.0: BAR 0 [mem 0x00000000-0x0000ffff 64bit]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:08.0: BAR 2 [mem 0x00000000-0x0000003f]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:09.0: [1af4:105a] type 00 class 0x018000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:09.0: BAR 0 [mem 0x00000000-0x0000ffff 64bit]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:09.0: BAR 2 [mem 0x00000000-0x0000003f]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0a.0: [1af4:105a] type 00 class 0x018000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0a.0: BAR 0 [mem 0x00000000-0x0000ffff 64bit]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0a.0: BAR 2 [mem 0x00000000-0x0000003f]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0b.0: [1af4:105a] type 00 class 0x018000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0b.0: BAR 0 [mem 0x00000000-0x0000ffff 64bit]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0b.0: BAR 2 [mem 0x00000000-0x0000003f]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0c.0: [1af4:105a] type 00 class 0x018000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0c.0: BAR 0 [mem 0x00000000-0x0000ffff 64bit]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0c.0: BAR 2 [mem 0x00000000-0x0000003f]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0d.0: [1af4:105a] type 00 class 0x018000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0d.0: BAR 0 [mem 0x00000000-0x0000ffff 64bit]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0d.0: BAR 2 [mem 0x00000000-0x0000003f]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0e.0: [1af4:1053] type 00 class 0x078000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0e.0: BAR 0 [mem 0x00000000-0x0000ffff 64bit]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0e.0: BAR 2 [mem 0x00000000-0x0000007f]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0f.0: [1af4:1044] type 00 class 0x100000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0f.0: BAR 0 [mem 0x00000000-0x00007fff 64bit]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0f.0: BAR 2 [mem 0x00000000-0x0000003f]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:10.0: [1af4:1045] type 00 class 0x058000 conventional PCI endpoint
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:10.0: BAR 0 [mem 0x00000000-0x0000ffff 64bit]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:10.0: BAR 2 [mem 0x00000000-0x0000003f]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:01.0: BAR 0 [mem 0x680000000-0x68000ffff 64bit]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:05.0: BAR 0 [mem 0x680010000-0x68001ffff 64bit]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:06.0: BAR 0 [mem 0x680020000-0x68002ffff 64bit]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:07.0: BAR 0 [mem 0x680030000-0x68003ffff 64bit]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:08.0: BAR 0 [mem 0x680040000-0x68004ffff 64bit]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:09.0: BAR 0 [mem 0x680050000-0x68005ffff 64bit]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0a.0: BAR 0 [mem 0x680060000-0x68006ffff 64bit]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0b.0: BAR 0 [mem 0x680070000-0x68007ffff 64bit]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0c.0: BAR 0 [mem 0x680080000-0x68008ffff 64bit]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0d.0: BAR 0 [mem 0x680090000-0x68009ffff 64bit]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0e.0: BAR 0 [mem 0x6800a0000-0x6800affff 64bit]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:10.0: BAR 0 [mem 0x6800b0000-0x6800bffff 64bit]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0f.0: BAR 0 [mem 0x6800c0000-0x6800c7fff 64bit]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:05.0: BAR 2 [mem 0x50000000-0x5000007f]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0e.0: BAR 2 [mem 0x50000080-0x500000ff]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:01.0: BAR 2 [mem 0x50000100-0x5000013f]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:06.0: BAR 2 [mem 0x50000140-0x5000017f]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:07.0: BAR 2 [mem 0x50000180-0x500001bf]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:08.0: BAR 2 [mem 0x500001c0-0x500001ff]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:09.0: BAR 2 [mem 0x50000200-0x5000023f]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0a.0: BAR 2 [mem 0x50000240-0x5000027f]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0b.0: BAR 2 [mem 0x50000280-0x500002bf]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0c.0: BAR 2 [mem 0x500002c0-0x500002ff]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0d.0: BAR 2 [mem 0x50000300-0x5000033f]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:0f.0: BAR 2 [mem 0x50000340-0x5000037f]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci 0000:00:10.0: BAR 2 [mem 0x50000380-0x500003bf]: assigned
+Nov 21 02:30:23 af8069ba3d96 kernel: pci_bus 0000:00: resource 4 [io  0x0000-0xffff]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci_bus 0000:00: resource 5 [mem 0x50000000-0x6ffdffff]
+Nov 21 02:30:23 af8069ba3d96 kernel: pci_bus 0000:00: resource 6 [mem 0x680000000-0xa7fffffff]
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio-pci 0000:00:01.0: enabling device (0000 -> 0002)
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio-pci 0000:00:05.0: enabling device (0000 -> 0002)
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio-pci 0000:00:06.0: enabling device (0000 -> 0002)
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio-pci 0000:00:07.0: enabling device (0000 -> 0002)
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio-pci 0000:00:08.0: enabling device (0000 -> 0002)
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio4: discovered new tag: virtiofs0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio4: completion threaded_callbacks=0 inline_requests=0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio4: HVC endpoint=0 generation=0 caps=0x0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio4: HVC completion=direct queue_accounting=0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio4: HVC foreground opcodes=31 expanded=1
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio-pci 0000:00:09.0: enabling device (0000 -> 0002)
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio5: discovered new tag: virtiofs1
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio5: completion threaded_callbacks=0 inline_requests=0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio5: HVC endpoint=0 generation=0 caps=0x0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio5: HVC completion=direct queue_accounting=0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio5: HVC foreground opcodes=31 expanded=1
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio-pci 0000:00:0a.0: enabling device (0000 -> 0002)
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio6: discovered new tag: virtiofs2
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio6: completion threaded_callbacks=0 inline_requests=0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio6: HVC endpoint=0 generation=0 caps=0x0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio6: HVC completion=direct queue_accounting=0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio6: HVC foreground opcodes=31 expanded=1
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio-pci 0000:00:0b.0: enabling device (0000 -> 0002)
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio7: discovered new tag: virtiofs3
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio7: completion threaded_callbacks=0 inline_requests=0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio7: HVC endpoint=0 generation=0 caps=0x0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio7: HVC completion=direct queue_accounting=0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio7: HVC foreground opcodes=31 expanded=1
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio-pci 0000:00:0c.0: enabling device (0000 -> 0002)
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio8: discovered new tag: virtiofs4
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio8: completion threaded_callbacks=0 inline_requests=0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio8: HVC endpoint=0 generation=0 caps=0x0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio8: HVC completion=direct queue_accounting=0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio8: HVC foreground opcodes=31 expanded=1
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio-pci 0000:00:0d.0: enabling device (0000 -> 0002)
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio9: discovered new tag: ROSETTA
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio9: completion threaded_callbacks=0 inline_requests=0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio9: HVC endpoint=0 generation=0 caps=0x0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio9: HVC completion=direct queue_accounting=0
+Nov 21 02:30:23 af8069ba3d96 kernel: virtiofs virtio9: HVC foreground opcodes=31 expanded=1
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio-pci 0000:00:0e.0: enabling device (0000 -> 0002)
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio-pci 0000:00:0f.0: enabling device (0000 -> 0002)
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio-pci 0000:00:10.0: enabling device (0000 -> 0002)
+Nov 21 02:30:23 af8069ba3d96 kernel: Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
+Nov 21 02:30:23 af8069ba3d96 kernel: printk: legacy console [hvc0] enabled
+Nov 21 02:30:23 af8069ba3d96 kernel: random: crng init done
+Nov 21 02:30:23 af8069ba3d96 kernel: brd: module loaded
+Nov 21 02:30:23 af8069ba3d96 kernel: loop: module loaded
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio_blk virtio2: 1/0/0 default/read/poll queues
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio_blk virtio2: [vda] 1073741824 512-byte logical blocks (550 GB/512 GiB)
+Nov 21 02:30:23 af8069ba3d96 kernel:  vda: vda1
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio_blk virtio3: 1/0/0 default/read/poll queues
+Nov 21 02:30:23 af8069ba3d96 kernel: virtio_blk virtio3: [vdb] 1105504 512-byte logical blocks (566 MB/540 MiB)
+Nov 21 02:30:23 af8069ba3d96 kernel: wireguard: WireGuard 1.0.0 loaded. See www.wireguard.com for information.
+Nov 21 02:30:23 af8069ba3d96 kernel: wireguard: Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+Nov 21 02:30:23 af8069ba3d96 kernel: tun: Universal TUN/TAP device driver, 1.6
+Nov 21 02:30:23 af8069ba3d96 kernel: PPP generic driver version 2.4.2
+Nov 21 02:30:23 af8069ba3d96 kernel: PPP BSD Compression module registered
+Nov 21 02:30:23 af8069ba3d96 kernel: PPP Deflate Compression module registered
+Nov 21 02:30:23 af8069ba3d96 kernel: PPP MPPE Compression module registered
+Nov 21 02:30:23 af8069ba3d96 kernel: NET: Registered PF_PPPOX protocol family
+Nov 21 02:30:23 af8069ba3d96 kernel: PPTP driver version 0.8.5
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver cdc_acm
+Nov 21 02:30:23 af8069ba3d96 kernel: cdc_acm: USB Abstract Control Model driver for USB modems and ISDN adapters
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver usblp
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver cdc_wdm
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver usbtmc
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver uas
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver usb-storage
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ums-alauda
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ums-cypress
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ums-datafab
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ums_eneub6250
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ums-freecom
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ums-isd200
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ums-jumpshot
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ums-karma
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ums-onetouch
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ums-realtek
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ums-sddr09
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ums-sddr55
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ums-usbat
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver usbserial_generic
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for generic
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver aircable
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for aircable
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ark3116
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for ark3116
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver belkin_sa
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Belkin / Peracom / GoHubs USB Serial Adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ch341
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for ch341-uart
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver cp210x
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for cp210x
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver cyberjack
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Reiner SCT Cyberjack USB card reader
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver cypress_m8
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for DeLorme Earthmate USB
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for HID->COM RS232 Adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Nokia CA-42 V2 Adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver usb_debug
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for debug
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for xhci_dbc
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver digi_acceleport
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Digi 2 port USB adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Digi 4 port USB adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver io_edgeport
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Edgeport 2 port adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Edgeport 4 port adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Edgeport 8 port adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for EPiC device
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver io_ti
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Edgeport TI 1 port adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Edgeport TI 2 port adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver empeg
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for empeg
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver f81534a_ctrl
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver f81232
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for f81232
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for f81534a
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver f81534
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Fintek F81532/F81534
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ftdi_sio
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for FTDI USB Serial Device
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver garmin_gps
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Garmin GPS usb/tty
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ipaq
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for PocketPC PDA
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ipw
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for IPWireless converter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver ir_usb
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for IR Dongle
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver iuu_phoenix
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for iuu_phoenix
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver keyspan
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Keyspan - (without firmware)
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Keyspan 1 port adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Keyspan 2 port adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Keyspan 4 port adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver keyspan_pda
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Keyspan PDA
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Keyspan PDA - (prerenumeration)
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver kl5kusb105
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for KL5KUSB105D / PalmConnect
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver kobil_sct
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for KOBIL USB smart card terminal
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver mct_u232
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for MCT U232
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver metro_usb
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Metrologic USB to Serial
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver mos7720
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Moschip 2 port adapter
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver mos7840
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Moschip 7840/7820 USB Serial Driver
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver mxuport
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for MOXA UPort
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver navman
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for navman
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver omninet
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for ZyXEL - omni.net usb
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver opticon
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for opticon
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver option
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for GSM modem (1-port)
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver oti6858
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for oti6858
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver pl2303
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for pl2303
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver qcaux
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for qcaux
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver qcserial
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Qualcomm USB modem
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver quatech2
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Quatech 2nd gen USB to Serial Driver
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver safe_serial
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for safe_serial
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver sierra
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for Sierra USB modem
+Nov 21 02:30:23 af8069ba3d96 kernel: usbcore: registered new interface driver usb_serial_simple
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for carelink
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for flashloader
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for funsoft
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for google
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for hp4x
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for kaufmann
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for libtransistor
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for moto_modem
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for motorola_tetra
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for nokia
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for novatel_gps
+Nov 21 02:30:23 af8069ba3d96 kernel: usbserial: USB Serial support registered for owon

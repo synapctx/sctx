@@ -1,0 +1,15 @@
+(1/12) Installing ca-certificates (20261020-r0)
+(2/12) Installing brotli-libs (1.1.0-r2)
+(3/12) Installing c-ares (1.33.1-r0)
+(4/12) Installing libunistring (1.2-r0)
+(5/12) Installing libidn2 (2.3.7-r0)
+(6/12) Installing nghttp2-libs (1.62.1-r0)
+(7/12) Installing libpsl (0.21.5-r1)
+(8/12) Installing zstd-libs (1.5.6-r0)
+(9/12) Installing libcurl (8.14.1-r2)
+(10/12) Installing curl (8.14.1-r2)
+(11/12) Installing oniguruma (6.9.9-r0)
+(12/12) Installing jq (1.7.1-r0)
+Executing busybox-1.36.1-r31.trigger
+Executing ca-certificates-20261020-r0.trigger
+OK: 17 MiB in 29 packages

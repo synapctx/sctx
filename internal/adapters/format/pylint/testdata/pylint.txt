@@ -1,0 +1,20 @@
+************* Module pkg.core
+pkg/core.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+pkg/core.py:5:0: C0116: Missing function or method docstring (missing-function-docstring)
+pkg/core.py:8:0: C0116: Missing function or method docstring (missing-function-docstring)
+pkg/core.py:11:0: C0116: Missing function or method docstring (missing-function-docstring)
+pkg/core.py:14:0: C0116: Missing function or method docstring (missing-function-docstring)
+pkg/core.py:18:0: C0103: Constant name "result" doesn't conform to UPPER_CASE naming style (invalid-name)
+pkg/core.py:19:0: E0602: Undefined variable 'undefined_fn' (undefined-variable)
+pkg/core.py:1:0: W0611: Unused import os (unused-import)
+pkg/core.py:2:0: W0611: Unused import sys (unused-import)
+************* Module pkg.ugly
+pkg/ugly.py:1:0: C0114: Missing module docstring (missing-module-docstring)
+pkg/ugly.py:1:0: C0410: Multiple imports on one line (os, sys) (multiple-imports)
+pkg/ugly.py:2:0: C0116: Missing function or method docstring (missing-function-docstring)
+pkg/ugly.py:1:0: W0611: Unused import os (unused-import)
+pkg/ugly.py:1:0: W0611: Unused import sys (unused-import)
+
+-----------------------------------
+Your code has been rated at 0.53/10
+

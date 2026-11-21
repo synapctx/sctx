@@ -1,0 +1,15 @@
+Note: Using configuration file /app/phpstan.neon.
+ ------ -------------------------------------------------------------- 
+  Line   Syntax.php                                                    
+ ------ -------------------------------------------------------------- 
+  2      Syntax error, unexpected EOF, expecting T_VARIABLE on line 2  
+         🪪  phpstan.parse (non-ignorable)                             
+ ------ -------------------------------------------------------------- 
+
+
+ [ERROR] Found 1 error                                                          
+
+⚠️  Result is incomplete because of severe errors. ⚠️
+   Fix these errors first and then re-run PHPStan
+   to get all reported errors.
+

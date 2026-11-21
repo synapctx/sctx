@@ -1,0 +1,81 @@
+FAIL src/math.test.js
+  ● math › adds wrong
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 4
+    Received: 3
+
+      2 | describe('math',()=>{
+      3 |   test('adds',()=>{expect(add(1,2)).toBe(3)});
+    > 4 |   test('adds wrong',()=>{expect(add(1,2)).toBe(4)});
+        |                                           ^
+      5 |   test('div throws',()=>{expect(()=>div(1,0)).toThrow('nope')});
+      6 |   test.skip('skipped',()=>{});
+      7 |   test('obj eq',()=>{expect({a:1,b:[1,2,3]}).toEqual({a:1,b:[1,2,4]})});
+
+      at Object.toBe (src/math.test.js:4:43)
+
+  ● math › div throws
+
+    expect(received).toThrow(expected)
+
+    Expected substring: "nope"
+    Received message:   "div by zero"
+
+        > 1 | exports.add=(a,b)=>a+b; exports.div=(a,b)=>{ if(b===0) throw new Error("div by zero"); return a/b}
+            |                                                              ^
+          2 |
+
+      at exports.div (src/math.js:1:62)
+      at div (src/math.test.js:5:37)
+      at Object.<anonymous> (../node_modules/expect/build/index.js:1824:9)
+      at Object.throwingMatcher [as toThrow] (../node_modules/expect/build/index.js:2235:93)
+      at Object.toThrow (src/math.test.js:5:47)
+      at Object.toThrow (src/math.test.js:5:47)
+
+  ● math › obj eq
+
+    expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 1
+    + Received  + 1
+
+      Object {
+        "a": 1,
+        "b": Array [
+          1,
+          2,
+    -     4,
+    +     3,
+        ],
+      }
+
+      5 |   test('div throws',()=>{expect(()=>div(1,0)).toThrow('nope')});
+      6 |   test.skip('skipped',()=>{});
+    > 7 |   test('obj eq',()=>{expect({a:1,b:[1,2,3]}).toEqual({a:1,b:[1,2,4]})});
+        |                                              ^
+      8 | });
+      9 |
+
+      at Object.toEqual (src/math.test.js:7:46)
+
+FAIL src/broken.test.js
+  ● Test suite failed to run
+
+    Cannot find module './nonexistent' from 'src/broken.test.js'
+
+    > 1 | const x = require('./nonexistent');
+        |           ^
+      2 | test('b',()=>{});
+      3 |
+
+      at Resolver._throwModNotFoundError (../node_modules/jest-resolve/build/index.js:1031:11)
+      at Object.require (src/broken.test.js:1:11)
+
+
+Test Suites: 2 failed, 1 passed, 3 total
+Tests:       3 failed, 1 skipped, 3 passed, 7 total
+Snapshots:   0 total
+Time:        0.228 s, estimated 1 s
+Ran all test suites.

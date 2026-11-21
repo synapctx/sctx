@@ -1,0 +1,15 @@
+STATUS: Resolving packages from lockfile...
+All packages are synced to date, nothing to do.
+/tmp/build-env/lib/python3.15/site-packages/setuptools/command/editable_wheel.py:354: BuildBackendWarning: Editable installation.
+!!
+
+        ********************************************************************************
+        Please be careful with folders in your working directory with the same
+        name as your package as they may take precedence during imports.
+        ********************************************************************************
+
+!!
+  with strategy, WheelFile(wheel_path, "w") as wheel_obj:
+  ✔ Update clean 0.1.0 -> 0.1.0 successful
+
+  0:00:00 🎉 All complete! 0/0

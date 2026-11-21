@@ -1,0 +1,7 @@
+Resolved 20 packages in 298ms
+Prepared 4 packages in 112ms
+Installed 4 packages in 3ms
+ + anyio==4.16.0
+ + h11==0.16.0
+ + httpcore==1.0.9
+ + httpx==0.28.1

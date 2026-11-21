@@ -1,0 +1,45 @@
+Nov 21 02:42:50 af8069ba3d96 systemd[1]: Started app.service - Demo app with varied logs.
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 1 in 7 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 2 in 14 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 3 in 21 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 4 in 28 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 5 in 35 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 6 in 42 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 7 in 49 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 8 in 56 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 9 in 63 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 10 in 70 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 11 in 77 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 12 in 84 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 13 in 91 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 14 in 98 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 15 in 105 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 16 in 112 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 17 in 119 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 18 in 126 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 19 in 133 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 20 in 140 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 21 in 147 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 22 in 154 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 23 in 161 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 24 in 168 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 25 in 175 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 26 in 182 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 27 in 189 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 28 in 196 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 29 in 203 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 30 in 210 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 31 in 217 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 32 in 224 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 33 in 231 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 34 in 238 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 35 in 245 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 36 in 252 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 37 in 259 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 38 in 266 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 39 in 273 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: processed batch 40 in 280 ms
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: ERROR: upstream timeout after 30s (attempt 1)
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: ERROR: upstream timeout after 30s (attempt 2)
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: WARN: retrying in 5s
+Nov 21 02:42:50 af8069ba3d96 sh[2348]: listening on :8080

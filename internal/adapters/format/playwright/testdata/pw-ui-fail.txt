@@ -1,0 +1,117 @@
+
+Running 4 tests using 1 worker
+
+  ✓  1 tests/ui.spec.js:2:1 › ui ok (329ms)
+  ✘  2 tests/ui.spec.js:3:1 › ui missing (909ms)
+  ✘  3 tests/ui.spec.js:4:1 › ui text mismatch (937ms)
+  ✘  4 tests/ui.spec.js:5:1 › ui click timeout (634ms)
+
+
+  1) tests/ui.spec.js:3:1 › ui missing ─────────────────────────────────────────────────────────────
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('button', { name: 'Submit' })
+    Expected: visible
+    Timeout: 800ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" getByRole('button', { name: 'Submit' }) with timeout 800ms
+      - waiting for getByRole('button', { name: 'Submit' })
+
+
+      1 | const {test,expect}=require('@playwright/test');
+      2 | test('ui ok',async({page})=>{await page.setContent('<h1>Hello</h1><button>Go</button>');await expect(page.locator('h1')).toHaveText('Hello')});
+    > 3 | test('ui missing',async({page})=>{await page.setContent('<h1>Hello</h1>');await expect(page.getByRole('button',{name:'Submit'})).toBeVisible()});
+        |                                                                                                                                  ^
+      4 | test('ui text mismatch',async({page})=>{await page.setContent('<h1>Hello</h1>');await expect(page.locator('h1')).toHaveText('Goodbye')});
+      5 | test('ui click timeout',async({page})=>{await page.setContent('<h1>Hello</h1>');await page.click('#nope',{timeout:500})});
+      6 |
+        at /repo/tests/ui.spec.js:3:130
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ui-ui-missing/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ui-ui-missing/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-ui-missing/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-ui-missing/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) tests/ui.spec.js:4:1 › ui text mismatch ───────────────────────────────────────────────────────
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator:  locator('h1')
+    Expected: "Goodbye"
+    Received: "Hello"
+    Timeout:  800ms
+
+    Call log:
+      - Expect "toHaveText" locator('h1') with timeout 800ms
+      - waiting for locator('h1')
+        9 × locator resolved to <h1>Hello</h1>
+          - unexpected value "Hello"
+
+
+      2 | test('ui ok',async({page})=>{await page.setContent('<h1>Hello</h1><button>Go</button>');await expect(page.locator('h1')).toHaveText('Hello')});
+      3 | test('ui missing',async({page})=>{await page.setContent('<h1>Hello</h1>');await expect(page.getByRole('button',{name:'Submit'})).toBeVisible()});
+    > 4 | test('ui text mismatch',async({page})=>{await page.setContent('<h1>Hello</h1>');await expect(page.locator('h1')).toHaveText('Goodbye')});
+        |                                                                                                                  ^
+      5 | test('ui click timeout',async({page})=>{await page.setContent('<h1>Hello</h1>');await page.click('#nope',{timeout:500})});
+      6 |
+        at /repo/tests/ui.spec.js:4:114
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ui-ui-text-mismatch/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ui-ui-text-mismatch/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-ui-text-mismatch/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-ui-text-mismatch/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) tests/ui.spec.js:5:1 › ui click timeout ───────────────────────────────────────────────────────
+
+    TimeoutError: page.click: Timeout 500ms exceeded.
+    Call log:
+      - waiting for locator('#nope')
+
+
+      3 | test('ui missing',async({page})=>{await page.setContent('<h1>Hello</h1>');await expect(page.getByRole('button',{name:'Submit'})).toBeVisible()});
+      4 | test('ui text mismatch',async({page})=>{await page.setContent('<h1>Hello</h1>');await expect(page.locator('h1')).toHaveText('Goodbye')});
+    > 5 | test('ui click timeout',async({page})=>{await page.setContent('<h1>Hello</h1>');await page.click('#nope',{timeout:500})});
+        |                                                                                            ^
+      6 |
+        at /repo/tests/ui.spec.js:5:92
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/ui-ui-click-timeout/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/ui-ui-click-timeout/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/ui-ui-click-timeout/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/ui-ui-click-timeout/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    tests/ui.spec.js:3:1 › ui missing ──────────────────────────────────────────────────────────────
+    tests/ui.spec.js:4:1 › ui text mismatch ────────────────────────────────────────────────────────
+    tests/ui.spec.js:5:1 › ui click timeout ────────────────────────────────────────────────────────
+  1 passed (6.0s)

@@ -1,0 +1,5 @@
+Lib/Class1.cs(4,41): error CS0103: The name 'c' does not exist in the current context
+Lib/Class1.cs(6,16): error CS0103: The name 'Undefined' does not exist in the current context
+Lib/Class1.cs(5,40): error CS0029: Cannot implicitly convert type 'int' to 'string'
+Build FAILED. 0 warnings, 3 errors (00:00:00.19)
+…+6 lines elided (3 restore, 3 duplicate)

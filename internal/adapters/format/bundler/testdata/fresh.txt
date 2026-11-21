@@ -1,0 +1,54 @@
+Fetching gem metadata from https://rubygems.org/...........
+Resolving dependencies...
+Fetching rake 13.4.2
+Installing rake 13.4.2
+Fetching ast 2.4.3
+Fetching diff-lcs 1.6.2
+Fetching language_server-protocol 3.17.0.6
+Fetching lint_roller 1.1.0
+Fetching prism 2.1.0 (arm64-darwin)
+Fetching minitest 6.1.0
+Fetching parallel 2.3.0
+Fetching drb 2.2.3
+Fetching json 3.1.0
+Fetching racc 1.8.1
+Fetching parser 3.3.14.0
+Installing ast 2.4.3
+Fetching rainbow 3.1.1
+Fetching regexp_parser 2.13.4
+Installing drb 2.2.3
+Fetching rspec-support 3.13.8
+Installing diff-lcs 1.6.2
+Installing parallel 2.3.0
+Fetching rspec-core 3.13.7
+Fetching rspec-expectations 3.13.6
+Installing lint_roller 1.1.0
+Fetching rspec 3.13.2
+Fetching rspec-mocks 3.13.9
+Fetching ruby-progressbar 1.13.0
+Fetching rubocop 1.92.3
+Fetching rubocop-ast 1.53.0
+Installing json 3.1.0 with native extensions
+Installing language_server-protocol 3.17.0.6
+Installing rainbow 3.1.1
+Installing rspec-core 3.13.7
+Fetching unicode-emoji 4.3.0
+Installing regexp_parser 2.13.4
+Fetching unicode-display_width 3.3.0
+Installing rspec-support 3.13.8
+Fetching rubocop-performance 1.27.0
+Installing racc 1.8.1 with native extensions
+Installing prism 2.1.0 (arm64-darwin)
+Installing minitest 6.1.0
+Installing rspec-expectations 3.13.6
+Installing rspec 3.13.2
+Installing parser 3.3.14.0
+Installing ruby-progressbar 1.13.0
+Installing rubocop-ast 1.53.0
+Installing unicode-emoji 4.3.0
+Installing unicode-display_width 3.3.0
+Installing rspec-mocks 3.13.9
+Installing rubocop 1.92.3
+Installing rubocop-performance 1.27.0
+Bundle complete! 5 Gemfile dependencies, 25 gems now installed.
+Bundled gems are installed into `./vendor/bundle`

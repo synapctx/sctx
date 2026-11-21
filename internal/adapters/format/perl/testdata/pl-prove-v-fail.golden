@@ -1,0 +1,27 @@
+#   Failed test 'list compare'
+#   at t/02-list.t line 4.
+#     Structures begin differing at:
+#          $got->[2] = '3'
+#     $expected->[2] = '4'
+#   Failed test 'hash compare'
+#   at t/02-list.t line 5.
+#     Structures begin differing at:
+#          $got->{b}[1] = '2'
+#     $expected->{b}[1] = '3'
+#   Failed test 'regex'
+#   at t/02-list.t line 7.
+#                   'hello'
+#     doesn't match '(?^:xyz)'
+t/02-list.t ..
+not ok 1 - list compare
+not ok 2 - hash compare
+not ok 4 - regex
+Dubious, test returned 3 (wstat 768, 0x300)
+Test Summary Report
+-------------------
+t/02-list.t (Wstat: 768 (exited 3) Tests: 4 Failed: 3)
+  Failed tests:  1-2, 4
+  Non-zero exit status: 3
+Files=2, Tests=16,  0 wallclock secs ( 0.01 usr  0.00 sys +  0.06 cusr  0.00 csys =  0.07 CPU)
+Result: FAIL
+…+23 lines (passing rows, plans, blanks, restated failure counts)

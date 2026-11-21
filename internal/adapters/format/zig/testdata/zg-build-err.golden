@@ -1,0 +1,10 @@
+install
++- install demo
+   +- zig build-exe demo Debug native 3 errors
+src/main.zig:2:45: error: use of undeclared identifier 'c'
+src/main.zig:6:9: error: unused local variable
+src/main.zig:4:11: error: unused local constant
+error: the following command failed with 3 compilation errors:
+Build Summary: 0/3 steps succeeded; 1 failed (disable with --summary none)
+error: the following build command failed with exit code 1:
+…+5 lines (step tree, command lines, passing tests, std frames, source echoes)

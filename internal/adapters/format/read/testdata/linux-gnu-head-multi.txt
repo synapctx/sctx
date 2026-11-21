@@ -1,0 +1,7 @@
+==> README.md <==
+# proj
+
+==> logs/app.log <==
+2026-11-21T10:00:0 INFO request id=0 path=/api/v1/items status=200 dur=0ms
+2026-11-21T10:00:1 INFO request id=1 path=/api/v1/items status=200 dur=1ms
+2026-11-21T10:00:2 INFO request id=2 path=/api/v1/items status=200 dur=2ms

@@ -1,0 +1,4 @@
+SyntaxError: Unexpected token (1:15)
+
+> 1 | db.users.find({
+    |                ^

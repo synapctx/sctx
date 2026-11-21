@@ -1,0 +1,65 @@
+RTNETLINK answers: Invalid argument
+Netid State     Recv-Q Send-Q                                         Local Address:Port               Peer Address:Port  Process
+nl    UNCONN    0      0                                                       rtnl:kernel                         *             
+nl    UNCONN    0      0                                                       rtnl:systemd-resolve/74             *             
+nl    UNCONN    896    0                                                       rtnl:238                            *             
+nl    UNCONN    0      0                                                       rtnl:systemd-resolve/74             *             
+nl    UNCONN    4352   0                                                    tcpdiag:ss/935                         *             
+nl    UNCONN    896    0                                                    tcpdiag:kernel                         *             
+nl    UNCONN    0      0                                                       xfrm:kernel                         *             
+nl    UNCONN    0      0                                                      audit:systemd/1                      *             
+nl    UNCONN    0      0                                                      audit:kernel                         *             
+nl    UNCONN    0      0                                                  fiblookup:kernel                         *             
+nl    UNCONN    0      0                                                        nft:systemd/1                      *             
+nl    UNCONN    0      0                                                        nft:kernel                         *             
+nl    UNCONN    0      0                                                     uevent:-57441106                      *             
+nl    UNCONN    0      0                                                     uevent:kernel                         *             
+nl    UNCONN    0      0                                                     uevent:systemd-logind/84              *             
+nl    UNCONN    0      0                                                     uevent:-1570490772                    *             
+nl    UNCONN    0      0                                                     uevent:-373767990                     *             
+nl    UNCONN    0      0                                                     uevent:systemd/1                      *             
+nl    UNCONN    0      0                                                       genl:kernel                         *             
+u_str ESTAB     0      0                                /run/dbus/system_bus_socket 810588                        * 811082       
+u_dgr ESTAB     0      0                                        /run/systemd/notify 806748                        * 0            
+u_str LISTEN    0      4096                                    /run/systemd/private 806751                        * 0            
+u_str LISTEN    0      4096              /run/systemd/userdb/io.systemd.DynamicUser 806753                        * 0            
+u_str LISTEN    0      4096                      /run/systemd/io.systemd.ManagedOOM 806754                        * 0            
+u_dgr ESTAB     0      0                               /run/systemd/journal/dev-log 806767                        * 0            
+u_dgr ESTAB     0      0                                /run/systemd/journal/socket 806769                        * 0            
+u_str LISTEN    0      4096                             /run/systemd/journal/stdout 806771                        * 0            
+u_str ESTAB     0      0                                /run/systemd/journal/stdout 810791                        * 808774       
+u_str ESTAB     0      0                                /run/systemd/journal/stdout 822120                        * 825455       
+u_str LISTEN    0      4096                 /run/systemd/journal/io.systemd.journal 808515                        * 0            
+u_str ESTAB     0      0                                /run/systemd/journal/stdout 809331                        * 811051       
+u_str LISTEN    0      4096                          /run/systemd/io.systemd.sysext 805806                        * 0            
+u_str ESTAB     0      0                                                          * 812049                        * 812050       
+u_dgr ESTAB     0      0                                                          * 806749                        * 806750       
+u_str ESTAB     0      0                                /run/dbus/system_bus_socket 811137                        * 813115       
+u_dgr ESTAB     0      0                                                          * 806864                        * 806769       
+u_str ESTAB     0      0                                                          * 811051                        * 809331       
+u_str ESTAB     0      0                                                          * 810586                        * 810585       
+u_str LISTEN    0      4096                 /run/systemd/resolve/io.systemd.Resolve 811079                        * 0            
+u_str LISTEN    0      4096         /run/systemd/resolve/io.systemd.Resolve.Monitor 811080                        * 0            
+u_str LISTEN    0      4096                             /run/dbus/system_bus_socket 813057                        * 0            
+u_str ESTAB     0      0                                /run/systemd/journal/stdout 812050                        * 812049       
+u_str ESTAB     0      0                                /run/dbus/system_bus_socket 811123                        * 811122       
+u_dgr ESTAB     0      0                                                          * 806750                        * 806749       
+u_str ESTAB     0      0                                                          * 810576                        * 810577       
+u_dgr ESTAB     0      0                                                          * 813102                        * 806769       
+u_dgr ESTAB     0      0                                                          * 808520                        * 806748       
+u_str ESTAB     0      0                                                          * 808774                        * 810791       
+u_str ESTAB     0      0                                /run/systemd/journal/stdout 810577                        * 810576       
+u_str ESTAB     0      0                                                          * 825455                        * 822120       
+u_str ESTAB     0      0                                                          * 810585                        * 810586       
+u_dgr ESTAB     0      0                                                          * 811066                        * 806769       
+u_str ESTAB     0      0      @a7e00a89a960667f/bus/systemd-resolve/bus-api-resolve 811082                        * 810588       
+u_str ESTAB     0      0               @2d84863eec576e52/bus/systemd/bus-api-system 811122                        * 811123       
+u_str ESTAB     0      0                @718bd17966fb610c/bus/systemd-logind/system 813115                        * 811137       
+udp   UNCONN    0      0                                                 127.0.0.54:domain                  0.0.0.0:*            
+udp   UNCONN    0      0                                              127.0.0.53%lo:domain                  0.0.0.0:*            
+tcp   LISTEN    0      1                                                    0.0.0.0:9000                    0.0.0.0:*            
+tcp   LISTEN    0      4096                                                 0.0.0.0:ssh                     0.0.0.0:*            
+tcp   LISTEN    0      4096                                           127.0.0.53%lo:domain                  0.0.0.0:*            
+tcp   LISTEN    0      4096                                              127.0.0.54:domain                  0.0.0.0:*            
+tcp   TIME-WAIT 0      0                                                 10.0.0.2:34168              192.0.2.80:http         
+tcp   LISTEN    0      4096                                                    [::]:ssh                        [::]:*            

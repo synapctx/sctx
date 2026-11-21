@@ -1,0 +1,13 @@
+Using version ^0.28.1 for httpx
+
+Updating dependencies
+Resolving dependencies...
+
+Package operations: 4 installs, 0 updates, 0 removals
+
+  - Installing h11 (0.16.0)
+  - Installing httpcore (1.0.9)
+  - Installing anyio (4.16.0)
+  - Installing httpx (0.28.1)
+
+Writing lock file

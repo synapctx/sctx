@@ -1,0 +1,10 @@
+▲ Next.js 16.4.6 (Turbopack)
+✓ Running next.config.js took 8ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1582ms
+  Running TypeScript ...
+app/bad/page.tsx(1,7): error TS2322: Type 'string' is not assignable to type 'number'.
+app/bad/page.tsx(2,7): error TS2322: Type 'number' is not assignable to type 'string'.
+Failed to type check.
+

@@ -1,0 +1,6 @@
+Removing 1: phpstan/phpstan 2.3.7
+./composer.json has been updated
+Running composer update phpstan/phpstan
+Lock file operations: 0 installs, 0 updates, 1 removal
+Package operations: 0 installs, 0 updates, 1 removal
+…+10 lines (progress, boilerplate)

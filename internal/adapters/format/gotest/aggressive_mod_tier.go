@@ -85,6 +85,12 @@ func filterModNoise(lines []string) ([]string, int) {
 
 // isModNoise reports whether l is a `go mod` fetch-progress line.
 func isModNoise(l string) bool {
+	if rest, ok := strings.CutPrefix(l, "# get "); ok {
+		// `go mod download -x` traces every proxy request. The request line and
+		// a 200 response are noise; any other status is evidence and is kept.
+		_, status, hasStatus := strings.Cut(rest, ": ")
+		return !hasStatus || strings.HasPrefix(status, "200 ")
+	}
 	for _, prefix := range modNoisePrefixes {
 		if strings.HasPrefix(l, prefix) {
 			return true

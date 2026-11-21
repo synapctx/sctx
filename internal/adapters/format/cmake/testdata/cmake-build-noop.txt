@@ -1,0 +1,3 @@
+[ 33%] Built target a
+[ 66%] Built target b
+[100%] Built target app

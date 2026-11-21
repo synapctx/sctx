@@ -1,0 +1,35 @@
+trivy:
+  requirements.txt (pip): vulnerabilities=26
+requirements.txt (pip)
+Total: 26 (HIGH: 17, CRITICAL: 9)
+  django 2.2.0
+    CVE-2019-14234 CRITICAL -> 1.11.23, 2.1.11, 2.2.4
+    CVE-2019-19844 CRITICAL -> 1.11.27, 2.2.9, 3.0.1
+    CVE-2020-7471 CRITICAL -> 1.11.28, 2.2.10, 3.0.3
+    CVE-2022-28346 CRITICAL -> 2.2.28, 3.2.13, 4.0.4
+    CVE-2022-28347 CRITICAL -> 2.2.28, 3.2.13, 4.0.4
+    CVE-2025-64459 CRITICAL -> 5.2.8, 5.1.14, 4.2.26
+    CVE-2019-14232 HIGH -> 1.11.23, 2.1.11, 2.2.4
+    CVE-2019-14233 HIGH -> 1.11.23, 2.1.11, 2.2.4
+    CVE-2019-14235 HIGH -> 1.11.23, 2.1.11, 2.2.4
+    CVE-2019-19118 HIGH -> 2.1.15, 2.2.8
+    CVE-2020-13254 HIGH -> 2.2.13, 3.0.7
+    CVE-2020-24583 HIGH -> 2.2.16, 3.0.10, 3.1.1
+    CVE-2020-9402 HIGH -> 1.11.29, 2.2.11, 3.0.4
+    CVE-2021-31542 HIGH -> 2.2.21, 3.1.9, 3.2.1
+    CVE-2021-33571 HIGH -> 2.2.24, 3.1.12, 3.2.4
+    CVE-2021-45115 HIGH -> 2.2.26, 3.2.11, 4.0.1
+    CVE-2021-45116 HIGH -> 2.2.26, 3.2.11, 4.0.1
+    CVE-2022-23833 HIGH -> 2.2.27, 3.2.12, 4.0.2
+    CVE-2022-36359 HIGH -> 3.2.15, 4.0.7
+    CVE-2025-57833 HIGH -> 4.2.24, 5.1.12, 5.2.6
+    CVE-2025-64458 HIGH -> 5.2.8, 5.1.14, 4.2.26
+    CVE-2026-15307 HIGH -> 5.2.17, 6.0.8
+  pyyaml 5.1
+    CVE-2019-20477 CRITICAL -> 5.2
+    CVE-2020-14343 CRITICAL -> 5.4
+    CVE-2020-1747 CRITICAL -> 5.3.1
+  requests 2.19.0
+    CVE-2018-18074 HIGH -> 2.20.0
+WARN [pip] Unable to find python `site-packages` directory. License detection is skipped. err="unable to find path to Python executable"
+…+6 stderr lines (progress, INFO logs, update notice)

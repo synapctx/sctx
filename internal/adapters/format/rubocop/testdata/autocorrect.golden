@@ -1,0 +1,19 @@
+ac/messy.rb (15)
+  1:1 C Style/Documentation: Missing top-level documentation comment for class Messy.
+  1:1 C fixable Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+  2:11,2:15 C fixed Layout/SpaceInsideParens: Space inside parentheses detected.
+  2:11,2:14 C Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  2:13 C fixed Layout/SpaceAfterComma: Space missing after comma.
+  3:5 W fixed Lint/UselessAssignment: Useless assignment to variable - x.
+  3:5 W fixed Lint/Void: Literal 1 used in void context.
+  4:5 C fixed Style/IfUnlessModifier: Favor modifier if usage when having a single-line body. Another good alternative is the usage of control flow &&/||.
+  4:10,5:12 C fixed Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+  4:15 C fixed Style/MultilineIfThen: Do not use then for multi-line if.
+  7:5 C fixed Style/RedundantReturn: Redundant return detected.
+  9:3 C fixed Layout/EmptyLineBetweenDefs: Expected 1 empty line between method definitions; found 0.
+ac/messy2.rb (3)
+  1:1 C fixable Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+  1:9 C Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  2:16 C fixed Layout/TrailingWhitespace: Trailing whitespace detected.
+cops: Naming/MethodParameterName×3, Layout/SpaceInsideParens×2, Style/FrozenStringLiteralComment×2, Style/StringLiterals×2, …+9 more cops
+2 files inspected, 18 offenses detected, 12 offenses corrected, 2 more offenses can be corrected with `rubocop -A`

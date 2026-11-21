@@ -1,0 +1,26 @@
+[info] welcome to sbt 1.10.5 (Eclipse Adoptium Java 17.0.13)
+[info] loading project definition from /work/proj/project
+[info] loading settings for project scok from build.sbt ...
+[info] set current project to demo (in build file:/work/proj/)
+[info] compiling 1 Scala source to /work/proj/target/scala-3.5.2/classes ...
+[warn] -- [E029] Pattern Match Exhaustivity Warning: /work/proj/src/main/scala/Demo.scala:3:41 
+[warn] 3 |  def unusedMatch(x: Option[Int]): Int = x match
+[warn]   |                                         ^
+[warn]   |                                       match may not be exhaustive.
+[warn]   |
+[warn]   |                                       It would fail on pattern case: None
+[warn]   |
+[warn]   | longer explanation available when compiling with `-explain`
+[warn] one warning found
+[info] done compiling
+[info] compiling 1 Scala source to /work/proj/target/scala-3.5.2/test-classes ...
+[info] done compiling
+[info] DemoSpec:
+[info] - adds
+[info] - adds2
+[info] Run completed in 800 milliseconds.
+[info] Total number of tests run: 2
+[info] Suites: completed 1, aborted 0
+[info] Tests: succeeded 2, failed 0, canceled 0, ignored 0, pending 0
+[info] All tests passed.
+[success] Total time: 7 s, completed Nov 21, 2026, 2:32:00 AM

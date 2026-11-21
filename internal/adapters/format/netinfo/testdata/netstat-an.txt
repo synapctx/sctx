@@ -1,0 +1,150 @@
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+tcp        0      0 0.0.0.0:9000            0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN     
+tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN     
+tcp        0      0 127.0.0.54:53           0.0.0.0:*               LISTEN     
+tcp        2      0 0.0.0.0:8001            0.0.0.0:*               LISTEN     
+tcp        2      0 0.0.0.0:8003            0.0.0.0:*               LISTEN     
+tcp        2      0 0.0.0.0:8002            0.0.0.0:*               LISTEN     
+tcp        0      0 127.0.0.1:47070         127.0.0.1:8002          ESTABLISHED
+tcp        0      0 127.0.0.1:47074         127.0.0.1:8002          ESTABLISHED
+tcp        0      0 127.0.0.1:47080         127.0.0.1:8002          ESTABLISHED
+tcp        0      1 127.0.0.1:47084         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47100         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47104         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47116         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47132         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47138         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47152         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47164         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47168         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47174         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47186         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47196         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47206         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47222         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47238         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47242         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47256         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47258         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47262         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47274         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47280         127.0.0.1:8002          SYN_SENT   
+tcp        0      1 127.0.0.1:47288         127.0.0.1:8002          SYN_SENT   
+tcp        0      0 127.0.0.1:8003          127.0.0.1:47854         ESTABLISHED
+tcp        0      0 127.0.0.1:8003          127.0.0.1:47844         ESTABLISHED
+tcp        0      0 127.0.0.1:47844         127.0.0.1:8003          ESTABLISHED
+tcp        0      0 127.0.0.1:47852         127.0.0.1:8003          ESTABLISHED
+tcp        0      0 127.0.0.1:47854         127.0.0.1:8003          ESTABLISHED
+tcp        0      1 127.0.0.1:47856         127.0.0.1:8003          SYN_SENT   
+tcp        0      1 127.0.0.1:47866         127.0.0.1:8003          SYN_SENT   
+tcp        0      1 127.0.0.1:47874         127.0.0.1:8003          SYN_SENT   
+tcp        0      0 127.0.0.1:8002          127.0.0.1:47074         ESTABLISHED
+tcp        0      0 127.0.0.1:8001          127.0.0.1:45238         ESTABLISHED
+tcp        0      0 127.0.0.1:8002          127.0.0.1:47080         ESTABLISHED
+tcp        0      0 127.0.0.1:8002          127.0.0.1:47070         ESTABLISHED
+tcp        0      0 127.0.0.1:45234         127.0.0.1:8001          ESTABLISHED
+tcp        0      0 127.0.0.1:45238         127.0.0.1:8001          ESTABLISHED
+tcp        0      0 127.0.0.1:45242         127.0.0.1:8001          ESTABLISHED
+tcp        0      1 127.0.0.1:45256         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45258         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45262         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45274         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45284         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45298         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45304         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45320         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45330         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45338         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45340         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45354         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45364         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45370         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45384         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45400         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45412         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45426         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45434         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45448         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45450         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45462         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45478         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45488         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45502         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45508         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45522         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45528         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45542         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45544         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45546         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45558         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45560         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45566         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45570         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45576         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45592         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45606         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45608         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45622         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45634         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45646         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45660         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45670         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45672         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45674         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45686         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45700         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45712         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45716         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45724         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45734         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45740         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45746         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45750         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45762         127.0.0.1:8001          SYN_SENT   
+tcp        0      1 127.0.0.1:45772         127.0.0.1:8001          SYN_SENT   
+tcp        0      0 127.0.0.1:8003          127.0.0.1:47852         ESTABLISHED
+tcp        0      0 127.0.0.1:8001          127.0.0.1:45242         ESTABLISHED
+tcp        0      0 127.0.0.1:8001          127.0.0.1:45234         ESTABLISHED
+tcp6       0      0 :::22                   :::*                    LISTEN     
+udp        0      0 127.0.0.54:53           0.0.0.0:*                          
+udp        0      0 127.0.0.53:53           0.0.0.0:*                          
+Active UNIX domain sockets (servers and established)
+Proto RefCnt Flags       Type       State         I-Node   Path
+unix  3      [ ]         STREAM     CONNECTED     810588   /run/dbus/system_bus_socket
+unix  3      [ ]         DGRAM      CONNECTED     806748   /run/systemd/notify
+unix  2      [ ACC ]     STREAM     LISTENING     806751   /run/systemd/private
+unix  2      [ ACC ]     STREAM     LISTENING     806753   /run/systemd/userdb/io.systemd.DynamicUser
+unix  2      [ ACC ]     STREAM     LISTENING     806754   /run/systemd/io.systemd.ManagedOOM
+unix  2      [ ]         DGRAM      CONNECTED     806767   /run/systemd/journal/dev-log
+unix  5      [ ]         DGRAM      CONNECTED     806769   /run/systemd/journal/socket
+unix  2      [ ACC ]     STREAM     LISTENING     806771   /run/systemd/journal/stdout
+unix  3      [ ]         STREAM     CONNECTED     810791   /run/systemd/journal/stdout
+unix  3      [ ]         STREAM     CONNECTED     822120   /run/systemd/journal/stdout
+unix  2      [ ACC ]     STREAM     LISTENING     808515   /run/systemd/journal/io.systemd.journal
+unix  3      [ ]         STREAM     CONNECTED     809331   /run/systemd/journal/stdout
+unix  2      [ ACC ]     STREAM     LISTENING     805806   /run/systemd/io.systemd.sysext
+unix  3      [ ]         STREAM     CONNECTED     812049   
+unix  3      [ ]         DGRAM      CONNECTED     806749   
+unix  3      [ ]         STREAM     CONNECTED     811137   /run/dbus/system_bus_socket
+unix  2      [ ]         DGRAM      CONNECTED     806864   
+unix  3      [ ]         STREAM     CONNECTED     811051   
+unix  3      [ ]         STREAM     CONNECTED     810586   
+unix  2      [ ACC ]     STREAM     LISTENING     811079   /run/systemd/resolve/io.systemd.Resolve
+unix  2      [ ACC ]     STREAM     LISTENING     811080   /run/systemd/resolve/io.systemd.Resolve.Monitor
+unix  2      [ ACC ]     STREAM     LISTENING     813057   /run/dbus/system_bus_socket
+unix  3      [ ]         STREAM     CONNECTED     812050   /run/systemd/journal/stdout
+unix  3      [ ]         STREAM     CONNECTED     811123   /run/dbus/system_bus_socket
+unix  3      [ ]         DGRAM      CONNECTED     806750   
+unix  3      [ ]         STREAM     CONNECTED     810576   
+unix  2      [ ]         DGRAM      CONNECTED     813102   
+unix  2      [ ]         DGRAM      CONNECTED     808520   
+unix  3      [ ]         STREAM     CONNECTED     808774   
+unix  3      [ ]         STREAM     CONNECTED     810577   /run/systemd/journal/stdout
+unix  3      [ ]         STREAM     CONNECTED     825455   
+unix  3      [ ]         STREAM     CONNECTED     810585   
+unix  2      [ ]         DGRAM      CONNECTED     811066   
+unix  3      [ ]         STREAM     CONNECTED     811082   @a7e00a89a960667f/bus/systemd-resolve/bus-api-resolve
+unix  3      [ ]         STREAM     CONNECTED     811122   @2d84863eec576e52/bus/systemd/bus-api-system
+unix  3      [ ]         STREAM     CONNECTED     813115   @718bd17966fb610c/bus/systemd-logind/system

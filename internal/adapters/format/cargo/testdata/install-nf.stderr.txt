@@ -1,0 +1,2 @@
+    Updating crates.io index
+error: could not find `nonexistent-crate-zzqq-1` in registry `crates-io` with version `*`

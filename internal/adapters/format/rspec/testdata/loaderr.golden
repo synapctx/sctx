@@ -1,0 +1,8 @@
+An error occurred while loading ./spec/broken_load_spec.rb. - Did you mean?
+                    rspec ./spec/calc_pass_spec.rb
+Failure/Error: require "does_not_exist_zzz"
+LoadError:
+  cannot load such file -- does_not_exist_zzz
+# ./spec/broken_load_spec.rb:1:in '<top (required)>'
+No examples found.
+0 examples, 0 failures, 1 error occurred outside of examples

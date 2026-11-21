@@ -1,0 +1,32 @@
+Updating and loading repositories:
+Repositories loaded.
+Package     Arch    Version       Repository      Size
+Installing:
+ htop       aarch64 3.3.0-4.fc41  fedora     556.4 KiB
+ jq         aarch64 1.7.1-8.fc41  fedora     722.7 KiB
+Installing dependencies:
+ hwloc-libs aarch64 2.12.0-1.fc41 updates      2.9 MiB
+ libnl3     aarch64 3.11.0-1.fc41 updates      1.3 MiB
+ oniguruma  aarch64 6.9.10-1.fc41 updates    826.1 KiB
+
+Transaction Summary:
+ Installing:         5 packages
+
+Total size of inbound packages is 3 MiB. Need to download 3 MiB.
+After this operation, 6 MiB extra will be used (install 6 MiB, remove 0 B).
+[1/5] jq-0:1.7.1-8.fc41.aarch64         100% | 573.8 KiB/s | 194.5 KiB |  00m00s
+[2/5] oniguruma-0:6.9.10-1.fc41.aarch64 100% | 601.5 KiB/s | 210.5 KiB |  00m00s
+[3/5] htop-0:3.3.0-4.fc41.aarch64       100% | 527.6 KiB/s | 195.2 KiB |  00m00s
+[4/5] hwloc-libs-0:2.12.0-1.fc41.aarch6 100% |   7.2 MiB/s |   2.1 MiB |  00m00s
+[5/5] libnl3-0:3.11.0-1.fc41.aarch64    100% |   1.2 MiB/s | 349.5 KiB |  00m00s
+--------------------------------------------------------------------------------
+[5/5] Total                             100% |   2.3 MiB/s |   3.0 MiB |  00m01s
+Running transaction
+[1/7] Verify package files              100% | 294.0   B/s |   5.0   B |  00m00s
+[2/7] Prepare transaction               100% | 217.0   B/s |   5.0   B |  00m00s
+[3/7] Installing libnl3-0:3.11.0-1.fc41 100% |  44.5 MiB/s |   1.3 MiB |  00m00s
+[4/7] Installing hwloc-libs-0:2.12.0-1. 100% | 260.9 MiB/s |   2.9 MiB |  00m00s
+[5/7] Installing oniguruma-0:6.9.10-1.f 100% |  80.9 MiB/s | 828.2 KiB |  00m00s
+[6/7] Installing jq-0:1.7.1-8.fc41.aarc 100% |  37.3 MiB/s | 725.1 KiB |  00m00s
+[7/7] Installing htop-0:3.3.0-4.fc41.aa 100% |   4.5 MiB/s | 558.5 KiB |  00m00s
+Complete!

@@ -1,0 +1,7 @@
+govulncheck: loading packages: 
+There are errors with the provided package patterns:
+
+/work/go-ts/buildpkg/b.go:3:23: cannot use "x" (untyped string constant) as int value in return statement
+
+For details on package patterns, see https://pkg.go.dev/cmd/go#hdr-Package_lists_and_patterns.
+

@@ -1,0 +1,45 @@
+2026-11-21T02:42:50+00:00 af8069ba3d96 systemd[1]: Started app.service - Demo app with varied logs.
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 1 in 7 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 2 in 14 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 3 in 21 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 4 in 28 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 5 in 35 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 6 in 42 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 7 in 49 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 8 in 56 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 9 in 63 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 10 in 70 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 11 in 77 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 12 in 84 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 13 in 91 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 14 in 98 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 15 in 105 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 16 in 112 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 17 in 119 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 18 in 126 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 19 in 133 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 20 in 140 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 21 in 147 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 22 in 154 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 23 in 161 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 24 in 168 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 25 in 175 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 26 in 182 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 27 in 189 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 28 in 196 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 29 in 203 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 30 in 210 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 31 in 217 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 32 in 224 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 33 in 231 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 34 in 238 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 35 in 245 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 36 in 252 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 37 in 259 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 38 in 266 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 39 in 273 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: processed batch 40 in 280 ms
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: ERROR: upstream timeout after 30s (attempt 1)
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: ERROR: upstream timeout after 30s (attempt 2)
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: WARN: retrying in 5s
+2026-11-21T02:42:50+00:00 af8069ba3d96 sh[2348]: listening on :8080

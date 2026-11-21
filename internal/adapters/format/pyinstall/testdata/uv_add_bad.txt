@@ -1,0 +1,5 @@
+error: Failed to add dependencies
+  cause: No solution found when resolving dependencies
+  cause: Because this-package-does-not-exist-zzz was not found in the package registry and your project depends on this-package-does-not-exist-zzz, we can conclude that your project's requirements are unsatisfiable.
+
+hint: If you want to add the package regardless of the failed resolution, provide the `--frozen` flag to skip locking and syncing

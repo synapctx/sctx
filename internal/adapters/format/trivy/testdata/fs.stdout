@@ -1,0 +1,1206 @@
+
+Report Summary
+
+┌─────────────────────┬────────────┬─────────────────┬─────────┬───────────────────┐
+│       Target        │    Type    │ Vulnerabilities │ Secrets │ Misconfigurations │
+├─────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ py/requirements.txt │    pip     │       51        │    -    │         -         │
+├─────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ k8s/deploy.yaml     │ kubernetes │        -        │    -    │        37         │
+├─────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ k8s/ok.yaml         │ kubernetes │        -        │    -    │         0         │
+├─────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ tf                  │ terraform  │        -        │    -    │         0         │
+├─────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ tf/main.tf          │ terraform  │        -        │    -    │        20         │
+├─────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ secrets/app.env     │    text    │        -        │    1    │         -         │
+├─────────────────────┼────────────┼─────────────────┼─────────┼───────────────────┤
+│ secrets/config.py   │    text    │        -        │    2    │         -         │
+└─────────────────────┴────────────┴─────────────────┴─────────┴───────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+py/requirements.txt (pip)
+=========================
+Total: 51 (UNKNOWN: 0, LOW: 4, MEDIUM: 21, HIGH: 17, CRITICAL: 9)
+
+┌──────────┬────────────────┬──────────┬────────┬───────────────────┬────────────────────────┬──────────────────────────────────────────────────────────────┐
+│ Library  │ Vulnerability  │ Severity │ Status │ Installed Version │     Fixed Version      │                            Title                             │
+├──────────┼────────────────┼──────────┼────────┼───────────────────┼────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ django   │ CVE-2019-14234 │ CRITICAL │ fixed  │ 2.2.0             │ 1.11.23, 2.1.11, 2.2.4 │ Django: SQL injection possibility in key and index lookups   │
+│          │                │          │        │                   │                        │ for JSONField/HStoreField                                    │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-14234                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2019-19844 │          │        │                   │ 1.11.27, 2.2.9, 3.0.1  │ Django: crafted email address allows account takeover        │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-19844                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-7471  │          │        │                   │ 1.11.28, 2.2.10, 3.0.3 │ django: potential SQL injection via StringAgg(delimiter)     │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-7471                    │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2022-28346 │          │        │                   │ 2.2.28, 3.2.13, 4.0.4  │ Django: SQL injection in QuerySet.annotate(),aggregate() and │
+│          │                │          │        │                   │                        │ extra()                                                      │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2022-28346                   │
+│          ├────────────────┤          │        │                   │                        ├──────────────────────────────────────────────────────────────┤
+│          │ CVE-2022-28347 │          │        │                   │                        │ Django: SQL injection via QuerySet.explain(options) on       │
+│          │                │          │        │                   │                        │ PostgreSQL                                                   │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2022-28347                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2025-64459 │          │        │                   │ 5.2.8, 5.1.14, 4.2.26  │ django: Django SQL injection                                 │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2025-64459                   │
+│          ├────────────────┼──────────┤        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2019-14232 │ HIGH     │        │                   │ 1.11.23, 2.1.11, 2.2.4 │ Django: backtracking in a regular expression in              │
+│          │                │          │        │                   │                        │ django.utils.text.Truncator leads to DoS                     │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-14232                   │
+│          ├────────────────┤          │        │                   │                        ├──────────────────────────────────────────────────────────────┤
+│          │ CVE-2019-14233 │          │        │                   │                        │ Django: the behavior of the underlying HTMLParser leading to │
+│          │                │          │        │                   │                        │ DoS                                                          │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-14233                   │
+│          ├────────────────┤          │        │                   │                        ├──────────────────────────────────────────────────────────────┤
+│          │ CVE-2019-14235 │          │        │                   │                        │ Django: Potential memory exhaustion in                       │
+│          │                │          │        │                   │                        │ django.utils.encoding.uri_to_iri()                           │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-14235                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2019-19118 │          │        │                   │ 2.1.15, 2.2.8          │ django: privilege escalation in the django admin             │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-19118                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-13254 │          │        │                   │ 2.2.13, 3.0.7          │ django: potential data leakage via malformed memcached keys  │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-13254                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-24583 │          │        │                   │ 2.2.16, 3.0.10, 3.1.1  │ django: incorrect permissions on intermediate-level          │
+│          │                │          │        │                   │                        │ directories on Python 3.7+                                   │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-24583                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-9402  │          │        │                   │ 1.11.29, 2.2.11, 3.0.4 │ django: potential SQL injection via "tolerance" parameter in │
+│          │                │          │        │                   │                        │ GIS functions and aggregates...                              │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-9402                    │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-31542 │          │        │                   │ 2.2.21, 3.1.9, 3.2.1   │ django: Potential directory-traversal via uploaded files     │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-31542                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-33571 │          │        │                   │ 2.2.24, 3.1.12, 3.2.4  │ django: Possible indeterminate SSRF, RFI, and LFI attacks    │
+│          │                │          │        │                   │                        │ since validators accepted leading...                         │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-33571                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-45115 │          │        │                   │ 2.2.26, 3.2.11, 4.0.1  │ django: Denial-of-service possibility in                     │
+│          │                │          │        │                   │                        │ UserAttributeSimilarityValidator                             │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-45115                   │
+│          ├────────────────┤          │        │                   │                        ├──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-45116 │          │        │                   │                        │ django: Potential information disclosure in dictsort         │
+│          │                │          │        │                   │                        │ template filter                                              │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-45116                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2022-23833 │          │        │                   │ 2.2.27, 3.2.12, 4.0.2  │ django: Denial-of-service possibility in file uploads        │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2022-23833                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2022-36359 │          │        │                   │ 3.2.15, 4.0.7          │ An issue was discovered in the HTTP FileResponse class in    │
+│          │                │          │        │                   │                        │ Django 3.2...                                                │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2022-36359                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2025-57833 │          │        │                   │ 4.2.24, 5.1.12, 5.2.6  │ django: Django SQL injection in FilteredRelation column      │
+│          │                │          │        │                   │                        │ aliases                                                      │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2025-57833                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2025-64458 │          │        │                   │ 5.2.8, 5.1.14, 4.2.26  │ Django: Denial-of-service vulnerability in Django on Windows │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2025-64458                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2026-15307 │          │        │                   │ 5.2.17, 6.0.8          │ django: Django: Remote code execution via GeoDjango spatial  │
+│          │                │          │        │                   │                        │ lookups                                                      │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2026-15307                   │
+│          ├────────────────┼──────────┤        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2019-11358 │ MEDIUM   │        │                   │ 2.1.9, 2.2.2           │ jquery: Prototype pollution in object's prototype leading to │
+│          │                │          │        │                   │                        │ denial of service, remote...                                 │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-11358                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2019-12308 │          │        │                   │ 1.11.21, 2.1.9, 2.2.2  │ django: missing URL validation by AdminURLFieldWidget leads  │
+│          │                │          │        │                   │                        │ to generation of clickable unsafe...                         │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-12308                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2019-12781 │          │        │                   │ 2.1.10, 2.2.3, 1.11.22 │ Django: Incorrect HTTP detection with reverse-proxy          │
+│          │                │          │        │                   │                        │ connecting via HTTPS                                         │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-12781                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-13596 │          │        │                   │ 2.2.13, 3.0.7          │ django: possible XSS via admin ForeignKeyRawIdWidget         │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-13596                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-24584 │          │        │                   │ 2.2.16, 3.0.10, 3.1.1  │ django: permission escalation in intermediate-level          │
+│          │                │          │        │                   │                        │ directories of the file system cache on...                   │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-24584                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-28658 │          │        │                   │ 2.2.20, 3.0.14, 3.1.8  │ django: potential directory-traversal via uploaded files     │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-28658                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-32052 │          │        │                   │ 2.2.22, 3.1.10, 3.2.2  │ django: header injection possibility since URLValidator      │
+│          │                │          │        │                   │                        │ accepted newlines in input on Python...                      │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-32052                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-3281  │          │        │                   │ 2.2.18, 3.1.6, 3.0.12  │ django: Potential directory-traversal via archive.extract()  │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-3281                    │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-33203 │          │        │                   │ 2.2.24, 3.1.12, 3.2.4  │ django: Potential directory traversal via ``admindocs``      │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-33203                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-44420 │          │        │                   │ 2.2.25, 3.1.14, 3.2.10 │ django: potential bypass of an upstream access control based │
+│          │                │          │        │                   │                        │ on URL paths...                                              │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-44420                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-45452 │          │        │                   │ 2.2.26, 3.2.11, 4.0.1  │ django: Potential directory-traversal via Storage.save()     │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-45452                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2022-22818 │          │        │                   │ 2.2.27, 3.2.12, 4.0.2  │ django: Possible XSS via '{% debug %}' template tag          │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2022-22818                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2024-45231 │          │        │                   │ 5.1.1, 5.0.9, 4.2.16   │ python-django: Potential user email enumeration via response │
+│          │                │          │        │                   │                        │ status on password reset                                     │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2024-45231                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2025-48432 │          │        │                   │ 5.2.2, 5.1.10, 4.2.22  │ django: Django Path Injection Vulnerability                  │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2025-48432                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2026-15830 │          │        │                   │ 5.2.17, 6.0.8, 6.1.1   │ django: Django: Denial of Service via parsing deeply nested  │
+│          │                │          │        │                   │                        │ geometry collections                                         │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2026-15830                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2026-53877 │          │        │                   │ 5.2.16, 6.0.7          │ django: Django: Information disclosure via heap buffer       │
+│          │                │          │        │                   │                        │ over-read in GDALRaster                                      │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2026-53877                   │
+│          ├────────────────┤          │        │                   │                        ├──────────────────────────────────────────────────────────────┤
+│          │ CVE-2026-53878 │          │        │                   │                        │ django: Django: HTTP header injection via                    │
+│          │                │          │        │                   │                        │ DomainNameValidator accepting newlines                       │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2026-53878                   │
+│          ├────────────────┼──────────┤        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2026-48587 │ LOW      │        │                   │ 5.2.15, 6.0.6          │ django: Django: Information disclosure via improper handling │
+│          │                │          │        │                   │                        │ of Vary header whitespace                                    │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2026-48587                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2026-48588 │          │        │                   │ 5.2.16, 6.0.7          │ django: Django: Information disclosure due to improper       │
+│          │                │          │        │                   │                        │ caching of Set-Cookie responses                              │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2026-48588                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2026-6873  │          │        │                   │ 5.2.15, 6.0.6          │ python-django: Django: Information disclosure via            │
+│          │                │          │        │                   │                        │ non-injective cookie salt derivation                         │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2026-6873                    │
+│          ├────────────────┤          │        │                   │                        ├──────────────────────────────────────────────────────────────┤
+│          │ CVE-2026-8404  │          │        │                   │                        │ Django: Django: Information disclosure due to improper       │
+│          │                │          │        │                   │                        │ handling of Cache-Control directives                         │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2026-8404                    │
+├──────────┼────────────────┼──────────┤        ├───────────────────┼────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ pyyaml   │ CVE-2019-20477 │ CRITICAL │        │ 5.1               │ 5.2                    │ PyYAML: command execution through python/object/apply        │
+│          │                │          │        │                   │                        │ constructor in FullLoader                                    │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-20477                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-14343 │          │        │                   │ 5.4                    │ PyYAML: incomplete fix for CVE-2020-1747                     │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-14343                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-1747  │          │        │                   │ 5.3.1                  │ PyYAML: arbitrary command execution through                  │
+│          │                │          │        │                   │                        │ python/object/new when FullLoader is used                    │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-1747                    │
+├──────────┼────────────────┼──────────┤        ├───────────────────┼────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ requests │ CVE-2018-18074 │ HIGH     │        │ 2.19.0            │ 2.20.0                 │ python-requests: Redirect from HTTPS to HTTP does not remove │
+│          │                │          │        │                   │                        │ Authorization header                                         │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2018-18074                   │
+│          ├────────────────┼──────────┤        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2023-32681 │ MEDIUM   │        │                   │ 2.31.0                 │ python-requests: Unintended leak of Proxy-Authorization      │
+│          │                │          │        │                   │                        │ header                                                       │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2023-32681                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2024-35195 │          │        │                   │ 2.32.0                 │ requests: subsequent requests to the same host ignore cert   │
+│          │                │          │        │                   │                        │ verification                                                 │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2024-35195                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2024-47081 │          │        │                   │ 2.32.4                 │ requests: Requests vulnerable to .netrc credentials leak via │
+│          │                │          │        │                   │                        │ malicious URLs                                               │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2024-47081                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2026-25645 │          │        │                   │ 2.33.0                 │ requests: Requests: Security bypass due to predictable       │
+│          │                │          │        │                   │                        │ temporary file creation                                      │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2026-25645                   │
+└──────────┴────────────────┴──────────┴────────┴───────────────────┴────────────────────────┴──────────────────────────────────────────────────────────────┘
+
+k8s/deploy.yaml (kubernetes)
+============================
+Tests: 135 (SUCCESSES: 98, FAILURES: 37)
+Failures: 37 (UNKNOWN: 0, LOW: 23, MEDIUM: 8, HIGH: 6, CRITICAL: 0)
+
+AVD-KSV-0001 (MEDIUM): Container 'bad' of Deployment 'bad' should set 'securityContext.allowPrivilegeEscalation' to false
+════════════════════════════════════════
+A program inside the container can elevate its own privileges and run as root, which might give the program control over the container and node.
+
+See https://avd.aquasec.com/misconfig/ksv001
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0001 (MEDIUM): Container 'web' of Deployment 'web' should set 'securityContext.allowPrivilegeEscalation' to false
+════════════════════════════════════════
+A program inside the container can elevate its own privileges and run as root, which might give the program control over the container and node.
+
+See https://avd.aquasec.com/misconfig/ksv001
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0003 (LOW): Container 'bad' of Deployment 'bad' should add 'ALL' to 'securityContext.capabilities.drop'
+════════════════════════════════════════
+The container should drop all default capabilities and add only those that are needed for its execution.
+
+See https://avd.aquasec.com/misconfig/ksv003
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0003 (LOW): Container 'web' of Deployment 'web' should add 'ALL' to 'securityContext.capabilities.drop'
+════════════════════════════════════════
+The container should drop all default capabilities and add only those that are needed for its execution.
+
+See https://avd.aquasec.com/misconfig/ksv003
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0004 (LOW): Container 'bad' of 'deployment' 'bad' in 'default' namespace should set securityContext.capabilities.drop
+════════════════════════════════════════
+Security best practices require containers to run with minimal required capabilities.
+
+See https://avd.aquasec.com/misconfig/ksv004
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0004 (LOW): Container 'web' of 'deployment' 'web' in 'default' namespace should set securityContext.capabilities.drop
+════════════════════════════════════════
+Security best practices require containers to run with minimal required capabilities.
+
+See https://avd.aquasec.com/misconfig/ksv004
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0011 (LOW): Container 'bad' of Deployment 'bad' should set 'resources.limits.cpu'
+════════════════════════════════════════
+Enforcing CPU limits prevents DoS via resource exhaustion.
+
+See https://avd.aquasec.com/misconfig/ksv011
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0011 (LOW): Container 'web' of Deployment 'web' should set 'resources.limits.cpu'
+════════════════════════════════════════
+Enforcing CPU limits prevents DoS via resource exhaustion.
+
+See https://avd.aquasec.com/misconfig/ksv011
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0012 (MEDIUM): Container 'bad' of Deployment 'bad' should set 'securityContext.runAsNonRoot' to true
+════════════════════════════════════════
+Force the running image to run as a non-root user to ensure least privileges.
+
+See https://avd.aquasec.com/misconfig/ksv012
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0012 (MEDIUM): Container 'web' of Deployment 'web' should set 'securityContext.runAsNonRoot' to true
+════════════════════════════════════════
+Force the running image to run as a non-root user to ensure least privileges.
+
+See https://avd.aquasec.com/misconfig/ksv012
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0013 (MEDIUM): Container 'bad' of Deployment 'bad' should specify an image tag
+════════════════════════════════════════
+It is best to avoid using the ':latest' image tag when deploying containers in production. Doing so makes it hard to track which version of the image is running, and hard to roll back the version.
+
+See https://avd.aquasec.com/misconfig/ksv013
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0013 (MEDIUM): Container 'web' of Deployment 'web' should specify an image tag
+════════════════════════════════════════
+It is best to avoid using the ':latest' image tag when deploying containers in production. Doing so makes it hard to track which version of the image is running, and hard to roll back the version.
+
+See https://avd.aquasec.com/misconfig/ksv013
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0014 (HIGH): Container 'bad' of Deployment 'bad' should set 'securityContext.readOnlyRootFilesystem' to true
+════════════════════════════════════════
+An immutable root file system prevents applications from writing to their local disk. This can limit intrusions, as attackers will not be able to tamper with the file system or write foreign executables to disk.
+
+See https://avd.aquasec.com/misconfig/ksv014
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0014 (HIGH): Container 'web' of Deployment 'web' should set 'securityContext.readOnlyRootFilesystem' to true
+════════════════════════════════════════
+An immutable root file system prevents applications from writing to their local disk. This can limit intrusions, as attackers will not be able to tamper with the file system or write foreign executables to disk.
+
+See https://avd.aquasec.com/misconfig/ksv014
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0015 (LOW): Container 'bad' of Deployment 'bad' should set 'resources.requests.cpu'
+════════════════════════════════════════
+When containers have resource requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.
+
+See https://avd.aquasec.com/misconfig/ksv015
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0015 (LOW): Container 'web' of Deployment 'web' should set 'resources.requests.cpu'
+════════════════════════════════════════
+When containers have resource requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.
+
+See https://avd.aquasec.com/misconfig/ksv015
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0016 (LOW): Container 'bad' of Deployment 'bad' should set 'resources.requests.memory'
+════════════════════════════════════════
+When containers have memory requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.
+
+See https://avd.aquasec.com/misconfig/ksv016
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0016 (LOW): Container 'web' of Deployment 'web' should set 'resources.requests.memory'
+════════════════════════════════════════
+When containers have memory requests specified, the scheduler can make better decisions about which nodes to place pods on, and how to deal with resource contention.
+
+See https://avd.aquasec.com/misconfig/ksv016
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0017 (HIGH): Container 'web' of Deployment 'web' should set 'securityContext.privileged' to false
+════════════════════════════════════════
+Privileged containers share namespaces with the host system and do not offer any security. They should be used exclusively for system containers that require high privileges.
+
+See https://avd.aquasec.com/misconfig/ksv017
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0018 (LOW): Container 'bad' of Deployment 'bad' should set 'resources.limits.memory'
+════════════════════════════════════════
+Enforcing memory limits prevents DoS via resource exhaustion.
+
+See https://avd.aquasec.com/misconfig/ksv018
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0018 (LOW): Container 'web' of Deployment 'web' should set 'resources.limits.memory'
+════════════════════════════════════════
+Enforcing memory limits prevents DoS via resource exhaustion.
+
+See https://avd.aquasec.com/misconfig/ksv018
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0020 (LOW): Container 'bad' of Deployment 'bad' should set 'securityContext.runAsUser' > 10000
+════════════════════════════════════════
+Force the container to run with user ID > 10000 to avoid conflicts with the host’s user table.
+
+See https://avd.aquasec.com/misconfig/ksv020
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0020 (LOW): Container 'web' of Deployment 'web' should set 'securityContext.runAsUser' > 10000
+════════════════════════════════════════
+Force the container to run with user ID > 10000 to avoid conflicts with the host’s user table.
+
+See https://avd.aquasec.com/misconfig/ksv020
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0021 (LOW): Container 'bad' of Deployment 'bad' should set 'securityContext.runAsGroup' > 10000
+════════════════════════════════════════
+Force the container to run with group ID > 10000 to avoid conflicts with the host’s user table.
+
+See https://avd.aquasec.com/misconfig/ksv021
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0021 (LOW): Container 'web' of Deployment 'web' should set 'securityContext.runAsGroup' > 10000
+════════════════════════════════════════
+Force the container to run with group ID > 10000 to avoid conflicts with the host’s user table.
+
+See https://avd.aquasec.com/misconfig/ksv021
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0030 (LOW): Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'
+════════════════════════════════════════
+According to pod security standard 'Seccomp', the RuntimeDefault seccomp profile must be required, or allow specific additional profiles.
+
+See https://avd.aquasec.com/misconfig/ksv030
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0030 (LOW): Either Pod or Container should set 'securityContext.seccompProfile.type' to 'RuntimeDefault'
+════════════════════════════════════════
+According to pod security standard 'Seccomp', the RuntimeDefault seccomp profile must be required, or allow specific additional profiles.
+
+See https://avd.aquasec.com/misconfig/ksv030
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0104 (MEDIUM): container "bad" of deployment "bad" in "default" namespace should specify a seccomp profile
+════════════════════════════════════════
+A program inside the container can bypass Seccomp protection policies.
+
+See https://avd.aquasec.com/misconfig/ksv104
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0104 (MEDIUM): container "web" of deployment "web" in "default" namespace should specify a seccomp profile
+════════════════════════════════════════
+A program inside the container can bypass Seccomp protection policies.
+
+See https://avd.aquasec.com/misconfig/ksv104
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0105 (LOW): securityContext.runAsUser should be set to a value greater than 0
+════════════════════════════════════════
+Containers should be forbidden from running with a root UID.
+
+See https://avd.aquasec.com/misconfig/ksv105
+────────────────────────────────────────
+ k8s/deploy.yaml:19-20
+────────────────────────────────────────
+  19 ┌           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0106 (LOW): container should drop all
+════════════════════════════════════════
+Containers must drop ALL capabilities, and are only permitted to add back the NET_BIND_SERVICE capability.
+
+See https://avd.aquasec.com/misconfig/ksv106
+────────────────────────────────────────
+ k8s/deploy.yaml:16-20
+────────────────────────────────────────
+  16 ┌       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+AVD-KSV-0106 (LOW): container should drop all
+════════════════════════════════════════
+Containers must drop ALL capabilities, and are only permitted to add back the NET_BIND_SERVICE capability.
+
+See https://avd.aquasec.com/misconfig/ksv106
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0110 (LOW): deployment bad in default namespace should set metadata.namespace to a non-default namespace
+════════════════════════════════════════
+Checks whether a workload is running in the default namespace.
+
+See https://avd.aquasec.com/misconfig/ksv110
+────────────────────────────────────────
+ k8s/deploy.yaml:37
+────────────────────────────────────────
+  37 [   name: bad
+────────────────────────────────────────
+
+
+AVD-KSV-0110 (LOW): deployment web in default namespace should set metadata.namespace to a non-default namespace
+════════════════════════════════════════
+Checks whether a workload is running in the default namespace.
+
+See https://avd.aquasec.com/misconfig/ksv110
+────────────────────────────────────────
+ k8s/deploy.yaml:4
+────────────────────────────────────────
+   4 [   name: web
+────────────────────────────────────────
+
+
+AVD-KSV-0118 (HIGH): container bad in default namespace is using the default security context
+════════════════════════════════════════
+Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.
+
+See https://avd.aquasec.com/misconfig/ksv118
+────────────────────────────────────────
+ k8s/deploy.yaml:49-50
+────────────────────────────────────────
+  49 ┌       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0118 (HIGH): deployment bad in default namespace is using the default security context, which allows root privileges
+════════════════════════════════════════
+Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.
+
+See https://avd.aquasec.com/misconfig/ksv118
+────────────────────────────────────────
+ k8s/deploy.yaml:48-50
+────────────────────────────────────────
+  48 ┌       containers:
+  49 │       - name: bad
+  50 └         image: busybox
+────────────────────────────────────────
+
+
+AVD-KSV-0118 (HIGH): deployment web in default namespace is using the default security context, which allows root privileges
+════════════════════════════════════════
+Security context controls the allocation of security parameters for the pod/container/volume, ensuring the appropriate level of protection. Relying on default security context may expose vulnerabilities to potential attacks that rely on privileged access.
+
+See https://avd.aquasec.com/misconfig/ksv118
+────────────────────────────────────────
+ k8s/deploy.yaml:15-20
+────────────────────────────────────────
+  15 ┌       containers:
+  16 │       - name: web
+  17 │         image: nginx:latest
+  18 │         securityContext:
+  19 │           privileged: true
+  20 └           runAsUser: 0
+────────────────────────────────────────
+
+
+
+tf/main.tf (terraform)
+======================
+Tests: 20 (SUCCESSES: 0, FAILURES: 20)
+Failures: 20 (UNKNOWN: 0, LOW: 4, MEDIUM: 4, HIGH: 12, CRITICAL: 0)
+
+AVD-AWS-0028 (HIGH): Instance does not require IMDS access to require a token.
+════════════════════════════════════════
+IMDS v2 (Instance Metadata Service) introduced session authentication tokens which improve security when talking to IMDS.
+
+By default <code>aws_instance</code> resource sets IMDS session auth tokens to be optional.
+
+To fully protect IMDS you need to enable session tokens by using <code>metadata_options</code> block and its <code>http_tokens</code> variable set to <code>required</code>.
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0028
+────────────────────────────────────────
+ tf/main.tf:22-29
+────────────────────────────────────────
+  22 ┌ resource "aws_instance" "web" {
+  23 │   ami           = "ami-12345678"
+  24 │   instance_type = "t2.micro"
+  25 │   associated_public_ip_address = true
+  26 │   root_block_device {
+  27 │     encrypted = false
+  28 │   }
+  29 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0077 (MEDIUM): Instance has very low backup retention period.
+════════════════════════════════════════
+RDS backup retention for clusters defaults to 1 day, this may not be enough to identify and respond to an issue. Backup retention periods should be set to a period that is a balance on cost and limiting risk.
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0077
+────────────────────────────────────────
+ tf/main.tf:31-40
+────────────────────────────────────────
+  31 ┌ resource "aws_db_instance" "db" {
+  32 │   allocated_storage    = 10
+  33 │   engine               = "mysql"
+  34 │   instance_class       = "db.t3.micro"
+  35 │   username             = "admin"
+  36 │   password             = "hunter2hunter2"
+  37 │   publicly_accessible  = true
+  38 │   storage_encrypted    = false
+  39 │   skip_final_snapshot  = true
+  40 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0080 (HIGH): Instance does not have storage encryption enabled.
+════════════════════════════════════════
+Encryption should be enabled for an RDS Database instances.
+When enabling encryption by setting the kms_key_id.
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0080
+────────────────────────────────────────
+ tf/main.tf:38
+   via tf/main.tf:31-40 (aws_db_instance.db)
+────────────────────────────────────────
+  31   resource "aws_db_instance" "db" {
+  32     allocated_storage    = 10
+  33     engine               = "mysql"
+  34     instance_class       = "db.t3.micro"
+  35     username             = "admin"
+  36     password             = "hunter2hunter2"
+  37     publicly_accessible  = true
+  38 [   storage_encrypted    = false
+  39     skip_final_snapshot  = true
+  40   }
+────────────────────────────────────────
+
+
+AVD-AWS-0086 (HIGH): No public access block so not blocking public acls
+════════════════════════════════════════
+S3 buckets should block public ACLs on buckets and any objects they contain. By blocking, PUTs with fail if the object has any public ACL a.
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0086
+────────────────────────────────────────
+ tf/main.tf:5-8
+────────────────────────────────────────
+   5 ┌ resource "aws_s3_bucket" "data" {
+   6 │   bucket = "example-data-bucket"
+   7 │   acl    = "public-read"
+   8 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0087 (HIGH): No public access block so not blocking public policies
+════════════════════════════════════════
+S3 bucket policy should have block public policy to prevent users from putting a policy that enable public access.
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0087
+────────────────────────────────────────
+ tf/main.tf:5-8
+────────────────────────────────────────
+   5 ┌ resource "aws_s3_bucket" "data" {
+   6 │   bucket = "example-data-bucket"
+   7 │   acl    = "public-read"
+   8 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0088 (HIGH): Bucket does not have encryption enabled
+════════════════════════════════════════
+S3 Buckets should be encrypted to protect the data that is stored within them if access is compromised.
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0088
+────────────────────────────────────────
+ tf/main.tf:5-8
+────────────────────────────────────────
+   5 ┌ resource "aws_s3_bucket" "data" {
+   6 │   bucket = "example-data-bucket"
+   7 │   acl    = "public-read"
+   8 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0089 (LOW): Bucket has logging disabled
+════════════════════════════════════════
+Ensures S3 bucket logging is enabled for S3 buckets
+
+See https://avd.aquasec.com/misconfig/s3-bucket-logging
+────────────────────────────────────────
+ tf/main.tf:5-8
+────────────────────────────────────────
+   5 ┌ resource "aws_s3_bucket" "data" {
+   6 │   bucket = "example-data-bucket"
+   7 │   acl    = "public-read"
+   8 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0090 (MEDIUM): Bucket does not have versioning enabled
+════════════════════════════════════════
+Versioning in Amazon S3 is a means of keeping multiple variants of an object in the same bucket.
+
+You can use the S3 Versioning feature to preserve, retrieve, and restore every version of every object stored in your buckets.
+
+With versioning you can recover more easily from both unintended user actions and application failures.
+
+When you enable versioning, also keep in mind the potential costs of storing noncurrent versions of objects. To help manage those costs, consider setting up an S3 Lifecycle configuration.
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0090
+────────────────────────────────────────
+ tf/main.tf:5-8
+────────────────────────────────────────
+   5 ┌ resource "aws_s3_bucket" "data" {
+   6 │   bucket = "example-data-bucket"
+   7 │   acl    = "public-read"
+   8 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0091 (HIGH): No public access block so not blocking public acls
+════════════════════════════════════════
+S3 buckets should ignore public ACLs on buckets and any objects they contain. By ignoring rather than blocking, PUT calls with public ACLs will still be applied but the ACL will be ignored.
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0091
+────────────────────────────────────────
+ tf/main.tf:5-8
+────────────────────────────────────────
+   5 ┌ resource "aws_s3_bucket" "data" {
+   6 │   bucket = "example-data-bucket"
+   7 │   acl    = "public-read"
+   8 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0092 (HIGH): Bucket has a public ACL: "public-read"
+════════════════════════════════════════
+Buckets should not have ACLs that allow public access
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0092
+────────────────────────────────────────
+ tf/main.tf:7
+   via tf/main.tf:5-8 (aws_s3_bucket.data)
+────────────────────────────────────────
+   5   resource "aws_s3_bucket" "data" {
+   6     bucket = "example-data-bucket"
+   7 [   acl    = "public-read"
+   8   }
+────────────────────────────────────────
+
+
+AVD-AWS-0093 (HIGH): No public access block so not restricting public buckets
+════════════════════════════════════════
+S3 buckets should restrict public policies for the bucket. By enabling, the restrict_public_buckets, only the bucket owner and AWS Services can access if it has a public policy.
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0093
+────────────────────────────────────────
+ tf/main.tf:5-8
+────────────────────────────────────────
+   5 ┌ resource "aws_s3_bucket" "data" {
+   6 │   bucket = "example-data-bucket"
+   7 │   acl    = "public-read"
+   8 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0094 (LOW): Bucket does not have a corresponding public access block.
+════════════════════════════════════════
+The "block public access" settings in S3 override individual policies that apply to a given bucket, meaning that all public access can be controlled in one central types for that bucket. It is therefore good practice to define these settings for each bucket in order to clearly define the public access that can be allowed for it.
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0094
+────────────────────────────────────────
+ tf/main.tf:5-8
+────────────────────────────────────────
+   5 ┌ resource "aws_s3_bucket" "data" {
+   6 │   bucket = "example-data-bucket"
+   7 │   acl    = "public-read"
+   8 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0107 (HIGH): Security group rule allows unrestricted ingress from any IP address.
+════════════════════════════════════════
+Security groups provide stateful filtering of ingress and egress network traffic to AWS
+resources. It is recommended that no security group allows unrestricted ingress access to
+remote server administration ports, such as SSH to port 22 and RDP to port 3389.
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0107
+────────────────────────────────────────
+ tf/main.tf:18
+   via tf/main.tf:14-19 (ingress)
+    via tf/main.tf:10-20 (aws_security_group.open)
+────────────────────────────────────────
+  10   resource "aws_security_group" "open" {
+  11     name        = "open"
+  12     description = "open to world"
+  13   
+  14     ingress {
+  15       from_port   = 22
+  16       to_port     = 22
+  17       protocol    = "tcp"
+  18 [     cidr_blocks = ["0.0.0.0/0"]
+  ..   
+────────────────────────────────────────
+
+
+AVD-AWS-0124 (LOW): Security group rule does not have a description.
+════════════════════════════════════════
+Security group rules should include a description for auditing purposes.
+
+Simplifies auditing, debugging, and managing security groups.
+
+
+See https://avd.aquasec.com/misconfig/aws-vpc-add-description-to-security-group-rule
+────────────────────────────────────────
+ tf/main.tf:14-19
+   via tf/main.tf:10-20 (aws_security_group.open)
+────────────────────────────────────────
+  10   resource "aws_security_group" "open" {
+  11     name        = "open"
+  12     description = "open to world"
+  13   
+  14 ┌   ingress {
+  15 │     from_port   = 22
+  16 │     to_port     = 22
+  17 │     protocol    = "tcp"
+  18 └     cidr_blocks = ["0.0.0.0/0"]
+  ..   
+────────────────────────────────────────
+
+
+AVD-AWS-0131 (HIGH): Root block device is not encrypted.
+════════════════════════════════════════
+Block devices should be encrypted to ensure sensitive data is held securely at rest.
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0131
+────────────────────────────────────────
+ tf/main.tf:27
+   via tf/main.tf:26-28 (root_block_device)
+    via tf/main.tf:22-29 (aws_instance.web)
+────────────────────────────────────────
+  22   resource "aws_instance" "web" {
+  23     ami           = "ami-12345678"
+  24     instance_type = "t2.micro"
+  25     associated_public_ip_address = true
+  26     root_block_device {
+  27 [     encrypted = false
+  28     }
+  29   }
+────────────────────────────────────────
+
+
+AVD-AWS-0132 (HIGH): Bucket does not encrypt data with a customer managed key.
+════════════════════════════════════════
+Encryption using AWS keys provides protection for your S3 buckets. To increase control of the encryption and manage factors like rotation use customer managed keys.
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0132
+────────────────────────────────────────
+ tf/main.tf:5-8
+────────────────────────────────────────
+   5 ┌ resource "aws_s3_bucket" "data" {
+   6 │   bucket = "example-data-bucket"
+   7 │   acl    = "public-read"
+   8 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0133 (LOW): Instance does not have performance insights enabled.
+════════════════════════════════════════
+Enabling Performance insights allows for greater depth in monitoring data.
+For example, information about active sessions could help diagose a compromise or assist in the investigation
+
+
+See https://avd.aquasec.com/misconfig/avd-aws-0133
+────────────────────────────────────────
+ tf/main.tf:31-40
+────────────────────────────────────────
+  31 ┌ resource "aws_db_instance" "db" {
+  32 │   allocated_storage    = 10
+  33 │   engine               = "mysql"
+  34 │   instance_class       = "db.t3.micro"
+  35 │   username             = "admin"
+  36 │   password             = "hunter2hunter2"
+  37 │   publicly_accessible  = true
+  38 │   storage_encrypted    = false
+  39 │   skip_final_snapshot  = true
+  40 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0176 (MEDIUM): Instance does not have IAM Authentication enabled
+════════════════════════════════════════
+Ensure IAM Database Authentication is enabled for RDS database instances to manage database access
+
+See https://avd.aquasec.com/misconfig/avd-aws-0176
+────────────────────────────────────────
+ tf/main.tf:31-40
+────────────────────────────────────────
+  31 ┌ resource "aws_db_instance" "db" {
+  32 │   allocated_storage    = 10
+  33 │   engine               = "mysql"
+  34 │   instance_class       = "db.t3.micro"
+  35 │   username             = "admin"
+  36 │   password             = "hunter2hunter2"
+  37 │   publicly_accessible  = true
+  38 │   storage_encrypted    = false
+  39 │   skip_final_snapshot  = true
+  40 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0177 (MEDIUM): Instance does not have Deletion Protection enabled
+════════════════════════════════════════
+Ensure deletion protection is enabled for RDS database instances.
+
+See https://avd.aquasec.com/misconfig/avd-aws-0177
+────────────────────────────────────────
+ tf/main.tf:31-40
+────────────────────────────────────────
+  31 ┌ resource "aws_db_instance" "db" {
+  32 │   allocated_storage    = 10
+  33 │   engine               = "mysql"
+  34 │   instance_class       = "db.t3.micro"
+  35 │   username             = "admin"
+  36 │   password             = "hunter2hunter2"
+  37 │   publicly_accessible  = true
+  38 │   storage_encrypted    = false
+  39 │   skip_final_snapshot  = true
+  40 └ }
+────────────────────────────────────────
+
+
+AVD-AWS-0180 (HIGH): Instance has Public Access enabled
+════════════════════════════════════════
+Ensures RDS instances and RDS Cluster instances are not launched into the public cloud.
+
+See https://avd.aquasec.com/misconfig/avd-aws-0180
+────────────────────────────────────────
+ tf/main.tf:37
+   via tf/main.tf:31-40 (aws_db_instance.db)
+────────────────────────────────────────
+  31   resource "aws_db_instance" "db" {
+  32     allocated_storage    = 10
+  33     engine               = "mysql"
+  34     instance_class       = "db.t3.micro"
+  35     username             = "admin"
+  36     password             = "hunter2hunter2"
+  37 [   publicly_accessible  = true
+  38     storage_encrypted    = false
+  39     skip_final_snapshot  = true
+  40   }
+────────────────────────────────────────
+
+
+
+secrets/app.env (secrets)
+=========================
+Total: 1 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 1)
+
+CRITICAL: AWS (aws-access-key-id)
+════════════════════════════════════════
+AWS Access Key ID
+────────────────────────────────────────
+ secrets/app.env:1 (offset: 18 bytes)
+────────────────────────────────────────
+   1 [ AWS_ACCESS_KEY_ID=********************
+   2   AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYzq9Kd83mQpL
+────────────────────────────────────────
+
+
+
+secrets/config.py (secrets)
+===========================
+Total: 2 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 1, CRITICAL: 1)
+
+CRITICAL: GitHub (github-pat)
+════════════════════════════════════════
+GitHub Personal Access Token
+────────────────────────────────────────
+ secrets/config.py:2 (offset: 26 bytes)
+────────────────────────────────────────
+   1   import os
+   2 [ GITHUB_TOKEN = "****************************************"
+   3   SLACK = "*****************-0000000000000-xxxxxxxxxxxxxxxxxxxxxxxx"
+────────────────────────────────────────
+
+
+HIGH: Slack (slack-access-token)
+════════════════════════════════════════
+Slack token
+────────────────────────────────────────
+ secrets/config.py:3 (offset: 77 bytes)
+────────────────────────────────────────
+   1   import os
+   2   GITHUB_TOKEN = "****************************************"
+   3 [ SLACK = "*****************-0000000000000-xxxxxxxxxxxxxxxxxxxxxxxx"
+   4   def f():
+────────────────────────────────────────
+
+

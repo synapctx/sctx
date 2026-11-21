@@ -1,0 +1,21 @@
+FAILED :compileJava
+src/main/java/demo/Calc.java:3: error: cannot find symbol
+    public int add(int a, int b) { return a + c; }
+                                              ^
+  symbol:   variable c
+  location: class Calc
+src/main/java/demo/Calc.java:4: error: incompatible types: int cannot be converted to String
+    public String div(int a, int b) { return a / b; }
+                                               ^
+src/main/java/demo/Calc.java:5: error: cannot find symbol
+    void x() { undefined(); }
+               ^
+  symbol:   method undefined()
+  location: class Calc
+3 errors
+What went wrong:
+Execution failed for task ':compileJava' (registered by plugin class 'org.gradle.api.plugins.JavaBasePlugin').
+> Compilation failed; see the compiler output below.
+BUILD FAILED in 571ms
+1 actionable task: 1 executed
+…+19 lines elided (2 noise, 14 duplicate, 3 help)

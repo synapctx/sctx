@@ -89,7 +89,8 @@ func parseSize(s string) (float64, bool) {
 // keeps everything after the first run of whitespace, including embedded
 // spaces.
 func parseLine(line string) (sizeStr, path string, ok bool) {
-	trimmed := strings.TrimRight(line, "\r")
+	// BSD/macOS du right-aligns sizes with leading spaces ("  12K\tpath").
+	trimmed := strings.TrimLeft(strings.TrimRight(line, "\r"), " ")
 	idx := strings.IndexAny(trimmed, " \t")
 	if idx == -1 {
 		return "", "", false

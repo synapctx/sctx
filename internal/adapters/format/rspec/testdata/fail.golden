@@ -1,0 +1,31 @@
+1) Calc adds wrong
+  Failure/Error: it("adds wrong") { expect(Calc.new.add(1, 2)).to eq(4) }
+    expected: 4
+         got: 3
+  # ./spec/calc_fail_spec.rb:3
+2) Calc divides by zero
+  Failure/Error: a / b
+  ZeroDivisionError:
+    divided by 0
+  # ./lib/calc.rb:4:in 'Integer#/'
+  # ./lib/calc.rb:4:in 'Calc#div'
+  # ./spec/calc_fail_spec.rb:4
+3) Calc multi-line diff
+  Failure/Error: expect({a: 1, b: [1,2,3], c: "x"}).to eq({a: 1, b: [1,2,4], c: "y"})
+    expected: {a: 1, b: [1, 2, 4], c: "y"}
+         got: {a: 1, b: [1, 2, 3], c: "x"}
+    Diff:
+    @@ -1,3 +1,3 @@
+     :a => 1,
+    -:b => [1, 2, 4],
+    -:c => "y",
+    +:b => [1, 2, 3],
+    +:c => "x",
+  # ./spec/calc_fail_spec.rb:6
+4) Calc nested nil
+  Failure/Error: it("nil") { expect(nil.upcase).to eq("X") }
+  NoMethodError:
+    undefined method 'upcase' for nil
+  # ./spec/calc_fail_spec.rb:10
+rerun: rspec ./spec/calc_fail_spec.rb:3 ./spec/calc_fail_spec.rb:4 ./spec/calc_fail_spec.rb:5 ./spec/calc_fail_spec.rb:10
+5 examples, 4 failures

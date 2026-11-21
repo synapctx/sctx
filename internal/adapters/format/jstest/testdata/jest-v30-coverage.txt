@@ -1,0 +1,11 @@
+----------|---------|----------|---------|---------|-------------------
+File      | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+----------|---------|----------|---------|---------|-------------------
+All files |      50 |        0 |      50 |     100 |                   
+ math.js  |      50 |        0 |      50 |     100 | 1                 
+----------|---------|----------|---------|---------|-------------------
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
+Time:        0.217 s, estimated 1 s
+Ran all test suites matching src/ok.test.js.

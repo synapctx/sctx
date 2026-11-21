@@ -1,0 +1,12 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.15.2, pytest-9.2.0, pluggy-1.7.0 -- /work/.venv/bin/python
+rootdir: /work/proj
+configfile: pyproject.toml
+plugins: platformdirs-4.14.8
+collecting ... collected 8 items / 5 deselected / 3 selected
+
+tests/test_core.py::test_ok PASSED                                       [ 33%]
+tests/test_core.py::test_xf XFAIL                                        [ 66%]
+tests/test_core.py::test_skip SKIPPED (no)                               [100%]
+
+============ 1 passed, 1 skipped, 5 deselected, 1 xfailed in 0.08s =============

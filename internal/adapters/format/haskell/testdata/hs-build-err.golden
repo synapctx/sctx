@@ -1,0 +1,7 @@
+src/Demo.hs:4:15: error: [GHC-88464]
+    Variable not in scope: c :: Int
+src/Demo.hs:10:7: error: [GHC-88464]
+    Variable not in scope: undefinedThing :: Int -> Int
+Error: [Cabal-7125]
+Failed to build demo-0.1.0.0.
+…+16 lines (build chatter, source echoes, blanks, passing-test tree)

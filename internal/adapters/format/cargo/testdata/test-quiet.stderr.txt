@@ -1,0 +1,13 @@
+warning: unused dependency `itoa`
+ --> Cargo.toml:7:1
+  |
+7 | itoa = "1"
+  | ^^^^^^^^^^
+  |
+  = note: `cargo::unused_dependencies` is set to `warn` by default
+help: consider removing the dependency on `itoa`
+error: test failed, to rerun pass `--lib`
+error: doctest failed, to rerun pass `--doc`
+error: 2 targets failed:
+    `--lib`
+    `--doc`

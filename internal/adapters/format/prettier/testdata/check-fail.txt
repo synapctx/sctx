@@ -1,0 +1,4 @@
+Checking formatting...
+[warn] src/a.js
+[warn] src/b.ts
+[warn] Code style issues found in 2 files. Run Prettier with --write to fix.

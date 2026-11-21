@@ -1,0 +1,2 @@
+
+aws: [ERROR]: An error occurred (AccessDenied) when calling the ListRoles operation: User: arn:aws:iam::111122223333:user/example.user.dev.abc0000000000 is not authorized to perform: iam:ListRoles on resource: arn:aws:iam::111122223333:role/ because no identity-based policy allows the iam:ListRoles action. Go to https://us-east-1.console.aws.amazon.com/iam/home?region=us-east-1#/authorization-details/dt0exampleexampleexampleexa for complete details, or call the GetRequestAuthorizationDetails API with the following authorization id: dt0exampleexampleexampleexa

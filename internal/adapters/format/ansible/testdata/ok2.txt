@@ -1,0 +1,42 @@
+
+PLAY [local] *******************************************************************
+
+TASK [Create scratch dir] ******************************************************
+ok: [localhost]
+
+TASK [Write config files] ******************************************************
+ok: [localhost] => (item=a)
+ok: [localhost] => (item=b)
+ok: [localhost] => (item=c)
+
+TASK [Show a message] **********************************************************
+ok: [localhost] => {
+    "msg": "hello"
+}
+
+TASK [Skipped task] ************************************************************
+skipping: [localhost]
+
+TASK [Check a thing (no change)] ***********************************************
+ok: [localhost]
+
+TASK [Run command] *************************************************************
+ok: [localhost]
+
+TASK [Debug loop] **************************************************************
+ok: [localhost] => (item=1) => {
+    "msg": "item 1"
+}
+ok: [localhost] => (item=2) => {
+    "msg": "item 2"
+}
+ok: [localhost] => (item=3) => {
+    "msg": "item 3"
+}
+ok: [localhost] => (item=4) => {
+    "msg": "item 4"
+}
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=6    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0   
+

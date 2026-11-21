@@ -1,0 +1,4 @@
+All tests successful.
+Files=1, Tests=12,  0 wallclock secs ( 0.01 usr  0.00 sys +  0.02 cusr  0.00 csys =  0.03 CPU)
+Result: PASS
+…+15 lines (passing rows, plans, blanks, restated failure counts)

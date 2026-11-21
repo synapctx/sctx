@@ -1,0 +1,15 @@
+2026-11-21T02:26:49Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-11-21T02:26:49Z	INFO	[secret] Secret scanning is enabled
+2026-11-21T02:26:49Z	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2026-11-21T02:26:49Z	INFO	[secret] Please see https://trivy.dev/v0.67/docs/scanner/secret#recommendation for faster secret detection
+2026-11-21T02:26:50Z	INFO	Detected OS	family="alpine" version="3.10.9"
+2026-11-21T02:26:50Z	INFO	[alpine] Detecting vulnerabilities...	os_version="3.10" repository="3.10" pkg_num=14
+2026-11-21T02:26:50Z	INFO	Number of language-specific files	num=0
+2026-11-21T02:26:50Z	WARN	This OS version is no longer supported by the distribution	family="alpine" version="3.10.9"
+2026-11-21T02:26:50Z	WARN	The vulnerability detection may be insufficient because security updates are not provided
+
+📣 [34mNotices:[0m
+  - Version 0.76.2 of Trivy is now available, current version is 0.67.2
+
+To suppress version checks, run Trivy scans with the --skip-version-check flag
+

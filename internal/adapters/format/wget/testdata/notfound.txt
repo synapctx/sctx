@@ -1,0 +1,6 @@
+--2026-11-21 02:25:07--  https://go.dev/nonexistent-zzz
+Resolving go.dev (go.dev)... 192.0.2.1, 192.0.2.1, 192.0.2.1, ...
+Connecting to go.dev (go.dev)|192.0.2.1|:443... connected.
+HTTP request sent, awaiting response... 404 Not Found
+2026-11-21 02:25:07 ERROR 404: Not Found.
+

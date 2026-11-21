@@ -1,0 +1,6 @@
+   Compiling demo v0.1.0 (/work/rs-ok)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.60s
+     Running unittests src/lib.rs (target/debug/build/demo/7809a55094760de5/out/demo-7809a55094760de5)
+     Running unittests src/main.rs (target/debug/build/demo/22b22fa7964061be/out/demo-22b22fa7964061be)
+     Running tests/it.rs (target/debug/build/demo/d54ce470464d5c57/out/it-d54ce470464d5c57)
+   Doc-tests demo

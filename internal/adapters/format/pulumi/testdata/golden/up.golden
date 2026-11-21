@@ -1,0 +1,15 @@
+…+17 lines (preview ×13, progress ×4)
+Updating (dev):
+
+ +  random:index:RandomPet pet created (0.00s) 
+ +  random:index:RandomId id1 created (0.00s) 
+ +  random:index:RandomPassword pw created (0.07s) 
+ +  pulumi:pulumi:Stack demo-dev created (0.12s) 
+Outputs:
+    petName: "bursting-parrot"
+
+Resources:
+    + 4 created
+
+Duration: 1s
+

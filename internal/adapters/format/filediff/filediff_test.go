@@ -54,8 +54,8 @@ func TestAggressive(t *testing.T) {
 			t.Fatalf("Aggressive() error = %v", err)
 		}
 		body := string(out.Body)
-		if !strings.HasPrefix(body, "1 hunks, +1 -1") {
-			t.Errorf("body missing summary, got: %q", body[:min(30, len(body))])
+		if !strings.HasPrefix(body, "sctx: compacted diff ") || !strings.Contains(strings.SplitN(body, "\n", 3)[1], "1 hunks, +1 -1") {
+			t.Errorf("body missing stamp+summary, got: %q", body[:min(80, len(body))])
 		}
 		for _, want := range []string{"--- a2.txt", "+++ b2.txt", "@@ -5,21 +5,21 @@", "-line15", "+CHANGED15", " line5", " line25"} {
 			if !strings.Contains(body, want) {

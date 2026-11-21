@@ -1,0 +1,8 @@
+lib/calc.rb (9)
+  1:1 C Style/Documentation: Missing top-level documentation comment for class Calc.
+  1:1 C fixable Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+  2:11,2:14,3:11,3:14 C Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  3:3,6:3 C fixable Layout/EmptyLineBetweenDefs: Expected 1 empty line between method definitions; found 0.
+  7:5 C fixable Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+cops: Naming/MethodParameterName×4, Layout/EmptyLineBetweenDefs×2, …+3 more cops
+1 file inspected, 9 offenses detected, 4 offenses autocorrectable

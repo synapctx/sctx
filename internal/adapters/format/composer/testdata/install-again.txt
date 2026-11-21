@@ -1,0 +1,7 @@
+Composer could not detect the root package (scratch/app) version, defaulting to '1.0.0'. See https://getcomposer.org/root-version
+Installing dependencies from lock file (including require-dev)
+Verifying lock file contents can be installed on current platform.
+Nothing to install, update or remove
+Generating autoload files
+1 package you are using is looking for funding.
+Use the `composer fund` command to find out more!

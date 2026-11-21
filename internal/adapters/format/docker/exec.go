@@ -21,6 +21,10 @@ func dockerTransportFailure(stderr []byte) bool {
 		"container is not running",
 		"no configuration file provided",
 		"no such service",
+		"oci runtime create failed",
+		"executable file not found in $path",
+		"unable to find image",
+		"pulling from",
 	} {
 		if strings.Contains(lower, marker) {
 			return true
@@ -47,4 +51,26 @@ func (f *Formatter) relaxedExec(ctx context.Context, in format.Input, sub string
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 	return nested.Relaxed(ctx, nested.Resolver(f.resolve), in, argv, dockerExecTransportFailure)
+}
+
+// dockerRunTransportFailure also treats exit 125 (the daemon, not the
+// command, failed) as transport output.
+func dockerRunTransportFailure(stderr []byte, exitCode int) bool {
+	return exitCode == 125 || dockerTransportFailure(stderr)
+}
+
+func (f *Formatter) aggressiveRun(ctx context.Context, in format.Input, sub string, rest []string) (format.Rendered, error) {
+	argv, ok := dockerargv.RunCommand(sub, rest)
+	if !ok {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	return nested.Aggressive(ctx, nested.Resolver(f.resolve), in, argv, dockerRunTransportFailure)
+}
+
+func (f *Formatter) relaxedRun(ctx context.Context, in format.Input, sub string, rest []string) (format.Rendered, error) {
+	argv, ok := dockerargv.RunCommand(sub, rest)
+	if !ok {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	return nested.Relaxed(ctx, nested.Resolver(f.resolve), in, argv, dockerRunTransportFailure)
 }

@@ -1,0 +1,26 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ------------------------------< demo:app >------------------------------
+[INFO] Building app 1.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] Loaded 24564 auto-discovered prefixes for remote repository central (prefixes-central.txt)
+Downloading from central: https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter-api/99.9.9/junit-jupiter-api-99.9.9.pom
+[WARNING] The POM for org.junit.jupiter:junit-jupiter-api:jar:99.9.9 is missing, no dependency information available
+Downloading from central: https://repo.maven.apache.org/maven2/org/junit/jupiter/junit-jupiter-api/99.9.9/junit-jupiter-api-99.9.9.jar
+[INFO] ------------------------------------------------------------------------
+[ERROR] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.963 s
+[INFO] Finished at: 2026-11-21T02:04:09Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal on project app: Could not resolve dependencies for project demo:app:jar:1.0
+[ERROR] dependency: org.junit.jupiter:junit-jupiter-api:jar:99.9.9 (compile)
+[ERROR] 	Could not find artifact org.junit.jupiter:junit-jupiter-api:jar:99.9.9 in central (https://repo.maven.apache.org/maven2)
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/DependencyResolutionException

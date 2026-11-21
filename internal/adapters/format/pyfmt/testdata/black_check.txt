@@ -1,0 +1,8 @@
+would reformat /work/proj/pkg/core.py
+would reformat /work/proj/pkg/ugly.py
+would reformat /work/proj/tests/test_broken.py
+would reformat /work/proj/tests/test_core.py
+would reformat /work/proj/tests/test_unit.py
+
+Oh no! 💥 💔 💥
+5 files would be reformatted, 1 file would be left unchanged.

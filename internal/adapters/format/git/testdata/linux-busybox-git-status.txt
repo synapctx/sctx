@@ -1,0 +1,18 @@
+On branch master
+Changes to be committed:
+  (use "git restore --staged <file>..." to unstage)
+	modified:   docs/d3.md
+	new file:   src/staged_new.go
+
+Changes not staged for commit:
+  (use "git add/rm <file>..." to update what will be committed)
+  (use "git restore <file>..." to discard changes in working directory)
+	deleted:    docs/d2.md
+	modified:   src/pkg/api/h1.go
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+	logs/dups.log
+	logs/events.jsonl
+	src/new.go
+

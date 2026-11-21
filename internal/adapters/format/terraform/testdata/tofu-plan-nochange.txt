@@ -1,0 +1,11 @@
+[0m[1mrandom_pet.p["gamma"]: Refreshing state... [id=champion-wahoo][0m
+[0m[1mrandom_pet.p["alpha"]: Refreshing state... [id=fast-skunk][0m
+[0m[1mrandom_password.pw: Refreshing state... [id=none][0m
+[0m[1mrandom_pet.p["beta"]: Refreshing state... [id=inviting-beetle][0m
+[0m[1mnull_resource.n: Refreshing state... [id=282705268468913132][0m
+[0m[1mlocal_file.f["beta"]: Refreshing state... [id=f8866ece2498a63d887ec3965f7a099e8258b4d3][0m
+[0m[1mlocal_file.f["alpha"]: Refreshing state... [id=634add41d12035630a3dfae2d5b85ab5bd6a584a][0m
+[0m[1mlocal_file.f["gamma"]: Refreshing state... [id=b6a8be1c9cea14580b65c6f80725b6591eb9238c][0m
+
+[0m[1m[32mNo changes.[0m[1m Your infrastructure matches the configuration.[0m
+[0m

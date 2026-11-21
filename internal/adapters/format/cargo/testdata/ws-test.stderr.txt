@@ -1,0 +1,10 @@
+   Compiling wa v0.1.0 (/work/rs-ws/a)
+   Compiling wb v0.1.0 (/work/rs-ws/b)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.63s
+     Running unittests src/lib.rs (target/debug/build/wa/6f0c71ff45e033b6/out/wa-6f0c71ff45e033b6)
+     Running unittests src/lib.rs (target/debug/build/wb/0ef88d872715d221/out/wb-0ef88d872715d221)
+error: test failed, to rerun pass `-p wb --lib`
+   Doc-tests wa
+   Doc-tests wb
+error: 1 target failed:
+    `-p wb --lib`

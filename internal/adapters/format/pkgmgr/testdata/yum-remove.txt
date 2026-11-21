@@ -1,0 +1,29 @@
+Dependencies resolved.
+================================================================================
+ Package           Architecture    Version                Repository       Size
+================================================================================
+Removing:
+ jq                aarch64         1.6-21.el9_9           @baseos         440 k
+Removing unused dependencies:
+ oniguruma         aarch64         6.9.6-1.el9.6          @baseos         765 k
+
+Transaction Summary
+================================================================================
+Remove  2 Packages
+
+Freed space: 1.2 M
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1 
+  Erasing          : jq-1.6-21.el9_9.aarch64                                1/2 
+  Erasing          : oniguruma-6.9.6-1.el9.6.aarch64                        2/2 
+  Verifying        : jq-1.6-21.el9_9.aarch64                                1/2 
+  Verifying        : oniguruma-6.9.6-1.el9.6.aarch64                        2/2 
+
+Removed:
+  jq-1.6-21.el9_9.aarch64            oniguruma-6.9.6-1.el9.6.aarch64           
+
+Complete!

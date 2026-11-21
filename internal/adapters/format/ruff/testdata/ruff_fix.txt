@@ -1,0 +1,10 @@
+F821 Undefined name `undefined_fn`
+  --> pkg/core.py:16:1
+   |
+15 | result: int = greet("x")
+16 | undefined_fn(3)
+   | ^^^^^^^^^^^^
+17 | add("a", 2)
+   |
+
+Found 12 errors (11 fixed, 1 remaining).

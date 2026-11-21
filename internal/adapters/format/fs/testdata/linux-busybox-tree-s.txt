@@ -1,0 +1,10 @@
+[ 352]  .
+├── [   7]  README.md
+├── [  96]  build
+├── [ 288]  docs
+├── [ 160]  logs
+├── [ 128]  node_modules
+├── [ 192]  src
+└── [  96]  vendor
+
+7 directories, 1 file

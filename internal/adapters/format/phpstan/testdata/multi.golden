@@ -1,0 +1,10 @@
+Calc.php (3)
+  7 Method App\Calc::bad() should return int but returns string. [return.type]
+  8 Method App\Calc::undefinedUse() has no return type specified. [missingType.return]
+  8 Undefined variable: $nope [variable.undefined]
+Other.php (3)
+  4 Method App\Other::run() has no return type specified. [missingType.return]
+  4 Method App\Other::run() has parameter $x with no type specified. [missingType.parameter]
+  5 Method App\Other::ret() should return string but returns int. [return.type]
+Found 6 errors
+…+14 lines (config note, progress, agent boilerplate)

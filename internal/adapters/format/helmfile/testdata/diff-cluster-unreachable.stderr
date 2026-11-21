@@ -1,0 +1,63 @@
+Building dependency release=demo2, chart=demo
+Building dependency release=demo, chart=demo
+in ./helmfile.yaml: 2 errors:
+err 0: command "/usr/local/bin/helm" exited with non-zero status:
+
+PATH:
+  /usr/local/bin/helm
+
+ARGS:
+  0: helm (4 bytes)
+  1: diff (4 bytes)
+  2: upgrade (7 bytes)
+  3: --allow-unreleased (18 bytes)
+  4: demo2 (5 bytes)
+  5: demo (4 bytes)
+  6: --namespace (11 bytes)
+  7: apps (4 bytes)
+  8: --reset-values (14 bytes)
+
+ERROR:
+  exit status 1
+
+EXIT STATUS
+  1
+
+STDERR:
+  Error: Failed to get release demo2 in namespace apps: exit status 1: Error: Kubernetes cluster unreachable: Get "http://localhost:8080/version": dial tcp [::1]:8080: connect: connection refused
+  Error: plugin "diff" exited with error
+
+COMBINED OUTPUT:
+  Error: Failed to get release demo2 in namespace apps: exit status 1: Error: Kubernetes cluster unreachable: Get "http://localhost:8080/version": dial tcp [::1]:8080: connect: connection refused
+  Error: plugin "diff" exited with error
+err 1: command "/usr/local/bin/helm" exited with non-zero status:
+
+PATH:
+  /usr/local/bin/helm
+
+ARGS:
+  0: helm (4 bytes)
+  1: diff (4 bytes)
+  2: upgrade (7 bytes)
+  3: --allow-unreleased (18 bytes)
+  4: demo (4 bytes)
+  5: demo (4 bytes)
+  6: --namespace (11 bytes)
+  7: apps (4 bytes)
+  8: --values (8 bytes)
+  9: /tmp/helmfile3504170644/apps-demo-values-69cffb5fb9 (51 bytes)
+  10: --reset-values (14 bytes)
+
+ERROR:
+  exit status 1
+
+EXIT STATUS
+  1
+
+STDERR:
+  Error: Failed to get release demo in namespace apps: exit status 1: Error: Kubernetes cluster unreachable: Get "http://localhost:8080/version": dial tcp [::1]:8080: connect: connection refused
+  Error: plugin "diff" exited with error
+
+COMBINED OUTPUT:
+  Error: Failed to get release demo in namespace apps: exit status 1: Error: Kubernetes cluster unreachable: Get "http://localhost:8080/version": dial tcp [::1]:8080: connect: connection refused
+  Error: plugin "diff" exited with error

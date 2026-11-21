@@ -1,0 +1,38 @@
+[0m02:40:49  Running with dbt=1.12.7
+[0m02:40:49  dbt version: 1.12.7
+[0m02:40:49  python version: 3.12.16
+[0m02:40:49  python path: /usr/local/bin/python3.12
+[0m02:40:49  os info: Linux-7.0.14-linuxkit-aarch64-with-glibc2.41
+[0m02:40:49  Using profiles dir at /usr/app
+[0m02:40:49  Using profiles.yml file at /usr/app/profiles.yml
+[0m02:40:49  Using dbt_project.yml file at /usr/app/dbt_project.yml
+[0m02:40:49  adapter type: postgres
+[0m02:40:49  adapter version: 1.9.1
+[0m02:40:49  Configuration:
+[0m02:40:49    profiles.yml file [[32mOK found and valid[0m]
+[0m02:40:49    dbt_project.yml file [[32mOK found and valid[0m]
+[0m02:40:49  Required dependencies:
+[0m02:40:49   - git [[31mERROR[0m]
+
+[0m02:40:49  Connection:
+[0m02:40:49    host: db
+[0m02:40:49    port: 5432
+[0m02:40:49    user: postgres
+[0m02:40:49    database: postgres
+[0m02:40:49    schema: dbt_dev
+[0m02:40:49    connect_timeout: 10
+[0m02:40:49    role: None
+[0m02:40:49    search_path: None
+[0m02:40:49    keepalives_idle: 0
+[0m02:40:49    sslmode: None
+[0m02:40:49    sslcert: None
+[0m02:40:49    sslkey: None
+[0m02:40:49    sslrootcert: None
+[0m02:40:49    application_name: dbt
+[0m02:40:49    retries: 1
+[0m02:40:49  Registered adapter: postgres=1.9.1
+[0m02:40:50    Connection test: [[32mOK connection ok[0m]
+
+[0m02:40:50  [31m1 check failed:[0m
+[0m02:40:50  Error from git --help: Could not find command, ensure it is in the user's PATH: "git"
+

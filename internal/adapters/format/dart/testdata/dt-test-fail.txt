@@ -1,0 +1,43 @@
+00:00 [32m+0[0m: [1m[90mloading test/demo_test.dart[0m[0m                                                                                                                                                                  00:00 [32m+0[0m: test/demo_test.dart: adds[0m                                                                                                                                                                    00:00 [32m+1[0m: test/demo_test.dart: adds[0m                                                                                                                                                                    00:00 [32m+1[0m: test/demo_test.dart: adds wrong[0m                                                                                                                                                              00:00 [32m+1[0m[31m -1[0m: test/demo_test.dart: adds wrong [1m[31m[E][0m[0m                                                                                                                                                       
+  Expected: <4>
+    Actual: <3>
+  
+  package:matcher           expect
+  test/demo_test.dart 8:28  main.<fn>
+  
+
+[1m[36mTo run this test again:[0m dart test test/demo_test.dart -p vm --plain-name 'adds wrong'
+00:00 [32m+1[0m[31m -1[0m: test/demo_test.dart: greets[0m                                                                                                                                                               00:00 [32m+1[0m[31m -2[0m: test/demo_test.dart: greets [1m[31m[E][0m[0m                                                                                                                                                           
+  Expected: 'hi bob'
+    Actual: 'hello bob'
+     Which: is different.
+            Expected: hi bob
+              Actual: hello bob
+                       ^
+             Differ at offset 1
+  
+  package:matcher           expect
+  test/demo_test.dart 9:24  main.<fn>
+  
+
+[1m[36mTo run this test again:[0m dart test test/demo_test.dart -p vm --plain-name 'greets'
+00:00 [32m+1[0m[31m -2[0m: test/demo_test.dart: list[0m                                                                                                                                                                 00:00 [32m+1[0m[31m -3[0m: test/demo_test.dart: list [1m[31m[E][0m[0m                                                                                                                                                             
+  Expected: [1, 2, 4]
+    Actual: [1, 2, 3]
+     Which: at location [2] is <3> instead of <4>
+  
+  package:matcher            expect
+  test/demo_test.dart 10:22  main.<fn>
+  
+
+[1m[36mTo run this test again:[0m dart test test/demo_test.dart -p vm --plain-name 'list'
+00:00 [32m+1[0m[31m -3[0m: test/demo_test.dart: throws[0m                                                                                                                                                               00:00 [32m+1[0m[31m -4[0m: test/demo_test.dart: throws [1m[31m[E][0m[0m                                                                                                                                                           
+  Bad state: boom
+  test/demo_test.dart 11:24  main.<fn>
+  
+
+[1m[36mTo run this test again:[0m dart test test/demo_test.dart -p vm --plain-name 'throws'
+00:00 [32m+1[0m[31m -4[0m: test/demo_test.dart: g inner ok[0m                                                                                                                                                           00:00 [32m+2[0m[31m -4[0m: test/demo_test.dart: g inner ok[0m                                                                                                                                                           00:00 [32m+2[0m[31m -4[0m: [31mSome tests failed.[0m                                                                                                                                                                        
+
+Consider enabling the flag chain-stack-traces to receive more detailed exceptions.
+For example, 'dart test --chain-stack-traces'.

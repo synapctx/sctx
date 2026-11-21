@@ -1,0 +1,91 @@
+run log: 599 lines, 1 jobs; timestamps omitted; runner setup ×34; blank lines ×108
+== aarch64-pc-windows-gnullvm (windows-11-arm)
+▸ Run actions/checkout@v7.0.1 (+21 lines)
+Syncing repository: sharkdp/fd
+▸ Getting Git version info (+3 lines)
+Temporarily overriding HOME='C:\a\_temp\8e42aeb0-c533-420b-a637-d500a80ce549' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory
+[command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory C:\a\fd\fd
+Deleting the contents of 'C:\a\fd\fd'
+▸ Determining repository object format
+▸ Initializing the repository (+3 lines)
+▸ Disabling automatic garbage collection (+1 lines)
+▸ Setting up auth (+14 lines)
+▸ Fetching the repository (+7 lines)
+▸ Determining the checkout info
+[command]"C:\Program Files\Git\bin\git.exe" sparse-checkout disable
+[command]"C:\Program Files\Git\bin\git.exe" config --local --unset-all extensions.worktreeConfig
+▸ Checking out the ref (+3 lines)
+[command]"C:\Program Files\Git\bin\git.exe" log -1 --format=%H
+b80cd53e65615060a62a5ea349a0d78b65d7029e
+▸ Removing auth (+26 lines)
+▸ Run msys2/setup-msys2@ec48f7c5447b3140e2b088413ae3a55687bccb6e
+with:
+  msystem: CLANGARM64
+  update: true
+  install: mingw-w64-clang-aarch64-clang
+  path-type: minimal
+  release: true
+  platform-check-severity: fatal
+  cache: true
+env:
+  CICD_INTERMEDIATES_DIR: _cicd-intermediates
+  MSRV_FEATURES: --all-features
+  BUILD_CMD: cargo
+  target: aarch64-pc-windows-gnullvm
+  name: fd
+▸ Downloading MSYS2...
+▸ Extracting MSYS2... (+99 lines)
+▸ Disable Key Refresh...
+▸ Restoring package cache... (+9 lines)
+▸ Starting MSYS2 for the first time... (+48 lines)
+▸ Disable CheckSpace... (+1 lines)
+▸ Updating packages...
+[command]C:\Windows\system32\cmd.exe /D /S /C C:\a\_temp\setup-msys2\msys2.cmd -c "'pacman' '--noconfirm' '-Syuu' '--overwrite' '*'"
+:: Synchronizing package databases...
+ clangarm64 downloading...
+ mingw32 downloading...
+ mingw64 downloading...
+ ucrt64 downloading...
+ clang64 downloading...
+ msys downloading...
+:: Starting core system upgrade...
+warning: terminate other MSYS2 programs before proceeding
+resolving dependencies...
+looking for conflicting packages...
+Packages (4) bash-5.3.20-3  filesystem-2026.10.18-3  msys2-runtime-3.6.12-1  pacman-6.1.0-29
+Total Installed Size:  54.05 MiB
+Net Upgrade Size:      -0.14 MiB
+:: Proceed with installation? [Y/n]
+checking keyring...
+checking package integrity...
+loading package files...
+checking for file conflicts...
+:: Processing package changes...
+upgrading bash...
+upgrading filesystem...
+upgrading msys2-runtime...
+upgrading pacman...
+:: To complete this update all MSYS2 processes including this terminal will be closed. Confirm to proceed [Y/n]
+▸ Killing remaining tasks... (+2 lines)
+▸ Final system upgrade... (+71 lines)
+▸ Installing additional packages through pacman... (+35 lines)
+▸ Saving package cache...
+[command]C:\Windows\system32\cmd.exe /D /S /C C:\a\_temp\setup-msys2\msys2.cmd -c "'paccache' '-r' '-f' '-u' '-k0'"
+##[error]Error: The process 'C:\Windows\system32\cmd.exe' failed with exit code 127
+Post job cleanup.
+[command]"C:\Program Files\Git\bin\git.exe" version
+git version 2.56.1.windows.1
+Temporarily overriding HOME='C:\a\_temp\6acadc5d-7fc5-4647-8236-7c76d181942d' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory
+[command]"C:\Program Files\Git\bin\git.exe" config --global --add safe.directory C:\a\fd\fd
+Removing SSH command configuration
+[command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp core\.sshCommand
+[command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :\""
+Removing HTTP extra header
+[command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+[command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "sh -c \"git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :\""
+Removing includeIf entries pointing to credentials config files
+[command]"C:\Program Files\Git\bin\git.exe" config --local --name-only --get-regexp ^includeIf\.gitdir:
+[command]"C:\Program Files\Git\bin\git.exe" submodule foreach --recursive "git config --local --show-origin --name-only --get-regexp remote.origin.url"
+Cleaning up orphan processes

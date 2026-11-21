@@ -1,0 +1,83 @@
+…+67 lines (refresh ×8, completed ×8, legend ×4, capped attributes ×34, blank ×13)
+[1m  # local_file.f["alpha"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "local_file" "f" {
+      [31m-[0m[0m content              = <<-EOT
+            hello lively-clever-clam
+            line2
+            line3
+        EOT [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha256 = "aNeiPvlVjYGd+RPUhraJFeaQmzfayYZyEPNol3tuJBE=" [90m-> null[0m[0m
+      …+9 attributes
+    }
+[1m  # local_file.f["beta"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "local_file" "f" {
+      [31m-[0m[0m content              = <<-EOT
+            hello usually-useful-barnacle
+            line2
+            line3
+        EOT [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha256 = "PU5LD7DeSRoIb6pO0kK3MOIn4Vg68RncUBM8NWtvIrE=" [90m-> null[0m[0m
+      …+9 attributes
+    }
+[1m  # local_file.f["gamma"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "local_file" "f" {
+      [31m-[0m[0m content              = <<-EOT
+            hello externally-keen-walrus
+            line2
+            line3
+        EOT [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha256 = "cyY5OK1Vi0Wf1xK8qnGwVWzatpiF05B2DawqGPs/fPc=" [90m-> null[0m[0m
+      …+9 attributes
+    }
+[1m  # null_resource.n[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "null_resource" "n" {
+      [31m-[0m[0m id       = "1708258351975758010" [90m-> null[0m[0m
+      [31m-[0m[0m triggers = {
+          [31m-[0m[0m "v" = "2"
+        } [90m-> null[0m[0m
+    }
+[1m  # random_password.pw[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "random_password" "pw" {
+      [31m-[0m[0m bcrypt_hash = (sensitive value) [90m-> null[0m[0m
+      [31m-[0m[0m id          = "none" [90m-> null[0m[0m
+      [31m-[0m[0m length      = 16 [90m-> null[0m[0m
+      [31m-[0m[0m lower       = true [90m-> null[0m[0m
+      [31m-[0m[0m min_lower   = 0 [90m-> null[0m[0m
+      [31m-[0m[0m min_numeric = 0 [90m-> null[0m[0m
+      …+7 attributes
+    }
+[1m  # random_pet.p["alpha"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "random_pet" "p" {
+      [31m-[0m[0m id        = "lively-clever-clam" [90m-> null[0m[0m
+      [31m-[0m[0m length    = 3 [90m-> null[0m[0m
+      [31m-[0m[0m separator = "-" [90m-> null[0m[0m
+    }
+[1m  # random_pet.p["beta"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "random_pet" "p" {
+      [31m-[0m[0m id        = "usually-useful-barnacle" [90m-> null[0m[0m
+      [31m-[0m[0m length    = 3 [90m-> null[0m[0m
+      [31m-[0m[0m separator = "-" [90m-> null[0m[0m
+    }
+[1m  # random_pet.p["gamma"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "random_pet" "p" {
+      [31m-[0m[0m id        = "externally-keen-walrus" [90m-> null[0m[0m
+      [31m-[0m[0m length    = 3 [90m-> null[0m[0m
+      [31m-[0m[0m separator = "-" [90m-> null[0m[0m
+    }
+[1mPlan:[0m [0m0 to add, 0 to change, 8 to destroy.
+Changes to Outputs:
+  [31m-[0m[0m pets = {
+      [31m-[0m[0m alpha = "lively-clever-clam"
+      [31m-[0m[0m beta  = "usually-useful-barnacle"
+      [31m-[0m[0m gamma = "externally-keen-walrus"
+    } [90m-> null[0m[0m
+  [31m-[0m[0m pw   = (sensitive value) [90m-> null[0m[0m
+[0m[1mnull_resource.n: Destroying... [id=1708258351975758010][0m[0m
+[0m[1mrandom_password.pw: Destroying... [id=none][0m[0m
+[0m[1mlocal_file.f["beta"]: Destroying... [id=e299c03d1881e5d0f4d5b218a84e942172617ec3][0m[0m
+[0m[1mlocal_file.f["alpha"]: Destroying... [id=ed6f952a077a8feb66a683aa3b009214a44c3432][0m[0m
+[0m[1mlocal_file.f["gamma"]: Destroying... [id=ebb34f9931e649947c455c35682ecddf764fb47e][0m[0m
+[0m[1mrandom_pet.p["beta"]: Destroying... [id=usually-useful-barnacle][0m[0m
+[0m[1mrandom_pet.p["gamma"]: Destroying... [id=externally-keen-walrus][0m[0m
+[0m[1mrandom_pet.p["alpha"]: Destroying... [id=lively-clever-clam][0m[0m
+Destroy complete! Resources: 8 destroyed.[0m

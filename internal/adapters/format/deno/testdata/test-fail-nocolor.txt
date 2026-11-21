@@ -1,0 +1,63 @@
+running 5 tests from ./a_test.ts
+adds ... ok (426µs)
+adds wrong ... FAILED (15ms)
+obj ... FAILED (361µs)
+skipped ... ignored (0ms)
+throws ... FAILED (117µs)
+running 2 tests from ./ok_test.ts
+ok1 ... ok (223µs)
+ok2 ... ok (23µs)
+
+ ERRORS 
+
+adds wrong => ./a_test.ts:3:6
+error: AssertionError: Values are not equal.
+
+
+    [Diff] Actual / Expected
+
+
+-   3
++   4
+
+  throw new AssertionError(message);
+        ^
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
+    at file:///repo/a_test.ts:3:33
+
+obj => ./a_test.ts:4:6
+error: AssertionError: Values are not equal.
+
+
+    [Diff] Actual / Expected
+
+
+    {
+      a: 1,
+      b: [
+        1,
+-       2,
++       3,
+      ],
+    }
+
+  throw new AssertionError(message);
+        ^
+    at assertEquals (https://jsr.io/@std/assert/1.0.19/equals.ts:67:9)
+    at file:///repo/a_test.ts:4:26
+
+throws => ./a_test.ts:6:6
+error: TypeError: kaboom
+Deno.test("throws", () => { throw new TypeError("kaboom"); });
+                                  ^
+    at file:///repo/a_test.ts:6:35
+
+ FAILURES 
+
+adds wrong => ./a_test.ts:3:6
+obj => ./a_test.ts:4:6
+throws => ./a_test.ts:6:6
+
+FAILED | 3 passed | 3 failed | 1 ignored (39ms)
+
+error: Test failed

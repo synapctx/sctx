@@ -1,0 +1,10 @@
+2026-11-21T02:31:46Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-11-21T02:31:46Z	WARN	[pip] Unable to find python `site-packages` directory. License detection is skipped.	err="unable to find path to Python executable"
+2026-11-21T02:31:46Z	INFO	Number of language-specific files	num=1
+2026-11-21T02:31:46Z	INFO	[pip] Detecting vulnerabilities...
+
+📣 [34mNotices:[0m
+  - Version 0.76.2 of Trivy is now available, current version is 0.67.2
+
+To suppress version checks, run Trivy scans with the --skip-version-check flag
+

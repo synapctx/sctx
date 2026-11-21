@@ -1,0 +1,21 @@
+Please note that these warnings are just used to help the Homebrew maintainers
+with debugging if you file an issue. If everything you use Homebrew for is
+working fine: please don't worry or file an issue; just ignore this. Thanks!
+
+Warning: You have an unnecessary local Core tap!
+This can cause problems installing up-to-date formulae.
+
+Please remove it by running:
+  brew untap homebrew/core
+
+Warning: Your system glibc 2.35 is too old.
+We will need to automatically install a newer version.
+
+We recommend updating to a newer version via your distribution's
+package manager, upgrading your distribution to the latest version,
+or changing distributions.
+This is a Tier 2 configuration:
+  https://docs.brew.sh/Support-Tiers#tier-2
+You can report issues with Tier 2 configurations to Homebrew/* repositories!
+  https://docs.brew.sh/Troubleshooting
+Read the above document before opening any issues or PRs.

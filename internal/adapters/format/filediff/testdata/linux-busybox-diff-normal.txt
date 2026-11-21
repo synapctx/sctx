@@ -1,0 +1,25 @@
+--- a.conf
++++ b.conf
+@@ -17,7 +17,7 @@
+ line 17 of the config file
+ line 18 of the config file
+ line 19 of the config file
+-line 20 of the config file
++LINE 20 of the config file
+ line 21 of the config file
+ line 22 of the config file
+ line 23 of the config file
+@@ -57,7 +57,7 @@
+ line 57 of the config file
+ line 58 of the config file
+ line 59 of the config file
+-line 60 of the config file
++LINE 60 of the config file
+ line 61 of the config file
+ line 62 of the config file
+ line 63 of the config file
+@@ -78,3 +78,4 @@
+ line 78 of the config file
+ line 79 of the config file
+ line 80 of the config file
++extra

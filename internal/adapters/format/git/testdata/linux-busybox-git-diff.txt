@@ -1,0 +1,18 @@
+diff --git a/docs/d2.md b/docs/d2.md
+deleted file mode 100644
+index 21ea6e8..0000000
+--- a/docs/d2.md
++++ /dev/null
+@@ -1,3 +0,0 @@
+-# Doc 2
+-
+-TODO write
+diff --git a/src/pkg/api/h1.go b/src/pkg/api/h1.go
+index 3a155d7..2117e1d 100644
+--- a/src/pkg/api/h1.go
++++ b/src/pkg/api/h1.go
+@@ -5,3 +5,4 @@ import "fmt"
+ // Handler1 serves.
+ func Handler1() { fmt.Println("TODO handler 1") }
+ // change 1
++// wip

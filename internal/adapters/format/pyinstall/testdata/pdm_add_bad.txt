@@ -1,0 +1,5 @@
+Adding packages to default dependencies: this-package-does-not-exist-zzz
+⠋ 0:00:00 Resolve for environment (>=3.10) None
+See /home/user/Library/Logs/pdm/pdm-lock-q_8ui4md.log for detailed debug log.
+[CandidateNotFound]: Unable to find candidates for this-package-does-not-exist-zzz. There may exist some issues with the package name or network condition.
+WARNING: Add '-v' to see the detailed traceback

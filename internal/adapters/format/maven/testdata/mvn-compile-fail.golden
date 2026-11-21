@@ -1,0 +1,14 @@
+app 1.0 (resources compiler:compile)
+[ERROR] COMPILATION ERROR : 
+[ERROR] src/main/java/demo/Calc.java:[3,47] cannot find symbol
+  symbol:   variable c
+  location: class demo.Calc
+[ERROR] src/main/java/demo/Calc.java:[4,48] incompatible types: int cannot be converted to java.lang.String
+[ERROR] src/main/java/demo/Calc.java:[5,16] cannot find symbol
+  symbol:   method undefined()
+  location: class demo.Calc
+3 errors 
+BUILD FAILURE
+Total time: 0.572 s
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.16.0:compile (default-compile) on project app: Compilation failure: Compilation failure: 
+…+35 lines elided (23 noise, 7 duplicate, 5 help)

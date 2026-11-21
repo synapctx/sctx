@@ -1,0 +1,46 @@
+[INFO] Initializing environment for https://github.com/pre-commit/pre-commit-hooks.
+[INFO] Installing environment for https://github.com/pre-commit/pre-commit-hooks.
+[INFO] Once installed this environment will be reused.
+[INFO] This may take a few minutes...
+trim trailing whitespace.................................................Failed
+- hook id: trailing-whitespace
+- exit code: 1
+- files were modified by this hook
+
+Fixing a.sh
+Fixing a.yaml
+
+fix end of files.........................................................Failed
+- hook id: end-of-file-fixer
+- exit code: 1
+- files were modified by this hook
+
+Fixing b.json
+Fixing c.txt
+
+check yaml...............................................................Passed
+check for added large files..............................................Passed
+check for merge conflicts................................................Passed
+check json...............................................................Failed
+- hook id: check-json
+- exit code: 1
+
+b.json: Failed to json decode (Expecting property name enclosed in double quotes: line 1 column 2 (char 1))
+
+shellcheck...............................................................Failed
+- hook id: shellcheck-local
+- exit code: 1
+
+In a.sh line 1:
+echo $1
+^-- SC2148 (error): Tips depend on target shell and yours is unknown. Add a shebang or a 'shell' directive.
+     ^-- SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+echo "$1"
+
+For more information:
+  https://www.shellcheck.net/wiki/SC2148 -- Tips depend on target shell and y...
+  https://www.shellcheck.net/wiki/SC2086 -- Double quote to prevent globbing ...
+
+Skipped by no files..................................(no files to check)Skipped

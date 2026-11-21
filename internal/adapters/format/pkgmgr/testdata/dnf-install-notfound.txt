@@ -1,0 +1,9 @@
+Updating and loading repositories:
+ Fedora 41 - aarch64 - Updates          100% |   3.5 MiB/s |  11.0 MiB |  00m03s
+ Fedora 41 openh264 (From Cisco) - aarc 100% |   2.2 KiB/s |   5.8 KiB |  00m03s
+ Fedora 41 - aarch64                    100% |   8.5 MiB/s |  34.4 MiB |  00m04s
+Repositories loaded.
+Failed to resolve the transaction:
+No match for argument: nosuchpkg-xyz
+You can try to add to command line:
+  --skip-unavailable to skip unavailable packages

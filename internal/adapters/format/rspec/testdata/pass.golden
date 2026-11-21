@@ -1,0 +1,3 @@
+pending: Calc pending later — not yet (./spec/calc_pass_spec.rb:5) …+4 lines
+pending: Calc skipped — later (./spec/calc_pass_spec.rb:6)
+4 examples, 0 failures, 2 pending

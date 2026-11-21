@@ -1,0 +1,27 @@
+DemoSpec:
+- adds wrong *** FAILED ***
+  3 did not equal 4 (DemoSpec.scala:4)
+- boom *** FAILED ***
+  java.lang.IllegalStateException: kaboom
+  at DemoSpec.testFun$proxy3$1(DemoSpec.scala:5)
+  at DemoSpec.$init$$$anonfun$3(DemoSpec.scala:5)
+DemoMunit:
+==> X DemoMunit.munit fail  0.085s munit.ComparisonFailException: src/test/scala/DemoMunit.scala:3
+2:  test("munit ok") { assertEquals(Demo.add(1, 1), 2) }
+3:  test("munit fail") { assertEquals(Demo.add(1, 1), 3) }
+values are not the same
+=> Obtained
+2
+=> Diff (- obtained, + expected)
+-2
++3
+ScalaTest
+Tests: succeeded 1, failed 2, canceled 0, ignored 0, pending 0
+*** 2 TESTS FAILED ***
+[error] Failed: Total 5, Failed 3, Errors 0, Passed 2
+[error] Failed tests:
+[error] 	DemoMunit
+[error] 	DemoSpec
+[error] (Test / test) sbt.TestsFailedException: Tests unsuccessful
+[error] Total time: 8 s, completed Nov 21, 2026, 2:31:46 AM
+…+21 lines (sbt chatter, passing tests, source echoes, framework frames)

@@ -1,0 +1,16 @@
+pkg/core.py:1:1: I001 [*] Import block is un-sorted or un-formatted
+pkg/core.py:1:8: F401 [*] `os` imported but unused
+pkg/core.py:2:8: F401 [*] `sys` imported but unused
+pkg/core.py:3:1: UP035 `typing.List` is deprecated, use `list` instead
+pkg/core.py:14:14: UP006 [*] Use `list` instead of `List` for type annotation
+pkg/core.py:15:8: UP045 [*] Use `X | None` for type annotations
+pkg/core.py:19:1: F821 Undefined name `undefined_fn`
+pkg/ugly.py:1:1: I001 [*] Import block is un-sorted or un-formatted
+pkg/ugly.py:1:9: F401 [*] `os` imported but unused
+pkg/ugly.py:1:12: F401 [*] `sys` imported but unused
+tests/test_broken.py:1:1: I001 [*] Import block is un-sorted or un-formatted
+tests/test_broken.py:1:8: F401 [*] `nonexistent_mod` imported but unused
+tests/test_core.py:1:1: I001 [*] Import block is un-sorted or un-formatted
+tests/test_unit.py:1:1: I001 [*] Import block is un-sorted or un-formatted
+Found 14 errors.
+[*] 12 fixable with `--fix`.

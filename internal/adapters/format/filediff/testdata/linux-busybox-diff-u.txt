@@ -1,0 +1,13 @@
+--- src/pkg/api/h1.go
++++ src/pkg/api/h2.go
+@@ -2,7 +2,6 @@
+ 
+ import "fmt"
+ 
+-// Handler1 serves.
+-func Handler1() { fmt.Println("TODO handler 1") }
+-// change 1
+-// wip
++// Handler2 serves.
++func Handler2() { fmt.Println("TODO handler 2") }
++// change 2

@@ -1,0 +1,1 @@
+WARN Failed to detect terminal width for dots format, error: inappropriate ioctl for device

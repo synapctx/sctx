@@ -1,0 +1,8 @@
+semgrep: 2 findings in 1 files
+py/app.py (2)
+  4 error python.lang.security.audit.subprocess-shell-true.subprocess-shell-true Found 'subprocess' function 'call' with 'shell=True'. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and variables, which makes it much easier for a malicious act…+50 chars
+  7 warning python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5 Detected MD5 hash algorithm which is considered insecure. MD5 is not collision resistant and is therefore not suitable as a cryptographic signature. Use SHA256 or SHA3 instead.
+…+5 code excerpt/details/autofix lines dropped
+Findings: 2 (2 blocking)
+Ran 151 rules on 1 file: 2 findings.
+…+14 stderr banner lines dropped

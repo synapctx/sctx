@@ -1,0 +1,17 @@
+2026-11-21T02:31:48Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-11-21T02:31:48Z	INFO	[secret] Secret scanning is enabled
+2026-11-21T02:31:48Z	INFO	[secret] If your scanning is slow, please try '--scanners vuln' to disable secret scanning
+2026-11-21T02:31:48Z	INFO	[secret] Please see https://trivy.dev/v0.67/docs/scanner/secret#recommendation for faster secret detection
+
+📣 [34mNotices:[0m
+  - Version 0.76.2 of Trivy is now available, current version is 0.67.2
+
+To suppress version checks, run Trivy scans with the --skip-version-check flag
+
+2026-11-21T02:31:49Z	FATAL	Fatal error	run error: image scan error: scan error: unable to initialize a scan service: unable to initialize artifact: unable to initialize container image: unable to find the specified image "nosuchimage:zz" in ["docker" "containerd" "podman" "remote"]: 4 errors occurred:
+	* docker error: unable to inspect the image (nosuchimage:zz): Cannot connect to the Docker daemon at unix:///var/run/docker.sock. Is the docker daemon running?
+	* containerd error: containerd socket not found: /run/containerd/containerd.sock
+	* podman error: unable to initialize Podman client: no podman socket found: stat podman/podman.sock: no such file or directory
+	* remote error: GET https://index.docker.io/v2/library/nosuchimage/manifests/zz: UNAUTHORIZED: authentication required; [map[Action:pull Class: Name:library/nosuchimage Type:repository]]
+
+

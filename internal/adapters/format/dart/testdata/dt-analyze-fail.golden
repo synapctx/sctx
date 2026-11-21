@@ -1,0 +1,10 @@
+  error - lib/demo.dart:12:11 - A value of type 'String' can't be assigned to a variable of type 'int'. - invalid_assignment
+  error - lib/demo.dart:13:3 - The function 'undefinedFn' isn't defined. - undefined_function
+  error - lib/demo.dart:14:9 - Undefined name 'missing'. - undefined_identifier
+warning - lib/demo.dart:1:8 - Unused import: 'dart:io'. - unused_import
+warning - lib/demo.dart:2:8 - Unused import: 'package:collection/collection.dart'. - unused_import
+warning - lib/demo.dart:7:7 - The value of the local variable 'unused' isn't used. - unused_local_variable
+warning - lib/demo.dart:12:7 - The value of the local variable 'x' isn't used. - unused_local_variable
+7 issues found.
+…+3 lines (progress rows, blanks, framework frames, package list)
+…+7 "Try ..." hints

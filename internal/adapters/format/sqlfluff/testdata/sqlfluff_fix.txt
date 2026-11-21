@@ -1,0 +1,24 @@
+The -f/--force option is deprecated as it is now the default behaviour.
+==== finding fixable violations ====
+== [sql/a.sql] FAIL
+L:   1 | P:   1 | LT09 | Select targets should be on a new line unless there is
+                       | only one select target. [layout.select_targets]
+L:   1 | P:  10 | LT01 | Expected single whitespace between comma ',' and naked
+                       | identifier. [layout.spacing]
+L:   1 | P:  12 | CP01 | Keywords must be consistently upper case.
+                       | [capitalisation.keywords]
+L:   1 | P:  21 | CP01 | Keywords must be consistently upper case.
+                       | [capitalisation.keywords]
+L:   1 | P:  21 | LT14 | The 'WHERE' keyword should always start a new line.
+                       | [layout.keyword_newline]
+L:   1 | P:  28 | LT01 | Expected single whitespace between naked identifier and
+                       | raw comparison operator '='. [layout.spacing]
+L:   1 | P:  29 | LT01 | Expected single whitespace between raw comparison
+                       | operator '=' and numeric literal. [layout.spacing]
+== [sql/a.sql] FIXED
+== [sql/b.sql] FAIL
+L:   1 | P:  14 | LT01 | Expected only single space before naked identifier.
+                       | Found '  '. [layout.spacing]
+== [sql/b.sql] FIXED
+8 fixable linting violations found
+  [1 unfixable linting violations found]

@@ -1,0 +1,2 @@
+[ERROR] WARNING: unable to find a config; path `nosuch.yml` does not exist (since you are running in docker, you cannot specify arbitrary paths on the host; they must be mounted into the container)
+[ERROR] invalid configuration file found (1 configs were invalid)

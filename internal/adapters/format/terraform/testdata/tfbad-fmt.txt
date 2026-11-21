@@ -1,0 +1,12 @@
+main.tf
+--- old/main.tf
++++ new/main.tf
+@@ -1,7 +1,7 @@
+ terraform {
+   required_providers {
+     local = { source = "hashicorp/local" }
+-    null = { source = "hashicorp/null" }
++    null  = { source = "hashicorp/null" }
+   }
+ }
+ variable "req" { type = string }

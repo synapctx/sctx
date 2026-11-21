@@ -30,14 +30,24 @@ func aggressiveFormat(in format.Input) (format.Rendered, error) {
 	raw := readAll(in.Stdout)
 	lines := splitLines(raw)
 
-	if len(lines) == 0 {
+	if len(lines) == 0 || userShapedOutput(in.Argv) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
 	var perFile []string
 	var summary string
 
-	for _, line := range lines {
+	snippets := false
+	for _, it := range parseItems(lines) {
+		if it.isBlock {
+			if it.code != "unformatted" {
+				return format.Rendered{}, format.ErrTierInapplicable
+			}
+			perFile = append(perFile, it.file)
+			snippets = snippets || it.dropped > 0
+			continue
+		}
+		line := it.plain
 		if m := perFileRe.FindStringSubmatch(line); m != nil {
 			perFile = append(perFile, m[1])
 			continue
@@ -76,6 +86,9 @@ func aggressiveFormat(in format.Input) (format.Rendered, error) {
 	} else {
 		fmt.Fprintf(&b, "%d files reformatted", len(perFile))
 	}
+	if snippets {
+		b.WriteString(" [diff snippets omitted; --diff shows them]")
+	}
 
-	return format.Rendered{Body: []byte(strings.TrimRight(b.String(), "\n"))}, nil
+	return format.Rendered{Body: []byte(strings.TrimRight(b.String(), "\n")), Elided: snippets}, nil
 }

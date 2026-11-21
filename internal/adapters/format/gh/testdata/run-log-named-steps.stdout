@@ -1,0 +1,500 @@
+docs	Set up job	﻿2026-11-21T01:19:49.9996551Z Current runner version: '2.338.2'
+docs	Set up job	2026-11-21T01:19:50.0025548Z ##[group]Runner Image Provisioner
+docs	Set up job	2026-11-21T01:19:50.0026498Z Hosted Compute Agent
+docs	Set up job	2026-11-21T01:19:50.0027112Z Version: 20261111.635
+docs	Set up job	2026-11-21T01:19:50.0027745Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+docs	Set up job	2026-11-21T01:19:50.0028535Z Build Date: 2026-11-11T01:49:01Z
+docs	Set up job	2026-11-21T01:19:50.0029266Z Worker ID: {32731ecd-48e0-460b-9c58-c63d0f1f84d8}
+docs	Set up job	2026-11-21T01:19:50.0029971Z Region: northcentralus
+docs	Set up job	2026-11-21T01:19:50.0030618Z Cloud: Azure
+docs	Set up job	2026-11-21T01:19:50.0031157Z ##[endgroup]
+docs	Set up job	2026-11-21T01:19:50.0032762Z ##[group]Operating System
+docs	Set up job	2026-11-21T01:19:50.0033455Z Ubuntu
+docs	Set up job	2026-11-21T01:19:50.0034253Z 26.04.1
+docs	Set up job	2026-11-21T01:19:50.0034914Z LTS
+docs	Set up job	2026-11-21T01:19:50.0035429Z ##[endgroup]
+docs	Set up job	2026-11-21T01:19:50.0036013Z ##[group]Runner Image
+docs	Set up job	2026-11-21T01:19:50.0036695Z Image: ubuntu-26.04
+docs	Set up job	2026-11-21T01:19:50.0037263Z Version: 20261116.202.1
+docs	Set up job	2026-11-21T01:19:50.0038401Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261116.202/images/ubuntu/Ubuntu2604-Readme.md
+docs	Set up job	2026-11-21T01:19:50.0040186Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261116.202
+docs	Set up job	2026-11-21T01:19:50.0041200Z ##[endgroup]
+docs	Set up job	2026-11-21T01:19:50.0042365Z ##[group]GITHUB_TOKEN Permissions
+docs	Set up job	2026-11-21T01:19:50.0044815Z Contents: read
+docs	Set up job	2026-11-21T01:19:50.0045474Z Metadata: read
+docs	Set up job	2026-11-21T01:19:50.0046230Z ##[endgroup]
+docs	Set up job	2026-11-21T01:19:50.0048414Z Secret source: None
+docs	Set up job	2026-11-21T01:19:50.0049415Z Cache mode: write
+docs	Set up job	2026-11-21T01:19:50.0050364Z Prepare workflow directory
+docs	Set up job	2026-11-21T01:19:50.0413723Z Prepare all required actions
+docs	Set up job	2026-11-21T01:19:50.0465200Z Getting action download info
+docs	Set up job	2026-11-21T01:19:50.2511577Z Download action repository 'actions/checkout@v7' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+docs	Set up job	2026-11-21T01:19:50.3962644Z Download action repository 'dtolnay/rust-toolchain@master' (SHA:df2a88e9fe4098bad09cb42c3dec7187f15861fc)
+docs	Set up job	2026-11-21T01:19:50.6685878Z Complete job name: docs
+docs	Checkout repository	﻿2026-11-21T01:19:50.7606559Z ##[group]Run actions/checkout@v7
+docs	Checkout repository	2026-11-21T01:19:50.7607935Z with:
+docs	Checkout repository	2026-11-21T01:19:50.7608476Z   repository: BurntSushi/ripgrep
+docs	Checkout repository	2026-11-21T01:19:50.7612272Z   token: ***
+docs	Checkout repository	2026-11-21T01:19:50.7612771Z   ssh-strict: true
+docs	Checkout repository	2026-11-21T01:19:50.7613277Z   ssh-user: git
+docs	Checkout repository	2026-11-21T01:19:50.7613792Z   persist-credentials: true
+docs	Checkout repository	2026-11-21T01:19:50.7614510Z   clean: true
+docs	Checkout repository	2026-11-21T01:19:50.7615024Z   sparse-checkout-cone-mode: true
+docs	Checkout repository	2026-11-21T01:19:50.7615604Z   fetch-depth: 1
+docs	Checkout repository	2026-11-21T01:19:50.7616137Z   fetch-tags: false
+docs	Checkout repository	2026-11-21T01:19:50.7616647Z   show-progress: true
+docs	Checkout repository	2026-11-21T01:19:50.7617156Z   lfs: false
+docs	Checkout repository	2026-11-21T01:19:50.7617636Z   submodules: false
+docs	Checkout repository	2026-11-21T01:19:50.7618142Z   set-safe-directory: true
+docs	Checkout repository	2026-11-21T01:19:50.7618712Z   allow-unsafe-pr-checkout: false
+docs	Checkout repository	2026-11-21T01:19:50.7619599Z ##[endgroup]
+docs	Checkout repository	2026-11-21T01:19:51.2683470Z Syncing repository: BurntSushi/ripgrep
+docs	Checkout repository	2026-11-21T01:19:51.2685867Z ##[group]Getting Git version info
+docs	Checkout repository	2026-11-21T01:19:51.2686727Z Working directory is '/home/runner/work/ripgrep/ripgrep'
+docs	Checkout repository	2026-11-21T01:19:51.2824638Z [command]/usr/bin/git version
+docs	Checkout repository	2026-11-21T01:19:51.2873237Z git version 2.56.1
+docs	Checkout repository	2026-11-21T01:19:51.2895941Z ##[endgroup]
+docs	Checkout repository	2026-11-21T01:19:51.2907372Z Temporarily overriding HOME='/home/runner/work/_temp/8da5974c-0592-4d70-94e9-8e015d7a1153' before making global git config changes
+docs	Checkout repository	2026-11-21T01:19:51.2912977Z Adding repository directory to the temporary git global config as a safe directory
+docs	Checkout repository	2026-11-21T01:19:51.2916038Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ripgrep/ripgrep
+docs	Checkout repository	2026-11-21T01:19:51.2987902Z Deleting the contents of '/home/runner/work/ripgrep/ripgrep'
+docs	Checkout repository	2026-11-21T01:19:51.2991193Z ##[group]Determining repository object format
+docs	Checkout repository	2026-11-21T01:19:51.2992920Z ##[endgroup]
+docs	Checkout repository	2026-11-21T01:19:51.2993801Z ##[group]Initializing the repository
+docs	Checkout repository	2026-11-21T01:19:51.2997917Z [command]/usr/bin/git init /home/runner/work/ripgrep/ripgrep
+docs	Checkout repository	2026-11-21T01:19:51.3265813Z hint: Using 'master' as the name for the initial branch. This default branch name
+docs	Checkout repository	2026-11-21T01:19:51.3267674Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+docs	Checkout repository	2026-11-21T01:19:51.3268776Z hint: to use in all of your new repositories, which will suppress this warning,
+docs	Checkout repository	2026-11-21T01:19:51.3269643Z hint: call:
+docs	Checkout repository	2026-11-21T01:19:51.3270146Z hint:
+docs	Checkout repository	2026-11-21T01:19:51.3270778Z hint: 	git config --global init.defaultBranch <name>
+docs	Checkout repository	2026-11-21T01:19:51.3271496Z hint:
+docs	Checkout repository	2026-11-21T01:19:51.3272183Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+docs	Checkout repository	2026-11-21T01:19:51.3273271Z hint: 'development'. The just-created branch can be renamed via this command:
+docs	Checkout repository	2026-11-21T01:19:51.3274448Z hint:
+docs	Checkout repository	2026-11-21T01:19:51.3275258Z hint: 	git branch -m <name>
+docs	Checkout repository	2026-11-21T01:19:51.3276272Z hint:
+docs	Checkout repository	2026-11-21T01:19:51.3277119Z hint: Disable this message with "git config set advice.defaultBranchName false"
+docs	Checkout repository	2026-11-21T01:19:51.3279099Z Initialized empty Git repository in /home/runner/work/ripgrep/ripgrep/.git/
+docs	Checkout repository	2026-11-21T01:19:51.3290628Z [command]/usr/bin/git remote add origin https://github.com/BurntSushi/ripgrep
+docs	Checkout repository	2026-11-21T01:19:51.3348058Z ##[endgroup]
+docs	Checkout repository	2026-11-21T01:19:51.3349084Z ##[group]Disabling automatic garbage collection
+docs	Checkout repository	2026-11-21T01:19:51.3351563Z [command]/usr/bin/git config --local gc.auto 0
+docs	Checkout repository	2026-11-21T01:19:51.3387370Z ##[endgroup]
+docs	Checkout repository	2026-11-21T01:19:51.3389173Z ##[group]Setting up auth
+docs	Checkout repository	2026-11-21T01:19:51.3389872Z Removing SSH command configuration
+docs	Checkout repository	2026-11-21T01:19:51.3393645Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+docs	Checkout repository	2026-11-21T01:19:51.3428902Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+docs	Checkout repository	2026-11-21T01:19:51.4049249Z Removing HTTP extra header
+docs	Checkout repository	2026-11-21T01:19:51.4054951Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+docs	Checkout repository	2026-11-21T01:19:51.4091001Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+docs	Checkout repository	2026-11-21T01:19:51.4376345Z Removing includeIf entries pointing to credentials config files
+docs	Checkout repository	2026-11-21T01:19:51.4381556Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+docs	Checkout repository	2026-11-21T01:19:51.4418132Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+docs	Checkout repository	2026-11-21T01:19:51.4710641Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+docs	Checkout repository	2026-11-21T01:19:51.4764319Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/ripgrep/ripgrep/.git.path /home/runner/work/_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config
+docs	Checkout repository	2026-11-21T01:19:51.4801377Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/ripgrep/ripgrep/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config
+docs	Checkout repository	2026-11-21T01:19:51.4841444Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config
+docs	Checkout repository	2026-11-21T01:19:51.4877098Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config
+docs	Checkout repository	2026-11-21T01:19:51.4907879Z ##[endgroup]
+docs	Checkout repository	2026-11-21T01:19:51.4908750Z ##[group]Fetching the repository
+docs	Checkout repository	2026-11-21T01:19:51.4915017Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules --depth=1 origin +4f8d0aed448d3c610d2f9c11176850ab0b414f68:refs/remotes/pull/3546/merge
+docs	Checkout repository	2026-11-21T01:19:51.8823049Z From https://github.com/BurntSushi/ripgrep
+docs	Checkout repository	2026-11-21T01:19:51.8824826Z  * [new ref]         4f8d0aed448d3c610d2f9c11176850ab0b414f68 -> pull/3546/merge
+docs	Checkout repository	2026-11-21T01:19:51.8829985Z ##[endgroup]
+docs	Checkout repository	2026-11-21T01:19:51.8831602Z ##[group]Determining the checkout info
+docs	Checkout repository	2026-11-21T01:19:51.8833357Z ##[endgroup]
+docs	Checkout repository	2026-11-21T01:19:51.8834660Z [command]/usr/bin/git sparse-checkout disable
+docs	Checkout repository	2026-11-21T01:19:51.8888182Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+docs	Checkout repository	2026-11-21T01:19:51.8920623Z ##[group]Checking out the ref
+docs	Checkout repository	2026-11-21T01:19:51.8923655Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/3546/merge
+docs	Checkout repository	2026-11-21T01:19:51.9173611Z Note: switching to 'refs/remotes/pull/3546/merge'.
+docs	Checkout repository	2026-11-21T01:19:51.9175355Z 
+docs	Checkout repository	2026-11-21T01:19:51.9176176Z You are in 'detached HEAD' state. You can look around, make experimental
+docs	Checkout repository	2026-11-21T01:19:51.9177994Z changes and commit them, and you can discard any commits you make in this
+docs	Checkout repository	2026-11-21T01:19:51.9179778Z state without impacting any branches by switching back to a branch.
+docs	Checkout repository	2026-11-21T01:19:51.9180811Z 
+docs	Checkout repository	2026-11-21T01:19:51.9181509Z If you want to create a new branch to retain commits you create, you may
+docs	Checkout repository	2026-11-21T01:19:51.9183180Z do so (now or later) by using -c with the switch command. Example:
+docs	Checkout repository	2026-11-21T01:19:51.9184366Z 
+docs	Checkout repository	2026-11-21T01:19:51.9184783Z   git switch -c <new-branch-name>
+docs	Checkout repository	2026-11-21T01:19:51.9185528Z 
+docs	Checkout repository	2026-11-21T01:19:51.9186079Z Or undo this operation with:
+docs	Checkout repository	2026-11-21T01:19:51.9186879Z 
+docs	Checkout repository	2026-11-21T01:19:51.9187367Z   git switch -
+docs	Checkout repository	2026-11-21T01:19:51.9187991Z 
+docs	Checkout repository	2026-11-21T01:19:51.9188981Z Turn off this advice by setting config variable advice.detachedHead to false
+docs	Checkout repository	2026-11-21T01:19:51.9190362Z 
+docs	Checkout repository	2026-11-21T01:19:51.9191956Z HEAD is now at 4f8d0ae Merge 3b43310663b1076bd6130f39b77366b4b50a0458 into 5cc1d69c51d154b135e2581fbee8908ae306c9e3
+docs	Checkout repository	2026-11-21T01:19:51.9284605Z ##[endgroup]
+docs	Checkout repository	2026-11-21T01:19:51.9334307Z [command]/usr/bin/git log -1 --format=%H
+docs	Checkout repository	2026-11-21T01:19:51.9362900Z 4f8d0aed448d3c610d2f9c11176850ab0b414f68
+docs	Install Rust	﻿2026-11-21T01:19:52.0238147Z ##[group]Run dtolnay/rust-toolchain@master
+docs	Install Rust	2026-11-21T01:19:52.0239514Z with:
+docs	Install Rust	2026-11-21T01:19:52.0240439Z   toolchain: stable
+docs	Install Rust	2026-11-21T01:19:52.0241412Z ##[endgroup]
+docs	Install Rust	2026-11-21T01:19:52.0335124Z ##[start-action display=Parse toolchain version;id=__dtolnay_rust-toolchain.parse]
+docs	Install Rust	2026-11-21T01:19:52.0428001Z ##[group]Run if [[ -z $toolchain ]]; then
+docs	Install Rust	2026-11-21T01:19:52.0429444Z ^[[36;1mif [[ -z $toolchain ]]; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0431538Z ^[[36;1m  # GitHub does not enforce `required: true` inputs itself. https://github.com/actions/runner/issues/1070^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0433772Z ^[[36;1m  echo "'toolchain' is a required input" >&2^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0435215Z ^[[36;1m  exit 1^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0436623Z ^[[36;1melif [[ $toolchain =~ ^stable' '[0-9]+' '(year|month|week|day)s?' 'ago$ ]]; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0438343Z ^[[36;1m  if [[ Linux == macOS ]]; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0440456Z ^[[36;1m    echo "toolchain=1.$((($(date -v-$(sed 's/stable \([0-9]*\) \(.\).*/\1\2/' <<< $toolchain) +%s)/60/60/24-16569)/7/6))" >> $GITHUB_OUTPUT^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0442610Z ^[[36;1m  else^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0444387Z ^[[36;1m    echo "toolchain=1.$((($(date --date "${toolchain#stable }" +%s)/60/60/24-16569)/7/6))" >> $GITHUB_OUTPUT^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0446322Z ^[[36;1m  fi^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0447608Z ^[[36;1melif [[ $toolchain =~ ^stable' 'minus' '[0-9]+' 'releases?$ ]]; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0449789Z ^[[36;1m  echo "toolchain=1.$((($(date +%s)/60/60/24-16569)/7/6-${toolchain//[^0-9]/}))" >> $GITHUB_OUTPUT^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0451697Z ^[[36;1melif [[ $toolchain =~ ^1\.[0-9]+$ ]]; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0453854Z ^[[36;1m  echo "toolchain=1.$((i=${toolchain#1.}, c=($(date +%s)/60/60/24-16569)/7/6, i+9*i*(10*i<=c)+90*i*(100*i<=c)))" >> $GITHUB_OUTPUT^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0456007Z ^[[36;1melse^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0456917Z ^[[36;1m  delimiter=EOF^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0458463Z ^[[36;1m  while [[ $toolchain == *$delimiter* ]]; do delimiter+=_; done^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0460575Z ^[[36;1m  printf 'toolchain<<%s\n%s\n%s\n' "$delimiter" "$toolchain" "$delimiter" >> $GITHUB_OUTPUT^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0462348Z ^[[36;1mfi^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0502542Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+docs	Install Rust	2026-11-21T01:19:52.0504155Z env:
+docs	Install Rust	2026-11-21T01:19:52.0505035Z   toolchain: stable
+docs	Install Rust	2026-11-21T01:19:52.0505967Z ##[endgroup]
+docs	Install Rust	2026-11-21T01:19:52.0744595Z ##[end-action id=__dtolnay_rust-toolchain.parse;outcome=success;conclusion=success;duration_ms=40]
+docs	Install Rust	2026-11-21T01:19:52.0754508Z ##[start-action display=Set $CARGO_HOME;id=__dtolnay_rust-toolchain.__run]
+docs	Install Rust	2026-11-21T01:19:52.0823612Z ##[group]Run echo CARGO_HOME=${CARGO_HOME:-"$HOME/.cargo"} >> $GITHUB_ENV
+docs	Install Rust	2026-11-21T01:19:52.0825898Z ^[[36;1mecho CARGO_HOME=${CARGO_HOME:-"$HOME/.cargo"} >> $GITHUB_ENV^[[0m
+docs	Install Rust	2026-11-21T01:19:52.0861338Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+docs	Install Rust	2026-11-21T01:19:52.0862750Z ##[endgroup]
+docs	Install Rust	2026-11-21T01:19:52.0948550Z ##[end-action id=__dtolnay_rust-toolchain.__run;outcome=success;conclusion=success;duration_ms=19]
+docs	Install Rust	2026-11-21T01:19:52.0956032Z ##[start-action display=Install rustup if needed;id=__dtolnay_rust-toolchain.__run_2]
+docs	Install Rust	2026-11-21T01:19:52.1020227Z ##[group]Run if ! command -v rustup &>/dev/null; then
+docs	Install Rust	2026-11-21T01:19:52.1021727Z ^[[36;1mif ! command -v rustup &>/dev/null; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1024767Z ^[[36;1m  curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused --location --silent --show-error --fail https://sh.rustup.rs | sh -s -- --default-toolchain none -y^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1027606Z ^[[36;1m  echo "$CARGO_HOME/bin" >> $GITHUB_PATH^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1028835Z ^[[36;1mfi^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1063344Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+docs	Install Rust	2026-11-21T01:19:52.1064960Z env:
+docs	Install Rust	2026-11-21T01:19:52.1065858Z   CARGO_HOME: /home/runner/.cargo
+docs	Install Rust	2026-11-21T01:19:52.1066946Z ##[endgroup]
+docs	Install Rust	2026-11-21T01:19:52.1150807Z ##[end-action id=__dtolnay_rust-toolchain.__run_2;outcome=success;conclusion=success;duration_ms=19]
+docs	Install Rust	2026-11-21T01:19:52.1158751Z ##[start-action display=Install rustup if needed on windows;id=__dtolnay_rust-toolchain.__run_3]
+docs	Install Rust	2026-11-21T01:19:52.1177648Z ##[end-action id=__dtolnay_rust-toolchain.__run_3;outcome=skipped;conclusion=skipped;duration_ms=0]
+docs	Install Rust	2026-11-21T01:19:52.1198341Z ##[start-action display=rustup toolchain install stable;id=__dtolnay_rust-toolchain.__run_4]
+docs	Install Rust	2026-11-21T01:19:52.1252458Z ##[group]Run set -f  # split targets and components on commas and whitespace, without glob expansion
+docs	Install Rust	2026-11-21T01:19:52.1255302Z ^[[36;1mset -f  # split targets and components on commas and whitespace, without glob expansion^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1257097Z ^[[36;1mflags=()^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1258253Z ^[[36;1mfor t in ${targets//,/ }; do flags+=(--target "$t"); done^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1259929Z ^[[36;1mfor c in ${components//,/ }; do flags+=(--component "$c"); done^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1261898Z ^[[36;1mif [[ $toolchain == nightly && -n $components ]]; then flags+=(--allow-downgrade); fi^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1263587Z ^[[36;1mlog=$(mktemp)^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1264746Z ^[[36;1mtrap 'rm -f "$log"' EXIT^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1265848Z ^[[36;1mfor attempt in 1 2 3 4 5; do^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1268073Z ^[[36;1m  if rustup toolchain install "$toolchain" "${flags[@]}" --profile minimal --no-self-update --force-non-host 2>&1 | tee "$log"; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1270307Z ^[[36;1m    break^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1271187Z ^[[36;1m  else^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1272062Z ^[[36;1m    status=$?^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1272993Z ^[[36;1m  fi^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1274413Z ^[[36;1m  if [[ $attempt == 5 ]] || ! grep -Fq 'checksum failed for ' "$log" \^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1276714Z ^[[36;1m      || ! grep -Fq 'this is likely due to an ongoing update of the official release server' "$log"; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1278582Z ^[[36;1m    exit "$status"^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1279568Z ^[[36;1m  fi^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1280990Z ^[[36;1m  echo "Retrying rustup toolchain install in 30 seconds (retry $attempt of 4)" >&2^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1282722Z ^[[36;1m  sleep 30^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1283612Z ^[[36;1mdone^[[0m
+docs	Install Rust	2026-11-21T01:19:52.1320752Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+docs	Install Rust	2026-11-21T01:19:52.1322304Z env:
+docs	Install Rust	2026-11-21T01:19:52.1323201Z   CARGO_HOME: /home/runner/.cargo
+docs	Install Rust	2026-11-21T01:19:52.1324473Z   toolchain: stable
+docs	Install Rust	2026-11-21T01:19:52.1325356Z   targets: 
+docs	Install Rust	2026-11-21T01:19:52.1326183Z   components: 
+docs	Install Rust	2026-11-21T01:19:52.1327075Z   RUSTUP_PERMIT_COPY_RENAME: 1
+docs	Install Rust	2026-11-21T01:19:52.1328085Z ##[endgroup]
+docs	Install Rust	2026-11-21T01:19:52.5042697Z info: syncing channel updates for stable-x86_64-unknown-linux-gnu
+docs	Install Rust	2026-11-21T01:19:52.6625090Z 
+docs	Install Rust	2026-11-21T01:19:52.6735634Z   stable-x86_64-unknown-linux-gnu unchanged - rustc 1.100.0 (0ef1bc386 2026-11-09)
+docs	Install Rust	2026-11-21T01:19:52.6738120Z 
+docs	Install Rust	2026-11-21T01:19:52.6802431Z ##[end-action id=__dtolnay_rust-toolchain.__run_4;outcome=success;conclusion=success;duration_ms=560]
+docs	Install Rust	2026-11-21T01:19:52.6816496Z ##[start-action display=rustup default stable;id=__dtolnay_rust-toolchain.__run_5]
+docs	Install Rust	2026-11-21T01:19:52.6878519Z ##[group]Run rustup default "$toolchain" --force-non-host
+docs	Install Rust	2026-11-21T01:19:52.6880556Z ^[[36;1mrustup default "$toolchain" --force-non-host^[[0m
+docs	Install Rust	2026-11-21T01:19:52.6921021Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+docs	Install Rust	2026-11-21T01:19:52.6922811Z env:
+docs	Install Rust	2026-11-21T01:19:52.6924212Z   CARGO_HOME: /home/runner/.cargo
+docs	Install Rust	2026-11-21T01:19:52.6925706Z   toolchain: stable
+docs	Install Rust	2026-11-21T01:19:52.6926917Z ##[endgroup]
+docs	Install Rust	2026-11-21T01:19:52.7045433Z info: using existing install for stable-x86_64-unknown-linux-gnu
+docs	Install Rust	2026-11-21T01:19:52.7054537Z info: default toolchain set to stable-x86_64-unknown-linux-gnu
+docs	Install Rust	2026-11-21T01:19:52.7055996Z 
+docs	Install Rust	2026-11-21T01:19:52.7135452Z   stable-x86_64-unknown-linux-gnu unchanged - rustc 1.100.0 (0ef1bc386 2026-11-09)
+docs	Install Rust	2026-11-21T01:19:52.7137526Z 
+docs	Install Rust	2026-11-21T01:19:52.7162254Z ##[end-action id=__dtolnay_rust-toolchain.__run_5;outcome=success;conclusion=success;duration_ms=34]
+docs	Install Rust	2026-11-21T01:19:52.7171034Z ##[start-action display=Create cachekey;id=__dtolnay_rust-toolchain.rustc-version]
+docs	Install Rust	2026-11-21T01:19:52.7221619Z ##[group]Run DATE=$(rustc +"$toolchain" --version --verbose | sed -ne 's/^commit-date: \(20[0-9][0-9]\)-\([01][0-9]\)-\([0-3][0-9]\)$/\1\2\3/p')
+docs	Install Rust	2026-11-21T01:19:52.7225157Z ^[[36;1mDATE=$(rustc +"$toolchain" --version --verbose | sed -ne 's/^commit-date: \(20[0-9][0-9]\)-\([01][0-9]\)-\([0-3][0-9]\)$/\1\2\3/p')^[[0m
+docs	Install Rust	2026-11-21T01:19:52.7227759Z ^[[36;1mHASH=$(rustc +"$toolchain" --version --verbose | sed -ne 's/^commit-hash: //p')^[[0m
+docs	Install Rust	2026-11-21T01:19:52.7229734Z ^[[36;1mecho "cachekey=$(echo $DATE$HASH | head -c12)" >> $GITHUB_OUTPUT^[[0m
+docs	Install Rust	2026-11-21T01:19:52.7265973Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+docs	Install Rust	2026-11-21T01:19:52.7267259Z env:
+docs	Install Rust	2026-11-21T01:19:52.7268105Z   CARGO_HOME: /home/runner/.cargo
+docs	Install Rust	2026-11-21T01:19:52.7269554Z   toolchain: stable
+docs	Install Rust	2026-11-21T01:19:52.7270938Z ##[endgroup]
+docs	Install Rust	2026-11-21T01:19:52.7677994Z ##[end-action id=__dtolnay_rust-toolchain.rustc-version;outcome=success;conclusion=success;duration_ms=50]
+docs	Install Rust	2026-11-21T01:19:52.7685569Z ##[start-action display=Disable incremental compilation;id=__dtolnay_rust-toolchain.__run_6]
+docs	Install Rust	2026-11-21T01:19:52.7816602Z ##[group]Run if [ -z "${CARGO_INCREMENTAL+set}" ]; then
+docs	Install Rust	2026-11-21T01:19:52.7819122Z ^[[36;1mif [ -z "${CARGO_INCREMENTAL+set}" ]; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.7821463Z ^[[36;1m  echo CARGO_INCREMENTAL=0 >> $GITHUB_ENV^[[0m
+docs	Install Rust	2026-11-21T01:19:52.7823553Z ^[[36;1mfi^[[0m
+docs	Install Rust	2026-11-21T01:19:52.7902484Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+docs	Install Rust	2026-11-21T01:19:52.7904948Z env:
+docs	Install Rust	2026-11-21T01:19:52.7906372Z   CARGO_HOME: /home/runner/.cargo
+docs	Install Rust	2026-11-21T01:19:52.7908177Z ##[endgroup]
+docs	Install Rust	2026-11-21T01:19:52.8027497Z ##[end-action id=__dtolnay_rust-toolchain.__run_6;outcome=success;conclusion=success;duration_ms=33]
+docs	Install Rust	2026-11-21T01:19:52.8037123Z ##[start-action display=Enable colors in Cargo output;id=__dtolnay_rust-toolchain.__run_7]
+docs	Install Rust	2026-11-21T01:19:52.8100941Z ##[group]Run if [ -z "${CARGO_TERM_COLOR+set}" ]; then
+docs	Install Rust	2026-11-21T01:19:52.8102852Z ^[[36;1mif [ -z "${CARGO_TERM_COLOR+set}" ]; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8105004Z ^[[36;1m  echo CARGO_TERM_COLOR=always >> $GITHUB_ENV^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8106693Z ^[[36;1mfi^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8144501Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+docs	Install Rust	2026-11-21T01:19:52.8146617Z env:
+docs	Install Rust	2026-11-21T01:19:52.8147807Z   CARGO_HOME: /home/runner/.cargo
+docs	Install Rust	2026-11-21T01:19:52.8149282Z   CARGO_INCREMENTAL: 0
+docs	Install Rust	2026-11-21T01:19:52.8150581Z ##[endgroup]
+docs	Install Rust	2026-11-21T01:19:52.8238210Z ##[end-action id=__dtolnay_rust-toolchain.__run_7;outcome=success;conclusion=success;duration_ms=19]
+docs	Install Rust	2026-11-21T01:19:52.8247010Z ##[start-action display=Enable Cargo sparse registry;id=__dtolnay_rust-toolchain.__run_8]
+docs	Install Rust	2026-11-21T01:19:52.8317965Z ##[group]Run # implemented in 1.66, stabilized in 1.68, made default in 1.70
+docs	Install Rust	2026-11-21T01:19:52.8319808Z ^[[36;1m# implemented in 1.66, stabilized in 1.68, made default in 1.70^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8322386Z ^[[36;1mif [ -z "${CARGO_REGISTRIES_CRATES_IO_PROTOCOL+set}" -o -f "/home/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol ]; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8325338Z ^[[36;1m  if rustc +"$toolchain" --version --verbose | grep -q '^release: 1\.6[89]\.'; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8327578Z ^[[36;1m    touch "/home/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol || true^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8329651Z ^[[36;1m    echo CARGO_REGISTRIES_CRATES_IO_PROTOCOL=sparse >> $GITHUB_ENV^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8331632Z ^[[36;1m  elif rustc +"$toolchain" --version --verbose | grep -q '^release: 1\.6[67]\.'; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8333874Z ^[[36;1m    touch "/home/runner/work/_temp"/.implicit_cargo_registries_crates_io_protocol || true^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8336171Z ^[[36;1m    echo CARGO_REGISTRIES_CRATES_IO_PROTOCOL=git >> $GITHUB_ENV^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8337581Z ^[[36;1m  fi^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8338404Z ^[[36;1mfi^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8373861Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+docs	Install Rust	2026-11-21T01:19:52.8375430Z env:
+docs	Install Rust	2026-11-21T01:19:52.8376285Z   CARGO_HOME: /home/runner/.cargo
+docs	Install Rust	2026-11-21T01:19:52.8377548Z   CARGO_INCREMENTAL: 0
+docs	Install Rust	2026-11-21T01:19:52.8378473Z   CARGO_TERM_COLOR: always
+docs	Install Rust	2026-11-21T01:19:52.8379431Z   toolchain: stable
+docs	Install Rust	2026-11-21T01:19:52.8380307Z ##[endgroup]
+docs	Install Rust	2026-11-21T01:19:52.8728425Z ##[end-action id=__dtolnay_rust-toolchain.__run_8;outcome=success;conclusion=success;duration_ms=47]
+docs	Install Rust	2026-11-21T01:19:52.8737479Z ##[start-action display=Work around spurious network errors in curl 8.0;id=__dtolnay_rust-toolchain.__run_9]
+docs	Install Rust	2026-11-21T01:19:52.8787468Z ##[group]Run # https://rust-lang.zulipchat.com/#narrow/stream/246057-t-cargo/topic/timeout.20investigation
+docs	Install Rust	2026-11-21T01:19:52.8790202Z ^[[36;1m# https://rust-lang.zulipchat.com/#narrow/stream/246057-t-cargo/topic/timeout.20investigation^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8792530Z ^[[36;1mif rustc +"$toolchain" --version --verbose | grep -q '^release: 1\.7[01]\.'; then^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8794568Z ^[[36;1m  echo CARGO_HTTP_MULTIPLEXING=false >> $GITHUB_ENV^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8795833Z ^[[36;1mfi^[[0m
+docs	Install Rust	2026-11-21T01:19:52.8831076Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+docs	Install Rust	2026-11-21T01:19:52.8832363Z env:
+docs	Install Rust	2026-11-21T01:19:52.8833188Z   CARGO_HOME: /home/runner/.cargo
+docs	Install Rust	2026-11-21T01:19:52.8834491Z   CARGO_INCREMENTAL: 0
+docs	Install Rust	2026-11-21T01:19:52.8835425Z   CARGO_TERM_COLOR: always
+docs	Install Rust	2026-11-21T01:19:52.8836359Z   toolchain: stable
+docs	Install Rust	2026-11-21T01:19:52.8837198Z ##[endgroup]
+docs	Install Rust	2026-11-21T01:19:52.9052509Z ##[end-action id=__dtolnay_rust-toolchain.__run_9;outcome=success;conclusion=success;duration_ms=31]
+docs	Install Rust	2026-11-21T01:19:52.9062781Z ##[start-action display=rustc +stable --version --verbose;id=__dtolnay_rust-toolchain.__run_10]
+docs	Install Rust	2026-11-21T01:19:52.9112052Z ##[group]Run rustc +"$toolchain" --version --verbose
+docs	Install Rust	2026-11-21T01:19:52.9113415Z ^[[36;1mrustc +"$toolchain" --version --verbose^[[0m
+docs	Install Rust	2026-11-21T01:19:52.9149221Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+docs	Install Rust	2026-11-21T01:19:52.9150486Z env:
+docs	Install Rust	2026-11-21T01:19:52.9151297Z   CARGO_HOME: /home/runner/.cargo
+docs	Install Rust	2026-11-21T01:19:52.9152302Z   CARGO_INCREMENTAL: 0
+docs	Install Rust	2026-11-21T01:19:52.9153224Z   CARGO_TERM_COLOR: always
+docs	Install Rust	2026-11-21T01:19:52.9154376Z   toolchain: stable
+docs	Install Rust	2026-11-21T01:19:52.9155235Z ##[endgroup]
+docs	Install Rust	2026-11-21T01:19:52.9339490Z rustc 1.100.0 (0ef1bc386 2026-11-09)
+docs	Install Rust	2026-11-21T01:19:52.9341974Z binary: rustc
+docs	Install Rust	2026-11-21T01:19:52.9343043Z commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+docs	Install Rust	2026-11-21T01:19:52.9344601Z commit-date: 2026-11-09
+docs	Install Rust	2026-11-21T01:19:52.9345556Z host: x86_64-unknown-linux-gnu
+docs	Install Rust	2026-11-21T01:19:52.9346523Z release: 1.100.0
+docs	Install Rust	2026-11-21T01:19:52.9347359Z LLVM version: 23.1.5
+docs	Install Rust	2026-11-21T01:19:52.9372921Z ##[end-action id=__dtolnay_rust-toolchain.__run_10;outcome=success;conclusion=success;duration_ms=30]
+docs	Check documentation	﻿2026-11-21T01:19:52.9504582Z ##[group]Run cargo doc --no-deps --document-private-items --workspace
+docs	Check documentation	2026-11-21T01:19:52.9507043Z ^[[36;1mcargo doc --no-deps --document-private-items --workspace^[[0m
+docs	Check documentation	2026-11-21T01:19:52.9545435Z shell: /usr/bin/bash -e {0}
+docs	Check documentation	2026-11-21T01:19:52.9546787Z env:
+docs	Check documentation	2026-11-21T01:19:52.9547972Z   CARGO_HOME: /home/runner/.cargo
+docs	Check documentation	2026-11-21T01:19:52.9549429Z   CARGO_INCREMENTAL: 0
+docs	Check documentation	2026-11-21T01:19:52.9550731Z   CARGO_TERM_COLOR: always
+docs	Check documentation	2026-11-21T01:19:52.9552104Z   RUSTDOCFLAGS: -D warnings
+docs	Check documentation	2026-11-21T01:19:52.9553462Z ##[endgroup]
+docs	Check documentation	2026-11-21T01:19:53.2212172Z ^[[1m^[[92m    Updating^[[0m crates.io index
+docs	Check documentation	2026-11-21T01:19:53.3301286Z ^[[1m^[[92m Downloading^[[0m crates ...
+docs	Check documentation	2026-11-21T01:19:53.4260455Z ^[[1m^[[92m  Downloaded^[[0m crossbeam-utils v0.8.22
+docs	Check documentation	2026-11-21T01:19:53.4305450Z ^[[1m^[[92m  Downloaded^[[0m crossbeam-deque v0.8.7
+docs	Check documentation	2026-11-21T01:19:53.4325153Z ^[[1m^[[92m  Downloaded^[[0m anyhow v1.0.104
+docs	Check documentation	2026-11-21T01:19:53.4358649Z ^[[1m^[[92m  Downloaded^[[0m cfg-if v1.0.4
+docs	Check documentation	2026-11-21T01:19:53.4368828Z ^[[1m^[[92m  Downloaded^[[0m find-msvc-tools v0.1.9
+docs	Check documentation	2026-11-21T01:19:53.4386460Z ^[[1m^[[92m  Downloaded^[[0m itoa v1.0.18
+docs	Check documentation	2026-11-21T01:19:53.4415558Z ^[[1m^[[92m  Downloaded^[[0m aho-corasick v1.1.5
+docs	Check documentation	2026-11-21T01:19:53.4454654Z ^[[1m^[[92m  Downloaded^[[0m encoding_rs_io v0.1.8
+docs	Check documentation	2026-11-21T01:19:53.4468335Z ^[[1m^[[92m  Downloaded^[[0m same-file v1.0.6
+docs	Check documentation	2026-11-21T01:19:53.4482915Z ^[[1m^[[92m  Downloaded^[[0m memmap2 v0.9.11
+docs	Check documentation	2026-11-21T01:19:53.4501738Z ^[[1m^[[92m  Downloaded^[[0m termcolor v1.4.1
+docs	Check documentation	2026-11-21T01:19:53.4535470Z ^[[1m^[[92m  Downloaded^[[0m textwrap v0.16.2
+docs	Check documentation	2026-11-21T01:19:53.4541430Z ^[[1m^[[92m  Downloaded^[[0m walkdir v2.5.0
+docs	Check documentation	2026-11-21T01:19:53.4559418Z ^[[1m^[[92m  Downloaded^[[0m zmij v1.0.23
+docs	Check documentation	2026-11-21T01:19:53.4585025Z ^[[1m^[[92m  Downloaded^[[0m jobserver v0.1.35
+docs	Check documentation	2026-11-21T01:19:53.4597982Z ^[[1m^[[92m  Downloaded^[[0m lexopt v0.3.2
+docs	Check documentation	2026-11-21T01:19:53.4612142Z ^[[1m^[[92m  Downloaded^[[0m log v0.4.33
+docs	Check documentation	2026-11-21T01:19:53.4636369Z ^[[1m^[[92m  Downloaded^[[0m pkg-config v0.3.33
+docs	Check documentation	2026-11-21T01:19:53.4651634Z ^[[1m^[[92m  Downloaded^[[0m shlex v2.0.1
+docs	Check documentation	2026-11-21T01:19:53.4663902Z ^[[1m^[[92m  Downloaded^[[0m crossbeam-epoch v0.9.20
+docs	Check documentation	2026-11-21T01:19:53.4688239Z ^[[1m^[[92m  Downloaded^[[0m pcre2 v0.2.11
+docs	Check documentation	2026-11-21T01:19:53.4704566Z ^[[1m^[[92m  Downloaded^[[0m serde_core v1.0.229
+docs	Check documentation	2026-11-21T01:19:53.4734889Z ^[[1m^[[92m  Downloaded^[[0m cc v1.4.0
+docs	Check documentation	2026-11-21T01:19:53.4760468Z ^[[1m^[[92m  Downloaded^[[0m memchr v2.8.3
+docs	Check documentation	2026-11-21T01:19:53.4816703Z ^[[1m^[[92m  Downloaded^[[0m serde v1.0.229
+docs	Check documentation	2026-11-21T01:19:53.4851655Z ^[[1m^[[92m  Downloaded^[[0m serde_json v1.0.151
+docs	Check documentation	2026-11-21T01:19:53.4923551Z ^[[1m^[[92m  Downloaded^[[0m regex-syntax v0.8.11
+docs	Check documentation	2026-11-21T01:19:53.4991665Z ^[[1m^[[92m  Downloaded^[[0m regex-automata v0.4.18
+docs	Check documentation	2026-11-21T01:19:53.5137217Z ^[[1m^[[92m  Downloaded^[[0m pcre2-sys v0.2.10
+docs	Check documentation	2026-11-21T01:19:53.5282931Z ^[[1m^[[92m  Downloaded^[[0m libc v0.2.189
+docs	Check documentation	2026-11-21T01:19:53.5692797Z ^[[1m^[[92m  Downloaded^[[0m encoding_rs v0.8.35
+docs	Check documentation	2026-11-21T01:19:53.5888834Z ^[[1m^[[92m  Downloaded^[[0m bstr v1.13.0
+docs	Check documentation	2026-11-21T01:19:54.3432698Z ^[[1m^[[92m    Checking^[[0m memchr v2.8.3
+docs	Check documentation	2026-11-21T01:19:54.3433488Z ^[[1m^[[92m   Compiling^[[0m libc v0.2.189
+docs	Check documentation	2026-11-21T01:19:54.3434663Z ^[[1m^[[92m    Checking^[[0m log v0.4.33
+docs	Check documentation	2026-11-21T01:19:54.3436077Z ^[[1m^[[92m    Checking^[[0m regex-syntax v0.8.11
+docs	Check documentation	2026-11-21T01:19:55.0620821Z ^[[1m^[[92m    Checking^[[0m cfg-if v1.0.4
+docs	Check documentation	2026-11-21T01:19:55.0787149Z ^[[1m^[[92m   Compiling^[[0m serde_core v1.0.229
+docs	Check documentation	2026-11-21T01:19:55.4982574Z ^[[1m^[[92m    Checking^[[0m aho-corasick v1.1.5
+docs	Check documentation	2026-11-21T01:19:56.0034174Z ^[[1m^[[92m    Checking^[[0m grep-matcher v0.1.9 (/home/runner/work/ripgrep/ripgrep/crates/matcher)
+docs	Check documentation	2026-11-21T01:19:56.0284269Z ^[[1m^[[92m    Checking^[[0m encoding_rs v0.8.35
+docs	Check documentation	2026-11-21T01:19:56.1105247Z ^[[1m^[[92m   Compiling^[[0m zmij v1.0.23
+docs	Check documentation	2026-11-21T01:19:56.4269377Z ^[[1m^[[92m    Checking^[[0m regex-automata v0.4.18
+docs	Check documentation	2026-11-21T01:19:56.9092596Z ^[[1m^[[92m    Checking^[[0m encoding_rs_io v0.1.8
+docs	Check documentation	2026-11-21T01:19:57.6793862Z ^[[1m^[[92m    Checking^[[0m memmap2 v0.9.11
+docs	Check documentation	2026-11-21T01:19:57.7191744Z ^[[1m^[[92m   Compiling^[[0m serde v1.0.229
+docs	Check documentation	2026-11-21T01:19:57.8918101Z ^[[1m^[[92m   Compiling^[[0m serde_json v1.0.151
+docs	Check documentation	2026-11-21T01:19:57.9839156Z ^[[1m^[[92m   Compiling^[[0m crossbeam-utils v0.8.22
+docs	Check documentation	2026-11-21T01:19:58.0335438Z ^[[1m^[[92m    Checking^[[0m termcolor v1.4.1
+docs	Check documentation	2026-11-21T01:19:58.2132159Z ^[[1m^[[92m   Compiling^[[0m jobserver v0.1.35
+docs	Check documentation	2026-11-21T01:19:58.4965226Z ^[[1m^[[92m    Checking^[[0m bstr v1.13.0
+docs	Check documentation	2026-11-21T01:19:58.5871137Z ^[[1m^[[92m    Checking^[[0m itoa v1.0.18
+docs	Check documentation	2026-11-21T01:19:58.6806004Z ^[[1m^[[92m   Compiling^[[0m find-msvc-tools v0.1.9
+docs	Check documentation	2026-11-21T01:19:58.8278314Z ^[[1m^[[92m   Compiling^[[0m crossbeam-epoch v0.9.20
+docs	Check documentation	2026-11-21T01:19:58.8444130Z ^[[1m^[[92m    Checking^[[0m globset v0.4.21 (/home/runner/work/ripgrep/ripgrep/crates/globset)
+docs	Check documentation	2026-11-21T01:19:58.9405222Z ^[[1m^[[92m   Compiling^[[0m shlex v2.0.1
+docs	Check documentation	2026-11-21T01:19:59.0471669Z ^[[1m^[[92m   Compiling^[[0m cc v1.4.0
+docs	Check documentation	2026-11-21T01:19:59.0735715Z ^[[1m^[[92m    Checking^[[0m grep-searcher v0.1.17 (/home/runner/work/ripgrep/ripgrep/crates/searcher)
+docs	Check documentation	2026-11-21T01:19:59.4444797Z ^[[1m^[[92m   Compiling^[[0m crossbeam-deque v0.8.7
+docs	Check documentation	2026-11-21T01:19:59.5805364Z ^[[1m^[[92m   Compiling^[[0m pkg-config v0.3.33
+docs	Check documentation	2026-11-21T01:19:59.7537473Z ^[[1m^[[92m    Checking^[[0m same-file v1.0.6
+docs	Check documentation	2026-11-21T01:19:59.7958787Z ^[[1m^[[92m    Checking^[[0m walkdir v2.5.0
+docs	Check documentation	2026-11-21T01:19:59.9062366Z ^[[1m^[[92m    Checking^[[0m grep-printer v0.3.1 (/home/runner/work/ripgrep/ripgrep/crates/printer)
+docs	Check documentation	2026-11-21T01:19:59.9755340Z ^[[1m^[[92m    Checking^[[0m grep-cli v0.1.12 (/home/runner/work/ripgrep/ripgrep/crates/cli)
+docs	Check documentation	2026-11-21T01:20:00.0445568Z ^[[1m^[[92m    Checking^[[0m grep-regex v0.1.14 (/home/runner/work/ripgrep/ripgrep/crates/regex)
+docs	Check documentation	2026-11-21T01:20:00.1412238Z ^[[1m^[[92m   Compiling^[[0m anyhow v1.0.104
+docs	Check documentation	2026-11-21T01:20:00.2180704Z ^[[1m^[[92m   Compiling^[[0m ripgrep v15.2.0 (/home/runner/work/ripgrep/ripgrep)
+docs	Check documentation	2026-11-21T01:20:00.3682874Z ^[[1m^[[92m    Checking^[[0m grep v0.4.1 (/home/runner/work/ripgrep/ripgrep/crates/grep)
+docs	Check documentation	2026-11-21T01:20:00.3810645Z ^[[1m^[[92m    Checking^[[0m ignore v0.4.34 (/home/runner/work/ripgrep/ripgrep/crates/ignore)
+docs	Check documentation	2026-11-21T01:20:00.3925406Z ^[[1m^[[92m    Checking^[[0m lexopt v0.3.2
+docs	Check documentation	2026-11-21T01:20:00.4755880Z ^[[1m^[[92m    Checking^[[0m textwrap v0.16.2
+docs	Check documentation	2026-11-21T01:20:00.5993050Z ^[[1m^[[92m   Compiling^[[0m pcre2-sys v0.2.10
+docs	Check documentation	2026-11-21T01:20:00.6263888Z ^[[1m^[[92m Documenting^[[0m grep v0.4.1 (/home/runner/work/ripgrep/ripgrep/crates/grep)
+docs	Check documentation	2026-11-21T01:20:00.7691924Z ^[[1m^[[92m Documenting^[[0m ignore v0.4.34 (/home/runner/work/ripgrep/ripgrep/crates/ignore)
+docs	Check documentation	2026-11-21T01:20:00.8364817Z ^[[1m^[[92m    Checking^[[0m pcre2 v0.2.11
+docs	Check documentation	2026-11-21T01:20:00.9482494Z ^[[1m^[[92m Documenting^[[0m grep-pcre2 v0.1.10 (/home/runner/work/ripgrep/ripgrep/crates/pcre2)
+docs	Check documentation	2026-11-21T01:20:01.1237022Z ^[[1m^[[92m Documenting^[[0m ripgrep v15.2.0 (/home/runner/work/ripgrep/ripgrep)
+docs	Check documentation	2026-11-21T01:20:04.6910033Z ^[[1m^[[92m Documenting^[[0m grep-printer v0.3.1 (/home/runner/work/ripgrep/ripgrep/crates/printer)
+docs	Check documentation	2026-11-21T01:20:05.0295753Z ^[[1m^[[92m Documenting^[[0m grep-cli v0.1.12 (/home/runner/work/ripgrep/ripgrep/crates/cli)
+docs	Check documentation	2026-11-21T01:20:05.1176414Z ^[[1m^[[92m Documenting^[[0m grep-regex v0.1.14 (/home/runner/work/ripgrep/ripgrep/crates/regex)
+docs	Check documentation	2026-11-21T01:20:05.1280434Z ^[[1m^[[92m Documenting^[[0m grep-searcher v0.1.17 (/home/runner/work/ripgrep/ripgrep/crates/searcher)
+docs	Check documentation	2026-11-21T01:20:05.2695522Z ^[[1m^[[92m Documenting^[[0m globset v0.4.21 (/home/runner/work/ripgrep/ripgrep/crates/globset)
+docs	Check documentation	2026-11-21T01:20:05.3486243Z ^[[1m^[[92m Documenting^[[0m grep-matcher v0.1.9 (/home/runner/work/ripgrep/ripgrep/crates/matcher)
+docs	Check documentation	2026-11-21T01:20:05.7281441Z ^[[1m^[[92m    Finished^[[0m `dev` profile [unoptimized + debuginfo] target(s) in 12.74s
+docs	Check documentation	2026-11-21T01:20:05.7373252Z ^[[1m^[[92m   Generated^[[0m /home/runner/work/ripgrep/ripgrep/target/doc/globset/index.html and 9 other files
+docs	Post Checkout repository	﻿2026-11-21T01:20:05.7648655Z Post job cleanup.
+docs	Post Checkout repository	2026-11-21T01:20:05.8590691Z [command]/usr/bin/git version
+docs	Post Checkout repository	2026-11-21T01:20:05.8632885Z git version 2.56.1
+docs	Post Checkout repository	2026-11-21T01:20:05.8669742Z Temporarily overriding HOME='/home/runner/work/_temp/3e34e273-b91c-440d-92be-5e4df27db597' before making global git config changes
+docs	Post Checkout repository	2026-11-21T01:20:05.8671136Z Adding repository directory to the temporary git global config as a safe directory
+docs	Post Checkout repository	2026-11-21T01:20:05.8675107Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/ripgrep/ripgrep
+docs	Post Checkout repository	2026-11-21T01:20:05.8709193Z Removing SSH command configuration
+docs	Post Checkout repository	2026-11-21T01:20:05.8715742Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+docs	Post Checkout repository	2026-11-21T01:20:05.8754860Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+docs	Post Checkout repository	2026-11-21T01:20:05.9036812Z Removing HTTP extra header
+docs	Post Checkout repository	2026-11-21T01:20:05.9042532Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+docs	Post Checkout repository	2026-11-21T01:20:05.9082626Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+docs	Post Checkout repository	2026-11-21T01:20:05.9364180Z Removing includeIf entries pointing to credentials config files
+docs	Post Checkout repository	2026-11-21T01:20:05.9370549Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+docs	Post Checkout repository	2026-11-21T01:20:05.9400603Z includeif.gitdir:/home/runner/work/ripgrep/ripgrep/.git.path
+docs	Post Checkout repository	2026-11-21T01:20:05.9401445Z includeif.gitdir:/home/runner/work/ripgrep/ripgrep/.git/worktrees/*.path
+docs	Post Checkout repository	2026-11-21T01:20:05.9401900Z includeif.gitdir:/github/workspace/.git.path
+docs	Post Checkout repository	2026-11-21T01:20:05.9402273Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+docs	Post Checkout repository	2026-11-21T01:20:05.9410249Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/ripgrep/ripgrep/.git.path
+docs	Post Checkout repository	2026-11-21T01:20:05.9436082Z /home/runner/work/_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config
+docs	Post Checkout repository	2026-11-21T01:20:05.9446518Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/ripgrep/ripgrep/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-20b5093c\-93b2\-45be\-baf5\-7e363da2ac31\.config
+docs	Post Checkout repository	2026-11-21T01:20:05.9492953Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/ripgrep/ripgrep/.git/worktrees/*.path
+docs	Post Checkout repository	2026-11-21T01:20:05.9523309Z /home/runner/work/_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config
+docs	Post Checkout repository	2026-11-21T01:20:05.9534732Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/ripgrep/ripgrep/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-20b5093c\-93b2\-45be\-baf5\-7e363da2ac31\.config
+docs	Post Checkout repository	2026-11-21T01:20:05.9576274Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+docs	Post Checkout repository	2026-11-21T01:20:05.9605005Z /github/runner_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config
+docs	Post Checkout repository	2026-11-21T01:20:05.9618303Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-20b5093c\-93b2\-45be\-baf5\-7e363da2ac31\.config
+docs	Post Checkout repository	2026-11-21T01:20:05.9662294Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+docs	Post Checkout repository	2026-11-21T01:20:05.9691139Z /github/runner_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config
+docs	Post Checkout repository	2026-11-21T01:20:05.9713393Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-20b5093c\-93b2\-45be\-baf5\-7e363da2ac31\.config
+docs	Post Checkout repository	2026-11-21T01:20:05.9746559Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+docs	Post Checkout repository	2026-11-21T01:20:06.0040762Z Removing credentials config '/home/runner/work/_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config'
+docs	Complete job	﻿2026-11-21T01:20:06.0243385Z Cleaning up orphan processes
+Compile Fuzz Test Targets	Set up job	﻿2026-11-21T01:19:49.6261000Z Current runner version: '2.338.2'
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6297989Z ##[group]Runner Image Provisioner
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6299364Z Hosted Compute Agent
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6300395Z Version: 20261111.635
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6301716Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6303073Z Build Date: 2026-11-11T01:49:01Z
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6304351Z Worker ID: {f15fad35-81d1-4632-bdc8-d5d3ba67cd4d}
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6305890Z Region: eastus2
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6306974Z Cloud: Azure
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6307902Z ##[endgroup]
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6310455Z ##[group]Operating System
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6311561Z Ubuntu
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6312429Z 26.04.1
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6313458Z LTS
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6314326Z ##[endgroup]
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6315704Z ##[group]Runner Image
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6316751Z Image: ubuntu-26.04
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6317771Z Version: 20261116.202.1
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6319686Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261116.202/images/ubuntu/Ubuntu2604-Readme.md
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6322732Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261116.202
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6324561Z ##[endgroup]
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6326537Z ##[group]GITHUB_TOKEN Permissions
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6329589Z Contents: read
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6330612Z Metadata: read
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6331547Z ##[endgroup]
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6334855Z Secret source: None
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6336486Z Cache mode: write
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6337727Z Prepare workflow directory
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6830949Z Prepare all required actions
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.6903692Z Getting action download info
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.8447330Z Download action repository 'actions/checkout@v7' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:49.9467645Z Download action repository 'dtolnay/rust-toolchain@master' (SHA:df2a88e9fe4098bad09cb42c3dec7187f15861fc)
+Compile Fuzz Test Targets	Set up job	2026-11-21T01:19:50.1867802Z Complete job name: Compile Fuzz Test Targets
+Compile Fuzz Test Targets	Checkout repository	﻿2026-11-21T01:19:50.2849671Z ##[group]Run actions/checkout@v7
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2850614Z with:
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2851072Z   repository: BurntSushi/ripgrep
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2854947Z   token: ***
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2855396Z   ssh-strict: true
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2855842Z   ssh-user: git
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2856301Z   persist-credentials: true
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2856788Z   clean: true
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2857247Z   sparse-checkout-cone-mode: true
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2857777Z   fetch-depth: 1
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2858207Z   fetch-tags: false
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2858699Z   show-progress: true
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2859151Z   lfs: false
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2859570Z   submodules: false
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2860017Z   set-safe-directory: true
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2860535Z   allow-unsafe-pr-checkout: false
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.2861316Z ##[endgroup]
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.5453676Z Syncing repository: BurntSushi/ripgrep
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.5457207Z ##[group]Getting Git version info
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.5458754Z Working directory is '/home/runner/work/ripgrep/ripgrep'
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.5461121Z [command]/usr/bin/git version
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.5462365Z git version 2.56.1
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.5485159Z ##[endgroup]
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.5495564Z Temporarily overriding HOME='/home/runner/work/_temp/e22b9480-bf6f-462a-9a90-73a4d7ef09d4' before making global git config changes
+Compile Fuzz Test Targets	Checkout repository	2026-11-21T01:19:50.5498542Z Adding repository directory to the temporary git global config as a safe directory

@@ -129,3 +129,23 @@ func TestAggressiveStatus(t *testing.T) {
 		}
 	})
 }
+
+func TestAggressiveStatusUpstream(t *testing.T) {
+	cases := []struct{ name, raw, want string }{
+		{"up to date", "On branch main\nYour branch is up to date with 'origin/main'.\n\nnothing to commit, working tree clean\n", "main...origin/main: clean"},
+		{"ahead", "On branch main\nYour branch is ahead of 'origin/main' by 3 commits.\n  (use \"git push\" to publish your local commits)\n\nnothing to commit, working tree clean\n", "main...origin/main (ahead 3): clean"},
+		{"diverged", statusAheadBehind, "main...origin/main (ahead 2, behind 3): clean"},
+		{"gone", "On branch topic\nYour branch is based on 'origin/topic', but the upstream is gone.\n  (use \"git branch --unset-upstream\" to fixup)\n\nnothing to commit, working tree clean\n", "topic (upstream origin/topic gone): clean"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			out, err := New().Aggressive(context.Background(), format.Input{Argv: []string{"git", "status"}, Stdout: strings.NewReader(tc.raw)})
+			if err != nil {
+				t.Fatalf("Aggressive() error = %v", err)
+			}
+			if got := string(out.Body); got != tc.want {
+				t.Errorf("body = %q, want %q", got, tc.want)
+			}
+		})
+	}
+}

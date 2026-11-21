@@ -1,0 +1,14 @@
+Filesystem           1K-blocks      Used Available Use% Mounted on
+overlay              528111992 146765820 354486312  29% /
+tmpfs                    65536         0     65536   0% /dev
+shm                      65536         0     65536   0% /dev/shm
+grpcfuse             971350180 860485180 110865000  89% /work
+/dev/vda1            528111992 146765820 354486312  29% /etc/hostname
+/dev/vda1            528111992 146765820 354486312  29% /etc/hosts
+/dev/vda1            528111992 146765820 354486312  29% /etc/resolv.conf
+tmpfs                    65536         0     65536   0% /proc/interrupts
+tmpfs                    65536         0     65536   0% /proc/kcore
+tmpfs                    65536         0     65536   0% /proc/keys
+tmpfs                        4         0         4   0% /proc/scsi
+tmpfs                    65536         0     65536   0% /proc/timer_list
+tmpfs                        4         0         4   0% /sys/firmware

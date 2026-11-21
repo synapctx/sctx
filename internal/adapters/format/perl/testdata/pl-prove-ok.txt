@@ -1,0 +1,5 @@
+t/01-add.t .. ok
+t/03-ok.t ... ok
+All tests successful.
+Files=2, Tests=14,  0 wallclock secs ( 0.01 usr  0.00 sys +  0.05 cusr  0.02 csys =  0.08 CPU)
+Result: PASS

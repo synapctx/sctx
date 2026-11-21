@@ -1,0 +1,44 @@
+FAIL slowpkg
+=== RUN   TestSlow
+FAIL slowpkg.TestSlow (-1.00s)
+
+=== Failed
+=== FAIL: slowpkg  (0.00s)
+panic: test timed out after 1s
+	running tests:
+		TestSlow (1s)
+
+goroutine 33 [running]:
+testing.(*M).startAlarm.func1()
+	/usr/local/go/src/testing/testing.go:2961 +0x2c4
+created by time.goFunc
+	/usr/local/go/src/time/sleep.go:182 +0x38
+
+goroutine 1 [chan receive]:
+testing.(*T).Run(0x2900747de008, {0x102cb5a95?, 0x29007479aa88?}, 0x102e1f710)
+	/usr/local/go/src/testing/testing.go:2268 +0x3cc
+testing.runTests.func1(0x2900747de008)
+	/usr/local/go/src/testing/testing.go:2744 +0x38
+testing.tRunner(0x2900747de008, 0x29007479abb8)
+	/usr/local/go/src/testing/testing.go:2195 +0xc4
+testing.runTests({0x102cb74e4, 0xe}, {0x102cb9b6e, 0x16}, 0x2900747a2078, {0x102e3d728, 0x1, 0x1}, {0x29007479ac58?, 0x2900747941a0?, ...})
+	/usr/local/go/src/testing/testing.go:2742 +0x400
+testing.(*M).Run(0x2900747cc280)
+	/usr/local/go/src/testing/testing.go:2602 +0x578
+main.main()
+	_testmain.go:46 +0x80
+
+goroutine 20 [sleep]:
+time.Sleep(0x12a05f200)
+	/usr/local/go/src/runtime/time.go:368 +0x150
+example.com/ts/slowpkg.TestSlow(0x2900747de248?)
+	/work/go-ts/slowpkg/s_test.go:5 +0x28
+testing.tRunner(0x2900747de248, 0x102e1f710)
+	/usr/local/go/src/testing/testing.go:2195 +0xc4
+created by testing.(*T).Run in goroutine 1
+	/usr/local/go/src/testing/testing.go:2260 +0x3b8
+FAIL	example.com/ts/slowpkg	1.179s
+
+=== FAIL: slowpkg TestSlow (unknown)
+
+DONE 1 tests, 2 failures in 1.179s

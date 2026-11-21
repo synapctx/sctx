@@ -1,0 +1,61 @@
+Building for debugging...
+[Planning 22 / 95]
+[Planning deferred tasks]
+[1 / 21]
+[2 / 22] Demo
+/work/proj/Sources/Demo/Demo.swift:2:32: [1;33mwarning: [1;39minitialization of immutable value 'x' was never used; consider replacing with assignment to '_' or removing it[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/no-usage\NoUsage]8;;\]
+[0;36m1 |[0;0m public func add(_ a: Int, _ b: Int) -> Int { a + b }
+[0;36m2 |[0;0m public func unusedWarn() { let x = 5 }
+  [0;36m|[0;0m                                `- [1;33mwarning: [1;39minitialization of immutable value 'x' was never used; consider replacing with assignment to '_' or removing it[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/no-usage\NoUsage]8;;\]
+[0;36m3 |[0;0m 
+
+[#NoUsage]: <https://docs.swift.org/compiler/documentation/diagnostics/no-usage>
+/work/proj/Package.swift: Demo: ld: warning: search path '/Library/Developer/CommandLineTools/Developer/Library/Frameworks' not found
+[12 / 23] Demo-product
+[12 / 23] DemoTests-product
+[20 / 49]
+[26 / 49]
+[29 / 49]
+[30 / 49]
+[33 / 49]
+[35 / 49]
+error: SwiftCompile normal arm64 failed with a nonzero exit code. Command line:     cd /work/swift
+    
+/work/proj/Tests/DemoTests/DemoTests.swift:4:12: [1;31merror: [1;39mexternal macro implementation type 'TestingMacros.TestDeclarationMacro' could not be found for macro 'Test'; plugin for module 'TestingMacros' not found[0;0m
+[0;36m2 |[0;0m @testable import Demo
+[0;36m3 |[0;0m 
+[0;36m4 |[0;0m @Test func addWorks() { #expect(add(1, 2) == 3) }
+  [0;36m|[0;0m            `- [1;31merror: [1;39mexternal macro implementation type 'TestingMacros.TestDeclarationMacro' could not be found for macro 'Test'; plugin for module 'TestingMacros' not found[0;0m
+[0;36m5 |[0;0m @Test func addBroken() { #expect(add(1, 2) == 4) }
+[0;36m6 |[0;0m @Test(arguments: [1, 2, 3]) func param(_ n: Int) { #expect(n < 3) }
+
+Testing.Test:1:30: [1;39mnote: [1;39m'Test' declared here[0;0m
+[0;36m1 |[0;0m @attached(peer) public macro Test(_ traits: any Testing.TestTrait...) = #externalMacro(module: "TestingMacros", type: "TestDeclarationMacro")
+  [0;36m|[0;0m                              `- [1;39mnote: [1;39m'Test' declared here[0;0m
+
+/work/proj/Tests/DemoTests/DemoTests.swift:5:12: [1;31merror: [1;39mexternal macro implementation type 'TestingMacros.TestDeclarationMacro' could not be found for macro 'Test'; plugin for module 'TestingMacros' not found[0;0m
+[0;36m3 |[0;0m 
+[0;36m4 |[0;0m @Test func addWorks() { #expect(add(1, 2) == 3) }
+[0;36m5 |[0;0m @Test func addBroken() { #expect(add(1, 2) == 4) }
+  [0;36m|[0;0m            `- [1;31merror: [1;39mexternal macro implementation type 'TestingMacros.TestDeclarationMacro' could not be found for macro 'Test'; plugin for module 'TestingMacros' not found[0;0m
+[0;36m6 |[0;0m @Test(arguments: [1, 2, 3]) func param(_ n: Int) { #expect(n < 3) }
+[0;36m7 |[0;0m 
+
+Testing.Test:1:30: [1;39mnote: [1;39m'Test' declared here[0;0m
+[0;36m1 |[0;0m @attached(peer) public macro Test(_ traits: any Testing.TestTrait...) = #externalMacro(module: "TestingMacros", type: "TestDeclarationMacro")
+  [0;36m|[0;0m                              `- [1;39mnote: [1;39m'Test' declared here[0;0m
+
+/work/proj/Tests/DemoTests/DemoTests.swift:6:34: [1;31merror: [1;39mexternal macro implementation type 'TestingMacros.TestDeclarationMacro' could not be found for macro 'Test(_:arguments:)'; plugin for module 'TestingMacros' not found[0;0m
+[0;36m4 |[0;0m @Test func addWorks() { #expect(add(1, 2) == 3) }
+[0;36m5 |[0;0m @Test func addBroken() { #expect(add(1, 2) == 4) }
+[0;36m6 |[0;0m @Test(arguments: [1, 2, 3]) func param(_ n: Int) { #expect(n < 3) }
+  [0;36m|[0;0m                                  `- [1;31merror: [1;39mexternal macro implementation type 'TestingMacros.TestDeclarationMacro' could not be found for macro 'Test(_:arguments:)'; plugin for module 'TestingMacros' not found[0;0m
+[0;36m7 |[0;0m 
+
+Testing.Test:1:30: [1;39mnote: [1;39m'Test(_:arguments:)' declared here[0;0m
+[0;36m1 |[0;0m @attached(peer) public macro Test<C>(_ traits: any Testing.TestTrait..., arguments collection: C) = #externalMacro(module: "TestingMacros", type: "TestDeclarationMacro") where C : Collection, C : Sendable, C.Element : Sendable
+  [0;36m|[0;0m                              `- [1;39mnote: [1;39m'Test(_:arguments:)' declared here[0;0m
+Failed frontend command:
+/Library/Developer/CommandLineTools/usr/bin/swift-frontend -frontend -emit-module -experimental-skip-non-inlinable-function-bodies-without-types /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/DerivedSources/test_entry_point.swift /work/proj/Tests/DemoTests/DemoTests.swift -target arm64-apple-macos12.0 -module-can-import-version Testing 2403 0 -disable-cross-import-overlay-search -swift-module-cross-import Testing /Library/Developer/CommandLineTools/Library/Developer/Frameworks/Testing.framework/Modules/Testing.swiftcrossimport/AppKit.swiftoverlay -swift-module-cross-import Testing /Library/Developer/CommandLineTools/Library/Developer/Frameworks/Testing.framework/Modules/Testing.swiftcrossimport/CoreGraphics.swiftoverlay -swift-module-cross-import Testing /Library/Developer/CommandLineTools/Library/Developer/Frameworks/Testing.framework/Modules/Testing.swiftcrossimport/CoreImage.swiftoverlay -swift-module-cross-import Testing /Library/Developer/CommandLineTools/Library/Developer/Frameworks/Testing.framework/Modules/Testing.swiftcrossimport/CoreTransferable.swiftoverlay -swift-module-cross-import Testing /Library/Developer/CommandLineTools/Library/Developer/Frameworks/Testing.framework/Modules/Testing.swiftcrossimport/Foundation.swiftoverlay -load-resolved-plugin /Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#\#SwiftMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests-dependencies-1.json -Xllvm -aarch64-use-tbi -enable-objc-interop -stack-check -sdk /Library/Developer/CommandLineTools/SDKs/MacOSX27.2.sdk -I /work/proj/.build/out/Products/Debug -Isystem /Library/Developer/CommandLineTools/Developer/usr/lib -F /work/proj/.build/out/Products/Debug/PackageFrameworks -F /work/proj/.build/out/Products/Debug -F /Library/Developer/CommandLineTools/Library/Developer/Frameworks -F /Library/Developer/CommandLineTools/Developer/Library/Frameworks -module-cache-path /work/proj/.build/out/Intermediates.noindex/SwiftExplicitPrecompiledModules -color-diagnostics -Xcc -fcolor-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=4 -swift-version 6 -Onone -D SWIFT_PACKAGE -D DEBUG -D Xcode -serialize-debugging-options -enable-upcoming-feature ApproachableConcurrency -enable-experimental-feature DebugDescriptionMacro -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /work/proj/.build/out/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /work/swift -enable-anonymous-context-mangled-names -file-compilation-dir /work/swift -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /work/proj/.build/out/SDKStatCaches.noindex/macosx27.2-26B118-a0facfad118c1a7a18f0aad9463f65495818d34bafcb1249783cb8b2c4efe0a2.sdkstatcache -Xcc -fmodules-prune-interval\=86400 -Xcc -fmodules-prune-after\=345600 -Xcc -I/work/proj/.build/out/Products/Debug/include -Xcc -I/work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/DerivedSources-normal/arm64 -Xcc -I/work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/DerivedSources/arm64 -Xcc -I/work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/DerivedSources -Xcc -DSWIFT_PACKAGE -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name DemoTests -package-name pkg -const-gather-protocols-file /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests_const_extract_protocols.json -disable-clang-spi -clang-target arm64-apple-macos27.2 -target-sdk-version 27.2 -target-sdk-name macosx27.2 -in-process-plugin-server-path /Library/Developer/CommandLineTools/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -emit-module-doc-path /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests.swiftdoc -emit-module-source-info-path /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests.swiftsourceinfo -serialize-diagnostics-path /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests-primary-emit-module.dia -emit-dependencies-path /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests-primary-emit-module.d -parse-as-library -o /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests.swiftmodule -emit-abi-descriptor-path /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/DemoTests-p.build/Objects-normal/arm64/DemoTests.abi.json
+error: Build failed
+error: fatalError

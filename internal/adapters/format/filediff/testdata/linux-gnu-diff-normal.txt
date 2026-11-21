@@ -1,0 +1,10 @@
+20c20
+< line 20 of the config file
+---
+> LINE 20 of the config file
+60c60
+< line 60 of the config file
+---
+> LINE 60 of the config file
+80a81
+> extra

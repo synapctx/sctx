@@ -1,0 +1,5 @@
+** (Mix) mix format failed due to --check-formatted.
+The following files are not formatted:
+/work/ex/lib/ugly.ex
+/work/ex/lib/demo.ex
+…+22 lines (compile progress, source excerpts, diffs, blanks)

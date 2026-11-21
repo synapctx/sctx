@@ -177,3 +177,32 @@ func padInt(i int) string {
 	}
 	return string(rune('0'+i/10)) + string(rune('0'+i%10))
 }
+
+func TestInstallSuccessNeverDuplicatesStderr(t *testing.T) {
+	const warn1 = "WARNING: Running pip as the 'root' user can result in broken permissions"
+	const warn2 = "WARNING: You are using pip version 21.0; however, version 24.0 is available."
+	stderr := warn1 + "\n" + warn2 + "\n"
+	tests := []struct {
+		name   string
+		stdout string
+	}{
+		{"stdout empty", ""},
+		{"stdout non-empty", "Collecting requests\nSuccessfully installed requests-2.31.0\n"},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			r, err := New().Aggressive(context.Background(), input([]string{"pip", "install", "requests"}, tc.stdout, stderr, 0))
+			if err != nil {
+				t.Fatal(err)
+			}
+			if !r.FoldStderr {
+				t.Fatalf("FoldStderr = false: stderr is in Body and would print twice; body=%q", r.Body)
+			}
+			for _, w := range []string{warn1, warn2} {
+				if got := strings.Count(string(r.Body), w); got != 1 {
+					t.Errorf("%q appears %d times in Body, want 1", w, got)
+				}
+			}
+		})
+	}
+}

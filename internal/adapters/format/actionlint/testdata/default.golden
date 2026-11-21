@@ -1,0 +1,9 @@
+actionlint: 6 findings in 1 file ([expression]=2 [shellcheck]=2 [job-needs]=1 [runner-label]=1)
+.github/workflows/bad.yml (6)
+  5:14 [runner-label] label "ubuntu-lates" is unknown. available labels are "windows-latest", "windows-latest-8-cores", "windows-2025", "windows-2025-vs2026", "windows-2022", "windows-11-arm", "ubuntu-slim", "ubuntu-latest", "ubuntu-latest-4-cores", "ubuntu-late…+519 chars
+  8:23 [expression] property "evnt" is not defined in object type {action: string; action_path: string; action_ref: string; action_repository: string; action_status: string; actor: string; actor_id: string; api_url: string; artifact_cache_size_limit: number; b…+684 chars
+  10:29 [expression] got unexpected character ' ' while lexing == operator, expecting '='
+  11:9 [shellcheck] shellcheck reported issue in this script: SC2045:error:1:10: Iterating over ls output is fragile. Use globs
+  11:9 [shellcheck] shellcheck reported issue in this script: SC2086:info:1:25: Double quote to prevent globbing and word splitting
+  13:3 [job-needs] job "deploy" needs job "bild" which does not exist in this workflow
+…dropped: 6 source excerpts

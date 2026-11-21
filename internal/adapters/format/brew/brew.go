@@ -1,5 +1,5 @@
 // Package brew implements a format.Formatter for the Homebrew CLI, covering
-// `brew install` and `brew upgrade`. It claims every brew invocation (the
+// `brew install`, `brew upgrade`, `brew reinstall` and `brew update`. It claims every brew invocation (the
 // registry holds one entry per program) and dispatches internally, applying
 // structured compression only to install/upgrade and degrading everything
 // else straight to ErrTierInapplicable at the Aggressive tier.
@@ -29,7 +29,7 @@ func (f *Formatter) Descriptor() format.Match {
 	return format.Match{Command: "brew"}
 }
 
-// subcommand returns "install" or "upgrade" if that is the brew subcommand
+// subcommand returns "install", "upgrade", "reinstall" or "update" if that is the brew subcommand
 // being invoked (skipping leading flags), or "" for anything else (e.g.
 // brew list, brew search) that this formatter does not structurally cover.
 func subcommand(argv []string) string {
@@ -40,7 +40,7 @@ func subcommand(argv []string) string {
 		if strings.HasPrefix(a, "-") {
 			continue
 		}
-		if a == "install" || a == "upgrade" {
+		if a == "install" || a == "upgrade" || a == "update" || a == "reinstall" {
 			return a
 		}
 		return ""
@@ -48,11 +48,11 @@ func subcommand(argv []string) string {
 	return ""
 }
 
-// Aggressive structurally compresses `brew install`/`brew upgrade` output;
+// Aggressive structurally compresses `brew install`/`upgrade`/`reinstall`/`update` output;
 // any other subcommand degrades to the next tier.
 func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Rendered, error) {
 	sub := subcommand(in.Argv)
-	if sub != "install" && sub != "upgrade" {
+	if sub == "" {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 	return aggressiveInstallUpgrade(in)

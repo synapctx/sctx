@@ -1,0 +1,74 @@
+--- a.conf	2026-11-21 02:47:24.096247863 +0000
++++ b.conf	2026-11-21 02:47:24.101709386 +0000
+@@ -5,31 +5,31 @@
+ line 5 of the config file
+ line 6 of the config file
+ line 7 of the config file
+ line 8 of the config file
+ line 9 of the config file
+ line 10 of the config file
+ line 11 of the config file
+ line 12 of the config file
+ line 13 of the config file
+ line 14 of the config file
+ line 15 of the config file
+ line 16 of the config file
+ line 17 of the config file
+ line 18 of the config file
+ line 19 of the config file
+-line 20 of the config file
++LINE 20 of the config file
+ line 21 of the config file
+ line 22 of the config file
+ line 23 of the config file
+ line 24 of the config file
+ line 25 of the config file
+ line 26 of the config file
+ line 27 of the config file
+ line 28 of the config file
+ line 29 of the config file
+ line 30 of the config file
+ line 31 of the config file
+ line 32 of the config file
+ line 33 of the config file
+ line 34 of the config file
+ line 35 of the config file
+@@ -45,36 +45,37 @@
+ line 45 of the config file
+ line 46 of the config file
+ line 47 of the config file
+ line 48 of the config file
+ line 49 of the config file
+ line 50 of the config file
+ line 51 of the config file
+ line 52 of the config file
+ line 53 of the config file
+ line 54 of the config file
+ line 55 of the config file
+ line 56 of the config file
+ line 57 of the config file
+ line 58 of the config file
+ line 59 of the config file
+-line 60 of the config file
++LINE 60 of the config file
+ line 61 of the config file
+ line 62 of the config file
+ line 63 of the config file
+ line 64 of the config file
+ line 65 of the config file
+ line 66 of the config file
+ line 67 of the config file
+ line 68 of the config file
+ line 69 of the config file
+ line 70 of the config file
+ line 71 of the config file
+ line 72 of the config file
+ line 73 of the config file
+ line 74 of the config file
+ line 75 of the config file
+ line 76 of the config file
+ line 77 of the config file
+ line 78 of the config file
+ line 79 of the config file
+ line 80 of the config file
++extra

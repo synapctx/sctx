@@ -1,0 +1,6 @@
+== [sql/d.sql] FAIL
+L:   1 | P:   1 |  PRS | Line 1, Position 1: Found unparsable section: 'SELEC x
+                       | FRM'. Expected: <Sequence: [<AnyNumberOf: [<Ref:
+                       | 'DelimiterGrammar'>..., <Delimited: [<Ref: 'Sta...
+WARNING: Parsing errors found and dialect is set to 'ansi'. Have you configured your dialect correctly?
+All Finished!

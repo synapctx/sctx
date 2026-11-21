@@ -1,0 +1,15 @@
+==> Updating Homebrew...
+==> Downloading https://ghcr.io/v2/homebrew/core/portable-ruby/blobs/sha256:629b9568a047bffa15ae7ea15544cdbcd2ac63ea136af71777de39fc68dd5598
+#=#=#                                                                         ##O#-#                                                                        ##O=#  #                                                                      #=#=-#  #                                                                     ####                                                                       6.7%####################################                                      50.9%###################################################################       93.3%######################################################################## 100.0%
+==> Pouring portable-ruby-4.0.10.arm64_linux.bottle.tar.gz
+==> Downloading Homebrew API data
+✔︎ JSON API packages.arm64_linux.jws.json
+==> Homebrew's analytics have entirely moved to our InfluxDB instance in the EU.
+We gather less data than before and have destroyed all Google Analytics data:
+  https://docs.brew.sh/Analytics
+Please reconsider re-enabling analytics to help our volunteer maintainers with:
+  brew analytics on
+==> Homebrew is run entirely by unpaid volunteers. Please consider donating:
+  https://github.com/Homebrew/brew#-donations
+
+Already up-to-date.

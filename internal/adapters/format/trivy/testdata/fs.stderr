@@ -1,0 +1,17 @@
+2026-11-21T02:31:46Z	INFO	[vuln] Vulnerability scanning is enabled
+2026-11-21T02:31:46Z	INFO	[misconfig] Misconfiguration scanning is enabled
+2026-11-21T02:31:47Z	INFO	[secret] Secret scanning is enabled
+2026-11-21T02:31:47Z	INFO	[secret] If your scanning is slow, please try '--scanners vuln,misconfig' to disable secret scanning
+2026-11-21T02:31:47Z	INFO	[secret] Please see https://trivy.dev/v0.67/docs/scanner/secret#recommendation for faster secret detection
+2026-11-21T02:31:47Z	WARN	[pip] Unable to find python `site-packages` directory. License detection is skipped.	err="unable to find path to Python executable"
+2026-11-21T02:31:48Z	INFO	[terraform scanner] Scanning root module	file_path="tf"
+2026-11-21T02:31:48Z	WARN	[terraform parser] Variable values were not found in the environment or variable files. Evaluating may not work correctly.	module="root" variables="unused"
+2026-11-21T02:31:48Z	INFO	Number of language-specific files	num=1
+2026-11-21T02:31:48Z	INFO	[pip] Detecting vulnerabilities...
+2026-11-21T02:31:48Z	INFO	Detected config files	num=4
+
+📣 [34mNotices:[0m
+  - Version 0.76.2 of Trivy is now available, current version is 0.67.2
+
+To suppress version checks, run Trivy scans with the --skip-version-check flag
+
