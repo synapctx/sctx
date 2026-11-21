@@ -40,6 +40,9 @@ type toolCall struct {
 	ToolName  string         `json:"tool_name"`
 	ToolInput map[string]any `json:"tool_input"`
 	SessionID string         `json:"session_id"`
+	// Cwd and PermissionMode feed the permission step-aside (permissions.go).
+	Cwd            string `json:"cwd"`
+	PermissionMode string `json:"permission_mode"`
 }
 
 // RunClaude implements `sctx hook claude`. args is everything after "claude" on
@@ -78,7 +81,7 @@ func runClaude(_ []string, in io.Reader, out io.Writer, version, agent string) i
 		return 0
 	}
 
-	if os.Getenv("SCT__REWRITE_DISABLED") == "true" {
+	if rewriteDisabledValue(os.Getenv(inlineOptOutVar)) {
 		return 0
 	}
 
@@ -94,6 +97,19 @@ func runClaude(_ []string, in io.Reader, out io.Writer, version, agent string) i
 
 	root, matchers := trustedProjectMatchers()
 	if rewritten, ok := rewriteWithProject(cmd, root, matchers); ok {
+		// A rewrite replaces the command Claude Code evaluates its permission
+		// rules (and auto-mode review) against, silently turning a deny into a
+		// prompt. Where Claude's own rules could apply, leave the command as the
+		// user wrote it. Only Claude's rules are consulted: Codex has its own.
+		if agent == "claude-code" {
+			if reason, aside := permissionStepAside(cmd, call.PermissionMode, call.Cwd); aside {
+				recordStepAside(reason)
+				if notice != "" {
+					writeAdditionalContext(out, "PreToolUse", notice)
+				}
+				return 0
+			}
+		}
 		writeRewrite(out, rewritten, notice)
 		return 0
 	}

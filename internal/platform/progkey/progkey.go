@@ -48,6 +48,9 @@ var subcommandBearing = map[string]bool{
 	"go": true, "git": true, "docker": true, "kubectl": true, "gh": true,
 	"golangci-lint": true, "ruff": true, "brew": true, "pip": true, "pip3": true,
 	"npm": true, "pnpm": true, "yarn": true,
+	// npx's first argument is a PACKAGE name, which can be a private one; Key
+	// joins it only for the tools in npxTools.
+	"npx": true,
 
 	// Not rewritten by sctx yet — these are the coverage-gap programs whose
 	// subcommand genuinely identifies the workload. `terraform plan` is output-heavy
@@ -64,11 +67,63 @@ var subcommandBearing = map[string]bool{
 	"rustup": true, "deno": true, "bun": true, "apt": true, "apt-get": true,
 	"gem": true, "bundle": true, "composer": true, "vault": true, "consul": true,
 	"nomad": true, "doctl": true, "flyctl": true, "wrangler": true, "argocd": true,
+
+	// Coverage expansion: programs whose first argument is an operation from the
+	// tool's own vocabulary. Deliberately absent although they have rewrite rows:
+	// mvn/gradle (a goal or task name can be project-defined, and `-f pom.xml`
+	// puts a path there), rake/rspec/rubocop/phpunit/phpstan (argv[1] is a path,
+	// task or flag), just/task (argv[1] is a user-chosen recipe name).
+	//
+	// turbo, nx, mise and rails are NOT here although they take a verb: their
+	// argv[1] can be a user-chosen task or package (`turbo deploy-acme`,
+	// `mise acme-task`), so they are keyed through programVerbs below.
+	"buf": true, "playwright": true, "next": true, "prisma": true, "biome": true,
+	"podman": true, "swift": true, "ast-grep": true,
+	"sg": true, "pdm": true, "ty": true, "sqlfluff": true,
+
+	// Wave 3. Every one takes a verb from its own vocabulary as argv[1]. Deliberately
+	// absent although they have rewrite rows: wget/tar/zip/unzip (URL, flag bundle or
+	// file), semgrep/grype/checkov/tflint/tfsec/ansible-lint (path, target or flag),
+	// prove/ghc/nix-build/nix-shell (file or flag), mysql/psql/mongosh/sqlite3/
+	// redis-cli/clickhouse-client (host, file or a command for the server),
+	// pacman/top/ss/netstat/iptables/ip6tables/dmesg/lsblk/journalctl (a flag or
+	// cluster), mount/traceroute (device, path or host). sbt and rebar3 are in
+	// programVerbs: their argv[1] can be a project-defined task or plugin.
+	"svn": true, "openssl": true,
+	"trivy": true, "gitleaks": true, "kube-linter": true, "osv-scanner": true, "helmfile": true,
+	"dart": true, "zig": true, "cabal": true, "bazel": true, "bazelisk": true, "nix": true,
+	"flyway": true, "liquibase": true, "dbt": true,
+	"dnf": true, "yum": true, "apk": true, "ip": true, "ufw": true,
+}
+
+// npxTools are the only npx first arguments recorded: tool names sctx formats.
+// Any other is a package name and may be private.
+var npxTools = map[string]bool{
+	"jest": true, "vitest": true, "tsc": true, "eslint": true,
+	"playwright": true, "prettier": true, "biome": true, "oxlint": true,
+	"prisma": true, "turbo": true, "nx": true,
+}
+
+// programVerbs lists programs whose first argument is only RECORDED when it is one of the
+// tool's own verbs named here. Their argv[1] can equally be a user-chosen task or package
+// name, which shape alone cannot tell from a verb, so a verb outside the list keys as the
+// bare program. (npx is the same shape and is handled through npxTools.)
+var programVerbs = map[string]map[string]bool{
+	"turbo": {"run": true, "build": true, "test": true, "lint": true, "typecheck": true},
+	"nx":    {"run-many": true, "affected": true, "run": true, "build": true, "test": true, "lint": true},
+	"mise":  {"run": true, "r": true},
+	"rails": {"test": true},
+	// sbt takes its tasks as argv[1] (`sbt deploy-acme`), and rebar3 resolves plugin
+	// providers the same way.
+	"sbt":    {"compile": true, "test": true, "clean": true, "update": true, "package": true, "assembly": true, "doc": true},
+	"rebar3": {"compile": true, "eunit": true, "ct": true, "as": true, "dialyzer": true, "xref": true},
 }
 
 // HasSubcommands reports whether program's first argument names an operation rather than
 // data. Exported so the hook can assert its rewrite table stays in correspondence.
-func HasSubcommands(program string) bool { return subcommandBearing[program] }
+func HasSubcommands(program string) bool {
+	return subcommandBearing[program] || programVerbs[program] != nil
+}
 
 // Key returns the telemetry program key for a command whose program is program and whose
 // following token is next (empty if there is none).
@@ -82,7 +137,13 @@ func Key(program, next string) string {
 	if program == "" {
 		return ""
 	}
-	if next == "" || !subcommandBearing[program] || !looksLikeSubcommand(next) {
+	if next == "" || !HasSubcommands(program) || !looksLikeSubcommand(next) {
+		return program
+	}
+	if program == "npx" && !npxTools[next] {
+		return program
+	}
+	if verbs, ok := programVerbs[program]; ok && !verbs[next] {
 		return program
 	}
 	return program + " " + next

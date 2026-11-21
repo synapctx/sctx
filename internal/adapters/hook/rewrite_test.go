@@ -19,7 +19,7 @@ type rewriteTestCase struct {
 
 // rewriteTestCases returns TestRewrite's table.
 func rewriteTestCases() []rewriteTestCase {
-	return []rewriteTestCase{
+	return append([]rewriteTestCase{
 		{"go test", "go test ./...", "sctx go test ./...", true},
 		{"go build", "go build ./cmd/foo", "sctx go build ./cmd/foo", true},
 		{"go vet", "go vet ./...", "sctx go vet ./...", true},
@@ -158,7 +158,7 @@ func rewriteTestCases() []rewriteTestCase {
 
 		{"empty command", "", "", false},
 		{"whitespace only", "   ", "   ", false},
-		{"unknown program", "mix test", "mix test", false},
+		{"unknown program", "nomad status", "nomad status", false},
 
 		{"pytest", "pytest -q", "sctx pytest -q", true},
 		{"pytest piped to tail", "pytest 2>&1 | tail -50", "sctx pytest 2>&1 | tail -50", true},
@@ -181,6 +181,24 @@ func rewriteTestCases() []rewriteTestCase {
 		{"npm install", "npm install", "sctx npm install", true},
 		{"npm ci piped to tail", "npm ci 2>&1 | tail -30", "sctx npm ci 2>&1 | tail -30", true},
 		{"pnpm test", "pnpm test", "sctx pnpm test", true},
+		{"jest", "jest src/cart.test.ts", "sctx jest src/cart.test.ts", true},
+		{"jest watch", "jest --watch", "jest --watch", false},
+		{"jest -w is max workers", "jest -w 2", "sctx jest -w 2", true},
+		{"vitest run", "vitest run", "sctx vitest run", true},
+		{"vitest watch long", "vitest --watch", "vitest --watch", false},
+		{"vitest watch short", "vitest -w", "vitest -w", false},
+		{"tsc", "tsc --noEmit", "sctx tsc --noEmit", true},
+		{"tsc watch", "tsc --noEmit --watch", "tsc --noEmit --watch", false},
+		{"eslint", "eslint src", "sctx eslint src", true},
+		{"npx jest", "npx jest", "sctx npx jest", true},
+		{"npx vitest run", "npx vitest run", "sctx npx vitest run", true},
+		{"npx tsc", "npx tsc --noEmit", "sctx npx tsc --noEmit", true},
+		{"npx unknown package is interactive-capable", "npx create-react-app foo", "npx create-react-app foo", false},
+		{"npx jest watch", "npx jest --watchAll", "npx jest --watchAll", false},
+		{"pnpm vitest", "pnpm vitest run", "sctx pnpm vitest run", true},
+		{"pnpm -w is workspace root", "pnpm -w test", "pnpm -w test", false},
+		{"yarn jest", "yarn jest", "sctx yarn jest", true},
+		{"yarn jest watch", "yarn jest --watch", "yarn jest --watch", false},
 		{"yarn add", "yarn add lodash", "sctx yarn add lodash", true},
 		{"npm publish not in table", "npm publish", "npm publish", false},
 
@@ -308,7 +326,7 @@ func rewriteTestCases() []rewriteTestCase {
 		{"unknown program piped to safe downstream declines", "foo | tail", "foo | tail", false},
 		{"cat piped to grep declines", "cat a.txt | grep x", "cat a.txt | grep x", false},
 		{"reserved name piped to safe downstream declines", "hook | tail", "hook | tail", false},
-	}
+	}, append(coverageRewriteCases(), append(hardeningRewriteCases(), append(wave3RewriteCases(), innerRewriteCases()...)...)...)...)
 }
 
 func TestRewrite(t *testing.T) {
@@ -342,9 +360,9 @@ func TestGapSegment(t *testing.T) {
 		wantProgram string
 		wantOK      bool
 	}{
-		{"bare uncovered program", "mix test", "mix test", true},
-		{"uncovered program piped to safe downstream", "mix test 2>&1 | tail -5", "mix test", true},
-		{"cd then uncovered program", "cd sub && mix test", "mix test", true},
+		{"bare uncovered program", "nomad status", "nomad status", true},
+		{"uncovered program piped to safe downstream", "nomad status 2>&1 | tail -5", "nomad status", true},
+		{"cd then uncovered program", "cd sub && nomad status", "nomad status", true},
 		{"uncovered program piped to head", "vault read secret/db | head", "vault read", true},
 		{"covered program uncovered subcommand", "go env GOPATH", "go env", true},
 
@@ -352,9 +370,9 @@ func TestGapSegment(t *testing.T) {
 		{"already-covered program declines", "git status", "", false},
 		{"interactive git is deliberate, not a gap", "git add -p", "", false},
 		{"streaming gh is deliberate, not a gap", "gh run watch 12", "", false},
-		{"file redirect declines", "mix test > out.txt", "", false},
-		{"unsafe downstream pipe declines", "mix test | grep x", "", false},
-		{"command substitution declines", "mix test $(x)", "", false},
+		{"file redirect declines", "nomad status > out.txt", "", false},
+		{"unsafe downstream pipe declines", "nomad status | grep x", "", false},
+		{"command substitution declines", "nomad status $(x)", "", false},
 		{"only noise builtin declines", "cd sub", "", false},
 		{"bare noise builtin declines", "echo hi", "", false},
 		{"already sctx-wrapped declines", "sctx npm test", "", false},

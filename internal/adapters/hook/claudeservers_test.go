@@ -9,7 +9,7 @@ import (
 // The server name is read from the developer's own config because it is the only
 // place that knows it. Matching is on the CREDENTIAL, not on a name pattern,
 // which is what makes the owner's machine work: there the servers are called
-// `parlitrack` and `cloudresty`, with no `synapctx-` prefix at all.
+// `acme` and `globex`, with no `synapctx-` prefix at all.
 func TestClaudeServerNameForMatchesOnTheCredential(t *testing.T) {
 	home := t.TempDir()
 	root := t.TempDir()
@@ -22,12 +22,12 @@ func TestClaudeServerNameForMatchesOnTheCredential(t *testing.T) {
 	  "projects": {"/some/path": {"history": ["irrelevant"]}},
 	  "mcpServers": {
 	    "context7": {"type": "http", "url": "https://c7", "headers": {"Authorization": "Bearer other"}},
-	    "parlitrack": {"type": "http", "url": "https://mcp", "headers": {"authorization": "Bearer tok-abc"}}
+	    "acme": {"type": "http", "url": "https://mcp", "headers": {"authorization": "Bearer tok-abc"}}
 	  }
 	}`)
 
-	if got := claudeServerNameFor(home, root, root, "tok-abc"); got != "parlitrack" {
-		t.Errorf("claudeServerNameFor = %q, want %q (header name case must not matter)", got, "parlitrack")
+	if got := claudeServerNameFor(home, root, root, "tok-abc"); got != "acme" {
+		t.Errorf("claudeServerNameFor = %q, want %q (header name case must not matter)", got, "acme")
 	}
 	// A token no registered server carries must NOT fall through to some other
 	// server's name — the caller would then print tool names for the wrong org.

@@ -116,7 +116,7 @@ func RunGemini(_ []string, in io.Reader, out io.Writer, version string) int {
 // same command from the same customer, and the ranking of what to build next
 // must not depend on which client happened to be open.
 func rewriteForAgent(cmd, version, agent, sessionID string) (string, bool) {
-	if os.Getenv("SCT__REWRITE_DISABLED") == "true" {
+	if rewriteDisabledValue(os.Getenv(inlineOptOutVar)) {
 		return "", false
 	}
 	writeSessionHandoff(agent, sessionID)

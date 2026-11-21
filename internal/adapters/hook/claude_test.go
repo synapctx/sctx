@@ -68,7 +68,7 @@ func TestRunClaudeNoFallback(t *testing.T) {
 		},
 		{
 			name:      "no rewrite rule applies",
-			stdin:     `{"tool_name":"Bash","tool_input":{"command":"mix test"}}`,
+			stdin:     `{"tool_name":"Bash","tool_input":{"command":"nomad status"}}`,
 			wantEmpty: true,
 		},
 		{
@@ -120,7 +120,7 @@ func TestAnUnmatchedCommandIsRecordedAsACoverageGap(t *testing.T) {
 	spoolDir := t.TempDir()
 	t.Setenv("SCT__SPOOL_DIR", spoolDir)
 
-	stdin := `{"tool_name":"Bash","tool_input":{"command":"mix test"}}`
+	stdin := `{"tool_name":"Bash","tool_input":{"command":"nomad status"}}`
 	var out bytes.Buffer
 	if code := runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code"); code != 0 {
 		t.Fatalf("runClaude() exit code = %d, want 0", code)
@@ -138,8 +138,8 @@ func TestAnUnmatchedCommandIsRecordedAsACoverageGap(t *testing.T) {
 	if ev.Kind != telemetry.KindCoverageGap {
 		t.Errorf("Kind = %q, want %q", ev.Kind, telemetry.KindCoverageGap)
 	}
-	if ev.Program != "mix test" {
-		t.Errorf("Program = %q, want %q", ev.Program, "mix test")
+	if ev.Program != "nomad status" {
+		t.Errorf("Program = %q, want %q", ev.Program, "nomad status")
 	}
 	// Arguments must never reach telemetry — only the program key.
 	if ev.Command != ev.Program {
@@ -157,8 +157,8 @@ func TestCoverageGapReasonDistinguishesKnownPrograms(t *testing.T) {
 	if got := coverageGapReason("npm publish"); got != telemetry.DeclineUnsupportedSubcommand {
 		t.Errorf("npm publish reason = %q", got)
 	}
-	if got := coverageGapReason("mix test"); got != telemetry.DeclineUnsupportedCommand {
-		t.Errorf("mix test reason = %q", got)
+	if got := coverageGapReason("nomad status"); got != telemetry.DeclineUnsupportedCommand {
+		t.Errorf("nomad status reason = %q", got)
 	}
 }
 
@@ -180,7 +180,7 @@ func TestACoveredCommandIsNotACoverageGap(t *testing.T) {
 // Shell builtins and already-wrapped commands must never reach the meter, or
 // the ranking that decides what to build next is dominated by `cd`.
 func TestNoiseIsNotRecordedAsACoverageGap(t *testing.T) {
-	for _, cmd := range []string{"cd /tmp", "echo hello", "sctx mix test"} {
+	for _, cmd := range []string{"cd /tmp", "echo hello", "sctx nomad status"} {
 		spoolDir := t.TempDir()
 		t.Setenv("SCT__SPOOL_DIR", spoolDir)
 		stdin := `{"tool_name":"Bash","tool_input":{"command":"` + cmd + `"}}`
@@ -204,7 +204,7 @@ func TestASpoolFailureNeverAffectsTheHook(t *testing.T) {
 	// os.MkdirAll fail inside spool.Append.
 	t.Setenv("SCT__SPOOL_DIR", filepath.Join(blocker, "spool"))
 
-	stdin := `{"tool_name":"Bash","tool_input":{"command":"mix test"}}`
+	stdin := `{"tool_name":"Bash","tool_input":{"command":"nomad status"}}`
 	var out bytes.Buffer
 	if code := runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code"); code != 0 {
 		t.Fatalf("runClaude() exit code = %d, want 0", code)
@@ -214,19 +214,19 @@ func TestASpoolFailureNeverAffectsTheHook(t *testing.T) {
 	}
 }
 
-// A gap inside a pipeline is still a gap: the meter must see `mix test`, not
+// A gap inside a pipeline is still a gap: the meter must see `nomad status`, not
 // nothing, or every pipelined command is invisible to it.
 func TestAGapInsideAPipelineIsStillRecorded(t *testing.T) {
 	spoolDir := t.TempDir()
 	t.Setenv("SCT__SPOOL_DIR", spoolDir)
 
-	stdin := `{"tool_name":"Bash","tool_input":{"command":"mix test | tail -5"}}`
+	stdin := `{"tool_name":"Bash","tool_input":{"command":"nomad status | tail -5"}}`
 	var out bytes.Buffer
 	runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code")
 
 	events := readSpoolEvents(t, spoolDir)
-	if len(events) != 1 || events[0].Program != "mix test" {
-		t.Fatalf("events = %+v, want one recording \"mix test\"", events)
+	if len(events) != 1 || events[0].Program != "nomad status" {
+		t.Fatalf("events = %+v, want one recording \"nomad status\"", events)
 	}
 }
 
@@ -234,7 +234,7 @@ func TestAGapAfterACdIsStillRecorded(t *testing.T) {
 	spoolDir := t.TempDir()
 	t.Setenv("SCT__SPOOL_DIR", spoolDir)
 
-	stdin := `{"tool_name":"Bash","tool_input":{"command":"cd sub && mix test"}}`
+	stdin := `{"tool_name":"Bash","tool_input":{"command":"cd sub && nomad status"}}`
 
 	var out bytes.Buffer
 	code := runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code")
@@ -246,8 +246,8 @@ func TestAGapAfterACdIsStillRecorded(t *testing.T) {
 	if len(events) != 1 {
 		t.Fatalf("spooled events = %d, want 1", len(events))
 	}
-	if events[0].Program != "mix test" {
-		t.Errorf("Program = %q, want %q", events[0].Program, "mix test")
+	if events[0].Program != "nomad status" {
+		t.Errorf("Program = %q, want %q", events[0].Program, "nomad status")
 	}
 }
 
@@ -291,7 +291,7 @@ func TestCommandSubstitutionIsNotRecorded(t *testing.T) {
 	spoolDir := t.TempDir()
 	t.Setenv("SCT__SPOOL_DIR", spoolDir)
 
-	stdin := `{"tool_name":"Bash","tool_input":{"command":"mix test $(x)"}}`
+	stdin := `{"tool_name":"Bash","tool_input":{"command":"nomad status $(x)"}}`
 
 	var out bytes.Buffer
 	code := runClaude(nil, strings.NewReader(stdin), &out, "v-test", "claude-code")
@@ -334,7 +334,7 @@ func TestDeriveProgram(t *testing.T) {
 		{"go test ./...", "go test"},
 		{"ls -la", "ls"},
 		{"terraform plan -out x", "terraform plan"},
-		{"mix test 2>&1", "mix test"},
+		{"nomad status 2>&1", "nomad status"},
 		{"git --no-pager -C repo -c color.ui=false status --short", "git status"},
 	}
 	for _, tt := range tests {
@@ -390,9 +390,9 @@ func TestMeasuredNoFormatterCandidateIsNotRecordedAgain(t *testing.T) {
 // write a formatter for) whose first argument is an operation, or the fixtures
 // stop resembling the real gaps they stand in for.
 var uncoveredFixtures = []string{
-	"mix test",
+	"nomad status",
 	"vault read secret/db",
-	"wget https://example.com/x.tar.gz",
+	"flyctl status",
 }
 
 // The counterweight to the test above: the no-program-token guard must not turn

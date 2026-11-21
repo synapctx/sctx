@@ -64,8 +64,8 @@ func TestTheMeterIgnoresLocalScripts(t *testing.T) {
 func TestAnExcludedProgramDoesNotHideARealGapBesideIt(t *testing.T) {
 	cases := []struct{ cmd, wantProgram string }{
 		{"python3 gen.py && vault read secret/db", "vault read"},
-		{"sed -i s/a/b/ x && mix test", "mix test"},
-		{"mkdir -p out && mix test", "mix test"},
+		{"sed -i s/a/b/ x && nomad status", "nomad status"},
+		{"mkdir -p out && nomad status", "nomad status"},
 		{"./scripts/prep.sh && vault write secret/db x=1", "vault write"},
 	}
 	for _, tt := range cases {
@@ -87,7 +87,7 @@ func TestRealCoverageGapsAreStillReported(t *testing.T) {
 	cases := []struct{ cmd, wantProgram string }{
 		{"vault read secret/db", "vault read"},
 		{"vault write secret/db x=1", "vault write"},
-		{"mix test --release", "mix test"},
+		{"nomad status --release", "nomad status"},
 		// An enumerated formatter surface still reports uncovered subcommands. Git is
 		// deliberately absent: all finite verbs now reach fallback coverage.
 		{"go env GOPATH", "go env"},
@@ -119,7 +119,7 @@ func TestTheExclusionDoesNotChangeWhatGetsWrapped(t *testing.T) {
 	// matchSegment's own sed branch enforces the same narrow grammar
 	// (platform/sedargv), so a non-matching invocation still declines wrapping
 	// even though the program name is listed.
-	for _, prog := range []string{"python3", "awk", "cp", "wc", "bash"} {
+	for _, prog := range []string{"python3", "awk", "cp", "bash"} {
 		if _, wrapped := subcommandTable[prog]; wrapped {
 			t.Errorf("%q is both excluded from the meter and present in subcommandTable.\n"+
 				"  If a formatter genuinely exists for it, it does not belong in unformattable —\n"+

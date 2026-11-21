@@ -44,11 +44,122 @@ func Remote(parts []string) ([]string, bool) {
 	if IsCompound(joined) {
 		return nil, false
 	}
-	argv, ok := Direct(strings.Fields(joined))
+	fields, ok := Split(joined)
+	if !ok {
+		return nil, false
+	}
+	argv, ok := Direct(fields)
 	if !ok || filepath.Base(argv[0]) == "ssh" {
 		return nil, false
 	}
 	return argv, true
+}
+
+// Split tokenizes one remote command line the way a POSIX shell would for the
+// plain cases and declines (ok=false) for everything else: single and double
+// quotes group words and are removed, but a backslash, a `$` or a backtick
+// inside double quotes, or an unterminated quote means the remote shell would
+// read something this grammar cannot confirm. strings.Fields used to split
+// `sbt "~ test"` into `sbt`, `"~` and `test`, hiding the watch task.
+func Split(s string) ([]string, bool) {
+	var (
+		out    []string
+		cur    strings.Builder
+		inWord bool
+		quote  byte
+	)
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		switch {
+		case quote == '\'':
+			if c == '\'' {
+				quote = 0
+			} else {
+				cur.WriteByte(c)
+			}
+		case quote == '"':
+			switch c {
+			case '"':
+				quote = 0
+			case '\\', '$', '`':
+				return nil, false
+			default:
+				cur.WriteByte(c)
+			}
+		case c == '\'' || c == '"':
+			quote, inWord = c, true
+		case c == '\\':
+			return nil, false
+		case c == ' ' || c == '\t':
+			if inWord {
+				out = append(out, cur.String())
+				cur.Reset()
+				inWord = false
+			}
+		default:
+			cur.WriteByte(c)
+			inWord = true
+		}
+	}
+	if quote != 0 {
+		return nil, false
+	}
+	if inWord {
+		out = append(out, cur.String())
+	}
+	return out, true
+}
+
+// ShortCluster reports whether any single-dash argument (`-fn`, not `--long`)
+// carries one of letters. Scanning a cluster stops at the first letter in
+// valueLetters, because every character after a value-taking option is that
+// option's VALUE (`journalctl -ufoo.service`, `-tfoo`): reading it as flags
+// misreads `foo`'s `f` as --follow. A letter in both sets counts as a flag.
+func ShortCluster(args []string, letters, valueLetters string) bool {
+	for _, a := range args {
+		if len(a) < 2 || a[0] != '-' || a[1] == '-' {
+			continue
+		}
+		for _, c := range a[1:] {
+			if strings.ContainsRune(letters, c) {
+				return true
+			}
+			if strings.ContainsRune(valueLetters, c) {
+				break
+			}
+		}
+	}
+	return false
+}
+
+// narrowingFollows reports a trailing pipeline stage that never reaches EOF:
+// `ls | tail -f x` follows its stdin's closure forever for a file operand,
+// and `less +F` follows too. The hook's streamsForever cannot be reached from
+// here (hook imports this package), so the narrowing programs' own follow
+// forms are recognised locally.
+func narrowingFollows(argv []string) bool {
+	if len(argv) == 0 {
+		return false
+	}
+	args := argv[1:]
+	switch filepath.Base(argv[0]) {
+	case "tail":
+		if ShortCluster(args, "fF", "ncs") {
+			return true
+		}
+		for _, a := range args {
+			if a == "--follow" || strings.HasPrefix(a, "--follow=") {
+				return true
+			}
+		}
+	case "less":
+		for _, a := range args {
+			if a == "+F" || a == "--follow-name" {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // narrowingTailPrograms mirrors hook.pipeSafeDownstream: programs safe to
@@ -85,8 +196,8 @@ func splitNarrowingPipeline(s string) ([]string, bool) {
 		if i == 0 {
 			continue
 		}
-		fields := strings.Fields(stage)
-		if len(fields) == 0 || !narrowingTailPrograms[filepath.Base(fields[0])] {
+		fields, ok := Split(stage)
+		if !ok || len(fields) == 0 || !narrowingTailPrograms[filepath.Base(fields[0])] || narrowingFollows(fields) {
 			return nil, false
 		}
 	}
@@ -96,7 +207,11 @@ func splitNarrowingPipeline(s string) ([]string, bool) {
 // remotePipelineHead validates and returns the head stage's argv — the
 // program whose formatter renders the (possibly truncated) combined output.
 func remotePipelineHead(stages []string) ([]string, bool) {
-	argv, ok := Direct(strings.Fields(stages[0]))
+	fields, ok := Split(stages[0])
+	if !ok {
+		return nil, false
+	}
+	argv, ok := Direct(fields)
 	if !ok || filepath.Base(argv[0]) == "ssh" {
 		return nil, false
 	}

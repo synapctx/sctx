@@ -14,6 +14,7 @@ import (
 	"github.com/synapctx/sctx/internal/platform/ghargv"
 	"github.com/synapctx/sctx/internal/platform/gitargv"
 	"github.com/synapctx/sctx/internal/platform/kubectlargv"
+	"github.com/synapctx/sctx/internal/platform/nestedcmd"
 	"github.com/synapctx/sctx/internal/platform/sedargv"
 	"github.com/synapctx/sctx/internal/platform/sshargv"
 )
@@ -102,7 +103,7 @@ var unformattable = map[string]bool{
 	// on frequency.
 	"cp": true, "mv": true, "rm": true, "mkdir": true, "rmdir": true,
 	"touch": true, "chmod": true, "chown": true, "ln": true, "mktemp": true,
-	"sleep": true, "kill": true, "wait": true, "wc": true,
+	"sleep": true, "kill": true, "wait": true,
 	"basename": true, "dirname": true, "which": true, "test": true,
 }
 
@@ -137,19 +138,30 @@ func alreadyWrapped(head string) bool {
 // should be rewritten. A nil slice means "always rewrite" regardless of
 // subcommand.
 var subcommandTable = map[string][]string{
-	"go": {"test", "build", "vet", "mod", "list", "run", "generate", "get", "fix"},
+	// TODO(owner decision): `go run`, `cargo run` and `dotnet run` are wrapped, so
+	// a long-running server started this way is buffered until it exits and the
+	// agent sees nothing before its timeout. The same call is open for the
+	// launcher spellings that start a server: `uv run uvicorn --reload`,
+	// `poetry run flask run`, `pnpm exec vite` / `npm exec vite` and `npm run dev`.
+	// Left as-is deliberately; only the explicit watch/serve spellings are refused
+	// in streamsForever.
+	"go": {"test", "build", "vet", "mod", "list", "run", "generate", "get", "fix", "install"},
 	// Git's finite porcelain surface is intentionally not enumerated. The
 	// shared argv parser finds the command after global flags and rejects the
 	// interactive/streaming protocol verbs; unknown finite verbs then receive
 	// relaxed/generic/verbatim fallback without being mislabeled structured.
-	"git":           nil,
-	"grep":          nil,
-	"rg":            nil,
-	"ls":            nil,
-	"find":          nil,
-	"tree":          nil,
-	"docker":        {"ps", "images", "image", "logs", "compose", "build", "inspect", "stats", "network", "volume", "container", "pull", "push", "history", "top", "exec"},
-	"kubectl":       {"get", "describe", "logs", "top", "events", "rollout", "api-resources", "apply", "create", "delete", "patch", "scale", "label", "annotate", "exec"},
+	"git":    nil,
+	"grep":   nil,
+	"rg":     nil,
+	"ls":     nil,
+	"find":   nil,
+	"tree":   nil,
+	"docker": {"ps", "images", "image", "logs", "compose", "build", "buildx", "builder", "inspect", "stats", "network", "volume", "container", "pull", "push", "history", "top", "exec", "run"},
+	// podman is docker-compatible and rides the docker formatter and the docker
+	// argv grammar (see matchAt/streamsForever), so exec -it, logs -f, stats and
+	// events are refused exactly as they are for docker.
+	"podman":        {"ps", "images", "image", "logs", "build", "inspect", "stats", "network", "volume", "container", "pull", "push", "history", "top", "exec", "run", "compose"},
+	"kubectl":       {"get", "describe", "logs", "top", "events", "rollout", "api-resources", "apply", "create", "delete", "patch", "scale", "label", "annotate", "exec", "config"},
 	"gh":            {"pr", "issue", "run", "repo", "api", "release", "search", "workflow", "cache", "gist", "project"},
 	"golangci-lint": {"run"},
 	"make":          nil,
@@ -173,7 +185,7 @@ var subcommandTable = map[string][]string{
 	// compressing sed's typical output.
 	"sed":     nil,
 	"ruff":    {"check", "format"},
-	"brew":    {"install", "upgrade"},
+	"brew":    {"install", "upgrade", "update", "reinstall"},
 	"pip":     {"install", "list", "show", "freeze", "download", "uninstall"},
 	"pip3":    {"install", "list", "show", "freeze", "download", "uninstall"},
 	"mongosh": nil,
@@ -192,15 +204,32 @@ var subcommandTable = map[string][]string{
 	// bare invocations get wrapped so that compaction can happen.
 	"jq":   nil,
 	"curl": nil,
-	// sqlite3's native default/list/csv output is arbitrary query data and must
-	// remain verbatim. Wrapping still reaches the generic JSON/repeat detector
-	// for caller-requested -json output and repetitive result streams.
+	// sqlite3: the dedicated formatter compacts the table shapes (-box/-table/
+	// -markdown/-column/-line) losslessly and caps a result only above 200 rows,
+	// with an explicit "…+N sqlite3 rows" marker; other shapes stay verbatim or go
+	// to the generic JSON/repeat detector. Only an invocation WITH SQL is wrapped:
+	// a bare `sqlite3 FILE` is a REPL and is refused in streamsForever.
 	"sqlite3": nil,
 	"dig":     nil,
 	"psql":    nil,
 	"npm":     {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
-	"pnpm":    {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
-	"yarn":    {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec"},
+	// pnpm and yarn also run a package binary directly (`pnpm vitest`, `yarn jest`);
+	// the npm formatter recognises the tool's report by its output shape.
+	"pnpm": {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec", "jest", "vitest", "tsc", "eslint"},
+	"yarn": {"install", "i", "ci", "add", "update", "audit", "list", "ls", "outdated", "run", "test", "exec", "jest", "vitest", "tsc", "eslint"},
+
+	// ── JavaScript/TypeScript tools with dedicated formatters ────────────────
+	//
+	// Every argument of these is a path, flag or glob, so each row is nil (wrap
+	// all) and none is subcommand-bearing in progkey. Watch modes never reach
+	// EOF and are refused in streamsForever. `npx` wraps ONLY when its first
+	// argument names one of the four tools: npx also runs arbitrary packages,
+	// some interactive (`npx create-…`), which must never be buffered.
+	"jest":   nil,
+	"vitest": nil,
+	"tsc":    nil,
+	"eslint": nil,
+	"npx":    {"jest", "vitest", "tsc", "eslint"},
 
 	// ── Covered by the GENERIC formatter only, deliberately ──────────────────
 	//
@@ -225,31 +254,189 @@ var subcommandTable = map[string][]string{
 	// the market" would build a tool for an audience of one. These rows are an
 	// explicit bet on users we cannot see, priced at roughly nothing because they
 	// add no formatter to maintain and cannot render worse than verbatim.
-	"aws":        nil,
-	"gcloud":     nil,
-	"az":         nil,
-	"terraform":  nil,
-	"tofu":       nil,
-	"pulumi":     nil,
-	"helm":       nil,
-	"cargo":      {"test", "build", "check", "clippy", "run", "fmt", "tree", "add", "update"},
-	"dotnet":     {"build", "test", "restore", "run", "publish", "list"},
-	"mvn":        nil,
-	"gradle":     nil,
-	"./gradlew":  nil,
-	"composer":   {"install", "update", "require", "show", "outdated", "validate"},
-	"bundle":     {"install", "update", "exec", "list", "outdated"},
-	"uv":         {"pip", "run", "sync", "lock", "add", "tree"},
-	"poetry":     {"install", "update", "add", "show", "lock", "run"},
-	"tsc":        nil,
-	"eslint":     nil,
-	"systemctl":  {"status", "list-units", "list-unit-files", "show", "is-active", "cat"},
+	"aws":       nil,
+	"gcloud":    nil,
+	"az":        nil,
+	"terraform": nil,
+	"tofu":      nil,
+	"pulumi":    nil,
+	"helm":      nil,
+	"cargo":     {"test", "build", "check", "clippy", "run", "fmt", "tree", "add", "update", "doc", "install", "nextest"},
+	"dotnet":    {"build", "test", "restore", "run", "publish", "list", "pack", "clean", "format"},
+	"mvn":       nil,
+	"mvnw":      nil,
+	"mvnd":      nil,
+	"gradle":    nil,
+	"./gradlew": nil,
+	"./mvnw":    nil,
+	"composer":  {"install", "update", "require", "remove", "show", "outdated", "validate"},
+	"bundle":    {"install", "update", "add", "remove", "exec", "list", "outdated"},
+	"uv":        {"pip", "run", "sync", "lock", "add", "remove", "tree"},
+	"poetry":    {"install", "update", "add", "remove", "show", "lock", "run"},
+	// `systemctl --failed` has no verb: the flag itself is the table entry.
+	"systemctl":  {"status", "list-units", "list-unit-files", "show", "is-active", "cat", "--failed"},
 	"journalctl": nil,
 	"df":         nil,
 	"terragrunt": nil,
 	// Keyed by the literal token, because matchSegment compares argv[0] as
 	// written rather than by basename — `./gradlew` is how projects invoke it.
 	"gradlew": nil,
+
+	// ── Coverage expansion: dedicated formatters ─────────────────────────────
+	//
+	// A nil row wraps every invocation and leaves the decision to the formatter
+	// (and to streamsForever for the spellings that never reach EOF); a row with
+	// subcommands wraps only those. See progkey for which are subcommand-bearing.
+	//
+	// core / filesystem. `env` is wrapped ONLY with no operands (matchAt): with
+	// operands it is a process wrapper (skipWrapper) and the command it launches
+	// is what gets wrapped.
+	"env":      nil,
+	"printenv": nil,
+	"lsof":     nil,
+	"wc":       nil,
+
+	// Go extras.
+	"gotestsum":   nil,
+	"govulncheck": nil,
+	"staticcheck": nil,
+	"buf":         {"lint", "build", "breaking", "generate"},
+
+	// IaC.
+	"ansible-playbook": nil,
+
+	// JavaScript / TypeScript. Every nil row takes path/flag/glob arguments, so
+	// none is subcommand-bearing in progkey. `playwright test` is wrapped although
+	// its default html reporter serves the report and blocks after a failing run
+	// (open: on-failure); the run side sets PLAYWRIGHT_HTML_OPEN=never in the
+	// child's environment (application/run/childenv.go).
+	"playwright": {"test"},
+	"prettier":   nil,
+	"next":       {"build"},
+	"prisma":     {"generate", "migrate", "db", "validate", "format"},
+	"biome":      {"check", "lint", "format", "ci"},
+	"oxlint":     nil,
+	"turbo":      {"run", "build", "test", "lint", "typecheck"},
+	"nx":         {"run-many", "affected", "run", "build", "test", "lint"},
+	"bun":        {"test"},
+	"deno":       {"test", "lint", "check"},
+
+	// Linters and pre-commit.
+	"shellcheck":   nil,
+	"hadolint":     nil,
+	"yamllint":     nil,
+	"markdownlint": nil,
+	"actionlint":   nil,
+	"pre-commit":   {"run"},
+
+	// Native toolchains and task runners.
+	"clang": nil, "clang++": nil, "gcc": nil, "g++": nil, "cc": nil, "c++": nil,
+	"cmake": nil, "ctest": nil, "ninja": nil, "ping": nil,
+	"swift":    {"build", "test"},
+	"ast-grep": {"scan"},
+	"sg":       {"scan"},
+	"just":     nil,
+	"task":     nil,
+	"mise":     {"run", "r"},
+
+	// Python.
+	"pdm":          {"install", "add", "remove", "update", "sync", "lock"},
+	"pip-compile":  nil,
+	"pyright":      nil,
+	"basedpyright": nil,
+	"ty":           {"check"},
+	"black":        nil,
+	"isort":        nil,
+	"flake8":       nil,
+	"pylint":       nil,
+	"sqlfluff":     {"lint", "fix", "format"},
+	"unittest":     nil,
+
+	// Ruby / PHP. `ruby` itself has no row: it is a general-purpose interpreter
+	// (see unformattable), so the minitest-under-ruby formatter is reached only
+	// through an explicit `sctx ruby ...`.
+	"rspec":   nil,
+	"rubocop": nil,
+	"rake":    nil,
+	"rails":   {"test"},
+	"phpunit": nil,
+	"phpstan": nil,
+
+	// Wave 3. Scanners: every one finishes on its own; the server/LSP spellings
+	// are refused in streamsForever. gitleaks `stdin` stays unwrapped (reads stdin).
+	"trivy":        {"image", "fs", "filesystem", "config", "repo", "rootfs", "sbom", "vm", "kubernetes", "k8s"},
+	"gitleaks":     {"detect", "git", "dir", "protect"},
+	"kube-linter":  {"lint"},
+	"osv-scanner":  {"scan"},
+	"semgrep":      nil,
+	"checkov":      nil,
+	"tflint":       nil,
+	"tfsec":        nil,
+	"grype":        nil,
+	"ansible-lint": nil,
+	"helmfile":     {"template", "lint", "diff", "apply", "sync", "build", "list"},
+
+	// Transfer, archive and certificate tools. wget/tar/zip/unzip take URLs, flag
+	// bundles or files, never a subcommand. openssl wraps only the shapes its
+	// formatter renders, and matchAt additionally demands a visible stdin redirect
+	// for s_client. `glab` has no argv grammar that tells its prompting verbs
+	// apart and is deliberately not wrapped.
+	"wget":    nil,
+	"tar":     nil,
+	"bsdtar":  nil,
+	"gtar":    nil,
+	"zip":     nil,
+	"unzip":   nil,
+	"openssl": {"x509", "req", "crl", "s_client"},
+	"svn":     {"checkout", "co", "update", "up", "switch", "sw", "add", "commit", "ci", "import", "export", "revert"},
+
+	// Languages and build systems. sbt's first argument is a task string and its
+	// bare/`~`/shell spellings are interactive, so the row is nil and the decision
+	// is made in streamsForever.
+	"mix":       {"compile", "test", "format", "deps.get", "deps.compile", "deps.update"},
+	"sbt":       nil,
+	"dart":      {"analyze", "test", "pub"},
+	"prove":     nil,
+	"zig":       {"build", "test", "build-exe", "build-lib", "build-obj"},
+	"rebar3":    {"compile", "eunit", "ct", "as"},
+	"cabal":     {"build", "test", "v2-build", "v2-test"},
+	"ghc":       nil,
+	"bazel":     {"build", "test"},
+	"bazelisk":  {"build", "test"},
+	"nix":       {"build", "flake"},
+	"nix-build": nil,
+	"nix-shell": nil,
+
+	// Database clients and migration tools. mysql, mongosh, sqlite3, redis-cli and
+	// clickhouse-client are REPLs without their statement flag: streamsForever
+	// refuses every spelling that has none.
+	"mysql":             nil,
+	"redis-cli":         nil,
+	"clickhouse-client": nil,
+	"flyway":            {"migrate", "info", "validate", "repair", "baseline", "clean", "undo"},
+	"liquibase":         {"update", "update-sql", "updateSQL", "status", "history", "validate", "rollback", "rollback-count", "tag", "diff", "drift"},
+	"dbt":               {"run", "test", "build", "seed", "snapshot", "compile", "deps", "debug", "parse", "clone"},
+
+	// Linux system administration. Package managers prompt without a consent flag
+	// and the monitors never return; both are refused in streamsForever
+	// (linuxStreams).
+	"apt":        {"update", "install", "upgrade", "dist-upgrade", "full-upgrade", "remove", "purge", "autoremove", "autopurge", "reinstall", "list"},
+	"apt-get":    {"update", "install", "upgrade", "dist-upgrade", "full-upgrade", "remove", "purge", "autoremove", "autopurge", "reinstall"},
+	"dnf":        {"install", "update", "upgrade", "remove", "erase", "autoremove", "reinstall", "downgrade", "distro-sync", "check-update", "makecache", "swap"},
+	"yum":        {"install", "update", "upgrade", "remove", "erase", "autoremove", "reinstall", "downgrade", "distro-sync", "check-update", "makecache", "swap"},
+	"apk":        {"add", "del", "update", "upgrade", "fix"},
+	"pacman":     nil,
+	"ip":         {"addr", "address", "a", "ad", "link", "l", "li"},
+	"ss":         nil,
+	"netstat":    nil,
+	"traceroute": nil,
+	"top":        nil,
+	"dmesg":      nil,
+	"mount":      nil,
+	"lsblk":      nil,
+	"iptables":   nil,
+	"ip6tables":  nil,
+	"ufw":        {"status"},
 }
 
 // argvOneIsOperation names programs wrapped for EVERY invocation (a nil row
@@ -276,6 +463,9 @@ var argvOneIsOperation = map[string]bool{
 	"git": true,
 	"aws": true, "gcloud": true, "az": true,
 	"terraform": true, "tofu": true, "terragrunt": true, "pulumi": true, "helm": true,
+	// sbt: wrapped for every non-interactive invocation (a task string is argv[1]);
+	// progkey records only its own verbs (programVerbs), never a custom task name.
+	"sbt": true,
 }
 
 // followFlags names, per program, the flags that make it stream until killed.
@@ -294,12 +484,98 @@ var argvOneIsOperation = map[string]bool{
 // that cannot arise.
 var followFlags = []string{"-f", "-F", "--follow"}
 
+// watchTools are the JS tools whose watch modes streamsForever knows.
+var watchTools = map[string]bool{
+	"jest": true, "vitest": true, "tsc": true, "eslint": true,
+	"playwright": true, "turbo": true, "nx": true, "bun": true, "deno": true,
+}
+
+// runnerTool finds the watch tool a package runner (npx, bunx, pnpm, yarn, npm)
+// launches: the first operand after runner flags and run/exec/dlx words, with
+// any @version removed. rest is everything after it.
+func runnerTool(args []string) (tool string, rest []string, ok bool) {
+	for i, a := range args {
+		switch {
+		case a == "run" || a == "exec" || a == "dlx" || a == "--" || strings.HasPrefix(a, "-"):
+			continue
+		}
+		name := shellTokenValue(a)
+		if at := strings.LastIndex(name, "@"); at > 0 {
+			name = name[:at]
+		}
+		if watchTools[name] {
+			return name, args[i+1:], true
+		}
+		return "", nil, false
+	}
+	return "", nil, false
+}
+
+// watchToolStreams applies the per-tool watch rules to a tool's own arguments.
+func watchToolStreams(tool string, args []string) bool {
+	for _, a := range args {
+		switch {
+		case a == "--watch" || a == "--watchAll" || a == "--watch=true" || a == "--watchAll=true":
+			return true
+		case a == "-w" && (tool == "vitest" || tool == "tsc"):
+			return true
+		case tool == "vitest" && (a == "--ui" || strings.HasPrefix(a, "--ui=")):
+			return true
+		case tool == "vitest" && (a == "watch" || a == "dev"):
+			// vitest commands that never return. Matched at any position: an
+			// option value (`--root watch`) is a harmless over-decline.
+			return true
+		}
+	}
+	return jsToolStreams(tool, args)
+}
+
+// journalctlValueLetters are journalctl's short options that take a value; the
+// rest of a cluster after one of them is that value.
+const journalctlValueLetters = "utgpnSUDMobcFiW"
+
 // streamsForever reports whether this invocation follows output indefinitely.
 // program is argv[0]; args are the tokens after it.
 func streamsForever(program string, args []string) bool {
 	switch program {
 	case "tail", "journalctl":
-		// No subcommand: the flag alone decides.
+		// No subcommand: the flag alone decides. The follow flag also hides inside a
+		// short cluster (`tail -fn 100 x`, `journalctl -fu nginx`), which the exact
+		// match below cannot see.
+		//
+		// A cluster is scanned only up to its first value-taking option: what
+		// follows it is that option's VALUE, so `journalctl -ufoo.service -n 50`
+		// and `-tfoo` name a unit and a tag, not --follow.
+		if program == "tail" && nestedcmd.ShortCluster(args, "fF", "ncs") ||
+			program == "journalctl" && nestedcmd.ShortCluster(args, "f", journalctlValueLetters) {
+			return true
+		}
+		if anyPrefix(args, "--follow=") {
+			return true
+		}
+	case "jest", "vitest", "tsc", "eslint", "playwright", "turbo", "nx", "bun", "deno",
+		"npx", "bunx", "pnpm", "yarn", "npm":
+		// Watch modes run until killed. `-w` is vitest's/tsc's short form but
+		// means "workspace root" to pnpm and "max workers" to jest, so the
+		// short flag only counts for the two tools that own it.
+		//
+		// A package runner hands the tool its arguments, so when the runner's
+		// first operand is one of these tools, the tool's own rules apply to the
+		// rest (`yarn tsc -w`, `pnpm vitest -w`, `npx vitest watch`).
+		if watchTools[program] {
+			if watchToolStreams(program, args) {
+				return true
+			}
+		} else if tool, rest, ok := runnerTool(args); ok && watchToolStreams(tool, rest) {
+			return true
+		}
+		for _, a := range args {
+			switch a {
+			case "--watch", "--watchAll", "--watch=true", "--watchAll=true":
+				return true
+			}
+		}
+		return false
 	case "kubectl":
 		inv, ok := kubectlargv.Parse(append([]string{program}, args...))
 		if !ok {
@@ -319,13 +595,18 @@ func streamsForever(program string, args []string) bool {
 		default:
 			return false
 		}
-	case "docker":
+	case "docker", "podman":
 		inv, ok := dockerargv.Parse(append([]string{program}, args...))
 		if !ok {
 			return false
 		}
 		if inv.Command == "logs" {
 			return dockerargv.HasFlag(inv.Args, "-f", "--follow")
+		}
+		// podman's `ps -w [N]` / `--watch[=N]` re-lists until interrupted.
+		if program == "podman" && (inv.Command == "ps" || (inv.Command == "container" && hasOperand(inv.Args, "ls", "list", "ps"))) &&
+			(anyArg(inv.Args, "-w", "--watch") || anyPrefix(inv.Args, "--watch=", "-w")) {
+			return true
 		}
 		if inv.Command == "stats" {
 			return !dockerargv.HasFlag(inv.Args, "--no-stream")
@@ -346,14 +627,15 @@ func streamsForever(program string, args []string) bool {
 		case "stats":
 			return !dockerargv.HasFlag(nested.Args, "--no-stream")
 		case "up":
-			return !dockerargv.HasFlag(nested.Args, "-d", "--detach")
+			// --wait implies --detach: it returns once the services are healthy.
+			return !dockerargv.HasFlag(nested.Args, "-d", "--detach", "--wait")
 		case "attach", "events", "watch":
 			return true
 		default:
 			return false
 		}
 	default:
-		return false
+		return coverageStreams(program, args)
 	}
 	for _, a := range args {
 		if slices.Contains(followFlags, a) {
@@ -363,12 +645,12 @@ func streamsForever(program string, args []string) bool {
 	return false
 }
 
-func kubectlExecSafe(args []string) bool {
+func kubectlExecSafe(args []string, depth int) bool {
 	inner, ok := kubectlargv.ExecCommand(args)
-	return ok && hookKnowsInner(inner)
+	return ok && hookKnowsInner(inner, depth)
 }
 
-func dockerInvocationSafe(argv []string) bool {
+func dockerInvocationSafe(argv []string, depth int) bool {
 	inv, ok := dockerargv.Parse(argv)
 	if !ok {
 		return false
@@ -378,9 +660,21 @@ func dockerInvocationSafe(argv []string) bool {
 		return true
 	case "network", "volume", "container", "image":
 		return len(inv.Args) > 0 && inv.Args[0] == "ls"
+	case "buildx", "builder":
+		// Only the BuildKit build, which the docker formatter renders as `docker
+		// build`; buildx bake/create/use and builder prune are not formatted.
+		for _, arg := range inv.Args {
+			if !strings.HasPrefix(arg, "-") {
+				return arg == "build"
+			}
+		}
+		return false
 	case "exec":
 		inner, ok := dockerargv.ExecCommand("exec", inv.Args)
-		return ok && hookKnowsInner(inner)
+		return ok && hookKnowsInner(inner, depth)
+	case "run":
+		inner, ok := dockerargv.RunCommand("run", inv.Args)
+		return ok && hookKnowsInner(inner, depth)
 	case "compose":
 		nested, ok := dockerargv.ParseCompose(inv)
 		if !ok {
@@ -391,7 +685,10 @@ func dockerInvocationSafe(argv []string) bool {
 			return true
 		case "exec":
 			inner, ok := dockerargv.ExecCommand("compose exec", nested.Args)
-			return ok && hookKnowsInner(inner)
+			return ok && hookKnowsInner(inner, depth)
+		case "run":
+			inner, ok := dockerargv.RunCommand("compose run", nested.Args)
+			return ok && hookKnowsInner(inner, depth)
 		default:
 			return false
 		}
@@ -400,16 +697,32 @@ func dockerInvocationSafe(argv []string) bool {
 	}
 }
 
-func hookKnowsInner(argv []string) bool {
-	if len(argv) == 0 {
+// maxInnerDepth bounds launcher-inside-launcher chains (`ssh h 'docker exec c
+// kubectl exec ...'`). Past it the answer is "no": a command nested that deep is
+// not one the hook can vouch for.
+const maxInnerDepth = 3
+
+// hookKnowsInner reports whether the program a launcher (ssh, docker exec,
+// kubectl exec, docker run, nix-shell --run) executes would itself be wrapped at
+// the top level. It is the SAME decision, not a lookalike: the argv is turned
+// back into tokens and handed to matchTokens, so wrapper peeling, bare-env-only,
+// the git/psql/sed/ssh gates, subcommand lists, docker/kubectl exec safety and
+// streamsForever all apply to the inner command exactly as they would to the
+// outer one, and a launcher inside a launcher recurses through the same code.
+// depth counts the launchers already entered.
+func hookKnowsInner(argv []string, depth int) bool {
+	if len(argv) == 0 || depth >= maxInnerDepth {
 		return false
 	}
-	program := argv[0]
-	if i := strings.LastIndexAny(program, `/\\`); i >= 0 {
-		program = program[i+1:]
+	if lookupName(argv[0]) == "sctx" {
+		return false
 	}
-	_, known := subcommandTable[program]
-	return known && program != "sctx"
+	tokens := make([]token, len(argv))
+	for i, a := range argv {
+		tokens[i] = token{text: a}
+	}
+	_, ok := matchTokens(tokens, depth+1)
+	return ok
 }
 
 // reservedNames are sctx's own native subcommands: rewriting a bare
@@ -758,7 +1071,7 @@ func matchProjectSegment(text, root string, matchers []projectfilter.Matcher) (i
 	for idx < len(tokens) && isAssignment(tokens[idx].text) {
 		idx++
 	}
-	if idx >= len(tokens) {
+	if idx >= len(tokens) || leadingOptOut(tokens) {
 		return 0, false
 	}
 	program := shellTokenValue(tokens[idx].text)
@@ -816,29 +1129,77 @@ func wrappable(segs []segment, i int) bool {
 // against reserved native subcommand names appearing bare — callers that
 // need those guards apply them (typically via segmentHead) before calling
 // matchSegment.
+//
+// Process wrappers (`timeout 60`, `nice -n 5`, `env A=b`, ...) are skipped and
+// the offset returned is that of the wrapped program, so the rewrite reads
+// `timeout 60 sctx go test`. A launcher (`npx tsc`, `python -m pytest`) is
+// wrapped as a whole and sctx's run side peels it to the inner tool's formatter.
 func matchSegment(text string) (int, bool) {
-	tokens := tokenize(text)
+	return matchTokens(tokenize(text), 0)
+}
+
+// matchTokens is matchSegment over already-split tokens. depth is the number of
+// launchers entered so far: 0 at the top level, more for the command a launcher
+// runs, which is decided by this very function (see hookKnowsInner).
+func matchTokens(tokens []token, depth int) (int, bool) {
 	if len(tokens) == 0 {
 		return 0, false
 	}
 
-	// Skip leading env assignments (FOO=bar cmd ...) when identifying the
-	// program, but keep the full text intact for prefixing.
-	idx := 0
-	for idx < len(tokens) && isAssignment(tokens[idx].text) {
-		idx++
-	}
-	if idx >= len(tokens) {
+	insert, inner, innerName, ok := headOf(tokens)
+	if !ok {
 		return 0, false
 	}
-	program := tokens[idx].text
-	lookupProgram := program
-	if i := strings.LastIndexAny(lookupProgram, `/\`); i >= 0 {
-		base := lookupProgram[i+1:]
-		if base == "git" || base == "gh" {
-			lookupProgram = base
+	// A leading `PATH=... cmd` changes where `sctx` is looked up: the rewritten
+	// command would exit 127. (`env PATH=` and `env -i` are declined in skipWrapper.)
+	for _, t := range tokens[:insert] {
+		if strings.HasPrefix(t.text, "PATH=") {
+			return 0, false
 		}
 	}
+	// `uv run --with x tail -f log`: a launcher flag we cannot parse hides the
+	// inner program, and the launcher's own row would wrap a follow.
+	if inner < 0 && runLauncherUnpeeled(tokens, insert) {
+		return 0, false
+	}
+
+	// A launcher is decided by the tool it runs WHEN that tool has a row: the inner
+	// invocation's own checks (streaming, subcommand, git/ssh safety) must apply,
+	// and falling back to the launcher's own row could wrap `uv run tail -f` — a
+	// follow — as plain `uv`. An inner tool with no row leaves the launcher's own
+	// row (`uv run`, `npm run`) as the only candidate, as before launchers existed.
+	if inner >= 0 {
+		innerProgram := lookupName(innerName)
+		if _, known := subcommandTable[innerProgram]; known {
+			return matchAt(tokens, insert, inner, innerName, depth)
+		}
+		// An inner program with no row of its own still decides whether the
+		// launcher's row may wrap: `uv run ptw` / `poetry run pytest-watch` stream
+		// forever, and the launcher's row alone would wrap them.
+		args := make([]string, 0, len(tokens)-inner-1)
+		for _, t := range tokens[inner+1:] {
+			args = append(args, shellTokenValue(t.text))
+		}
+		if streamsForever(innerProgram, args) {
+			return 0, false
+		}
+		// `bundle exec <anything>` runs an arbitrary program (a server, a REPL, a
+		// worker): without a row for it there is nothing to say it finishes.
+		if lookupName(shellTokenValue(tokens[insert].text)) == "bundle" {
+			return 0, false
+		}
+	}
+	return matchAt(tokens, insert, insert, "", depth)
+}
+
+// matchAt applies the subcommandTable rules to the program at tokens[prog]
+// (named by name when non-empty, else by the token itself) and returns the
+// offset of tokens[insert], where "sctx " is to go.
+func matchAt(tokens []token, insert, prog int, name string, depth int) (int, bool) {
+	if name == "" {
+		name = tokens[prog].text
+	}
+	lookupProgram := lookupName(name)
 
 	if reservedNames[lookupProgram] {
 		return 0, false
@@ -848,77 +1209,83 @@ func matchSegment(text string) (int, bool) {
 	if !known {
 		return 0, false
 	}
-	if lookupProgram == "git" {
-		argv := make([]string, 0, len(tokens)-idx)
-		for _, token := range tokens[idx:] {
-			argv = append(argv, token.text)
+	// argvOf rebuilds the program's argv with the looked-up name in position 0, so
+	// the shared parsers see `git`, not `/usr/bin/git`.
+	argvOf := func(unquote bool) []string {
+		argv := make([]string, 0, len(tokens)-prog)
+		argv = append(argv, lookupProgram)
+		for _, t := range tokens[prog+1:] {
+			if unquote {
+				argv = append(argv, shellTokenValue(t.text))
+			} else {
+				argv = append(argv, t.text)
+			}
 		}
-		inv, ok := gitargv.Parse(argv)
+		return argv
+	}
+	switch {
+	case lookupProgram == "env":
+		// Only a bare `env` (print the environment) is wrapped as a program. With
+		// operands it is a wrapper skipWrapper already peeled, or one it declined
+		// on purpose (`env -i`, `env PATH=...`), and must stay that way.
+		if prog+1 < len(tokens) {
+			return 0, false
+		}
+	case lookupProgram == "git":
+		inv, ok := gitargv.Parse(argvOf(false))
 		if !ok || !gitargv.SafeToBuffer(inv) {
 			return 0, false
 		}
-	} else if lookupProgram == "gh" {
-		argv := make([]string, 0, len(tokens)-idx)
-		for _, token := range tokens[idx:] {
-			argv = append(argv, token.text)
-		}
-		inv, ok := ghargv.Parse(argv)
+	case lookupProgram == "gh":
+		inv, ok := ghargv.Parse(argvOf(false))
 		if !ok || !ghargv.SafeReadOnly(inv) {
 			return 0, false
 		}
-	} else if lookupProgram == "ssh" {
-		argv := make([]string, 0, len(tokens)-idx)
-		for _, token := range tokens[idx:] {
-			argv = append(argv, shellTokenValue(token.text))
-		}
-		inner, ok := sshargv.RemoteCommand(argv)
-		if !ok || !hookKnowsInner(inner) {
+	case lookupProgram == "ssh":
+		inner, ok := sshargv.RemoteCommand(argvOf(true))
+		if !ok || !hookKnowsInner(inner, depth) {
 			return 0, false
 		}
-	} else if lookupProgram == "psql" {
-		argv := make([]string, 0, len(tokens)-idx)
-		for _, token := range tokens[idx:] {
-			argv = append(argv, shellTokenValue(token.text))
-		}
-		if !psqlSafeToBuffer(argv) {
+	case lookupProgram == "psql":
+		if !psqlSafeToBuffer(argvOf(true)) {
 			return 0, false
 		}
-	} else if lookupProgram == "sed" {
+	case lookupProgram == "sed":
 		// Only the two read-only shapes are wrapped; every other sed
 		// invocation is a transform sctx cannot safely buffer and declines
 		// here rather than being counted as a gap (see the sed comment in
 		// unformattable above — this is the deliberate exception).
-		argv := make([]string, 0, len(tokens)-idx)
-		for _, token := range tokens[idx:] {
-			argv = append(argv, shellTokenValue(token.text))
-		}
-		if !sedargv.RecognizedRead(argv) {
+		if !sedargv.RecognizedRead(argvOf(true)) {
 			return 0, false
 		}
-	} else if len(subs) > 0 {
+	case len(subs) > 0:
 		switch lookupProgram {
 		case "kubectl":
-			argv := make([]string, 0, len(tokens)-idx)
-			for _, token := range tokens[idx:] {
-				argv = append(argv, token.text)
-			}
-			inv, ok := kubectlargv.Parse(argv)
+			inv, ok := kubectlargv.Parse(argvOf(false))
 			if !ok || !contains(subs, inv.Command) {
 				return 0, false
 			}
-			if inv.Command == "exec" && !kubectlExecSafe(inv.Args) {
+			if inv.Command == "exec" && !kubectlExecSafe(inv.Args, depth) {
 				return 0, false
 			}
-		case "docker":
-			argv := make([]string, 0, len(tokens)-idx)
-			for _, token := range tokens[idx:] {
-				argv = append(argv, token.text)
-			}
-			if !dockerInvocationSafe(argv) {
+		case "docker", "podman":
+			if !dockerInvocationSafe(argvOf(false), depth) {
 				return 0, false
 			}
 		default:
-			if idx+1 >= len(tokens) || !contains(subs, tokens[idx+1].text) {
+			if prog+1 >= len(tokens) {
+				return 0, false
+			}
+			verb := tokens[prog+1].text
+			if pkgManagers[lookupProgram] {
+				// `apt-get -y install x`: the verb follows the options.
+				rest := make([]string, 0, len(tokens)-prog-1)
+				for _, t := range tokens[prog+1:] {
+					rest = append(rest, shellTokenValue(t.text))
+				}
+				verb = pkgVerb(rest)
+			}
+			if !contains(subs, verb) {
 				return 0, false
 			}
 		}
@@ -927,15 +1294,17 @@ func matchSegment(text string) (int, bool) {
 	// A following command never reaches EOF, and sctx formats only after it does.
 	// Wrapping one turns "the agent sees output until its timeout" into "the agent
 	// sees nothing at all" — a strict regression that no saving could justify.
-	args := make([]string, 0, len(tokens)-idx)
-	for _, t := range tokens[idx+1:] {
-		args = append(args, t.text)
+	// Unquoted, as segmentStreamsForever passes them: the shell strips the quotes,
+	// so `tail "-f" x` follows exactly like `tail -f x`.
+	args := make([]string, 0, len(tokens)-prog)
+	for _, t := range tokens[prog+1:] {
+		args = append(args, shellTokenValue(t.text))
 	}
 	if streamsForever(lookupProgram, args) {
 		return 0, false
 	}
 
-	return tokens[idx].offset, true
+	return tokens[insert].offset, true
 }
 
 func gapSegment(cmd string) (string, bool) {
@@ -945,7 +1314,8 @@ func gapSegment(cmd string) (string, bool) {
 	}
 
 	for _, seg := range segs {
-		if h := segmentHead(seg.text); alreadyWrapped(h) {
+		eff, _ := effectiveSegment(seg.text)
+		if h := segmentHead(eff); alreadyWrapped(h) {
 			return "", false
 		}
 	}
@@ -954,11 +1324,19 @@ func gapSegment(cmd string) (string, bool) {
 		if seg.pipeFrom {
 			continue
 		}
-		h := segmentHead(seg.text)
+		eff, optedOut := effectiveSegment(seg.text)
+		h := segmentHead(eff)
 		if h == "" {
 			return "", false
 		}
 		if noiseBuiltins[h] {
+			continue
+		}
+		// An explicit opt-out (inline, or via `env`) is a decision, not a gap to report.
+		if optedOut {
+			return "", false
+		}
+		if wrapperNames[h] {
 			continue
 		}
 		// NOT A GAP, and never will be — see unformattable. `continue` rather than
@@ -971,22 +1349,22 @@ func gapSegment(cmd string) (string, bool) {
 		if reservedNames[h] {
 			return "", false
 		}
-		if segmentStreamsForever(seg.text) {
+		if segmentStreamsForever(eff) {
 			continue
 		}
 		if !wrappable(segs, i) {
 			return "", false
 		}
-		if deliberatelyUnbuffered(seg.text) {
+		if deliberatelyUnbuffered(eff) {
 			return "", false
 		}
-		if deliberatelyNoFormatter(seg.text) {
+		if deliberatelyNoFormatter(eff) {
 			return "", false
 		}
-		if _, covered := matchSegment(seg.text); covered {
+		if _, covered := matchSegment(eff); covered {
 			return "", false
 		}
-		return seg.text, true
+		return eff, true
 	}
 
 	return "", false
@@ -1008,11 +1386,15 @@ func declineSegment(cmd string) (string, string, bool) {
 		if seg.pipeFrom {
 			continue
 		}
-		if _, known := recognizableHead(seg.text); !known {
+		eff, optedOut := effectiveSegment(seg.text)
+		if optedOut {
 			continue
 		}
-		if segmentStreamsForever(seg.text) {
-			return seg.text, telemetry.DeclineStreaming, true
+		if _, known := recognizableHead(eff); !known {
+			continue
+		}
+		if segmentStreamsForever(eff) {
+			return eff, telemetry.DeclineStreaming, true
 		}
 		if hasDisallowedRedirect(seg.text) {
 			return seg.text, telemetry.DeclineUnsafeShellShape, true
@@ -1047,20 +1429,80 @@ func recognizableHead(text string) (string, bool) {
 
 func segmentStreamsForever(text string) bool {
 	tokens := tokenize(text)
+	insert, inner, innerName, ok := headOf(tokens)
+	if !ok {
+		return false
+	}
+	argsAfter := func(i int) []string {
+		args := make([]string, 0, len(tokens)-i-1)
+		for _, token := range tokens[i+1:] {
+			args = append(args, shellTokenValue(token.text))
+		}
+		return args
+	}
+	if streamsForever(filepathBase(shellTokenValue(tokens[insert].text)), argsAfter(insert)) {
+		return true
+	}
+	if inner >= 0 {
+		return streamsForever(lookupName(innerName), argsAfter(inner))
+	}
+	return runLauncherUnpeeled(tokens, insert)
+}
+
+// runLauncherUnpeeled reports whether tokens[insert:] is `uv run` / `poetry run`
+// whose inner program launcher.Peel could not identify AND that could be hiding
+// a streaming one: its first operand is a flag (`--with x`, `--`) or any later
+// token is a program streamsForever knows (`uv run "tail" -f log`). Declining
+// here is the safe direction: a wrapped follow loses all output.
+func runLauncherUnpeeled(tokens []token, insert int) bool {
+	if insert+2 >= len(tokens) {
+		return false
+	}
+	switch name, verb := lookupName(shellTokenValue(tokens[insert].text)), tokens[insert+1].text; {
+	case (name == "uv" || name == "poetry") && verb == "run":
+	case name == "bundle" && verb == "exec":
+		// Launcher.Peel found no inner program, so nothing says it finishes.
+		return true
+	default:
+		return false
+	}
+	rest := tokens[insert+2:]
+	if strings.HasPrefix(rest[0].text, "-") {
+		return true
+	}
+	for k, t := range rest {
+		args := make([]string, 0, len(rest)-k-1)
+		for _, u := range rest[k+1:] {
+			args = append(args, shellTokenValue(u.text))
+		}
+		if streamsForever(filepathBase(shellTokenValue(t.text)), args) {
+			return true
+		}
+	}
+	return false
+}
+
+// effectiveSegment returns text starting at the program that actually runs —
+// past leading assignments and process wrappers (headOf) — and whether the
+// segment opted out of rewriting (inline or via `env`). The gap meter judges the
+// effective program, so `timeout 60 sctx go test` is not a gap and a streaming
+// command behind a wrapper is recorded as streaming, with its inner program.
+func effectiveSegment(text string) (eff string, optedOut bool) {
+	tokens := tokenize(text)
+	if insert, _, _, ok := headOf(tokens); ok {
+		return text[tokens[insert].offset:], false
+	}
 	idx := 0
 	for idx < len(tokens) && isAssignment(tokens[idx].text) {
 		idx++
 	}
-	if idx >= len(tokens) {
-		return false
-	}
-	program := filepathBase(shellTokenValue(tokens[idx].text))
-	args := make([]string, 0, len(tokens)-idx-1)
-	for _, token := range tokens[idx+1:] {
-		args = append(args, shellTokenValue(token.text))
-	}
-	return streamsForever(program, args)
+	return text, idx < len(tokens)
 }
+
+// wrapperNames are the programs skipWrapper peels. A segment still headed by one
+// had a wrapper shape the parser deliberately declined (`timeout -s KILL`,
+// `env -i`): a decision, not a coverage gap.
+var wrapperNames = map[string]bool{"timeout": true, "env": true, "nice": true, "nohup": true, "stdbuf": true, "time": true}
 
 // deliberatelyNoFormatter removes measured, consciously rejected candidates
 // from the gap ranking. `go doc` output is the documentation/API index the
@@ -1133,7 +1575,7 @@ func deliberatelyUnbuffered(text string) bool {
 			argv[i] = shellTokenValue(argv[i])
 		}
 		inner, ok := sshargv.RemoteCommand(argv)
-		return !ok || !hookKnowsInner(inner)
+		return !ok || !hookKnowsInner(inner, 0)
 	case "psql":
 		for i := range argv {
 			argv[i] = shellTokenValue(argv[i])
