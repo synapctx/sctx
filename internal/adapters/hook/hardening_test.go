@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
@@ -134,8 +135,12 @@ func TestStepAsideNote(t *testing.T) {
 		t.Fatal("note older than 7 days must be hidden")
 	}
 	fi, err := os.Stat(filepath.Join(spoolDir(), "permission-stepaside"))
-	if err != nil || fi.Mode().Perm() != 0o600 {
-		t.Fatalf("stat = %v, %v", fi, err)
+	if err != nil {
+		t.Fatalf("stat: %v", err)
+	}
+	// Unix permission bits do not exist on Windows (Go reports 0666 there).
+	if runtime.GOOS != "windows" && fi.Mode().Perm() != 0o600 {
+		t.Fatalf("mode = %v, want 0600", fi.Mode().Perm())
 	}
 }
 
