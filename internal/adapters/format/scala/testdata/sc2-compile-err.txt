@@ -1,0 +1,21 @@
+[info] welcome to sbt 1.10.5 (Eclipse Adoptium Java 17.0.13)
+[info] loading project definition from /work/proj/project
+[info] loading settings for project sc2 from build.sbt ...
+[info] set current project to demo2 (in build file:/work/proj/)
+[info] Executing in batch mode. For better performance use sbt's shell
+[info] compiling 1 Scala source to /work/proj/target/scala-2.13/classes ...
+[error] /work/proj/src/main/scala/Demo.scala:2:38: not found: value c
+[error]   def add(a: Int, b: Int): Int = a + c
+[error]                                      ^
+[error] /work/proj/src/main/scala/Demo.scala:3:19: type mismatch;
+[error]  found   : Int(42)
+[error]  required: String
+[error]   def s: String = 42
+[error]                   ^
+[warn] /work/proj/src/main/scala/Demo.scala:4:35: local val y in method unused is never used
+[warn]   def unused(x: Int): Int = { val y = 1; x }
+[warn]                                   ^
+[warn] one warning found
+[error] two errors found
+[error] (Compile / compileIncremental) Compilation failed
+[error] Total time: 2 s, completed Nov 21, 2026, 2:32:49 AM

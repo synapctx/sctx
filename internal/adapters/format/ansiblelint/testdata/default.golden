@@ -1,0 +1,21 @@
+ansible-lint: 16 findings in 1 file (fqcn[action-core]=4 name[missing]=3 no-changed-when=2 no-free-form=2 command-instead-of-shell=1 name[casing]=1 name[play]=1 package-latest=1 risky-file-permissions=1)
+ans/play.yml (16)
+  1:3 name[play] All plays should be named.
+  3 command-instead-of-shell Use shell only when shell functionality is required. [Task/Handler: shell echo hi]
+  3:7 fqcn[action-core] Use FQCN for builtin module actions (shell). [Use `ansible.builtin.shell` or `ansible.legacy.shell` instead.]
+  3 name[missing] All tasks should be named. [Task/Handler: shell echo hi]
+  3 no-changed-when Commands should not change things if nothing needs doing. [Task/Handler: shell echo hi]
+  4:7 fqcn[action-core] Use FQCN for builtin module actions (command). [Use `ansible.builtin.command` or `ansible.legacy.command` instead.]
+  4 name[missing] All tasks should be named. [Task/Handler: command ls]
+  4 no-changed-when Commands should not change things if nothing needs doing. [Task/Handler: command ls]
+  5:13 name[casing] All names should start with an uppercase letter. [Task/Handler: copy]
+  5 no-free-form Avoid using free-form when calling module actions. (copy) [Task/Handler: copy]
+  5 risky-file-permissions File permissions unset or incorrect. [Task/Handler: copy]
+  6:7 fqcn[action-core] Use FQCN for builtin module actions (copy). [Use `ansible.builtin.copy` or `ansible.legacy.copy` instead.]
+  7:7 fqcn[action-core] Use FQCN for builtin module actions (apt). [Use `ansible.builtin.apt` or `ansible.legacy.apt` instead.]
+  7 name[missing] All tasks should be named. [Task/Handler: apt name=git state=latest]
+  7 no-free-form Avoid using free-form when calling module actions. (apt) [Task/Handler: apt name=git state=latest]
+  7 package-latest Package installs should not use latest. [Task/Handler: apt name=git state=latest]
+…dropped: 11 stderr summary lines
+WARNING  Listing 16 violation(s) that are fatal
+Failed: 16 failure(s), 0 warning(s) in 1 files processed of 1 encountered. Last profile that met the validation criteria was 'min'.

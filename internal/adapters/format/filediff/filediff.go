@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
+	"github.com/synapctx/sctx/internal/platform/difffloor"
 )
 
 // Formatter renders `diff` output.
@@ -45,7 +46,11 @@ func (f *Formatter) Aggressive(_ context.Context, in format.Input) (format.Rende
 	if len(lines) == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
-	if !looksUnified(lines) {
+	if !looksUnified(lines) || !difffloor.Text(raw) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	if difffloor.Below(len(lines)) {
+		// Fidelity floor: a small diff passes through verbatim.
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
@@ -55,7 +60,8 @@ func (f *Formatter) Aggressive(_ context.Context, in format.Input) (format.Rende
 	}
 
 	summary := fmt.Sprintf("%d hunks, +%d -%d", hunks, adds, dels)
-	body := strings.Join(append([]string{summary}, kept...), "\n")
+	stamp := difffloor.Stamp(len(lines), len(kept)+2)
+	body := strings.Join(append([]string{stamp, summary}, kept...), "\n")
 	if len(body) >= len(raw) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}

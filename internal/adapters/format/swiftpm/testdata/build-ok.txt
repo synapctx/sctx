@@ -1,0 +1,16 @@
+Building for debugging...
+[Planning deferred tasks]
+[19 / 28]
+[20 / 29] Demo
+[23 / 37]
+[26 / 37]
+[34 / 37] Demo
+/work/proj/Sources/Demo/Demo.swift:2:32: [1;33mwarning: [1;39minitialization of immutable value 'x' was never used; consider replacing with assignment to '_' or removing it[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/no-usage\NoUsage]8;;\]
+[0;36m1 |[0;0m public func add(_ a: Int, _ b: Int) -> Int { a + b }
+[0;36m2 |[0;0m public func unusedWarn() { let x = 5 }
+  [0;36m|[0;0m                                `- [1;33mwarning: [1;39minitialization of immutable value 'x' was never used; consider replacing with assignment to '_' or removing it[0;0m [#]8;;https://docs.swift.org/compiler/documentation/diagnostics/no-usage\NoUsage]8;;\]
+[0;36m3 |[0;0m 
+
+[#NoUsage]: <https://docs.swift.org/compiler/documentation/diagnostics/no-usage>
+/work/proj/Package.swift: Demo: ld: warning: search path '/Library/Developer/CommandLineTools/Developer/Library/Frameworks' not found
+Build complete! (26.96 secs)

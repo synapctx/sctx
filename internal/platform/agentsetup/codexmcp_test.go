@@ -15,8 +15,8 @@ func TestCodexMCPInstallPreservesConfigAndIsIdempotent(t *testing.T) {
 	path := filepath.Join(home, ".codex", "config.toml")
 	write(t, path, "model = \"gpt-test\"\n\n[projects.\"/work\"]\ntrust_level = \"trusted\"\n")
 	tokens := map[string]string{
-		"synapctx":   "sctx_live_syn",
-		"cloudresty": "sctx_live_cloud",
+		"synapctx": "sctx_live_syn",
+		"globex":   "sctx_live_cloud",
 	}
 
 	changed, err := InstallCodexMCP(home, "https://mcp.synapctx.com", tokens)
@@ -38,11 +38,11 @@ func TestCodexMCPInstallPreservesConfigAndIsIdempotent(t *testing.T) {
 			t.Errorf("existing config %q was not preserved:\n%s", preserved, got)
 		}
 	}
-	if strings.Index(got, "synapctx-cloudresty") > strings.Index(got, "synapctx-synapctx") {
+	if strings.Index(got, "synapctx-globex") > strings.Index(got, "synapctx-synapctx") {
 		t.Errorf("registrations are not deterministic:\n%s", got)
 	}
 	for _, want := range []string{
-		"[mcp_servers.synapctx-cloudresty]",
+		"[mcp_servers.synapctx-globex]",
 		"[mcp_servers.synapctx-synapctx]",
 		"url = \"https://mcp.synapctx.com/mcp\"",
 		"Authorization = \"Bearer sctx_live_cloud\"",

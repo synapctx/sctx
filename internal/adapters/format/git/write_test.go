@@ -87,7 +87,7 @@ func TestAggressiveWrite(t *testing.T) {
 			t.Fatalf("Aggressive() error = %v", err)
 		}
 		body := string(out.Body)
-		for _, want := range []string{"Fast-forward", "1 file changed, 5 insertions(+)"} {
+		for _, want := range []string{"ok fast-forward d018a40..850a312", "e.txt | 5 +++++", "1 file changed, 5 insertions(+)"} {
 			if !strings.Contains(body, want) {
 				t.Errorf("body missing %q, got: %q", want, body)
 			}
@@ -106,8 +106,8 @@ func TestAggressiveWrite(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Aggressive() error = %v", err)
 		}
-		if !strings.Contains(string(out.Body), "[main 850a312] add e.txt") {
-			t.Errorf("body missing commit summary: %q", out.Body)
+		if got, want := string(out.Body), "ok main 850a312 add e.txt: 1 file changed, 5 insertions(+); 1 created"; got != want {
+			t.Errorf("body = %q, want %q", got, want)
 		}
 	})
 
@@ -155,4 +155,54 @@ func TestAggressiveWrite(t *testing.T) {
 			t.Errorf("body = %q, want it to contain %q", out.Body, "push: done")
 		}
 	})
+}
+
+func TestConfirmWrite(t *testing.T) {
+	run := func(argv []string, stdout string) string {
+		t.Helper()
+		out, err := New().Aggressive(context.Background(), format.Input{Argv: argv, Stdout: strings.NewReader(stdout), Stderr: strings.NewReader("")})
+		if err != nil {
+			t.Fatalf("Aggressive(%v) error = %v", argv, err)
+		}
+		return string(out.Body)
+	}
+
+	t.Run("commit with -m omits the subject the caller wrote", func(t *testing.T) {
+		got := run([]string{"git", "commit", "-m", "add e.txt"}, commitOutput)
+		if want := "ok main 850a312: 1 file changed, 5 insertions(+); 1 created"; got != want {
+			t.Errorf("got %q, want %q", got, want)
+		}
+	})
+	t.Run("commit with unrecognised lines is left as filtered output", func(t *testing.T) {
+		raw := "pre-commit: ran 3 checks\n" + commitOutput
+		got := run([]string{"git", "commit", "-m", "x"}, raw)
+		if !strings.Contains(got, "pre-commit: ran 3 checks") || !strings.Contains(got, "[main 850a312] add e.txt") {
+			t.Errorf("hook output must survive verbatim, got %q", got)
+		}
+	})
+	t.Run("pull and merge up to date", func(t *testing.T) {
+		for _, sub := range []string{"pull", "merge"} {
+			if got := run([]string{"git", sub}, "Already up to date.\n"); got != "ok up-to-date" {
+				t.Errorf("%s: got %q", sub, got)
+			}
+		}
+	})
+	t.Run("merge fast-forward keeps the diffstat", func(t *testing.T) {
+		raw := "Updating 125be30..40e21d4\nFast-forward\n feat.txt | 1 +\n 1 file changed, 1 insertion(+)\n create mode 100644 feat.txt\n"
+		want := "ok fast-forward 125be30..40e21d4\nfeat.txt | 1 +\n1 file changed, 1 insertion(+)\ncreate mode 100644 feat.txt"
+		if got := run([]string{"git", "merge", "feat"}, raw); got != want {
+			t.Errorf("got %q, want %q", got, want)
+		}
+	})
+}
+
+func TestWriteKeepsFinalSegmentOfRedrawnLine(t *testing.T) {
+	raw := "Rebasing (1/2)\rRebasing (2/2)\r\x1b[KSuccessfully rebased and updated refs/heads/t2.\n"
+	out, err := New().Aggressive(context.Background(), format.Input{Argv: []string{"git", "rebase", "main"}, Stdout: strings.NewReader(""), Stderr: strings.NewReader(raw)})
+	if err != nil {
+		t.Fatalf("Aggressive() error = %v", err)
+	}
+	if got, want := string(out.Body), "Successfully rebased and updated refs/heads/t2."; got != want {
+		t.Errorf("body = %q, want %q", got, want)
+	}
 }

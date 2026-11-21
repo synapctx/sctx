@@ -2,6 +2,7 @@ package du
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 
@@ -190,4 +191,20 @@ func TestFormatter_Relaxed(t *testing.T) {
 			t.Fatalf("err = %v, want ErrTierInapplicable", err)
 		}
 	})
+}
+
+func TestAggressiveMacOSPaddedSizes(t *testing.T) {
+	var b strings.Builder
+	for i := 0; i < 60; i++ {
+		fmt.Fprintf(&b, "%4dK\tinternal/pkg%02d\n", (i%9+1)*4, i)
+	}
+	raw := b.String()
+	out, err := New().Aggressive(context.Background(), format.Input{Argv: []string{"du", "-h", "internal"}, Stdout: strings.NewReader(raw)})
+	if err != nil {
+		t.Fatalf("Aggressive() error = %v", err)
+	}
+	body := string(out.Body)
+	if !strings.HasPrefix(body, "36K\t") || !strings.Contains(body, "…+20 more paths") {
+		t.Errorf("padded sizes not parsed/sorted/capped: %q", body[:min(len(body), 200)])
+	}
 }

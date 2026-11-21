@@ -57,6 +57,42 @@ func TestResolveByArgv(t *testing.T) {
 	}
 }
 
+// A launched command is claimed by the INNER tool's formatter, so the hook can
+// wrap `npx`/`uv run`/`python -m` forms and still get that tool's rendering.
+func TestResolveByArgvPeelsLaunchers(t *testing.T) {
+	pytestFmt := &stubFormatter{match: format.Match{Command: "pytest"}}
+	ruffFmt := &stubFormatter{match: format.Match{Command: "ruff"}}
+	r := NewRegistry()
+	r.Register(pytestFmt)
+	r.Register(ruffFmt)
+
+	tests := []struct {
+		name string
+		argv []string
+		want format.Formatter
+		key  string
+	}{
+		{"uv run", []string{"uv", "run", "pytest", "-x"}, pytestFmt, "pytest"},
+		{"poetry run", []string{"poetry", "run", "pytest"}, pytestFmt, "pytest"},
+		{"python -m", []string{"python", "-m", "pytest"}, pytestFmt, "pytest"},
+		{"python3 -m versioned path", []string{"/usr/bin/python3.12", "-m", "ruff", "check"}, ruffFmt, "ruff check"},
+		{"npx versioned", []string{"npx", "ruff@1", "check"}, ruffFmt, "ruff check"},
+		{"unknown flag is not peeled", []string{"uv", "run", "--with", "x", "pytest"}, nil, "uv"},
+		{"bare python is not peeled", []string{"python", "pytest"}, nil, "python"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, _ := r.ResolveByArgv(tt.argv)
+			if got != tt.want {
+				t.Fatalf("formatter = %v, want %v", got, tt.want)
+			}
+			if key := CommandKey(tt.argv); key != tt.key {
+				t.Fatalf("CommandKey = %q, want %q", key, tt.key)
+			}
+		})
+	}
+}
+
 func TestProjectFormatterCannotShadowBuiltinWithoutExplicitOverride(t *testing.T) {
 	r := NewRegistry()
 	builtin := &stubFormatter{match: format.Match{Command: "make"}}
@@ -127,6 +163,31 @@ func TestCommandKey(t *testing.T) {
 		{[]string{"grep", "-rn", "pattern"}, "grep"}, // arbitrary args stay out of the key
 		{[]string{"ls"}, "ls"},
 		{nil, ""},
+	}
+	for _, tt := range tests {
+		if got := CommandKey(tt.argv); got != tt.want {
+			t.Errorf("CommandKey(%v) = %q, want %q", tt.argv, got, tt.want)
+		}
+	}
+}
+
+// A launcher is peeled for the stats key only when it runs a tool sctx knows;
+// a script or private package name must never become a key.
+func TestCommandKeyDoesNotLeakLauncherTargets(t *testing.T) {
+	tests := []struct {
+		argv []string
+		want string
+	}{
+		{[]string{"uv", "run", "scripts/sync_acme_billing.py"}, "uv"},
+		{[]string{"npm", "exec", "@acme/internal-cli", "deploy"}, "npm exec"},
+		{[]string{"npm", "exec", "--", "private-pkg"}, "npm exec"},
+		{[]string{"pnpm", "exec", "acme-deploy", "prod"}, "pnpm exec"},
+		{[]string{"npx", "private-pkg", "build"}, "npx"},
+		{[]string{"poetry", "run", "acme-tool"}, "poetry"},
+		{[]string{"python", "-m", "http.server"}, "python"},
+		{[]string{"npx", "tsc", "--noEmit"}, "tsc"},
+		{[]string{"python3", "-m", "pytest"}, "pytest"},
+		{[]string{"uv", "run", "pytest", "-x"}, "pytest"},
 	}
 	for _, tt := range tests {
 		if got := CommandKey(tt.argv); got != tt.want {

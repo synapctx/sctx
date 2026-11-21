@@ -43,6 +43,37 @@ func TestKeyNeverLeaksArguments(t *testing.T) {
 		{"dig", "internal", "dig"},              // a DOMAIN
 		{"psql", "production", "psql"},          // a DATABASE NAME
 		{"terraform", "plan", "terraform plan"}, // genuinely a subcommand
+		// A user-chosen task or package name sits where a verb would.
+		{"turbo", "deploy-acme", "turbo"},
+		{"nx", "acme-app", "nx"},
+		{"mise", "acme-task", "mise"},
+		{"rails", "acme", "rails"},
+		{"turbo", "run", "turbo run"},
+		{"nx", "affected", "nx affected"},
+		{"mise", "r", "mise r"},
+		{"rails", "test", "rails test"},
+		// Wave 3: a first argument that is a user-chosen task, plugin, host or path.
+		{"sbt", "deploy-acme", "sbt"},
+		{"sbt", "compile", "sbt compile"},
+		{"rebar3", "acme-plugin", "rebar3"},
+		{"rebar3", "eunit", "rebar3 eunit"},
+		{"mysql", "customers", "mysql"},   // a DATABASE NAME
+		{"redis-cli", "get", "redis-cli"}, // a command for the server
+		{"sqlite3", "app", "sqlite3"},     // a FILE
+		{"clickhouse-client", "db", "clickhouse-client"},
+		{"wget", "example", "wget"},             // a URL host
+		{"tar", "czf", "tar"},                   // a flag bundle
+		{"unzip", "backup", "unzip"},            // a FILE
+		{"semgrep", "acme", "semgrep"},          // a path
+		{"grype", "acme", "grype"},              // an image or directory
+		{"traceroute", "prodbox", "traceroute"}, // a HOST
+		{"mount", "data", "mount"},              // a DEVICE or path
+		{"iptables", "nat", "iptables"},         // a flag in practice
+		{"dbt", "run", "dbt run"},
+		{"trivy", "image", "trivy image"},
+		{"dnf", "install", "dnf install"},
+		{"ip", "addr", "ip addr"},
+		{"nix", "build", "nix build"},
 	} {
 		if got := Key(tc.program, tc.next); got != tc.want {
 			t.Errorf("Key(%q, %q) = %q, want %q", tc.program, tc.next, got, tc.want)
@@ -117,6 +148,18 @@ func TestKeyRejectsNonSubcommandShapes(t *testing.T) {
 	} {
 		if got := Key(tc.program, tc.next); got != tc.want {
 			t.Errorf("Key(%q, %q) = %q, want %q", tc.program, tc.next, got, tc.want)
+		}
+	}
+}
+
+// TestNpxKeyNamesOnlyKnownTools: npx's first argument is a package name, which may be private.
+func TestNpxKeyNamesOnlyKnownTools(t *testing.T) {
+	for next, want := range map[string]string{
+		"jest": "npx jest", "vitest": "npx vitest", "tsc": "npx tsc", "eslint": "npx eslint",
+		"acme-internal-cli": "npx", "create-react-app": "npx", "-y": "npx",
+	} {
+		if got := Key("npx", next); got != want {
+			t.Errorf("Key(npx, %q) = %q, want %q", next, got, want)
 		}
 	}
 }

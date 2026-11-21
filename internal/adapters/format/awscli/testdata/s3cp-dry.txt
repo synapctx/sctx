@@ -1,0 +1,7 @@
+(dryrun) upload: dry/f1.txt to s3://example-bucket-sctx/prefix/f1.txt
+(dryrun) upload: dry/f2.txt to s3://example-bucket-sctx/prefix/f2.txt
+(dryrun) upload: dry/f3.txt to s3://example-bucket-sctx/prefix/f3.txt
+(dryrun) upload: dry/f4.txt to s3://example-bucket-sctx/prefix/f4.txt
+(dryrun) upload: dry/f5.txt to s3://example-bucket-sctx/prefix/f5.txt
+(dryrun) upload: dry/f6.txt to s3://example-bucket-sctx/prefix/f6.txt
+(dryrun) upload: dry/sub/z.log to s3://example-bucket-sctx/prefix/sub/z.log

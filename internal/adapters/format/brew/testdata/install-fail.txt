@@ -1,0 +1,3 @@
+Warning: No available formula with the name "nonexistentformulazz".
+Error: No formulae or casks found for nonexistentformulazz.
+==> Searching for similarly named formulae and casks...

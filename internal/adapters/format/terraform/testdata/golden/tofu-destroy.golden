@@ -1,0 +1,83 @@
+…+68 lines (refresh ×8, completed ×8, legend ×4, capped attributes ×34, blank ×14)
+[1m  # local_file.f["alpha"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "local_file" "f" {
+      [31m-[0m[0m content              = <<-EOT
+            hello fast-skunk
+            line2
+            line3
+        EOT [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha256 = "JILwN8HJ55XwCuD5jtWsinxwJfgdYL0qzc2SK1HRCrU=" [90m-> null[0m[0m
+      …+9 attributes
+    }
+[1m  # local_file.f["beta"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "local_file" "f" {
+      [31m-[0m[0m content              = <<-EOT
+            hello inviting-beetle
+            line2
+            line3
+        EOT [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha256 = "uYcyd6uTuGbfWwwqC4Nr1KlAj6L1Sa2111EzYLD7mG4=" [90m-> null[0m[0m
+      …+9 attributes
+    }
+[1m  # local_file.f["gamma"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "local_file" "f" {
+      [31m-[0m[0m content              = <<-EOT
+            hello champion-wahoo
+            line2
+            line3
+        EOT [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha256 = "+yF48ZpjLsMTsR5QPQv2G63CldbxYdo+hpqXIvYKVlk=" [90m-> null[0m[0m
+      …+9 attributes
+    }
+[1m  # null_resource.n[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "null_resource" "n" {
+      [31m-[0m[0m id       = "282705268468913132" [90m-> null[0m[0m
+      [31m-[0m[0m triggers = {
+          [31m-[0m[0m "v" = "1"
+        } [90m-> null[0m[0m
+    }
+[1m  # random_password.pw[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "random_password" "pw" {
+      [31m-[0m[0m bcrypt_hash = (sensitive value) [90m-> null[0m[0m
+      [31m-[0m[0m id          = "none" [90m-> null[0m[0m
+      [31m-[0m[0m length      = 16 [90m-> null[0m[0m
+      [31m-[0m[0m lower       = true [90m-> null[0m[0m
+      [31m-[0m[0m min_lower   = 0 [90m-> null[0m[0m
+      [31m-[0m[0m min_numeric = 0 [90m-> null[0m[0m
+      …+7 attributes
+    }
+[1m  # random_pet.p["alpha"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "random_pet" "p" {
+      [31m-[0m[0m id        = "fast-skunk" [90m-> null[0m[0m
+      [31m-[0m[0m length    = 2 [90m-> null[0m[0m
+      [31m-[0m[0m separator = "-" [90m-> null[0m[0m
+    }
+[1m  # random_pet.p["beta"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "random_pet" "p" {
+      [31m-[0m[0m id        = "inviting-beetle" [90m-> null[0m[0m
+      [31m-[0m[0m length    = 2 [90m-> null[0m[0m
+      [31m-[0m[0m separator = "-" [90m-> null[0m[0m
+    }
+[1m  # random_pet.p["gamma"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "random_pet" "p" {
+      [31m-[0m[0m id        = "champion-wahoo" [90m-> null[0m[0m
+      [31m-[0m[0m length    = 2 [90m-> null[0m[0m
+      [31m-[0m[0m separator = "-" [90m-> null[0m[0m
+    }
+[1mPlan:[0m 0 to add, 0 to change, 8 to destroy.
+Changes to Outputs:
+  [31m-[0m[0m pets = {
+      [31m-[0m[0m alpha = "fast-skunk"
+      [31m-[0m[0m beta  = "inviting-beetle"
+      [31m-[0m[0m gamma = "champion-wahoo"
+    } [90m-> null[0m[0m
+  [31m-[0m[0m pw   = (sensitive value) [90m-> null[0m[0m
+[0m[1mrandom_password.pw: Destroying... [id=none][0m[0m
+[0m[1mnull_resource.n: Destroying... [id=282705268468913132][0m[0m
+[0m[1mlocal_file.f["gamma"]: Destroying... [id=b6a8be1c9cea14580b65c6f80725b6591eb9238c][0m[0m
+[0m[1mlocal_file.f["beta"]: Destroying... [id=f8866ece2498a63d887ec3965f7a099e8258b4d3][0m[0m
+[0m[1mlocal_file.f["alpha"]: Destroying... [id=634add41d12035630a3dfae2d5b85ab5bd6a584a][0m[0m
+[0m[1mrandom_pet.p["alpha"]: Destroying... [id=fast-skunk][0m[0m
+[0m[1mrandom_pet.p["gamma"]: Destroying... [id=champion-wahoo][0m[0m
+[0m[1mrandom_pet.p["beta"]: Destroying... [id=inviting-beetle][0m[0m
+Destroy complete! Resources: 8 destroyed.

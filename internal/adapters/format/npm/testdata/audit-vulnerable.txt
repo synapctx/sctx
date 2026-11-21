@@ -1,0 +1,28 @@
+# npm audit report
+
+lodash  <=4.17.23
+Severity: critical
+Command Injection in lodash - https://github.com/advisories/GHSA-35jh-r3h4-6jhm
+Prototype Pollution in lodash - https://github.com/advisories/GHSA-jf85-cpcp-j695
+Prototype Pollution in lodash - https://github.com/advisories/GHSA-p6mc-m468-83gw
+Regular Expression Denial of Service (ReDoS) in lodash - https://github.com/advisories/GHSA-29mw-wpgm-hmr9
+lodash vulnerable to Code Injection via `_.template` imports key names - https://github.com/advisories/GHSA-r5fr-rjxr-66jc
+Lodash has Prototype Pollution Vulnerability in `_.unset`, `_.omit`, and `_.pullAt` functions - https://github.com/advisories/GHSA-xxjr-mmjv-4gpg
+fix available via `npm audit fix`
+node_modules/lodash
+
+minimist  <=0.2.3
+Severity: critical
+Prototype Pollution in minimist - https://github.com/advisories/GHSA-vh95-rmgr-6w4m
+Prototype Pollution in minimist - https://github.com/advisories/GHSA-xvch-5gv4-984h
+fix available via `npm audit fix --force`
+Will install minimist@1.2.8, which is a breaking change
+node_modules/minimist
+
+2 critical severity vulnerabilities
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force

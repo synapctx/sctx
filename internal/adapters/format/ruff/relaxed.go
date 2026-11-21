@@ -1,46 +1,44 @@
 package ruff
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
 )
 
-// worthKeeping reports whether a relaxed-tier line carries signal: a
-// diagnostic/per-file line ("path:line:col:" or "Reformatted"/"Would
-// reformat:" shape) or anything mentioning an error, as opposed to blank
-// lines or progress noise.
-func worthKeeping(line string) bool {
-	trimmed := strings.TrimSpace(line)
-	if trimmed == "" {
-		return false
-	}
-	if diagnosticRe.MatchString(line) || perFileRe.MatchString(line) {
-		return true
-	}
-	if foundRe.MatchString(line) || fixableHintRe.MatchString(line) || formatSummaryRe.MatchString(line) {
-		return true
-	}
-	if strings.Contains(line, "error") || strings.Contains(line, "Error") {
-		return true
-	}
-	return trimmed == "All checks passed!"
-}
-
-// filterRelaxedLines drops blank/progress noise, deduplicates consecutive
-// identical lines, and retains anything with diagnostic or error shape.
-func filterRelaxedLines(lines []string) []string {
+// relaxedLines renders ruff output without interpreting it: each diagnostic
+// block collapses to "file:line:col: CODE message" (its source/diff snippet
+// is the only thing dropped, with a count) and every other line is kept,
+// with consecutive duplicates removed. Nothing a reader needs to locate or
+// understand a diagnostic is lost.
+func relaxedLines(lines []string) ([]string, bool) {
 	var out []string
-	for _, line := range lines {
-		if !worthKeeping(line) {
+	dropped := false
+	for _, it := range parseItems(lines) {
+		var l string
+		switch {
+		case it.isBlock:
+			fix := ""
+			if it.fixable {
+				fix = " [*]"
+			}
+			l = fmt.Sprintf("%s:%s:%s: %s%s %s", it.file, it.line, it.col, it.code, fix, it.msg)
+			if it.dropped > 1 {
+				l += fmt.Sprintf(" …+%d context", it.dropped)
+				dropped = true
+			}
+		case strings.TrimSpace(it.plain) == "":
+			continue
+		default:
+			l = it.plain
+		}
+		if len(out) > 0 && out[len(out)-1] == l {
 			continue
 		}
-		if len(out) > 0 && out[len(out)-1] == line {
-			continue
-		}
-		out = append(out, line)
+		out = append(out, l)
 	}
-	return out
+	return out, dropped
 }
 
 // relaxedFilter is the ruff formatter's Relaxed tier: it applies to every
@@ -49,21 +47,14 @@ func relaxedFilter(in format.Input) (format.Rendered, error) {
 	rawStdout := readAll(in.Stdout)
 	rawStderr := readAll(in.Stderr)
 
-	stdoutLines := filterRelaxedLines(splitLines(rawStdout))
-	stderrLines := filterRelaxedLines(splitLines(rawStderr))
+	if userShapedOutput(in.Argv) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	stdoutLines, d1 := relaxedLines(splitLines(rawStdout))
+	stderrLines, d2 := relaxedLines(splitLines(rawStderr))
 
 	if len(stdoutLines) == 0 && len(stderrLines) == 0 {
-		if len(rawStdout) == 0 && len(rawStderr) == 0 {
-			return format.Rendered{}, format.ErrTierInapplicable
-		}
-		summary := firstNonEmptyLine(rawStdout)
-		if summary == "" {
-			summary = firstNonEmptyLine(rawStderr)
-		}
-		if summary == "" {
-			summary = "(no output)"
-		}
-		return format.Rendered{Body: []byte(summary), FoldStderr: len(rawStderr) > 0}, nil
+		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
 	var body []string
@@ -73,14 +64,6 @@ func relaxedFilter(in format.Input) (format.Rendered, error) {
 	return format.Rendered{
 		Body:       []byte(strings.Join(body, "\n")),
 		FoldStderr: len(stderrLines) > 0,
+		Elided:     d1 || d2,
 	}, nil
-}
-
-func firstNonEmptyLine(raw []byte) string {
-	for _, l := range splitLines(raw) {
-		if strings.TrimSpace(l) != "" {
-			return l
-		}
-	}
-	return ""
 }

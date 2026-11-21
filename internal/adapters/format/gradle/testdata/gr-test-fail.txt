@@ -1,0 +1,31 @@
+> Task :compileJava
+> Task :processResources NO-SOURCE
+> Task :classes
+> Task :compileTestJava
+> Task :processTestResources NO-SOURCE
+> Task :testClasses
+
+> Task :test FAILED
+
+CalcTest > adds() FAILED
+    org.opentest4j.AssertionFailedError at CalcTest.java:5
+
+CalcTest > divs() FAILED
+    java.lang.ArithmeticException at CalcTest.java:6
+
+CalcTest > nulls() FAILED
+    org.opentest4j.AssertionFailedError at CalcTest.java:8
+
+4 tests completed, 3 failed
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///work/gr-fail/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 1s
+3 actionable tasks: 3 executed

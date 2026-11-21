@@ -1,0 +1,112 @@
+
+OpenTofu used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [32m+[0m create[0m
+
+OpenTofu will perform the following actions:
+
+[1m  # local_file.f["alpha"][0m will be created
+[0m  [32m+[0m[0m resource "local_file" "f" {
+      [32m+[0m[0m content              = (known after apply)
+      [32m+[0m[0m content_base64sha256 = (known after apply)
+      [32m+[0m[0m content_base64sha512 = (known after apply)
+      [32m+[0m[0m content_md5          = (known after apply)
+      [32m+[0m[0m content_sha1         = (known after apply)
+      [32m+[0m[0m content_sha256       = (known after apply)
+      [32m+[0m[0m content_sha512       = (known after apply)
+      [32m+[0m[0m directory_permission = "0777"
+      [32m+[0m[0m file_permission      = "0777"
+      [32m+[0m[0m filename             = "./out/alpha.txt"
+      [32m+[0m[0m id                   = (known after apply)
+    }
+
+[1m  # local_file.f["beta"][0m will be created
+[0m  [32m+[0m[0m resource "local_file" "f" {
+      [32m+[0m[0m content              = (known after apply)
+      [32m+[0m[0m content_base64sha256 = (known after apply)
+      [32m+[0m[0m content_base64sha512 = (known after apply)
+      [32m+[0m[0m content_md5          = (known after apply)
+      [32m+[0m[0m content_sha1         = (known after apply)
+      [32m+[0m[0m content_sha256       = (known after apply)
+      [32m+[0m[0m content_sha512       = (known after apply)
+      [32m+[0m[0m directory_permission = "0777"
+      [32m+[0m[0m file_permission      = "0777"
+      [32m+[0m[0m filename             = "./out/beta.txt"
+      [32m+[0m[0m id                   = (known after apply)
+    }
+
+[1m  # local_file.f["gamma"][0m will be created
+[0m  [32m+[0m[0m resource "local_file" "f" {
+      [32m+[0m[0m content              = (known after apply)
+      [32m+[0m[0m content_base64sha256 = (known after apply)
+      [32m+[0m[0m content_base64sha512 = (known after apply)
+      [32m+[0m[0m content_md5          = (known after apply)
+      [32m+[0m[0m content_sha1         = (known after apply)
+      [32m+[0m[0m content_sha256       = (known after apply)
+      [32m+[0m[0m content_sha512       = (known after apply)
+      [32m+[0m[0m directory_permission = "0777"
+      [32m+[0m[0m file_permission      = "0777"
+      [32m+[0m[0m filename             = "./out/gamma.txt"
+      [32m+[0m[0m id                   = (known after apply)
+    }
+
+[1m  # null_resource.n[0m will be created
+[0m  [32m+[0m[0m resource "null_resource" "n" {
+      [32m+[0m[0m id       = (known after apply)
+      [32m+[0m[0m triggers = {
+          [32m+[0m[0m "v" = "1"
+        }
+    }
+
+[1m  # random_password.pw[0m will be created
+[0m  [32m+[0m[0m resource "random_password" "pw" {
+      [32m+[0m[0m bcrypt_hash = (sensitive value)
+      [32m+[0m[0m id          = (known after apply)
+      [32m+[0m[0m length      = 16
+      [32m+[0m[0m lower       = true
+      [32m+[0m[0m min_lower   = 0
+      [32m+[0m[0m min_numeric = 0
+      [32m+[0m[0m min_special = 0
+      [32m+[0m[0m min_upper   = 0
+      [32m+[0m[0m number      = true
+      [32m+[0m[0m numeric     = true
+      [32m+[0m[0m result      = (sensitive value)
+      [32m+[0m[0m special     = true
+      [32m+[0m[0m upper       = true
+    }
+
+[1m  # random_pet.p["alpha"][0m will be created
+[0m  [32m+[0m[0m resource "random_pet" "p" {
+      [32m+[0m[0m id        = (known after apply)
+      [32m+[0m[0m length    = 2
+      [32m+[0m[0m separator = "-"
+    }
+
+[1m  # random_pet.p["beta"][0m will be created
+[0m  [32m+[0m[0m resource "random_pet" "p" {
+      [32m+[0m[0m id        = (known after apply)
+      [32m+[0m[0m length    = 2
+      [32m+[0m[0m separator = "-"
+    }
+
+[1m  # random_pet.p["gamma"][0m will be created
+[0m  [32m+[0m[0m resource "random_pet" "p" {
+      [32m+[0m[0m id        = (known after apply)
+      [32m+[0m[0m length    = 2
+      [32m+[0m[0m separator = "-"
+    }
+
+[1mPlan:[0m 8 to add, 0 to change, 0 to destroy.
+[0m
+Changes to Outputs:
+  [32m+[0m[0m pets = {
+      [32m+[0m[0m alpha = (known after apply)
+      [32m+[0m[0m beta  = (known after apply)
+      [32m+[0m[0m gamma = (known after apply)
+    }
+  [32m+[0m[0m pw   = (sensitive value)
+[90m
+─────────────────────────────────────────────────────────────────────────────[0m
+
+Note: You didn't use the -out option to save this plan, so OpenTofu can't
+guarantee to take exactly these actions if you run "tofu apply" now.

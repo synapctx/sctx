@@ -1,0 +1,11 @@
+…+21 lines (ok ×6, skipping ×1, empty tasks ×5, blank ×9)
+PLAY [local]
+TASK [Show a message]
+ok: [localhost] => {"msg": "hello"}
+TASK [Debug loop]
+ok: [localhost] => (item=1) => {"msg": "item 1"}
+ok: [localhost] => (item=2) => {"msg": "item 2"}
+ok: [localhost] => (item=3) => {"msg": "item 3"}
+ok: [localhost] => (item=4) => {"msg": "item 4"}
+PLAY RECAP
+localhost                  : ok=6    changed=0    unreachable=0    failed=0    skipped=1    rescued=0    ignored=0

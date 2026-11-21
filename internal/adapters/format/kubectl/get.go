@@ -39,10 +39,11 @@ func aggressiveGet(in format.Input) (format.Rendered, error) {
 	}
 	for _, line := range lines[1:] {
 		if strings.TrimSpace(line) == "" {
-			// `kubectl get TYPE,TYPE` emits multiple independently shaped
-			// tables separated by blank lines. A single header cannot safely
-			// describe every following row.
-			return format.Rendered{}, format.ErrTierInapplicable
+			// `kubectl get TYPE,TYPE` (and `get all`) emits several
+			// independently shaped tables separated by blank lines. A single
+			// header cannot describe every following row, so each section is
+			// rendered on its own.
+			return aggressiveGetSections(lines)
 		}
 	}
 
@@ -91,6 +92,10 @@ func aggressiveGet(in format.Input) (format.Rendered, error) {
 			}
 		}
 		return true
+	}
+
+	if body, ok := renderPodSummary(names, rows, isHealthy); ok {
+		return format.Rendered{Body: body}, nil
 	}
 
 	var healthyNames []string
@@ -178,4 +183,39 @@ func aggressiveGetWide(in format.Input) (format.Rendered, error) {
 	}
 	body := renderCappedTable(lines[0], lines[1:], maxGetWideRows)
 	return format.Rendered{Body: body}, nil
+}
+
+// aggressiveGetSections renders each blank-line separated table of a
+// multi-resource `kubectl get` independently and rejoins them with a blank
+// line. A section that cannot be rendered stays verbatim; when no section
+// shrinks the whole output is left to the next tier.
+func aggressiveGetSections(lines []string) (format.Rendered, error) {
+	var out []string
+	rendered := false
+	flush := func(sec []string) {
+		if len(sec) == 0 {
+			return
+		}
+		r, err := aggressiveGet(format.Input{Stdout: strings.NewReader(strings.Join(sec, "\n"))})
+		if err == nil && len(r.Body) < len(strings.Join(sec, "\n")) {
+			out = append(out, string(r.Body))
+			rendered = true
+			return
+		}
+		out = append(out, strings.Join(sec, "\n"))
+	}
+	var sec []string
+	for _, l := range lines {
+		if strings.TrimSpace(l) == "" {
+			flush(sec)
+			sec = nil
+			continue
+		}
+		sec = append(sec, l)
+	}
+	flush(sec)
+	if !rendered {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	return format.Rendered{Body: []byte(strings.Join(out, "\n\n"))}, nil
 }

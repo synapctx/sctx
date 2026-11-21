@@ -1,0 +1,7 @@
+src3/a.js 15ms
+src3/clean.js 1ms (unchanged)
+[error] src3/syn.js: SyntaxError: Unexpected token (2:8)
+[error]   1 | const a = {
+[error] > 2 |   b: 1,,
+[error]     |        ^
+[error]   3 |

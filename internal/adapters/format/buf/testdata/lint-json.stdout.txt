@@ -1,0 +1,9 @@
+{"path":"proto/demo/v1/demo.proto","start_line":7,"start_column":9,"end_line":7,"end_column":19,"type":"MESSAGE_PASCAL_CASE","message":"Message name \"getRequest\" should be PascalCase, such as \"GetRequest\"."}
+{"path":"proto/demo/v1/demo.proto","start_line":8,"start_column":10,"end_line":8,"end_column":12,"type":"FIELD_LOWER_SNAKE_CASE","message":"Field name \"Id\" should be lower_snake_case, such as \"id\"."}
+{"path":"proto/demo/v1/demo.proto","start_line":13,"start_column":8,"end_line":13,"end_column":12,"type":"ENUM_PASCAL_CASE","message":"Enum name \"kind\" should be PascalCase, such as \"Kind\"."}
+{"path":"proto/demo/v1/demo.proto","start_line":13,"start_column":15,"end_line":13,"end_column":16,"type":"ENUM_VALUE_PREFIX","message":"Enum value name \"A\" should be prefixed with \"KIND_\"."}
+{"path":"proto/demo/v1/demo.proto","start_line":13,"start_column":15,"end_line":13,"end_column":16,"type":"ENUM_ZERO_VALUE_SUFFIX","message":"Enum zero value name \"A\" should be suffixed with \"_UNSPECIFIED\"."}
+{"path":"proto/demo/v1/demo.proto","start_line":13,"start_column":22,"end_line":13,"end_column":23,"type":"ENUM_VALUE_PREFIX","message":"Enum value name \"B\" should be prefixed with \"KIND_\"."}
+{"path":"proto/demo/v1/demo.proto","start_line":16,"start_column":9,"end_line":16,"end_column":13,"type":"SERVICE_SUFFIX","message":"Service name \"Demo\" should be suffixed with \"Service\"."}
+{"path":"proto/demo/v1/demo.proto","start_line":17,"start_column":7,"end_line":17,"end_column":10,"type":"RPC_PASCAL_CASE","message":"RPC name \"get\" should be PascalCase, such as \"Get\"."}
+{"path":"proto/demo/v1/demo.proto","start_line":17,"start_column":11,"end_line":17,"end_column":21,"type":"RPC_REQUEST_STANDARD_NAME","message":"RPC request type \"getRequest\" should be named \"GetRequest\" or \"DemoGetRequest\"."}

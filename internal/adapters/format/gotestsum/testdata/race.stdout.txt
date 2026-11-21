@@ -1,0 +1,33 @@
+✖  racepkg (187ms)
+
+=== Failed
+=== FAIL: racepkg TestRace (0.00s)
+==================
+WARNING: DATA RACE
+Read at 0x00c00011a188 by goroutine 7:
+  example.com/ts/racepkg.TestRace.func1()
+      /work/go-ts/racepkg/r_test.go:9 +0x68
+
+Previous write at 0x00c00011a188 by goroutine 8:
+  example.com/ts/racepkg.TestRace.func1()
+      /work/go-ts/racepkg/r_test.go:9 +0x78
+
+Goroutine 7 (running) created at:
+  example.com/ts/racepkg.TestRace()
+      /work/go-ts/racepkg/r_test.go:9 +0x74
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /usr/local/go/src/testing/testing.go:2260 +0x34
+
+Goroutine 8 (finished) created at:
+  example.com/ts/racepkg.TestRace()
+      /work/go-ts/racepkg/r_test.go:9 +0x74
+  testing.tRunner()
+      /usr/local/go/src/testing/testing.go:2195 +0x164
+  testing.(*T).Run.gowrap1()
+      /usr/local/go/src/testing/testing.go:2260 +0x34
+==================
+    testing.go:1867: race detected during execution of test
+
+DONE 1 tests, 1 failure in 0.187s

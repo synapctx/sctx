@@ -1,0 +1,100 @@
+…+20 lines (notes ×5, chart labels ×10, blank ×5)
+NAME: rel
+LAST DEPLOYED: Sat Nov 21 02:03:11 2026
+NAMESPACE: default
+STATUS: pending-install
+REVISION: 1
+DESCRIPTION: Dry run complete
+HOOKS:
+---
+# Source: web/templates/tests/test-connection.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "rel-web-test-connection"
+  labels:
+    app.kubernetes.io/name: web
+    app.kubernetes.io/instance: rel
+    app.kubernetes.io/version: "1.16.0"
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['rel-web:80']
+  restartPolicy: Never
+MANIFEST:
+---
+# Source: web/templates/serviceaccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rel-web
+  labels:
+    app.kubernetes.io/name: web
+    app.kubernetes.io/instance: rel
+    app.kubernetes.io/version: "1.16.0"
+automountServiceAccountToken: true
+---
+# Source: web/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: rel-web
+  labels:
+    app.kubernetes.io/name: web
+    app.kubernetes.io/instance: rel
+    app.kubernetes.io/version: "1.16.0"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: web
+    app.kubernetes.io/instance: rel
+---
+# Source: web/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rel-web
+  labels:
+    app.kubernetes.io/name: web
+    app.kubernetes.io/instance: rel
+    app.kubernetes.io/version: "1.16.0"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: web
+      app.kubernetes.io/instance: rel
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: web
+        app.kubernetes.io/instance: rel
+        app.kubernetes.io/version: "1.16.0"
+    spec:
+      serviceAccountName: rel-web
+      containers:
+        - name: web
+          image: "nginx:1.16.0"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+NOTES: …+5 lines

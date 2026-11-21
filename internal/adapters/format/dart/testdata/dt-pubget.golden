@@ -1,0 +1,4 @@
+Changed 49 dependencies!
+14 packages have newer versions incompatible with dependency constraints.
+Try `dart pub outdated` for more information.
+…+51 lines (progress rows, blanks, framework frames, package list)

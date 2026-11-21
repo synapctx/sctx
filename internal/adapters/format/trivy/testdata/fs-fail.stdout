@@ -1,0 +1,115 @@
+
+Report Summary
+
+┌──────────────────┬──────┬─────────────────┐
+│      Target      │ Type │ Vulnerabilities │
+├──────────────────┼──────┼─────────────────┤
+│ requirements.txt │ pip  │       26        │
+└──────────────────┴──────┴─────────────────┘
+Legend:
+- '-': Not scanned
+- '0': Clean (no security findings detected)
+
+
+requirements.txt (pip)
+======================
+Total: 26 (HIGH: 17, CRITICAL: 9)
+
+┌──────────┬────────────────┬──────────┬────────┬───────────────────┬────────────────────────┬──────────────────────────────────────────────────────────────┐
+│ Library  │ Vulnerability  │ Severity │ Status │ Installed Version │     Fixed Version      │                            Title                             │
+├──────────┼────────────────┼──────────┼────────┼───────────────────┼────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ django   │ CVE-2019-14234 │ CRITICAL │ fixed  │ 2.2.0             │ 1.11.23, 2.1.11, 2.2.4 │ Django: SQL injection possibility in key and index lookups   │
+│          │                │          │        │                   │                        │ for JSONField/HStoreField                                    │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-14234                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2019-19844 │          │        │                   │ 1.11.27, 2.2.9, 3.0.1  │ Django: crafted email address allows account takeover        │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-19844                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-7471  │          │        │                   │ 1.11.28, 2.2.10, 3.0.3 │ django: potential SQL injection via StringAgg(delimiter)     │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-7471                    │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2022-28346 │          │        │                   │ 2.2.28, 3.2.13, 4.0.4  │ Django: SQL injection in QuerySet.annotate(),aggregate() and │
+│          │                │          │        │                   │                        │ extra()                                                      │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2022-28346                   │
+│          ├────────────────┤          │        │                   │                        ├──────────────────────────────────────────────────────────────┤
+│          │ CVE-2022-28347 │          │        │                   │                        │ Django: SQL injection via QuerySet.explain(options) on       │
+│          │                │          │        │                   │                        │ PostgreSQL                                                   │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2022-28347                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2025-64459 │          │        │                   │ 5.2.8, 5.1.14, 4.2.26  │ django: Django SQL injection                                 │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2025-64459                   │
+│          ├────────────────┼──────────┤        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2019-14232 │ HIGH     │        │                   │ 1.11.23, 2.1.11, 2.2.4 │ Django: backtracking in a regular expression in              │
+│          │                │          │        │                   │                        │ django.utils.text.Truncator leads to DoS                     │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-14232                   │
+│          ├────────────────┤          │        │                   │                        ├──────────────────────────────────────────────────────────────┤
+│          │ CVE-2019-14233 │          │        │                   │                        │ Django: the behavior of the underlying HTMLParser leading to │
+│          │                │          │        │                   │                        │ DoS                                                          │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-14233                   │
+│          ├────────────────┤          │        │                   │                        ├──────────────────────────────────────────────────────────────┤
+│          │ CVE-2019-14235 │          │        │                   │                        │ Django: Potential memory exhaustion in                       │
+│          │                │          │        │                   │                        │ django.utils.encoding.uri_to_iri()                           │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-14235                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2019-19118 │          │        │                   │ 2.1.15, 2.2.8          │ django: privilege escalation in the django admin             │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-19118                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-13254 │          │        │                   │ 2.2.13, 3.0.7          │ django: potential data leakage via malformed memcached keys  │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-13254                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-24583 │          │        │                   │ 2.2.16, 3.0.10, 3.1.1  │ django: incorrect permissions on intermediate-level          │
+│          │                │          │        │                   │                        │ directories on Python 3.7+                                   │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-24583                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-9402  │          │        │                   │ 1.11.29, 2.2.11, 3.0.4 │ django: potential SQL injection via "tolerance" parameter in │
+│          │                │          │        │                   │                        │ GIS functions and aggregates...                              │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-9402                    │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-31542 │          │        │                   │ 2.2.21, 3.1.9, 3.2.1   │ django: Potential directory-traversal via uploaded files     │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-31542                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-33571 │          │        │                   │ 2.2.24, 3.1.12, 3.2.4  │ django: Possible indeterminate SSRF, RFI, and LFI attacks    │
+│          │                │          │        │                   │                        │ since validators accepted leading...                         │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-33571                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-45115 │          │        │                   │ 2.2.26, 3.2.11, 4.0.1  │ django: Denial-of-service possibility in                     │
+│          │                │          │        │                   │                        │ UserAttributeSimilarityValidator                             │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-45115                   │
+│          ├────────────────┤          │        │                   │                        ├──────────────────────────────────────────────────────────────┤
+│          │ CVE-2021-45116 │          │        │                   │                        │ django: Potential information disclosure in dictsort         │
+│          │                │          │        │                   │                        │ template filter                                              │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2021-45116                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2022-23833 │          │        │                   │ 2.2.27, 3.2.12, 4.0.2  │ django: Denial-of-service possibility in file uploads        │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2022-23833                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2022-36359 │          │        │                   │ 3.2.15, 4.0.7          │ An issue was discovered in the HTTP FileResponse class in    │
+│          │                │          │        │                   │                        │ Django 3.2...                                                │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2022-36359                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2025-57833 │          │        │                   │ 4.2.24, 5.1.12, 5.2.6  │ django: Django SQL injection in FilteredRelation column      │
+│          │                │          │        │                   │                        │ aliases                                                      │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2025-57833                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2025-64458 │          │        │                   │ 5.2.8, 5.1.14, 4.2.26  │ Django: Denial-of-service vulnerability in Django on Windows │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2025-64458                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2026-15307 │          │        │                   │ 5.2.17, 6.0.8          │ django: Django: Remote code execution via GeoDjango spatial  │
+│          │                │          │        │                   │                        │ lookups                                                      │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2026-15307                   │
+├──────────┼────────────────┼──────────┤        ├───────────────────┼────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ pyyaml   │ CVE-2019-20477 │ CRITICAL │        │ 5.1               │ 5.2                    │ PyYAML: command execution through python/object/apply        │
+│          │                │          │        │                   │                        │ constructor in FullLoader                                    │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2019-20477                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-14343 │          │        │                   │ 5.4                    │ PyYAML: incomplete fix for CVE-2020-1747                     │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-14343                   │
+│          ├────────────────┤          │        │                   ├────────────────────────┼──────────────────────────────────────────────────────────────┤
+│          │ CVE-2020-1747  │          │        │                   │ 5.3.1                  │ PyYAML: arbitrary command execution through                  │
+│          │                │          │        │                   │                        │ python/object/new when FullLoader is used                    │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2020-1747                    │
+├──────────┼────────────────┼──────────┤        ├───────────────────┼────────────────────────┼──────────────────────────────────────────────────────────────┤
+│ requests │ CVE-2018-18074 │ HIGH     │        │ 2.19.0            │ 2.20.0                 │ python-requests: Redirect from HTTPS to HTTP does not remove │
+│          │                │          │        │                   │                        │ Authorization header                                         │
+│          │                │          │        │                   │                        │ https://avd.aquasec.com/nvd/cve-2018-18074                   │
+└──────────┴────────────────┴──────────┴────────┴───────────────────┴────────────────────────┴──────────────────────────────────────────────────────────────┘

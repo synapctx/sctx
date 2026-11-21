@@ -17,8 +17,13 @@ func (f *findFormatter) Descriptor() format.Match {
 }
 
 const (
-	findNamesPerDirCap = 10
-	findDirsCap        = 60
+	// findNamesPerDirCap is the largest directory whose file names are listed.
+	findNamesPerDirCap = 4
+	// findNamesBudget is the total number of file names listed across the
+	// whole output; beyond it directories are count-only.
+	findNamesBudget = 40
+	// findDirsCap bounds the directory lines for pathological trees.
+	findDirsCap = 400
 	// findMinLines guards against compressing trivially small output: below
 	// this many lines, grouping by directory adds more noise than it saves.
 	findMinLines = 4
@@ -34,11 +39,12 @@ func (f *findFormatter) Aggressive(_ context.Context, in format.Input) (format.R
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
+	roots := findRoots(in.Argv)
 	var body, note string
 	if entries, ok := parseFindLsLines(lines); ok {
-		body, note = renderFindLs(entries)
+		body, note = renderFindLs(entries, roots)
 	} else {
-		body, note = renderFindPaths(lines)
+		body, note = renderFindPaths(lines, roots)
 	}
 
 	if !shrunk(raw, body) {
@@ -51,18 +57,28 @@ func (f *findFormatter) Aggressive(_ context.Context, in format.Input) (format.R
 // directory, capping both the number of directories shown and the number of
 // names listed per directory, with explicit "…+N" markers for anything
 // elided.
-func renderFindPaths(paths []string) (body string, note string) {
+func renderFindPaths(paths []string, roots []string) (body string, note string) {
+	noise, absorbed := splitNoise(paths, roots)
 	byDir := make(map[string][]string)
-	for _, p := range paths {
+	for i, p := range paths {
+		if absorbed[i] {
+			continue
+		}
 		dir := path.Dir(p)
 		byDir[dir] = append(byDir[dir], path.Base(p))
 	}
-	return renderFindGroups(byDir, len(paths))
+	return renderFindGroups(byDir, len(paths), noise)
 }
 
 // renderFindGroups renders a dir -> labels grouping shared by the plain and
-// -ls rendering paths, applying findDirsCap / findNamesPerDirCap.
-func renderFindGroups(byDir map[string][]string, total int) (body string, note string) {
+// -ls rendering paths. Every directory that holds a match appears with its
+// count, with directories sharing a parent folded under one "parent/:" header
+// so common prefixes are printed once. File names are listed only for small
+// directories (<= findNamesPerDirCap) and only until findNamesBudget names have
+// been spent across the whole listing; everything else is count-only and the
+// omitted names are counted in a trailing "…+N" line. At most findDirsCap
+// directories are shown; the remainder is counted, never dropped silently.
+func renderFindGroups(byDir map[string][]string, total int, noise []*noiseGroup) (body string, note string) {
 	dirs := make([]string, 0, len(byDir))
 	for d := range byDir {
 		dirs = append(dirs, d)
@@ -70,32 +86,54 @@ func renderFindGroups(byDir map[string][]string, total int) (body string, note s
 	sort.Strings(dirs)
 
 	var out []string
+	budget := findNamesBudget
+	omitted := 0
+	curParent := ""
+	var cur []string
+	flush := func() {
+		if len(cur) > 0 {
+			out = append(out, curParent+": "+strings.Join(cur, ", "))
+			cur = nil
+		}
+	}
 	for i, d := range dirs {
 		if i >= findDirsCap {
-			remainingDirs := len(dirs) - findDirsCap
+			flush()
 			remainingPaths := 0
 			for _, dd := range dirs[findDirsCap:] {
 				remainingPaths += len(byDir[dd])
 			}
-			out = append(out, fmt.Sprintf("…+%d more dirs (%d paths)", remainingDirs, remainingPaths))
+			out = append(out, fmt.Sprintf("…+%d more dirs (%d paths)", len(dirs)-findDirsCap, remainingPaths))
 			break
 		}
-
 		names := byDir[d]
-		shown := names
-		extra := 0
-		if len(names) > findNamesPerDirCap {
-			extra = len(names) - findNamesPerDirCap
-			shown = names[:findNamesPerDirCap]
+		parent, leaf := path.Dir(d), path.Base(d)
+		if d == "." {
+			parent, leaf = ".", "."
 		}
-		line := fmt.Sprintf("%s/ (%d): %s", d, len(names), strings.Join(shown, ", "))
-		if extra > 0 {
-			line += fmt.Sprintf(", …+%d more files in %s", extra, d)
+		if pp := parent + "/"; pp != curParent {
+			flush()
+			curParent = pp
 		}
-		out = append(out, line)
+		entry := fmt.Sprintf("%s %d", leaf, len(names))
+		if len(names) <= findNamesPerDirCap && len(names) <= budget {
+			budget -= len(names)
+			entry += " [" + strings.Join(names, ", ") + "]"
+		} else {
+			omitted += len(names)
+		}
+		cur = append(cur, entry)
 	}
-
-	return strings.Join(out, "\n"), fmt.Sprintf("%d paths", total)
+	flush()
+	if omitted > 0 {
+		out = append(out, fmt.Sprintf("…+%d file names not listed (counts shown per dir)", omitted))
+	}
+	out = append(out, noiseLines(noise)...)
+	header := fmt.Sprintf("%d paths in %d dirs", total, len(dirs))
+	if len(noise) > 0 {
+		header = fmt.Sprintf("%d paths in %d dirs (+%d noise dirs collapsed)", total, len(dirs), len(noise))
+	}
+	return header + "\n" + strings.Join(out, "\n"), fmt.Sprintf("%d paths", total)
 }
 
 // findLsEntry is one parsed `find -ls` line.
@@ -140,14 +178,22 @@ func parseFindLsLine(line string) (findLsEntry, bool) {
 // renderFindLs compacts `find -ls` output to a grouped "path (size)"
 // listing per directory, dropping the inode/blocks/links/owner/group/date
 // noise that -ls carries on every line.
-func renderFindLs(entries []findLsEntry) (body string, note string) {
+func renderFindLs(entries []findLsEntry, roots []string) (body string, note string) {
+	paths := make([]string, len(entries))
+	for i, e := range entries {
+		paths[i] = e.path
+	}
+	noise, absorbed := splitNoise(paths, roots)
 	byDir := make(map[string][]string)
-	for _, e := range entries {
+	for i, e := range entries {
+		if absorbed[i] {
+			continue
+		}
 		dir := path.Dir(e.path)
 		label := fmt.Sprintf("%s (%s)", path.Base(e.path), e.size)
 		byDir[dir] = append(byDir[dir], label)
 	}
-	return renderFindGroups(byDir, len(entries))
+	return renderFindGroups(byDir, len(entries), noise)
 }
 
 func (f *findFormatter) Relaxed(ctx context.Context, in format.Input) (format.Rendered, error) {

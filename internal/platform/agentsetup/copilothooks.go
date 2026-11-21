@@ -11,8 +11,8 @@ package agentsetup
 //
 // Verified against docs.github.com/en/copilot/reference/hooks-reference
 // (fetched 2026-09-04) for the directory and the PASCAL-CASE `PreToolUse` key
-// (the docs accept either case) and against the rtk reference implementation
-// for the entry shape and for which INPUT schema the CLI actually answers to
+// (the docs accept either case) and against a working third-party integration's
+// source for the entry shape and for which INPUT schema the CLI actually answers to
 // — see thirdparty.go's doc comment for the full reasoning; the installed
 // hook itself is schema-agnostic, since `sctx hook copilot` decodes both.
 //

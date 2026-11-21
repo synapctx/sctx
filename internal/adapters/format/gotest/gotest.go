@@ -29,7 +29,7 @@ func (f *Formatter) Descriptor() format.Match {
 
 // Aggressive renders a structured, maximally compressed summary for `go
 // test`, and an error-focused summary for `go build`/`go vet`. It also
-// covers `go mod`, `go list`, `go run`, `go generate`, `go get`, and `go fix`
+// covers `go mod`, `go list`, `go run`, `go generate`, `go get`, `go install`, and `go fix`
 // (apply mode only). Any other go subcommand is not handled at this tier.
 func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Rendered, error) {
 	switch subcommand(in) {
@@ -48,7 +48,9 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 		return aggressiveRun(in)
 	case "generate":
 		return aggressiveGenerate(in)
-	case "get":
+	case "get", "install":
+		// install shares get's output shape: "go: downloading" progress, then
+		// either nothing or build/resolution errors that must survive verbatim.
 		return aggressiveGet(in)
 	case "fix":
 		// -diff emits a patch; see diffMode for why no tier may touch it.

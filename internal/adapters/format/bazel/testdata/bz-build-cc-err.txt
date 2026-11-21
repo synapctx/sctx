@@ -1,0 +1,20 @@
+Computing main repo mapping: 
+Loading: 
+Loading: 0 packages loaded
+Analyzing: target //pkg:lib (0 packages loaded, 0 targets configured)
+Analyzing: target //pkg:lib (0 packages loaded, 0 targets configured)
+
+INFO: Analyzed target //pkg:lib (81 packages loaded, 388 targets configured).
+[1 / 1] no actions running
+ERROR: /work/proj/pkg/BUILD:2:11: Compiling pkg/lib.cc failed: (Exit 1): gcc failed: error executing CppCompile command (from target //pkg:lib) /usr/local/bin/gcc -U_FORTIFY_SOURCE -fstack-protector -Wall -Wunused-but-set-parameter -Wno-free-nonheap-object -fno-omit-frame-pointer '-std=c++14' -MD -MF ... (remaining 16 arguments skipped)
+
+Use --sandbox_debug to see verbose messages from the sandbox and retain the sandbox build root for debugging
+pkg/lib.cc: In function 'int f()':
+pkg/lib.cc:1:18: error: 'nope' was not declared in this scope
+    1 | int f() { return nope; }
+      |                  ^~~~
+Target //pkg:lib failed to build
+Use --verbose_failures to see the command lines of failed build steps.
+INFO: Elapsed time: 1.425s, Critical Path: 0.02s
+INFO: 4 processes: 4 internal.
+ERROR: Build did NOT complete successfully

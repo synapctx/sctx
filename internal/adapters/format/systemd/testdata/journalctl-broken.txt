@@ -1,0 +1,60 @@
+Nov 21 02:30:35 af8069ba3d96 systemd[1]: /etc/systemd/system/broken.service:7: Unknown key name 'StartLimitIntervalSec' in section 'Service', ignoring.
+Nov 21 02:30:35 af8069ba3d96 systemd[1]: Started broken.service - Demo broken worker.
+Nov 21 02:30:35 af8069ba3d96 sh[139]: connecting to db 192.0.2.10:5432
+Nov 21 02:30:35 af8069ba3d96 sh[139]: FATAL: password authentication failed for user app
+Nov 21 02:30:35 af8069ba3d96 systemd[1]: broken.service: Main process exited, code=exited, status=1/FAILURE
+Nov 21 02:30:35 af8069ba3d96 systemd[1]: broken.service: Failed with result 'exit-code'.
+Nov 21 02:30:36 af8069ba3d96 systemd[1]: broken.service: Scheduled restart job, restart counter is at 1.
+Nov 21 02:30:36 af8069ba3d96 systemd[1]: Started broken.service - Demo broken worker.
+Nov 21 02:30:36 af8069ba3d96 sh[143]: connecting to db 192.0.2.10:5432
+Nov 21 02:30:36 af8069ba3d96 sh[143]: FATAL: password authentication failed for user app
+Nov 21 02:30:36 af8069ba3d96 systemd[1]: broken.service: Main process exited, code=exited, status=1/FAILURE
+Nov 21 02:30:36 af8069ba3d96 systemd[1]: broken.service: Failed with result 'exit-code'.
+Nov 21 02:30:37 af8069ba3d96 systemd[1]: broken.service: Scheduled restart job, restart counter is at 2.
+Nov 21 02:30:37 af8069ba3d96 systemd[1]: Started broken.service - Demo broken worker.
+Nov 21 02:30:37 af8069ba3d96 sh[146]: connecting to db 192.0.2.10:5432
+Nov 21 02:30:37 af8069ba3d96 sh[146]: FATAL: password authentication failed for user app
+Nov 21 02:30:37 af8069ba3d96 systemd[1]: broken.service: Main process exited, code=exited, status=1/FAILURE
+Nov 21 02:30:37 af8069ba3d96 systemd[1]: broken.service: Failed with result 'exit-code'.
+Nov 21 02:30:38 af8069ba3d96 systemd[1]: broken.service: Scheduled restart job, restart counter is at 3.
+Nov 21 02:30:38 af8069ba3d96 systemd[1]: Started broken.service - Demo broken worker.
+Nov 21 02:30:38 af8069ba3d96 sh[149]: connecting to db 192.0.2.10:5432
+Nov 21 02:30:38 af8069ba3d96 sh[149]: FATAL: password authentication failed for user app
+Nov 21 02:30:38 af8069ba3d96 systemd[1]: broken.service: Main process exited, code=exited, status=1/FAILURE
+Nov 21 02:30:38 af8069ba3d96 systemd[1]: broken.service: Failed with result 'exit-code'.
+Nov 21 02:30:40 af8069ba3d96 systemd[1]: broken.service: Scheduled restart job, restart counter is at 4.
+Nov 21 02:30:40 af8069ba3d96 systemd[1]: broken.service: Start request repeated too quickly.
+Nov 21 02:30:40 af8069ba3d96 systemd[1]: broken.service: Failed with result 'exit-code'.
+Nov 21 02:30:40 af8069ba3d96 systemd[1]: Failed to start broken.service - Demo broken worker.
+Nov 21 02:30:52 af8069ba3d96 systemd[1]: /etc/systemd/system/broken.service:7: Unknown key name 'StartLimitIntervalSec' in section 'Service', ignoring.
+Nov 21 02:30:52 af8069ba3d96 systemd[1]: /etc/systemd/system/broken.service:7: Unknown key name 'StartLimitIntervalSec' in section 'Service', ignoring.
+Nov 21 02:42:53 af8069ba3d96 systemd[1]: /etc/systemd/system/broken.service:7: Unknown key name 'StartLimitIntervalSec' in section 'Service', ignoring.
+Nov 21 02:42:53 af8069ba3d96 systemd[1]: /etc/systemd/system/broken.service:7: Unknown key name 'StartLimitIntervalSec' in section 'Service', ignoring.
+Nov 21 02:42:58 af8069ba3d96 systemd[1]: /etc/systemd/system/broken.service:7: Unknown key name 'StartLimitIntervalSec' in section 'Service', ignoring.
+Nov 21 02:42:58 af8069ba3d96 systemd[1]: Started broken.service - Demo broken worker.
+Nov 21 02:42:58 af8069ba3d96 sh[2414]: connecting to db 192.0.2.10:5432
+Nov 21 02:42:58 af8069ba3d96 sh[2414]: FATAL: password authentication failed for user app
+Nov 21 02:42:58 af8069ba3d96 systemd[1]: broken.service: Main process exited, code=exited, status=1/FAILURE
+Nov 21 02:42:58 af8069ba3d96 systemd[1]: broken.service: Failed with result 'exit-code'.
+Nov 21 02:42:59 af8069ba3d96 systemd[1]: broken.service: Scheduled restart job, restart counter is at 1.
+Nov 21 02:42:59 af8069ba3d96 systemd[1]: Started broken.service - Demo broken worker.
+Nov 21 02:42:59 af8069ba3d96 sh[2418]: connecting to db 192.0.2.10:5432
+Nov 21 02:42:59 af8069ba3d96 sh[2418]: FATAL: password authentication failed for user app
+Nov 21 02:42:59 af8069ba3d96 systemd[1]: broken.service: Main process exited, code=exited, status=1/FAILURE
+Nov 21 02:42:59 af8069ba3d96 systemd[1]: broken.service: Failed with result 'exit-code'.
+Nov 21 02:43:00 af8069ba3d96 systemd[1]: broken.service: Scheduled restart job, restart counter is at 2.
+Nov 21 02:43:00 af8069ba3d96 systemd[1]: Started broken.service - Demo broken worker.
+Nov 21 02:43:00 af8069ba3d96 sh[2421]: connecting to db 192.0.2.10:5432
+Nov 21 02:43:00 af8069ba3d96 sh[2421]: FATAL: password authentication failed for user app
+Nov 21 02:43:00 af8069ba3d96 systemd[1]: broken.service: Main process exited, code=exited, status=1/FAILURE
+Nov 21 02:43:00 af8069ba3d96 systemd[1]: broken.service: Failed with result 'exit-code'.
+Nov 21 02:43:01 af8069ba3d96 systemd[1]: broken.service: Scheduled restart job, restart counter is at 3.
+Nov 21 02:43:01 af8069ba3d96 systemd[1]: Started broken.service - Demo broken worker.
+Nov 21 02:43:01 af8069ba3d96 sh[2425]: connecting to db 192.0.2.10:5432
+Nov 21 02:43:01 af8069ba3d96 sh[2425]: FATAL: password authentication failed for user app
+Nov 21 02:43:01 af8069ba3d96 systemd[1]: broken.service: Main process exited, code=exited, status=1/FAILURE
+Nov 21 02:43:01 af8069ba3d96 systemd[1]: broken.service: Failed with result 'exit-code'.
+Nov 21 02:43:03 af8069ba3d96 systemd[1]: broken.service: Scheduled restart job, restart counter is at 4.
+Nov 21 02:43:03 af8069ba3d96 systemd[1]: broken.service: Start request repeated too quickly.
+Nov 21 02:43:03 af8069ba3d96 systemd[1]: broken.service: Failed with result 'exit-code'.
+Nov 21 02:43:03 af8069ba3d96 systemd[1]: Failed to start broken.service - Demo broken worker.

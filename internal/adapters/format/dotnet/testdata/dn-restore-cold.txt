@@ -1,0 +1,3 @@
+  Determining projects to restore...
+  Restored /work/dn-ok/Lib/Lib.csproj (in 0.9 ms).
+  Restored /work/dn-ok/Lib.Tests/Lib.Tests.csproj (in 1.69 sec).

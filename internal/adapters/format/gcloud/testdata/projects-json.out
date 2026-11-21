@@ -1,0 +1,68 @@
+[
+  {
+    "createTime": "2025-10-19T18:54:38.955130Z",
+    "lifecycleState": "ACTIVE",
+    "name": "Default Gemini Project",
+    "parent": {
+      "id": "1234567890123",
+      "type": "organization"
+    },
+    "projectId": "gen-lang-client-1234567890",
+    "projectNumber": "1234567890123"
+  },
+  {
+    "createTime": "2025-07-23T21:15:27.179974Z",
+    "lifecycleState": "ACTIVE",
+    "name": "Acme Corp. - Staging",
+    "parent": {
+      "id": "1234567890123",
+      "type": "organization"
+    },
+    "projectId": "acm-staging-0a1b2c",
+    "projectNumber": "123456789012"
+  },
+  {
+    "createTime": "2025-07-23T21:14:31.596213Z",
+    "lifecycleState": "ACTIVE",
+    "name": "Acme Corp. - Management",
+    "parent": {
+      "id": "1234567890123",
+      "type": "organization"
+    },
+    "projectId": "acm-management-0a1b2c",
+    "projectNumber": "123456789012"
+  },
+  {
+    "createTime": "2025-07-23T21:12:40.183657Z",
+    "lifecycleState": "ACTIVE",
+    "name": "Acme Corp. - Registry",
+    "parent": {
+      "id": "1234567890123",
+      "type": "organization"
+    },
+    "projectId": "acm-registry-0a1b2c",
+    "projectNumber": "123456789012"
+  },
+  {
+    "createTime": "2025-07-21T07:35:34.941146Z",
+    "lifecycleState": "ACTIVE",
+    "name": "Acme Corp. - Production",
+    "parent": {
+      "id": "1234567890123",
+      "type": "organization"
+    },
+    "projectId": "acm-production-0a1b2c",
+    "projectNumber": "123456789012"
+  },
+  {
+    "createTime": "2025-07-21T07:34:52.043992Z",
+    "lifecycleState": "ACTIVE",
+    "name": "Acme Corp. - Development",
+    "parent": {
+      "id": "1234567890123",
+      "type": "organization"
+    },
+    "projectId": "acm-development-0a1b2c",
+    "projectNumber": "123456789012"
+  }
+]

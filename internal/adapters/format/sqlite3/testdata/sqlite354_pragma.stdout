@@ -1,0 +1,5 @@
+0|id|INTEGER|0||1
+1|customer_id|INTEGER|0||0
+2|status|TEXT|0||0
+3|total|REAL|0||0
+4|note|TEXT|0||0

@@ -1,0 +1,61 @@
+● web.service - Demo web service
+     Loaded: loaded (/etc/systemd/system/web.service; disabled; preset: enabled)
+     Active: active (running) since Sat 2026-11-21 02:30:35 UTC; 12min ago
+   Main PID: 134 (sh)
+      Tasks: 2 (limit: 28836)
+     Memory: 544.0K (peak: 1.5M)
+        CPU: 920ms
+     CGroup: /docker/af8069ba3d967671390204e0a03f6e04a7bd8a4df772e5daa169062604654fcb/system.slice/web.service
+             ├─ 134 /bin/sh -c "while true; do echo \"handling request id=\$RANDOM status=200\"; sleep 1; done"
+             └─2429 sleep 1
+
+Nov 21 02:42:55 af8069ba3d96 sh[134]: handling request id= status=200
+Nov 21 02:42:56 af8069ba3d96 sh[134]: handling request id= status=200
+Nov 21 02:42:57 af8069ba3d96 sh[134]: handling request id= status=200
+Nov 21 02:42:58 af8069ba3d96 sh[134]: handling request id= status=200
+Nov 21 02:42:59 af8069ba3d96 sh[134]: handling request id= status=200
+Nov 21 02:43:00 af8069ba3d96 sh[134]: handling request id= status=200
+Nov 21 02:43:01 af8069ba3d96 sh[134]: handling request id= status=200
+Nov 21 02:43:02 af8069ba3d96 sh[134]: handling request id= status=200
+Nov 21 02:43:03 af8069ba3d96 sh[134]: handling request id= status=200
+Nov 21 02:43:04 af8069ba3d96 sh[134]: handling request id= status=200
+
+× broken.service - Demo broken worker
+     Loaded: loaded (/etc/systemd/system/broken.service; static)
+     Active: failed (Result: exit-code) since Sat 2026-11-21 02:43:03 UTC; 2s ago
+   Duration: 1ms
+    Process: 2425 ExecStart=/bin/sh -c echo "connecting to db 192.0.2.10:5432"; echo "FATAL: password authentication failed for user app" >&2; exit 1 (code=exited, status=1/FAILURE)
+   Main PID: 2425 (code=exited, status=1/FAILURE)
+        CPU: 1ms
+
+Nov 21 02:43:03 af8069ba3d96 systemd[1]: broken.service: Scheduled restart job, restart counter is at 4.
+Nov 21 02:43:03 af8069ba3d96 systemd[1]: broken.service: Start request repeated too quickly.
+Nov 21 02:43:03 af8069ba3d96 systemd[1]: broken.service: Failed with result 'exit-code'.
+Nov 21 02:43:03 af8069ba3d96 systemd[1]: Failed to start broken.service - Demo broken worker.
+
+● pool.service - Demo prefork server
+     Loaded: loaded (/etc/systemd/system/pool.service; disabled; preset: enabled)
+     Active: active (running) since Sat 2026-11-21 02:42:50 UTC; 15s ago
+       Docs: man:pool(8)
+             https://example.com/docs/pool
+   Main PID: 2350 (sh)
+      Tasks: 13 (limit: 28836)
+     Memory: 2.2M (peak: 3.9M)
+        CPU: 7ms
+     CGroup: /docker/af8069ba3d967671390204e0a03f6e04a7bd8a4df772e5daa169062604654fcb/system.slice/pool.service
+             ├─2350 /bin/sh -c "for i in 1 2 3 4 5 6 7 8 9 10 11 12; do sleep 100000 & done; echo \"pool master ready\"; wait"
+             ├─2352 sleep 100000
+             ├─2353 sleep 100000
+             ├─2354 sleep 100000
+             ├─2355 sleep 100000
+             ├─2356 sleep 100000
+             ├─2357 sleep 100000
+             ├─2358 sleep 100000
+             ├─2359 sleep 100000
+             ├─2360 sleep 100000
+             ├─2361 sleep 100000
+             ├─2362 sleep 100000
+             └─2363 sleep 100000
+
+Nov 21 02:42:50 af8069ba3d96 systemd[1]: Started pool.service - Demo prefork server.
+Nov 21 02:42:50 af8069ba3d96 sh[2350]: pool master ready

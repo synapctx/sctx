@@ -9,6 +9,7 @@ import (
 	"github.com/synapctx/sctx/internal/platform/ghargv"
 	"github.com/synapctx/sctx/internal/platform/gitargv"
 	"github.com/synapctx/sctx/internal/platform/kubectlargv"
+	"github.com/synapctx/sctx/internal/platform/launcher"
 )
 
 // Registry resolves a wrapped command's argv to the formatter that claims
@@ -125,7 +126,7 @@ var valueFlags = map[string]map[string]bool{
 // plus its subcommand for known multi-command tools, e.g. "go test",
 // "git status", plain "grep" otherwise.
 func CommandKey(argv []string) string {
-	program, rest := normalize(argv)
+	program, rest := normalizeWith(argv, launcher.Attributed)
 	if program == "" {
 		return ""
 	}
@@ -194,8 +195,19 @@ func CommandKey(argv []string) string {
 }
 
 // normalize strips leading VAR=val environment assignments and returns the
-// program basename plus the remaining arguments.
+// program basename plus the remaining arguments. A launcher (`npx tsc`,
+// `uv run pytest`, `python -m mypy`) is peeled to the tool it runs, so the
+// inner tool's formatter claims the output and the stats key names that tool.
+// The basename is what makes `/usr/local/bin/make` resolve like `make`.
 func normalize(argv []string) (string, []string) {
+	return normalizeWith(argv, launcher.Inner)
+}
+
+// normalizeWith is normalize with the launcher policy chosen by the caller:
+// formatter resolution peels every launcher, while the stats key peels only
+// launchers of attributable tools (launcher.Attributed) so a script or private
+// package name never becomes a key.
+func normalizeWith(argv []string, peel func([]string) []string) (string, []string) {
 	i := 0
 	for i < len(argv) && isEnvAssignment(argv[i]) {
 		i++
@@ -203,7 +215,8 @@ func normalize(argv []string) (string, []string) {
 	if i >= len(argv) {
 		return "", nil
 	}
-	return filepath.Base(argv[i]), argv[i+1:]
+	inner := peel(argv[i:])
+	return filepath.Base(inner[0]), inner[1:]
 }
 
 func isEnvAssignment(s string) bool {

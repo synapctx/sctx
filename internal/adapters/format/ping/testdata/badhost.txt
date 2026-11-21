@@ -1,0 +1,1 @@
+ping: cannot resolve nonexistent.invalid: Unknown host

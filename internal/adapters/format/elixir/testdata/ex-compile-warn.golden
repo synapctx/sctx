@@ -1,0 +1,4 @@
+==> demo
+warning: variable "y" is unused (if the variable is not meant to be used, prefix it with an underscore)
+    └─ lib/demo.ex:4:5: Demo.unused_var/1
+…+10 lines (compile progress, source excerpts, diffs, blanks)

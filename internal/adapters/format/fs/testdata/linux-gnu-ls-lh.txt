@@ -1,0 +1,9 @@
+build:
+total 296K
+-rw-r--r-- 1 root root 293K Nov 21 02:39 blob.bin
+
+logs:
+total 48K
+-rw-r--r-- 1 root root  32K Nov 21 02:39 app.log
+-rw-r--r-- 1 root root 4.4K Nov 21 02:39 dups.log
+-rw-r--r-- 1 root root 5.4K Nov 21 02:39 events.jsonl

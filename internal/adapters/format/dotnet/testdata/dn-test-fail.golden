@@ -1,0 +1,28 @@
+Lib -> Lib/bin/Debug/net11.0/Lib.dll
+Lib.Tests -> Lib.Tests/bin/Debug/net11.0/Lib.Tests.dll
+Skipped Lib.Tests.CalcTests.Skipped
+Failed Lib.Tests.CalcTests.Positive(x: -2)
+  x must be positive
+    at Lib.Tests.CalcTests.Positive(Int32 x) in Lib.Tests/UnitTest1.cs:line 6
+    …+2 framework frames
+Failed Lib.Tests.CalcTests.Adds
+  Assert.Equal() Failure: Values differ
+  Expected: 6
+  Actual:   5
+    at Lib.Tests.CalcTests.Adds() in Lib.Tests/UnitTest1.cs:line 4
+    …+2 framework frames
+Failed Lib.Tests.CalcTests.Strs
+  Assert.Equal() Failure: Strings differ
+                ↓ (pos 6)
+  Expected: "hello world"
+  Actual:   "hello there"
+                ↑ (pos 6)
+    at Lib.Tests.CalcTests.Strs() in Lib.Tests/UnitTest1.cs:line 7
+    …+2 framework frames
+Failed Lib.Tests.CalcTests.Divs
+  System.DivideByZeroException : Attempted to divide by zero.
+    at Lib.Calc.Div(Int32 a, Int32 b) in Lib/Class1.cs:line 5
+    at Lib.Tests.CalcTests.Divs() in Lib.Tests/UnitTest1.cs:line 5
+    …+2 framework frames
+Failed! Failed: 4, Passed: 2, Skipped: 1, Total: 7, Duration: 19 ms - Lib.Tests.dll (net11.0)
+…+18 lines elided (3 restore, 7 noise, 8 framework frames)

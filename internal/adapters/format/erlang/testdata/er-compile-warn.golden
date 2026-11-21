@@ -1,0 +1,4 @@
+src/demo.erl:6: Warning: function unused_fn/0 is unused
+src/demo.erl:7: Warning: function shadow/1 is unused
+src/demo.erl:7: Warning: variable 'Y' is unused
+…+14 lines (rebar3 chatter, progress, diagnostic box furniture, OTP frames, blanks)

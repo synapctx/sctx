@@ -1,0 +1,54 @@
+diff --git a/src/pkg/api/h0.go b/src/pkg/api/h0.go
+index b4f5210..f173704 100644
+--- a/src/pkg/api/h0.go
++++ b/src/pkg/api/h0.go
+@@ -4,3 +4,4 @@ import "fmt"
+ 
+ // Handler0 serves.
+ func Handler0() { fmt.Println("TODO handler 0") }
++// change 0
+diff --git a/src/pkg/api/h1.go b/src/pkg/api/h1.go
+index d57248a..3a155d7 100644
+--- a/src/pkg/api/h1.go
++++ b/src/pkg/api/h1.go
+@@ -4,3 +4,4 @@ import "fmt"
+ 
+ // Handler1 serves.
+ func Handler1() { fmt.Println("TODO handler 1") }
++// change 1
+diff --git a/src/pkg/api/h2.go b/src/pkg/api/h2.go
+index 6b9eb80..36cf7fb 100644
+--- a/src/pkg/api/h2.go
++++ b/src/pkg/api/h2.go
+@@ -4,3 +4,4 @@ import "fmt"
+ 
+ // Handler2 serves.
+ func Handler2() { fmt.Println("TODO handler 2") }
++// change 2
+diff --git a/src/pkg/api/h3.go b/src/pkg/api/h3.go
+index 30e1fd3..6710b1d 100644
+--- a/src/pkg/api/h3.go
++++ b/src/pkg/api/h3.go
+@@ -4,3 +4,4 @@ import "fmt"
+ 
+ // Handler3 serves.
+ func Handler3() { fmt.Println("TODO handler 3") }
++// change 3
+diff --git a/src/pkg/api/h4.go b/src/pkg/api/h4.go
+index f1e2b08..7b97f65 100644
+--- a/src/pkg/api/h4.go
++++ b/src/pkg/api/h4.go
+@@ -4,3 +4,4 @@ import "fmt"
+ 
+ // Handler4 serves.
+ func Handler4() { fmt.Println("TODO handler 4") }
++// change 4
+diff --git a/src/pkg/api/h5.go b/src/pkg/api/h5.go
+index 426baa9..2bf0825 100644
+--- a/src/pkg/api/h5.go
++++ b/src/pkg/api/h5.go
+@@ -4,3 +4,4 @@ import "fmt"
+ 
+ // Handler5 serves.
+ func Handler5() { fmt.Println("TODO handler 5") }
++// change 5

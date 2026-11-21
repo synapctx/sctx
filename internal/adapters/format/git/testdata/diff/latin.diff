@@ -1,0 +1,7 @@
+diff --git a/latin.txt b/latin.txt
+index e084f3c..897e6bf 100644
+--- a/latin.txt
++++ b/latin.txt
+@@ -1 +1 @@
+-café line
++café changed

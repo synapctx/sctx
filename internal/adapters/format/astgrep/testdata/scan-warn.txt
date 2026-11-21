@@ -1,0 +1,18 @@
+warning[no-console]: Do not use console.log
+  ┌─ a.js:2:3
+  │
+2 │   console.log("a", x);
+  │   ^^^^^^^^^^^^^^^^^^^
+
+warning[no-console]: Do not use console.log
+  ┌─ a.js:3:12
+  │
+3 │   if (x) { console.log("b"); }
+  │            ^^^^^^^^^^^^^^^^
+
+warning[no-console]: Do not use console.log
+  ┌─ a.js:6:19
+  │
+6 │ const g = () => { console.log("deep"); };
+  │                   ^^^^^^^^^^^^^^^^^^^
+

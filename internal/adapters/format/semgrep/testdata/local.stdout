@@ -1,0 +1,22 @@
+                   
+                   
+┌─────────────────┐
+│ 3 Code Findings │
+└─────────────────┘
+             
+    py/app.py
+    ❯❱ py.no-shell-true
+          subprocess call with shell=True allows command injection
+                                                                  
+            4┆ return subprocess.call(cmd, shell=True)
+   
+    ❯❱ py.no-verify-false
+          TLS verification disabled
+                                   
+           16┆ return requests.get(u, verify=False)
+   
+   ❯❯❱ py.no-eval
+          Avoid eval on untrusted input
+                                       
+           19┆ return eval(s)
+

@@ -1,0 +1,47 @@
+> Task :cli:compileJava UP-TO-DATE
+> Task :cli:processResources NO-SOURCE
+> Task :cli:classes UP-TO-DATE
+> Task :cli:compileTestJava UP-TO-DATE
+> Task :cli:processTestResources NO-SOURCE
+> Task :cli:testClasses UP-TO-DATE
+> Task :cli:test UP-TO-DATE
+> Task :core:compileJava UP-TO-DATE
+> Task :core:processResources NO-SOURCE
+> Task :core:classes UP-TO-DATE
+> Task :core:compileTestJava UP-TO-DATE
+> Task :core:processTestResources NO-SOURCE
+> Task :core:testClasses UP-TO-DATE
+> Task :core:test UP-TO-DATE
+> Task :web:compileJava UP-TO-DATE
+> Task :web:processResources NO-SOURCE
+> Task :web:classes UP-TO-DATE
+> Task :web:compileTestJava UP-TO-DATE
+> Task :web:processTestResources NO-SOURCE
+> Task :web:testClasses UP-TO-DATE
+
+> Task :web:test FAILED
+
+SvcTest > a() FAILED
+    org.opentest4j.AssertionFailedError at SvcTest.java:4
+
+2 tests completed, 1 failed
+
+[Incubating] Problems report is available at: file:///work/gr-multi/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':web:test'.
+> There were failing tests. See the report at: file:///work/gr-multi/web/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.9.2/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 940ms
+9 actionable tasks: 1 executed, 8 up-to-date

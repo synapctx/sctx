@@ -1,0 +1,1 @@
+ping: nosuch.invalid: Name or service not known

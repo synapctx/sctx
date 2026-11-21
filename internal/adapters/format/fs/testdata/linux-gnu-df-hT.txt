@@ -1,0 +1,7 @@
+Filesystem     Type           Size  Used Avail Use% Mounted on
+overlay        overlay        504G  149G  330G  32% /
+tmpfs          tmpfs           64M     0   64M   0% /dev
+shm            tmpfs           64M     0   64M   0% /dev/shm
+grpcfuse       fuse.grpcfuse  927G  829G   98G  90% /work
+/dev/vda1      ext4           504G  149G  330G  32% /etc/hosts
+tmpfs          tmpfs          4.0K     0  4.0K   0% /proc/scsi

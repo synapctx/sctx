@@ -1,0 +1,6 @@
+In file included from inc.c:1:
+inc/h.h: In function 'bad_h':
+inc/h.h:1:51: error: 'nope' undeclared (first use in this function)
+    1 | static inline int bad_h(void) { int q; return 1 + nope; }
+      |                                                   ^~~~
+inc/h.h:1:51: note: each undeclared identifier is reported only once for each function it appears in

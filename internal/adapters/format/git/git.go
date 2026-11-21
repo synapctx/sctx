@@ -12,6 +12,7 @@ import (
 
 	"github.com/synapctx/sctx/internal/adapters/format/generic"
 	"github.com/synapctx/sctx/internal/domain/format"
+	"github.com/synapctx/sctx/internal/platform/difffloor"
 	"github.com/synapctx/sctx/internal/platform/gitargv"
 )
 
@@ -36,7 +37,7 @@ func (f *Formatter) Dedicated(argv []string) bool {
 	sub, _ := subcommand(argv)
 	switch sub {
 	case "add", "commit", "push", "pull", "fetch", "status", "log", "diff", "show",
-		"branch", "stash", "blame", "reflog", "tag", "remote", "shortlog", "ls-files", "worktree":
+		"branch", "stash", "blame", "reflog", "tag", "remote", "shortlog", "ls-files", "worktree", "ls-tree", "merge", "clone", "rebase", "cherry-pick", "revert":
 		return true
 	default:
 		return false
@@ -58,7 +59,7 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 	sub, args := subcommand(in.Argv)
 
 	switch sub {
-	case "add", "commit", "push", "pull", "fetch":
+	case "add", "commit", "push", "pull", "fetch", "merge", "clone", "rebase", "cherry-pick", "revert":
 		return aggressiveWrite(sub, in)
 	}
 
@@ -94,6 +95,8 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 		return aggressiveLsFiles(in, args)
 	case "worktree":
 		return aggressiveWorktree(in, args)
+	case "ls-tree":
+		return aggressiveLsTree(in, args)
 	default:
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
@@ -114,6 +117,19 @@ func (f *Formatter) Relaxed(ctx context.Context, in format.Input) (format.Render
 		// valid JSON compaction and provable repeated-line collapsing. No output
 		// grammar is guessed, so this is reachability rather than dedicated coverage.
 		return generic.New().Relaxed(ctx, in)
+	}
+	if sub == "diff" || sub == "show" || (sub == "log" && hasAnyArg(args, "-p", "-u", "--patch")) {
+		// Fidelity floor and binary guard: the relaxed filter drops blank
+		// lines, which are real context in a diff, so small or non-text
+		// diffs go verbatim. The chain gives every tier its own reader.
+		if diffArgsUnsafeToParse(args) {
+			return format.Rendered{}, format.ErrTierInapplicable
+		}
+		raw := readAll(in.Stdout)
+		if !difffloor.Text(raw) || difffloor.Below(len(splitLines(raw))) {
+			return format.Rendered{}, format.ErrTierInapplicable
+		}
+		in.Stdout = bytes.NewReader(raw)
 	}
 	return relaxedFilter(in)
 }

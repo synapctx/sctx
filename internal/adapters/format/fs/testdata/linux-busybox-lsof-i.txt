@@ -1,0 +1,3 @@
+COMMAND PID USER FD   TYPE  DEVICE SIZE/OFF NODE NAME
+nc        8 root 3u  IPv6 1254319      0t0  TCP *:http-alt (LISTEN)
+nc       10 root 3u  IPv6 1253341      0t0  TCP *:9090 (LISTEN)

@@ -16,6 +16,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/synapctx/sctx/internal/platform/launcher"
 	"github.com/synapctx/sctx/internal/platform/progkey"
 
 	"github.com/cloudresty/ulid"
@@ -46,7 +47,7 @@ type Options struct {
 	// process lifetime.
 	Identity agentenv.Identity
 	// Bypass records how sctx's own formatting was skipped for this run: ""
-	// (not bypassed), "force_tier" or "double_dash". See telemetry.Event.Bypass.
+	// (not bypassed), "force_tier", "double_dash" or "bypass". See telemetry.Event.Bypass.
 	Bypass string
 	// Salt is config.ArgvSalt: a per-machine secret that makes ArgvHash a
 	// one-way, unlinkable-across-machines fingerprint of normalized argv.
@@ -60,6 +61,10 @@ type Options struct {
 	// Opt-in this release; config.Config.Redact / SCT__REDACT feed it.
 	Redact bool
 }
+
+// OutputCutNotice is printed to stderr, after the command's own output, when a
+// background process kept the output pipes open past the runner's wait delay.
+const OutputCutNotice = "sctx: a background process kept the output open after the command exited; stopped reading after 3s — later output from it was not captured"
 
 type Service struct {
 	registry *Registry
@@ -92,7 +97,7 @@ func NewService(registry *Registry, runner domexec.Runner, store stats.Store, em
 // exit with. The returned error reports sctx-internal failures (command not
 // startable); the wrapped command failing is not an error.
 func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
-	outcome, runErr := s.runner.Run(ctx, domexec.Command{Argv: argv})
+	outcome, runErr := s.runner.Run(ctx, domexec.Command{Argv: argv, Env: childEnv(argv, processEnviron())})
 	if runErr != nil {
 		return outcome.ExitCode, runErr
 	}
@@ -108,11 +113,14 @@ func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
 		return outcome.ExitCode, err
 	}
 
-	formatter, resolved := s.registry.ResolveByArgv(argv)
+	// Formatters parse argv themselves and expect the tool as argv[0]; a launched
+	// command (`npx tsc`, `uv run pytest`) is handed to them as the inner tool's.
+	fargv := launcher.Inner(argv)
+	formatter, resolved := s.registry.ResolveByArgv(fargv)
 	formatterMatched := resolved
 	if resolved {
 		if classifier, ok := formatter.(interface{ Dedicated([]string) bool }); ok {
-			formatterMatched = classifier.Dedicated(argv)
+			formatterMatched = classifier.Dedicated(fargv)
 		}
 	}
 	if !resolved && s.sniff != nil {
@@ -135,7 +143,7 @@ func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
 	}
 
 	in := format.Input{
-		Argv:     argv,
+		Argv:     fargv,
 		Command:  CommandKey(argv),
 		Stdout:   bytes.NewReader(raw),
 		Stderr:   bytes.NewReader(rawStderr),
@@ -189,6 +197,10 @@ func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
 		}
 		emittedStderr = len(stderrBody)
 	}
+	if outcome.OutputCut {
+		// After the command's own output, so it reads as a note about it.
+		fmt.Fprintln(s.stderr, OutputCutNotice)
+	}
 	if result.Elided && s.opts.RawCache != nil {
 		// The sidecar is what an agent reads back on request via the "sctx:
 		// raw output" hint below, so it is redacted too — an unredacted copy
@@ -203,8 +215,12 @@ func (s *Service) Execute(ctx context.Context, argv []string) (int, error) {
 			redactedCount += rep.Count
 			unscanned += rep.Unscanned
 		}
-		if entry, err := s.opts.RawCache.Store(cacheStdout, cacheStderr); err == nil {
-			hint := fmt.Sprintf("sctx: raw output: %s (%s)\n", entry.Path, s.opts.RawCache.TTL)
+		program := ""
+		if len(argv) > 0 {
+			program = argv[0]
+		}
+		if entry, err := s.opts.RawCache.StoreFor(program, cacheStdout, cacheStderr); err == nil {
+			hint := fmt.Sprintf("sctx: raw output: sctx recall %s \u00b7 %s (%s)\n", entry.ID, entry.Path, s.opts.RawCache.TTL)
 			if n, err := s.stderr.Write([]byte(hint)); err == nil {
 				emittedStderr += n
 			}
@@ -362,10 +378,12 @@ func argvHash(salt string, argv []string) string {
 
 // deriveProgram returns the stable aggregation key used by telemetry: the
 // program's basename plus its operation (e.g. "go test", "git status").
+// A launcher is peeled only for attributable tools (launcher.Attributed), so
+// a script or private package it runs never becomes a key.
 // Git's global options are scanned before selecting that operation so paths
 // passed through -C/--git-dir never enter telemetry keys.
 func deriveProgram(argv []string) string {
-	return progkey.FromArgv(argv)
+	return progkey.FromArgv(launcher.Attributed(argv))
 }
 
 // looksLikeJSON is deliberately GONE. It gated the fallback on stdout starting

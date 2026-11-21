@@ -140,3 +140,32 @@ func TestRenderChainPreservesElisionSignal(t *testing.T) {
 		t.Fatal("tier chain dropped formatter elision signal")
 	}
 }
+
+// A render that folds stderr into its body replaces both streams, so it is
+// measured against stdout plus stderr. A body larger than stdout alone but
+// smaller than both streams together (findings on stdout, the summary on
+// stderr) used to be rejected as "not smaller than raw output".
+func TestRenderChainMeasuresAFoldedStderrRenderAgainstBothStreams(t *testing.T) {
+	stdout := []byte("finding one\nfinding two\n")
+	stderr := []byte("summary: lots of banner and progress text that the render drops\n")
+	body := "finding one\nfinding two\nsummary: 2 findings" // > len(stdout), < both streams
+	if len(body) <= len(stdout) || len(body) >= len(stdout)+len(stderr) {
+		t.Fatalf("fixture sizes are wrong: body %d, stdout %d, stderr %d", len(body), len(stdout), len(stderr))
+	}
+	render := func(fold bool) *fakeFormatter {
+		fn := func(format.Input) (format.Rendered, error) {
+			return format.Rendered{Body: []byte(body), FoldStderr: fold}, nil
+		}
+		return &fakeFormatter{aggressive: fn, relaxed: fn}
+	}
+	got := renderChain(context.Background(), render(true), format.Input{}, stdout, stderr, "", nil)
+	if got.Tier != format.TierAggressive || got.Anomaly != "" {
+		t.Fatalf("folded-stderr render: tier %q anomaly %q, want aggressive with none", got.Tier, got.Anomaly)
+	}
+	// Without FoldStderr the stderr is still emitted beside the body, so the
+	// comparison stays against stdout alone.
+	got = renderChain(context.Background(), render(false), format.Input{}, stdout, stderr, "", nil)
+	if got.Tier != format.TierVerbatim {
+		t.Fatalf("unfolded render larger than stdout: tier %q, want verbatim", got.Tier)
+	}
+}

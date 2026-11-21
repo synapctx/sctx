@@ -211,8 +211,8 @@
                 "com.docker.compose.image": "sha256:cc6ebc51755d9fcfc750a0b71961a9c0aa8bd2d281b323a67da961e894f60ae2",
                 "com.docker.compose.oneoff": "False",
                 "com.docker.compose.project": "sctx-formatter-20260815",
-                "com.docker.compose.project.config_files": "/private/tmp/sctx-docker-fixtures/compose.yaml",
-                "com.docker.compose.project.working_dir": "/private/tmp/sctx-docker-fixtures",
+                "com.docker.compose.project.config_files": "/work/proj/sctx-docker-fixtures/compose.yaml",
+                "com.docker.compose.project.working_dir": "/work/proj/sctx-docker-fixtures",
                 "com.docker.compose.service": "healthy",
                 "com.docker.compose.version": "5.3.0",
                 "com.synapctx.sctx.formatter-test": "true"

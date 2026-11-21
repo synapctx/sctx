@@ -6,6 +6,11 @@ import (
 	"testing"
 )
 
+// fakeAWSKey is a key-SHAPED test value assembled at runtime: a literal
+// `AKIA…` string is what secret scanners (GitHub push protection) match, and
+// this repository must never look like it carries one.
+var fakeAWSKey = "AKIA" + "ABCDEFGHIJKLMNOP"
+
 func TestRulesPositiveNearMissPlaceholder(t *testing.T) {
 	cases := []struct {
 		name     string
@@ -13,7 +18,7 @@ func TestRulesPositiveNearMissPlaceholder(t *testing.T) {
 		wantKind string // "" means no redaction expected
 	}{
 		// aws-access-key
-		{"aws positive", "key=AKIAABCDEFGHIJKLMNOP", "aws-access-key"},
+		{"aws positive", "key=" + fakeAWSKey, "aws-access-key"},
 		{"aws near-miss short", "key=AKIAABCDEFG", ""},
 		{"aws near-miss lowercase", "key=akiaabcdefghijklmnop", ""},
 
@@ -42,6 +47,15 @@ func TestRulesPositiveNearMissPlaceholder(t *testing.T) {
 		// npm-token
 		{"npm positive", "_authToken=abcd1234efgh5678", "npm-token"},
 		{"npm near-miss no value", "_authToken=", ""},
+
+		// generic-secret behind ANSI colour codes (gitleaks -v output shape)
+		{"ansi-coloured secret value", "Secret:      \x1b[1;3;mwJalrXUtnFEMIK7MDENGbPxRfiCYzK8q3vN2hT5\x1b[0m", "generic-secret"},
+
+		// kubeconfig-credential
+		{"kubeconfig client key", "    client-key-data: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQo=", "kubeconfig-credential"},
+		{"kubeconfig client cert", "    client-certificate-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1J", "kubeconfig-credential"},
+		{"kubeconfig elided by kubectl", "    client-key-data: DATA+OMITTED", ""},
+		{"kubeconfig CA is public, not redacted", "    certificate-authority-data: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1J", ""},
 
 		// private-key
 		{"private key positive", "-----BEGIN RSA PRIVATE KEY-----\nMIIBogIBAAKCAQ==\n-----END RSA PRIVATE KEY-----", "private-key"},
@@ -127,14 +141,14 @@ func TestLeftmostLongestBearerJWT(t *testing.T) {
 }
 
 func TestMarkerTextExact(t *testing.T) {
-	out, _ := Apply([]byte("AKIAABCDEFGHIJKLMNOP"))
+	out, _ := Apply([]byte(fakeAWSKey))
 	if string(out) != "[REDACTED:aws-access-key]" {
 		t.Fatalf("out = %q", out)
 	}
 }
 
 func TestExitCodeAndCountsAreNeverRedacted(t *testing.T) {
-	rendered := "FAIL ×3\n…+12 more\nAKIAABCDEFGHIJKLMNOP\nexit code: 1\n"
+	rendered := "FAIL ×3\n…+12 more\n" + fakeAWSKey + "\nexit code: 1\n"
 	out, rep := Apply([]byte(rendered))
 	if rep.Count != 1 {
 		t.Fatalf("rep=%+v, want exactly 1 redaction", rep)
@@ -146,7 +160,7 @@ func TestExitCodeAndCountsAreNeverRedacted(t *testing.T) {
 }
 
 func TestWriterSplitToken(t *testing.T) {
-	key := "AKIAABCDEFGHIJKLMNOP"
+	key := fakeAWSKey
 	first, second := key[:10], key[10:]
 
 	var buf bytes.Buffer
@@ -205,7 +219,7 @@ func (c *closeTrackingBuffer) Close() error {
 
 func TestMaxScanBehaviour(t *testing.T) {
 	before := bytes.Repeat([]byte("x"), maxScan-32)
-	secretBefore := "AKIAABCDEFGHIJKLMNOP"
+	secretBefore := fakeAWSKey
 	secretAfter := "sctx_live_shouldnotberedacted12345"
 
 	input := append(append([]byte{}, before...), []byte(secretBefore)...)
@@ -232,7 +246,7 @@ func FuzzApply(f *testing.F) {
 	seeds := []string{
 		"",
 		"plain text with no secrets",
-		"AKIAABCDEFGHIJKLMNOP",
+		fakeAWSKey,
 		"Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U",
 		"-----BEGIN RSA PRIVATE KEY-----\nMII\n-----END RSA PRIVATE KEY-----",
 		"api_key=changeme secret: token=abc123ABC456!!",
@@ -251,4 +265,44 @@ func FuzzApply(f *testing.F) {
 			t.Fatalf("negative report count: %d", rep.Count)
 		}
 	})
+}
+
+func TestGenericSecretValueContainingANSI(t *testing.T) {
+	cases := []struct {
+		name, in, want string
+	}{
+		{"csi inside value", "password=AbCd\x1b[0mEf0123456789xYzQwErTy", "[REDACTED:generic-secret]"},
+		{"grep color shape", "password=\x1b[01;31m\x1b[KAbCd\x1b[m\x1b[KEf0123456789xYzQwErTy\x1b[m\x1b[K", "[REDACTED:generic-secret]\x1b[m\x1b[K"},
+		{"trailing reset kept", "Secret:\x1b[1;3;mAbCd0123456789xYzQwErTy\x1b[0m", "[REDACTED:generic-secret]\x1b[0m"},
+		{"short after strip not redacted", "password=ab\x1b[0mcdefghij", "password=ab\x1b[0mcdefghij"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			out, _ := Apply([]byte(tc.in))
+			if string(out) != tc.want {
+				t.Fatalf("Apply(%q) = %q; want %q", tc.in, out, tc.want)
+			}
+		})
+	}
+}
+
+func TestKubeconfigCredentialShapes(t *testing.T) {
+	const b64 = "LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQo="
+	const m = "[REDACTED:kubeconfig-credential]"
+	cases := []struct{ name, in, want string }{
+		{"yaml inline", "client-key-data: " + b64 + "\n", "client-key-data: " + m + "\n"},
+		{"json pretty", `"client-key-data": "` + b64 + `",`, `"client-key-data": "` + m + `",`},
+		{"json compact", `{"client-key-data":"` + b64 + `","x":1}`, `{"client-key-data":"` + m + `","x":1}`},
+		{"yaml block", "client-key-data: |\n  " + b64 + "\nserver: x\n", "client-key-data: |\n  " + m + "\nserver: x\n"},
+		{"yaml block multiline", "client-key-data: |\n  " + b64 + "\n  " + b64 + "\nserver: x\n", "client-key-data: |\n  " + m + "\nserver: x\n"},
+		{"cert yaml", "client-certificate-data: " + b64, "client-certificate-data: " + m},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			out, rep := Apply([]byte(tc.in))
+			if string(out) != tc.want || rep.Count != 1 {
+				t.Fatalf("Apply(%q) = %q (count %d); want %q", tc.in, out, rep.Count, tc.want)
+			}
+		})
+	}
 }

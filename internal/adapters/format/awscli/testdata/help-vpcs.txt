@@ -1,0 +1,943 @@
+DESCRIBE-VPCS()                                                DESCRIBE-VPCS()
+
+NNAAMMEE
+     describe-vpcs -
+
+DDEESSCCRRIIPPTTIIOONN
+     Describes your VPCs. The default is to describe all your VPCs.
+     Alternatively, you can specify specific VPC IDs or filter the results to
+     include only the VPCs that match specific criteria.
+
+     See also: AWS API Documentation
+
+     ddeessccrriibbee--vvppccss is a paginated operation. Multiple API calls may be issued
+     in order to retrieve the entire data set of results. You can disable
+     pagination by providing the ----nnoo--ppaaggiinnaattee argument.  When using ----oouuttppuutt
+     tteexxtt and the ----qquueerryy argument on a paginated response, the ----qquueerryy
+     argument must extract data from the results of the following query
+     expressions: VVppccss
+
+SSYYNNOOPPSSIISS
+
+          describe-vpcs
+        [--filters <value>]
+        [--vpc-ids <value>]
+        [--dry-run | --no-dry-run]
+        [--cli-input-json | --cli-input-yaml]
+        [--starting-token <value>]
+        [--page-size <value>]
+        [--max-items <value>]
+        [--generate-cli-skeleton <value>]
+        [--debug]
+        [--endpoint-url <value>]
+        [--no-verify-ssl]
+        [--no-paginate]
+        [--output <value>]
+        [--query <value>]
+        [--profile <value>]
+        [--region <value>]
+        [--version <value>]
+        [--color <value>]
+        [--no-sign-request]
+        [--ca-bundle <value>]
+        [--cli-read-timeout <value>]
+        [--cli-connect-timeout <value>]
+        [--cli-binary-format <value>]
+        [--no-cli-pager]
+        [--cli-auto-prompt]
+        [--no-cli-auto-prompt]
+        [--cli-error-format <value>]
+        [--help]
+
+OOPPTTIIOONNSS
+     ----ffiilltteerrss (list)
+        The filters.
+
+        +o cciiddrr - The primary IPv4 CIDR block of the VPC. The CIDR block you
+          specify must exactly match the VPC's CIDR block for information to
+          be returned for the VPC. Must contain the slash followed by one or
+          two digits (for example, //2288 ).
+
+        +o cciiddrr--bblloocckk--aassssoocciiaattiioonn..cciiddrr--bblloocckk - An IPv4 CIDR block associated
+          with the VPC.
+
+        +o cciiddrr--bblloocckk--aassssoocciiaattiioonn..aassssoocciiaattiioonn--iidd - The association ID for an
+          IPv4 CIDR block associated with the VPC.
+
+        +o cciiddrr--bblloocckk--aassssoocciiaattiioonn..ssttaattee - The state of an IPv4 CIDR block
+          associated with the VPC.
+
+        +o ddhhccpp--ooppttiioonnss--iidd - The ID of a set of DHCP options.
+
+        +o iippvv66--cciiddrr--bblloocckk--aassssoocciiaattiioonn..iippvv66--cciiddrr--bblloocckk - An IPv6 CIDR block
+          associated with the VPC.
+
+        +o iippvv66--cciiddrr--bblloocckk--aassssoocciiaattiioonn..iippvv66--ppooooll - The ID of the IPv6 address
+          pool from which the IPv6 CIDR block is allocated.
+
+        +o iippvv66--cciiddrr--bblloocckk--aassssoocciiaattiioonn..aassssoocciiaattiioonn--iidd - The association ID for
+          an IPv6 CIDR block associated with the VPC.
+
+        +o iippvv66--cciiddrr--bblloocckk--aassssoocciiaattiioonn..ssttaattee - The state of an IPv6 CIDR block
+          associated with the VPC.
+
+        +o iiss--ddeeffaauulltt - Indicates whether the VPC is the default VPC.
+
+        +o oowwnneerr--iidd - The ID of the Amazon Web Services account that owns the
+          VPC.
+
+        +o ssttaattee - The state of the VPC (ppeennddiinngg | aavvaaiillaabbllee ).
+
+        +o ttaagg - The key/value combination of a tag assigned to the resource.
+          Use the tag key in the filter name and the tag value as the filter
+          value. For example, to find all resources that have a tag with the
+          key OOwwnneerr and the value TTeeaammAA , specify ttaagg::OOwwnneerr for the filter
+          name and TTeeaammAA for the filter value.
+
+        +o ttaagg--kkeeyy - The key of a tag assigned to the resource. Use this filter
+          to find all resources assigned a tag with a specific key, regardless
+          of the tag value.
+
+        +o vvppcc--iidd - The ID of the VPC.
+
+        (structure)
+           A filter name and value pair that is used to return a more specific
+           list of results from a describe operation. Filters can be used to
+           match a set of resources by specific criteria, such as tags,
+           attributes, or IDs.
+
+           If you specify multiple filters, the filters are joined with an AANNDD
+           , and the request returns only results that match all of the
+           specified filters.
+
+           For more information, see _L_i_s_t _a_n_d _f_i_l_t_e_r _u_s_i_n_g _t_h_e _C_L_I _a_n_d _A_P_I in
+           the _A_m_a_z_o_n _E_C_2 _U_s_e_r _G_u_i_d_e .
+
+           Name -> (string)
+              The name of the filter. Filter names are case-sensitive.
+
+            Values -> (list)
+              The filter values. Filter values are case-sensitive. If you
+              specify multiple values for a filter, the values are joined with
+              an OORR , and the request returns all results that match any of
+              the specified values.
+
+              (string)
+
+     Shorthand Syntax:
+
+        Name=string,Values=string,string ...
+
+     JSON Syntax:
+
+        [
+          {
+            "Name": "string",
+            "Values": ["string", ...]
+          }
+          ...
+        ]
+
+     ----vvppcc--iiddss (list)
+        The IDs of the VPCs.
+
+        (string)
+
+     Syntax:
+
+        "string" "string" ...
+
+     ----ddrryy--rruunn | ----nnoo--ddrryy--rruunn (boolean)
+        Checks whether you have the required permissions for the action,
+        without actually making the request, and provides an error response.
+        If you have the required permissions, the error response is
+        DDrryyRRuunnOOppeerraattiioonn . Otherwise, it is UUnnaauutthhoorriizzeeddOOppeerraattiioonn .
+
+     ----ccllii--iinnppuutt--jjssoonn | ----ccllii--iinnppuutt--yyaammll (string) Reads arguments from the
+     JSON string provided. The JSON string follows the format provided by
+     ----ggeenneerraattee--ccllii--sskkeelleettoonn. If other arguments are provided on the command
+     line, those values will override the JSON-provided values. It is not
+     possible to pass arbitrary binary values using a JSON-provided value as
+     the string will be taken literally. This may not be specified along with
+     ----ccllii--iinnppuutt--yyaammll.
+
+     ----ssttaarrttiinngg--ttookkeenn (string)
+        A token to specify where to start paginating. This is the NNeexxttTTookkeenn
+        from a previously truncated response.
+
+        For usage examples, see _P_a_g_i_n_a_t_i_o_n in the _A_W_S _C_o_m_m_a_n_d _L_i_n_e _I_n_t_e_r_f_a_c_e
+        _U_s_e_r _G_u_i_d_e .
+
+     ----ppaaggee--ssiizzee (integer)
+        The size of each page to get in the AWS service call. This does not
+        affect the number of items returned in the command's output. Setting a
+        smaller page size results in more calls to the AWS service, retrieving
+        fewer items in each call. This can help prevent the AWS service calls
+        from timing out.
+
+        For usage examples, see _P_a_g_i_n_a_t_i_o_n in the _A_W_S _C_o_m_m_a_n_d _L_i_n_e _I_n_t_e_r_f_a_c_e
+        _U_s_e_r _G_u_i_d_e .
+
+        Constraints:
+
+        +o min: 55
+
+        +o max: 11000000
+
+     ----mmaaxx--iitteemmss (integer)
+        The total number of items to return in the command's output. If the
+        total number of items available is more than the value specified, a
+        NNeexxttTTookkeenn is provided in the command's output. To resume pagination,
+        provide the NNeexxttTTookkeenn value in the ssttaarrttiinngg--ttookkeenn argument of a
+        subsequent command. DDoo nnoott use the NNeexxttTTookkeenn response element directly
+        outside of the AWS CLI.
+
+        For usage examples, see _P_a_g_i_n_a_t_i_o_n in the _A_W_S _C_o_m_m_a_n_d _L_i_n_e _I_n_t_e_r_f_a_c_e
+        _U_s_e_r _G_u_i_d_e .
+
+     ----ggeenneerraattee--ccllii--sskkeelleettoonn (string) Prints a JSON skeleton to standard
+     output without sending an API request. If provided with no value or the
+     value iinnppuutt, prints a sample input JSON that can be used as an argument
+     for ----ccllii--iinnppuutt--jjssoonn. Similarly, if provided yyaammll--iinnppuutt it will print a
+     sample input YAML that can be used with ----ccllii--iinnppuutt--yyaammll. If provided
+     with the value oouuttppuutt, it validates the command inputs and returns a
+     sample output JSON for that command. The generated JSON skeleton is not
+     stable between versions of the AWS CLI and there are no backwards
+     compatibility guarantees in the JSON skeleton generated.
+
+GGLLOOBBAALL OOPPTTIIOONNSS
+     ----ddeebbuugg (boolean)
+
+     Turn on debug logging.
+
+     ----eennddppooiinntt--uurrll (string)
+
+     Override command's default URL with the given URL.
+
+     ----nnoo--vveerriiffyy--ssssll (boolean)
+
+     By default, the AWS CLI uses SSL when communicating with AWS services.
+     For each SSL connection, the AWS CLI will verify SSL certificates. This
+     option overrides the default behavior of verifying SSL certificates.
+
+     ----nnoo--ppaaggiinnaattee (boolean)
+
+     Disable automatic pagination. If automatic pagination is disabled, the
+     AWS CLI will only make one call, for the first page of results.
+
+     ----oouuttppuutt (string)
+
+     The formatting style for command output.
+
+     +o json
+
+     +o text
+
+     +o table
+
+     +o yaml
+
+     +o yaml-stream
+
+     +o off
+
+     ----qquueerryy (string)
+
+     A JMESPath query to use in filtering the response data.
+
+     ----pprrooffiillee (string)
+
+     Use a specific profile from your credential file.
+
+     ----rreeggiioonn (string)
+
+     The region to use. Overrides config/env settings.
+
+     ----vveerrssiioonn (string)
+
+     Display the version of this tool.
+
+     ----ccoolloorr (string)
+
+     Turn on/off color output.
+
+     +o on
+
+     +o off
+
+     +o auto
+
+     ----nnoo--ssiiggnn--rreeqquueesstt (boolean)
+
+     Do not sign requests. Credentials will not be loaded if this argument is
+     provided.
+
+     ----ccaa--bbuunnddllee (string)
+
+     The CA certificate bundle to use when verifying SSL certificates.
+     Overrides config/env settings.
+
+     ----ccllii--rreeaadd--ttiimmeeoouutt (int)
+
+     The maximum socket read time in seconds. If the value is set to 0, the
+     socket read will be blocking and not timeout. The default value is 60
+     seconds.
+
+     ----ccllii--ccoonnnneecctt--ttiimmeeoouutt (int)
+
+     The maximum socket connect time in seconds. If the value is set to 0, the
+     socket connect will be blocking and not timeout. The default value is 60
+     seconds.
+
+     ----ccllii--bbiinnaarryy--ffoorrmmaatt (string)
+
+     The formatting style to be used for binary blobs. The default format is
+     base64. The base64 format expects binary blobs to be provided as a base64
+     encoded string. The raw-in-base64-out format preserves compatibility with
+     AWS CLI V1 behavior and binary values must be passed literally. When
+     providing contents from a file that map to a binary blob ffiilleebb:://// will
+     always be treated as binary and use the file contents directly regardless
+     of the ccllii--bbiinnaarryy--ffoorrmmaatt setting. When using ffiillee:://// the file contents
+     will need to properly formatted for the configured ccllii--bbiinnaarryy--ffoorrmmaatt.
+
+     +o base64
+
+     +o raw-in-base64-out
+
+     ----nnoo--ccllii--ppaaggeerr (boolean)
+
+     Disable cli pager for output.
+
+     ----ccllii--aauuttoo--pprroommpptt (boolean)
+
+     Automatically prompt for CLI input parameters.
+
+     ----nnoo--ccllii--aauuttoo--pprroommpptt (boolean)
+
+     Disable automatically prompt for CLI input parameters.
+
+     ----ccllii--eerrrroorr--ffoorrmmaatt (string)
+
+     The formatting style for error output. By default, errors are displayed
+     in enhanced format.
+
+     +o legacy
+
+     +o json
+
+     +o yaml
+
+     +o text
+
+     +o table
+
+     +o enhanced
+
+     ----hheellpp (boolean)
+
+     Display help for the command/subcommand.
+
+EEXXAAMMPPLLEESS
+     NNOOTTEE::
+        To use the following examples, you must have the AWS CLI installed and
+        configured. See the _G_e_t_t_i_n_g _s_t_a_r_t_e_d _g_u_i_d_e in the _A_W_S _C_L_I _U_s_e_r _G_u_i_d_e
+        for more information.
+
+        Unless otherwise stated, all examples have unix-like quotation rules.
+        These examples will need to be adapted to your terminal's quoting
+        rules. See _U_s_i_n_g _q_u_o_t_a_t_i_o_n _m_a_r_k_s _w_i_t_h _s_t_r_i_n_g_s in the _A_W_S _C_L_I _U_s_e_r
+        _G_u_i_d_e .
+
+     EExxaammppllee 11:: TToo ddeessccrriibbee aallll ooff yyoouurr VVPPCCss
+
+     The following ddeessccrriibbee--vvppccss example retrieves details about your VPCs.
+
+        aws ec2 describe-vpcs
+
+     Output:
+
+        {
+            "Vpcs": [
+                {
+                    "CidrBlock": "30.1.0.0/16",
+                    "DhcpOptionsId": "dopt-19edf471",
+                    "State": "available",
+                    "VpcId": "vpc-0e9801d129EXAMPLE",
+                    "OwnerId": "123456789012",
+                    "InstanceTenancy": "default",
+                    "CidrBlockAssociationSet": [
+                        {
+                            "AssociationId": "vpc-cidr-assoc-062c64cfafEXAMPLE",
+                            "CidrBlock": "30.1.0.0/16",
+                            "CidrBlockState": {
+                                "State": "associated"
+                            }
+                        }
+                    ],
+                    "IsDefault": false,
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": "Not Shared"
+                        }
+                    ]
+                },
+                {
+                    "CidrBlock": "10.0.0.0/16",
+                    "DhcpOptionsId": "dopt-19edf471",
+                    "State": "available",
+                    "VpcId": "vpc-06e4ab6c6cEXAMPLE",
+                    "OwnerId": "123456789111",
+                    "InstanceTenancy": "default",
+                    "CidrBlockAssociationSet": [
+                        {
+                            "AssociationId": "vpc-cidr-assoc-00b17b4eddEXAMPLE",
+                            "CidrBlock": "10.0.0.0/16",
+                            "CidrBlockState": {
+                                "State": "associated"
+                            }
+                        }
+                    ],
+                    "IsDefault": false,
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": "Shared VPC"
+                        }
+                    ]
+                }
+            ]
+        }
+
+     For more information, see _C_o_n_f_i_g_u_r_e _a _v_i_r_t_u_a_l _p_r_i_v_a_t_e _c_l_o_u_d in the _A_m_a_z_o_n
+     _V_P_C _U_s_e_r _G_u_i_d_e.
+
+     EExxaammppllee 22:: TToo ddeessccrriibbee aa ssppeecciiffiieedd VVPPCC
+
+     The following ddeessccrriibbee--vvppccss example retrieves details for the specified
+     VPC.
+
+        aws ec2 describe-vpcs \
+            --vpc-ids vpc-06e4ab6c6cEXAMPLE
+
+     Output:
+
+        {
+            "Vpcs": [
+                {
+                    "CidrBlock": "10.0.0.0/16",
+                    "DhcpOptionsId": "dopt-19edf471",
+                    "State": "available",
+                    "VpcId": "vpc-06e4ab6c6cEXAMPLE",
+                    "OwnerId": "123456789012",
+                    "InstanceTenancy": "default",
+                    "CidrBlockAssociationSet": [
+                        {
+                            "AssociationId": "vpc-cidr-assoc-00b17b4eddEXAMPLE",
+                            "CidrBlock": "10.0.0.0/16",
+                            "CidrBlockState": {
+                                "State": "associated"
+                            }
+                        }
+                    ],
+                    "IsDefault": false,
+                    "Tags": [
+                        {
+                            "Key": "Name",
+                            "Value": "Shared VPC"
+                        }
+                    ]
+                }
+            ]
+        }
+
+     For more information, see _C_o_n_f_i_g_u_r_e _a _v_i_r_t_u_a_l _p_r_i_v_a_t_e _c_l_o_u_d in the _A_m_a_z_o_n
+     _V_P_C _U_s_e_r _G_u_i_d_e.
+
+OOUUTTPPUUTT
+     NextToken -> (string)
+        The token to include in another request to get the next page of items.
+        This value is nnuullll when there are no more items to return.
+
+     Vpcs -> (list)
+        Information about the VPCs.
+
+        (structure)
+           Describes a VPC.
+
+           OwnerId -> (string)
+              The ID of the Amazon Web Services account that owns the VPC.
+
+            InstanceTenancy -> (string)
+              The allowed tenancy of instances launched into the VPC.
+
+              Possible values:
+
+              +o ddeeffaauulltt
+
+              +o ddeeddiiccaatteedd
+
+              +o hhoosstt
+
+            Ipv6CidrBlockAssociationSet -> (list)
+              Information about the IPv6 CIDR blocks associated with the VPC.
+
+              (structure)
+                 Describes an IPv6 CIDR block associated with a VPC.
+
+                 AssociationId -> (string)
+                    The association ID for the IPv6 CIDR block.
+
+                   Ipv6CidrBlock -> (string)
+                    The IPv6 CIDR block.
+
+                   Ipv6CidrBlockState -> (structure)
+                    Information about the state of the CIDR block.
+
+                    State -> (string)
+                       The state of the CIDR block.
+
+                       Possible values:
+
+                       +o aassssoocciiaattiinngg
+
+                       +o aassssoocciiaatteedd
+
+                       +o ddiissaassssoocciiaattiinngg
+
+                       +o ddiissaassssoocciiaatteedd
+
+                       +o ffaaiilliinngg
+
+                       +o ffaaiilleedd
+
+                      StatusMessage -> (string)
+                       A message about the status of the CIDR block, if
+                       applicable.
+
+                   NetworkBorderGroup -> (string)
+                    The name of the unique set of Availability Zones, Local
+                    Zones, or Wavelength Zones from which Amazon Web Services
+                    advertises IP addresses, for example,
+                    uuss--eeaasstt--11--wwll11--bbooss--wwllzz--11 .
+
+                   Ipv6Pool -> (string)
+                    The ID of the IPv6 address pool from which the IPv6 CIDR
+                    block is allocated.
+
+                   Ipv6AddressAttribute -> (string)
+                    Public IPv6 addresses are those advertised on the internet
+                    from Amazon Web Services. Private IP addresses are not and
+                    cannot be advertised on the internet from Amazon Web
+                    Services.
+
+                    Possible values:
+
+                    +o ppuubblliicc
+
+                    +o pprriivvaattee
+
+                   IpSource -> (string)
+                    The source that allocated the IP address space. bbyyooiipp or
+                    aammaazzoonn indicates public IP address space allocated by
+                    Amazon or space that you have allocated with Bring your
+                    own IP (BYOIP). nnoonnee indicates private space.
+
+                    Possible values:
+
+                    +o aammaazzoonn
+
+                    +o bbyyooiipp
+
+                    +o nnoonnee
+
+            CidrBlockAssociationSet -> (list)
+              Information about the IPv4 CIDR blocks associated with the VPC.
+
+              (structure)
+                 Describes an IPv4 CIDR block associated with a VPC.
+
+                 AssociationId -> (string)
+                    The association ID for the IPv4 CIDR block.
+
+                   CidrBlock -> (string)
+                    The IPv4 CIDR block.
+
+                   CidrBlockState -> (structure)
+                    Information about the state of the CIDR block.
+
+                    State -> (string)
+                       The state of the CIDR block.
+
+                       Possible values:
+
+                       +o aassssoocciiaattiinngg
+
+                       +o aassssoocciiaatteedd
+
+                       +o ddiissaassssoocciiaattiinngg
+
+                       +o ddiissaassssoocciiaatteedd
+
+                       +o ffaaiilliinngg
+
+                       +o ffaaiilleedd
+
+                      StatusMessage -> (string)
+                       A message about the status of the CIDR block, if
+                       applicable.
+
+            IsDefault -> (boolean)
+              Indicates whether the VPC is the default VPC.
+
+            EncryptionControl -> (structure)
+              Describes the configuration and state of VPC encryption
+              controls.
+
+              For more information, see _E_n_f_o_r_c_e _V_P_C _e_n_c_r_y_p_t_i_o_n _i_n _t_r_a_n_s_i_t in
+              the _A_m_a_z_o_n _V_P_C _U_s_e_r _G_u_i_d_e .
+
+              VpcId -> (string)
+                 The ID of the VPC associated with the encryption control
+                 configuration.
+
+               VpcEncryptionControlId -> (string)
+                 The ID of the VPC Encryption Control configuration.
+
+               Mode -> (string)
+                 The encryption mode for the VPC Encryption Control
+                 configuration.
+
+                 Possible values:
+
+                 +o mmoonniittoorr
+
+                 +o eennffoorrccee
+
+               State -> (string)
+                 The current state of the VPC Encryption Control
+                 configuration.
+
+                 Possible values:
+
+                 +o eennffoorrccee--iinn--pprrooggrreessss
+
+                 +o mmoonniittoorr--iinn--pprrooggrreessss
+
+                 +o eennffoorrccee--ffaaiilleedd
+
+                 +o mmoonniittoorr--ffaaiilleedd
+
+                 +o ddeelleettiinngg
+
+                 +o ddeelleetteedd
+
+                 +o aavvaaiillaabbllee
+
+                 +o ccrreeaattiinngg
+
+                 +o ddeelleettee--ffaaiilleedd
+
+               StateMessage -> (string)
+                 A message providing additional information about the
+                 encryption control state.
+
+               ResourceExclusions -> (structure)
+                 Information about resource exclusions for the VPC Encryption
+                 Control configuration.
+
+                 InternetGateway -> (structure)
+                    The exclusion configuration for internet gateway traffic.
+
+                    State -> (string)
+                       The current state of the exclusion configuration.
+
+                       Possible values:
+
+                       +o eennaabblliinngg
+
+                       +o eennaabblleedd
+
+                       +o ddiissaabblliinngg
+
+                       +o ddiissaabblleedd
+
+                      StateMessage -> (string)
+                       A message providing additional information about the
+                       exclusion state.
+
+                   EgressOnlyInternetGateway -> (structure)
+                    The exclusion configuration for egress-only internet
+                    gateway traffic.
+
+                    State -> (string)
+                       The current state of the exclusion configuration.
+
+                       Possible values:
+
+                       +o eennaabblliinngg
+
+                       +o eennaabblleedd
+
+                       +o ddiissaabblliinngg
+
+                       +o ddiissaabblleedd
+
+                      StateMessage -> (string)
+                       A message providing additional information about the
+                       exclusion state.
+
+                   NatGateway -> (structure)
+                    The exclusion configuration for NAT gateway traffic.
+
+                    State -> (string)
+                       The current state of the exclusion configuration.
+
+                       Possible values:
+
+                       +o eennaabblliinngg
+
+                       +o eennaabblleedd
+
+                       +o ddiissaabblliinngg
+
+                       +o ddiissaabblleedd
+
+                      StateMessage -> (string)
+                       A message providing additional information about the
+                       exclusion state.
+
+                   VirtualPrivateGateway -> (structure)
+                    The exclusion configuration for virtual private gateway
+                    traffic.
+
+                    State -> (string)
+                       The current state of the exclusion configuration.
+
+                       Possible values:
+
+                       +o eennaabblliinngg
+
+                       +o eennaabblleedd
+
+                       +o ddiissaabblliinngg
+
+                       +o ddiissaabblleedd
+
+                      StateMessage -> (string)
+                       A message providing additional information about the
+                       exclusion state.
+
+                   VpcPeering -> (structure)
+                    The exclusion configuration for VPC peering connection
+                    traffic.
+
+                    State -> (string)
+                       The current state of the exclusion configuration.
+
+                       Possible values:
+
+                       +o eennaabblliinngg
+
+                       +o eennaabblleedd
+
+                       +o ddiissaabblliinngg
+
+                       +o ddiissaabblleedd
+
+                      StateMessage -> (string)
+                       A message providing additional information about the
+                       exclusion state.
+
+                   Lambda -> (structure)
+                    The exclusion configuration for Lambda function traffic.
+
+                    State -> (string)
+                       The current state of the exclusion configuration.
+
+                       Possible values:
+
+                       +o eennaabblliinngg
+
+                       +o eennaabblleedd
+
+                       +o ddiissaabblliinngg
+
+                       +o ddiissaabblleedd
+
+                      StateMessage -> (string)
+                       A message providing additional information about the
+                       exclusion state.
+
+                   VpcLattice -> (structure)
+                    The exclusion configuration for VPC Lattice traffic.
+
+                    State -> (string)
+                       The current state of the exclusion configuration.
+
+                       Possible values:
+
+                       +o eennaabblliinngg
+
+                       +o eennaabblleedd
+
+                       +o ddiissaabblliinngg
+
+                       +o ddiissaabblleedd
+
+                      StateMessage -> (string)
+                       A message providing additional information about the
+                       exclusion state.
+
+                   ElasticFileSystem -> (structure)
+                    The exclusion configuration for Elastic File System
+                    traffic.
+
+                    State -> (string)
+                       The current state of the exclusion configuration.
+
+                       Possible values:
+
+                       +o eennaabblliinngg
+
+                       +o eennaabblleedd
+
+                       +o ddiissaabblliinngg
+
+                       +o ddiissaabblleedd
+
+                      StateMessage -> (string)
+                       A message providing additional information about the
+                       exclusion state.
+
+                   GlobalAccelerator -> (structure)
+                    The exclusion configuration for Amazon Web Services Global
+                    Accelerator traffic.
+
+                    State -> (string)
+                       The current state of the exclusion configuration.
+
+                       Possible values:
+
+                       +o eennaabblliinngg
+
+                       +o eennaabblleedd
+
+                       +o ddiissaabblliinngg
+
+                       +o ddiissaabblleedd
+
+                      StateMessage -> (string)
+                       A message providing additional information about the
+                       exclusion state.
+
+                   ApiGatewayV2 -> (structure)
+                    The exclusion configuration for Amazon API Gateway V2
+                    traffic.
+
+                    State -> (string)
+                       The current state of the exclusion configuration.
+
+                       Possible values:
+
+                       +o eennaabblliinngg
+
+                       +o eennaabblleedd
+
+                       +o ddiissaabblliinngg
+
+                       +o ddiissaabblleedd
+
+                      StateMessage -> (string)
+                       A message providing additional information about the
+                       exclusion state.
+
+               Tags -> (list)
+                 The tags assigned to the VPC Encryption Control
+                 configuration.
+
+                 (structure)
+                    Describes a tag.
+
+                    Key -> (string)
+                       The key of the tag.
+
+                       Constraints: Tag keys are case-sensitive and accept a
+                       maximum of 127 Unicode characters. May not begin with
+                       aawwss:: .
+
+                      Value -> (string)
+                       The value of the tag.
+
+                       Constraints: Tag values are case-sensitive and accept a
+                       maximum of 256 Unicode characters.
+
+            Tags -> (list)
+              Any tags assigned to the VPC.
+
+              (structure)
+                 Describes a tag.
+
+                 Key -> (string)
+                    The key of the tag.
+
+                    Constraints: Tag keys are case-sensitive and accept a
+                    maximum of 127 Unicode characters. May not begin with aawwss::
+                    .
+
+                   Value -> (string)
+                    The value of the tag.
+
+                    Constraints: Tag values are case-sensitive and accept a
+                    maximum of 256 Unicode characters.
+
+            BlockPublicAccessStates -> (structure)
+              The state of VPC Block Public Access (BPA).
+
+              InternetGatewayBlockMode -> (string)
+                 The mode of VPC BPA.
+
+                 +o ooffff : VPC BPA is not enabled and traffic is allowed to and
+                   from internet gateways and egress-only internet gateways in
+                   this Region.
+
+                 +o bblloocckk--bbiiddiirreeccttiioonnaall : Block all traffic to and from
+                   internet gateways and egress-only internet gateways in this
+                   Region (except for excluded VPCs and subnets).
+
+                 +o bblloocckk--iinnggrreessss : Block all internet traffic to the VPCs in
+                   this Region (except for VPCs or subnets which are
+                   excluded). Only traffic to and from NAT gateways and
+                   egress-only internet gateways is allowed because these
+                   gateways only allow outbound connections to be established.
+
+                   Possible values:
+
+                 +o ooffff
+
+                 +o bblloocckk--bbiiddiirreeccttiioonnaall
+
+                 +o bblloocckk--iinnggrreessss
+
+            VpcId -> (string)
+              The ID of the VPC.
+
+            State -> (string)
+              The current state of the VPC.
+
+              Possible values:
+
+              +o ppeennddiinngg
+
+              +o aavvaaiillaabbllee
+
+              +o ddeelleettiinngg
+
+            CidrBlock -> (string)
+              The primary IPv4 CIDR block for the VPC.
+
+            DhcpOptionsId -> (string)
+              The ID of the set of DHCP options you've associated with the
+              VPC.
+
+                                                               DESCRIBE-VPCS()

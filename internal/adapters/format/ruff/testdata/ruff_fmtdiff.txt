@@ -1,0 +1,109 @@
+--- pkg/core.py
++++ pkg/core.py
+@@ -2,19 +2,24 @@
+ import sys
+ from typing import List, Optional
+ 
++
+ def add(a: int, b: int) -> int:
+     return a + b
+ 
++
+ def greet(name: str) -> str:
+     return "hi " + name
+ 
++
+ def bad(x: int) -> str:
+     return x
+ 
++
+ def lst() -> List[int]:
+     y: Optional[int] = None
+     return [y.bit_length()]
+ 
++
+ result: int = greet("x")
+ undefined_fn(3)
+ add("a", 2)
+
+--- pkg/ugly.py
++++ pkg/ugly.py
+@@ -1,6 +1,8 @@
+-import  os,sys
+-def f( a,b ):
+-    return {'a':a,
+-        'b':b}
+-x = [1,2,
+-  3]
++import os, sys
++
++
++def f(a, b):
++    return {"a": a, "b": b}
++
++
++x = [1, 2, 3]
+
+--- tests/test_broken.py
++++ tests/test_broken.py
+@@ -1,2 +1,5 @@
+ import nonexistent_mod
+-def test_x(): pass
++
++
++def test_x():
++    pass
+
+--- tests/test_core.py
++++ tests/test_core.py
+@@ -1,23 +1,29 @@
+ import pytest
+ from pkg.core import add
+ 
++
+ def test_ok():
+     assert add(1, 2) == 3
+ 
++
+ def test_fail():
+     assert add(1, 2) == 4
+ 
++
+ @pytest.mark.parametrize("a,b,e", [(1, 1, 2), (2, 2, 5), (0, 0, 0)])
+ def test_param(a, b, e):
+     assert add(a, b) == e
+ 
++
+ @pytest.mark.xfail
+ def test_xf():
+     assert False
+ 
++
+ @pytest.mark.skip(reason="no")
+ def test_skip():
+     pass
+ 
++
+ def test_err():
+     raise ValueError("boom")
+
+--- tests/test_unit.py
++++ tests/test_unit.py
+@@ -1,5 +1,12 @@
+ import unittest
++
++
+ class T(unittest.TestCase):
+-    def test_a(self): self.assertEqual(1, 1)
+-    def test_b(self): self.assertEqual(1, 2)
+-    def test_c(self): raise RuntimeError("x")
++    def test_a(self):
++        self.assertEqual(1, 1)
++
++    def test_b(self):
++        self.assertEqual(1, 2)
++
++    def test_c(self):
++        raise RuntimeError("x")
+
+5 files would be reformatted, 1 file already formatted

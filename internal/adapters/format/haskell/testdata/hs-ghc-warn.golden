@@ -1,0 +1,15 @@
+src/Demo.hs:3:1: warning: [GHC-66111] [-Wunused-imports]
+    The import of ‘Data.List’ is redundant
+      except perhaps to import instances from ‘Data.List’
+    To import instances alone, use: import Data.List()
+src/Demo.hs:12:1: warning: [GHC-40910] [-Wunused-top-binds]
+    Defined but not used: ‘helper’
+src/Demo.hs:12:16: warning: [GHC-40910] [-Wunused-local-binds]
+    Defined but not used: ‘y’
+src/Demo.hs:12:20: warning: [GHC-18042] [-Wtype-defaults]
+    • Defaulting the type variable ‘a0’ to type ‘Integer’ in the following constraint
+        Num a0 arising from the literal ‘2’
+    • In the expression: 2
+      In an equation for ‘y’: y = 2
+      In the expression: let y = 2 in x
+…+16 lines (build chatter, source echoes, blanks, passing-test tree)

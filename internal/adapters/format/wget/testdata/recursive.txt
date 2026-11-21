@@ -1,0 +1,18 @@
+--2026-11-21 02:25:08--  https://go.dev/doc/gopher/
+Resolving go.dev (go.dev)... 192.0.2.1, 192.0.2.1, 192.0.2.1, ...
+Connecting to go.dev (go.dev)|192.0.2.1|:443... connected.
+HTTP request sent, awaiting response... 301 Moved Permanently
+Location: /blog/gopher [following]
+--2026-11-21 02:25:08--  https://go.dev/blog/gopher
+Reusing existing connection to go.dev:443.
+HTTP request sent, awaiting response... 200 OK
+Length: 37334 (36K) [text/html]
+Saving to: ‘go.dev/doc/gopher/index.html’
+
+     0K .......... .......... .......... ......               100%  504K=0.07s
+
+2026-11-21 02:25:09 (504 KB/s) - ‘go.dev/doc/gopher/index.html’ saved [37334/37334]
+
+FINISHED --2026-11-21 02:25:09--
+Total wall clock time: 0.7s
+Downloaded: 1 files, 36K in 0.07s (504 KB/s)

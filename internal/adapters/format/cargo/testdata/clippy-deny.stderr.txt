@@ -1,0 +1,90 @@
+    Checking demo v0.1.0 (/work/rs-clippy)
+error: unneeded `return` statement
+ --> src/lib.rs:2:5
+  |
+2 |     return x + 1;
+  |     ^^^^^^^^^^^^
+  |
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#needless_return
+  = note: `-D clippy::needless-return` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[allow(clippy::needless_return)]`
+help: remove `return`
+  |
+2 -     return x + 1;
+2 +     x + 1
+  |
+
+error: unneeded `return` statement
+ --> src/lib.rs:6:5
+  |
+6 |     return x * 2;
+  |     ^^^^^^^^^^^^
+  |
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#needless_return
+help: remove `return`
+  |
+6 -     return x * 2;
+6 +     x * 2
+  |
+
+error: writing `&Vec` instead of `&[_]` involves a new object where a slice will do
+ --> src/lib.rs:9:13
+  |
+9 | pub fn c(v: &Vec<i32>) -> usize {
+  |             ^^^^^^^^^
+  |
+  = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#ptr_arg
+  = note: `-D clippy::ptr-arg` implied by `-D warnings`
+  = help: to override `-D warnings` add `#[allow(clippy::ptr_arg)]`
+help: change this to
+  |
+9 - pub fn c(v: &Vec<i32>) -> usize {
+9 + pub fn c(v: &[i32]) -> usize {
+  |
+
+error: the loop variable `i` is only used to index `v`
+  --> src/lib.rs:11:14
+   |
+11 |     for i in 0..v.len() {
+   |              ^^^^^^^^^^
+   |
+note: for this index operation
+  --> src/lib.rs:12:14
+   |
+12 |         n += v[i] as usize;
+   |              ^^^^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#needless_range_loop
+   = note: `-D clippy::needless-range-loop` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::needless_range_loop)]`
+help: consider using an iterator
+   |
+11 -     for i in 0..v.len() {
+11 +     for <item> in &v {
+   |
+
+error: this `if` has identical blocks
+  --> src/lib.rs:18:18
+   |
+18 |     if x == true { 1 } else { 1 }
+   |                  ^^^^^
+   |
+note: same as this
+  --> src/lib.rs:18:29
+   |
+18 |     if x == true { 1 } else { 1 }
+   |                             ^^^^^
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#if_same_then_else
+   = note: `-D clippy::if-same-then-else` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::if_same_then_else)]`
+
+error: equality checks against true are unnecessary
+  --> src/lib.rs:18:8
+   |
+18 |     if x == true { 1 } else { 1 }
+   |        ^^^^^^^^^ help: try: `x`
+   |
+   = help: for further information visit https://rust-lang.github.io/rust-clippy/rust-1.100.0/index.html#bool_comparison
+   = note: `-D clippy::bool-comparison` implied by `-D warnings`
+   = help: to override `-D warnings` add `#[allow(clippy::bool_comparison)]`
+
+error: could not compile `demo` (lib) due to 6 previous errors

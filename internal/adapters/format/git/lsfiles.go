@@ -30,6 +30,13 @@ func aggressiveLsFiles(in format.Input, args []string) (format.Rendered, error) 
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
+	return renderPathsByDir(paths, raw, "")
+}
+
+// renderPathsByDir groups repo-relative paths by directory with per-directory
+// counts and explicit elision markers. legend, when non-empty, is the first
+// line of the render.
+func renderPathsByDir(paths []string, raw []byte, legend string) (format.Rendered, error) {
 	byDir := make(map[string][]string)
 	for _, p := range paths {
 		dir := path.Dir(p)
@@ -69,6 +76,9 @@ func aggressiveLsFiles(in format.Input, args []string) (format.Rendered, error) 
 	}
 
 	body := strings.Join(out, "\n")
+	if legend != "" {
+		body = legend + "\n" + body
+	}
 	if len(body) >= len(raw) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}

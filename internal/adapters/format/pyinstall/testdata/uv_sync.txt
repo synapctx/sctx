@@ -1,0 +1,23 @@
+Using CPython 3.15.2 interpreter at: /opt/homebrew/opt/python@3.15/bin/python3.15
+Creating virtual environment at: .venv
+Resolved 15 packages in 552ms
+Downloading pygments (1.2MiB)
+Downloading pydantic-core (2.0MiB)
+ Downloaded pydantic-core
+ Downloaded pygments
+Prepared 14 packages in 2.78s
+Installed 14 packages in 13ms
+ + annotated-types==0.8.0
+ + certifi==2026.11.20
+ + charset-normalizer==3.5.2
+ + idna==3.20
+ + markdown-it-py==4.3.0
+ + mdurl==0.1.2
+ + pydantic==2.14.4
+ + pydantic-core==2.50.5
+ + pygments==2.21.0
+ + requests==2.34.2
+ + rich==15.0.0
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.5
+ + urllib3==2.8.0

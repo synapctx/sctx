@@ -1,0 +1,10 @@
+Dockerfile:1 DL3006 [1m[93mwarning[0m: Always tag the version of an image explicitly
+Dockerfile:2 DL3015 [92minfo[0m: Avoid additional packages by specifying `--no-install-recommends`
+Dockerfile:2 DL3009 [92minfo[0m: Delete the apt lists (/var/lib/apt/lists) after installing something
+Dockerfile:2 DL3008 [1m[93mwarning[0m: Pin versions in apt get install. Instead of `apt-get install <package>` use `apt-get install <package>=<version>`
+Dockerfile:3 DL3003 [1m[93mwarning[0m: Use WORKDIR to switch to a directory
+Dockerfile:3 DL3047 [92minfo[0m: Avoid use of wget without progress bar. Use `wget --progress=dot:giga <url>`. Or consider using `-q` or `-nv` (shorthands for `--quiet` or `--no-verbose`).
+Dockerfile:4 DL3020 [1m[91merror[0m: Use COPY instead of ADD for files and folders
+Dockerfile:5 DL3042 [1m[93mwarning[0m: Avoid use of cache directory with pip. Use `pip install --no-cache-dir <package>`
+Dockerfile:5 DL3013 [1m[93mwarning[0m: Pin versions in pip. Instead of `pip install <package>` use `pip install <package>==<version>` or `pip install --requirement <requirements file>`
+Dockerfile:7 DL3025 [1m[93mwarning[0m: Use arguments JSON notation for CMD and ENTRYPOINT arguments

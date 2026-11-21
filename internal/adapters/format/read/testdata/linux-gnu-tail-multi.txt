@@ -1,0 +1,7 @@
+==> README.md <==
+# proj
+
+==> logs/app.log <==
+2026-11-21T10:00:38 INFO request id=398 path=/api/v1/items status=200 dur=398ms
+2026-11-21T10:00:39 INFO request id=399 path=/api/v1/items status=200 dur=399ms
+2026-11-21T10:01:00 ERROR db timeout id=7

@@ -1,0 +1,10 @@
+
+ NX   3 tasks: 3 succeeded
+
+
+Re-run with --output-style=static to inline logs.
+
+  Run duration:      1.5s
+  Cache:             0/3 hit (0%)
+  Critical path:     1.5s (2 tasks)
+  Recoverable time:  <1ms

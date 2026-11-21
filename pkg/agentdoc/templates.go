@@ -37,10 +37,12 @@ somewhere to intervene:
 
 - **Claude Code**, **Codex** (PreToolUse hook), **Gemini CLI** (BeforeTool hook),
   **Cursor** (1.7+, preToolUse hook), **GitHub Copilot CLI** (1.0.73+,
-  PreToolUse hook) and **Factory Droid** (PreToolUse hook)
-- **Kilo Code** and **OpenCode** (a plugin on ` + "`tool.execute.before`" + `)
+  PreToolUse hook), **Factory Droid** (PreToolUse hook), **Trae** (PreToolUse
+  hook) and **Mistral Vibe** (pre_tool hook)
+- **Kilo Code** and **OpenCode** (a plugin on ` + "`tool.execute.before`" + `) and
+  **Pi** (an extension on ` + "`tool_call`" + `)
 
-In those eight, write commands naturally — including pipelines and ` + "`&&`" + ` — and
+In those eleven, write commands naturally — including pipelines and ` + "`&&`" + ` — and
 do not prefix ` + "`sctx`" + ` yourself. Codex is the exception worth knowing: it will not
 run a hook until a human trusts it once with ` + "`/hooks`" + `, so until then nothing is
 wrapped there and prefixing is worth it.
@@ -87,6 +89,7 @@ marker between them. Unrecognized output stays raw.
 ` + "`sctx -- <cmd>`" + ` runs a reserved name (` + "`gain`" + `, ` + "`init`" + `, ...) as a
 program instead of a native subcommand; it does not force verbatim — use
 ` + "`SCT__FORCE_TIER=verbatim`" + ` when you genuinely need every byte.
+` + "`sctx bypass <cmd>`" + ` runs one command unfiltered (still counted in ` + "`sctx gain`" + `).
 
 ## The subcommand that changes what SynapCTX can answer
 
@@ -101,8 +104,9 @@ taught agents—not command coverage. ` + "`sctx setup`" + ` reports, per agent 
 machine, whether the instructions, the MCP servers and the rewrite hook are
 actually in place.
 
-` + "`sctx: raw output: PATH (TTL)`" + ` points to expiring, byte-exact local
-` + "`stdout`/`stderr`" + `; read only if an omitted detail is needed.
+` + "`sctx: raw output: sctx recall ID · PATH (TTL)`" + ` points to expiring, byte-exact
+local ` + "`stdout`/`stderr`" + `; read only if an omitted detail is needed, with
+` + "`sctx recall ID [--grep RE | --from N --lines M | --stderr]`" + `.
 
 Trusted ` + "`.sctx/filters.json`" + ` rules need external digest approval.
 ` + "`sctx filters verify`" + ` and ` + "`sctx filters status`" + ` are safe to run and say

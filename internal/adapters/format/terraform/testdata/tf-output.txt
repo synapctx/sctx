@@ -1,0 +1,6 @@
+pets = {
+  "alpha" = "bold-gecko"
+  "beta" = "cosmic-reindeer"
+  "gamma" = "engaged-mako"
+}
+pw = <sensitive>

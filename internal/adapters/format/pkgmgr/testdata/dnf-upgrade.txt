@@ -1,0 +1,27 @@
+Updating and loading repositories:
+Repositories loaded.
+Package              Arch    Version        Repository                            Size
+Upgrading:
+ xz                  aarch64 1:5.8.1-4.fc41 updates                            1.4 MiB
+   replacing xz      aarch64 1:5.8.1-2.fc41 6364fe1cc93547bd8035897a3d7f18e9   1.4 MiB
+ xz-libs             aarch64 1:5.8.1-4.fc41 updates                          201.7 KiB
+   replacing xz-libs aarch64 1:5.8.1-2.fc41 6364fe1cc93547bd8035897a3d7f18e9 201.7 KiB
+
+Transaction Summary:
+ Upgrading:          2 packages
+ Replacing:          2 packages
+
+Total size of inbound packages is 685 KiB. Need to download 685 KiB.
+After this operation, 88 B extra will be used (install 2 MiB, remove 2 MiB).
+[1/2] xz-libs-1:5.8.1-4.fc41.aarch64    100% | 418.7 KiB/s | 111.0 KiB |  00m00s
+[2/2] xz-1:5.8.1-4.fc41.aarch64         100% |   1.2 MiB/s | 574.1 KiB |  00m00s
+--------------------------------------------------------------------------------
+[2/2] Total                             100% | 839.6 KiB/s | 685.1 KiB |  00m01s
+Running transaction
+[1/6] Verify package files              100% | 500.0   B/s |   2.0   B |  00m00s
+[2/6] Prepare transaction               100% |  64.0   B/s |   4.0   B |  00m00s
+[3/6] Upgrading xz-libs-1:5.8.1-4.fc41. 100% |   4.4 MiB/s | 202.8 KiB |  00m00s
+[4/6] Upgrading xz-1:5.8.1-4.fc41.aarch 100% | 101.0 MiB/s |   1.4 MiB |  00m00s
+[5/6] Removing xz-1:5.8.1-2.fc41.aarch6 100% |   9.6 KiB/s | 148.0   B |  00m00s
+[6/6] Removing xz-libs-1:5.8.1-2.fc41.a 100% |  48.0   B/s |   7.0   B |  00m00s
+Complete!

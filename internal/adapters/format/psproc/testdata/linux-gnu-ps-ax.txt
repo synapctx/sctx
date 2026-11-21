@@ -1,0 +1,30 @@
+    PID TTY      STAT   TIME COMMAND
+      1 ?        Ss     0:00 sh -c chmod +x /work/*; /work/capture.sh ubuntu /work/raw - ; /work/capture.sh ubuntu /work/before /work/sctx-before; /work/capture.sh ubuntu /work/after /work/sctx-after
+      7 ?        S      0:00 /bin/sh /work/capture.sh ubuntu /work/raw -
+     37 ?        S      0:00 sleep 600
+     38 ?        S      0:00 sleep 600
+     39 ?        S      0:00 sleep 600
+     40 ?        S      0:00 sleep 600
+     41 ?        S      0:00 sleep 600
+     42 ?        S      0:00 sleep 600
+     43 ?        S      0:00 sleep 600
+     44 ?        S      0:00 sleep 600
+     45 ?        S      0:00 sleep 600
+     46 ?        S      0:00 sleep 600
+     47 ?        S      0:00 sleep 600
+     48 ?        S      0:00 sleep 600
+     49 ?        S      0:00 sleep 600
+     50 ?        S      0:00 sleep 600
+     51 ?        S      0:00 sleep 600
+     52 ?        S      0:00 sleep 600
+     53 ?        S      0:00 sleep 600
+     54 ?        S      0:00 sleep 600
+     55 ?        S      0:00 sleep 600
+     56 ?        S      0:00 sleep 600
+     57 ?        S      0:00 sleep 600
+     58 ?        S      0:00 sleep 600
+     59 ?        S      0:00 sleep 600
+     60 ?        S      0:00 sleep 600
+     61 ?        S      0:00 sleep 600
+    235 ?        S      0:00 sh -c ps -ax
+    236 ?        R      0:00 ps -ax

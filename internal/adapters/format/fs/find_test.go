@@ -2,6 +2,8 @@ package fs
 
 import (
 	"fmt"
+	"os"
+	"path"
 	"strings"
 	"testing"
 
@@ -41,23 +43,23 @@ func TestFindFormatterAggressive(t *testing.T) {
 		if out.Note != "18 paths" {
 			t.Errorf("Note = %q, want %q", out.Note, "18 paths")
 		}
-		if !strings.Contains(body, "src/app/ (15):") {
-			t.Errorf("expected grouped dir header with count, got %q", body)
+		if !strings.Contains(body, "src/: app 15, lib 2 [a.go, b.go]") {
+			t.Errorf("expected folded parent with per-dir counts, got %q", body)
 		}
-		if !strings.Contains(body, "…+5") {
-			t.Errorf("expected 15-name dir to cap at 10 with a +5 marker, got %q", body)
+		if !strings.Contains(body, "…+15 file names not listed") {
+			t.Errorf("expected the 15-file dir to be count-only with an omitted-names marker, got %q", body)
 		}
-		if !strings.Contains(body, "src/lib/ (2): a.go, b.go") {
-			t.Errorf("expected small dir listed in full, got %q", body)
+		if strings.Contains(body, "file1.go") {
+			t.Errorf("large dir names should not be listed, got %q", body)
 		}
 		if !shrunk(findFixture, body) {
 			t.Fatalf("body not smaller than raw: body=%d raw=%d", len(body), len(findFixture))
 		}
 	})
 
-	t.Run("caps directories at 60 with a remaining-dirs marker", func(t *testing.T) {
+	t.Run("caps directories with a remaining-dirs marker", func(t *testing.T) {
 		var b strings.Builder
-		for i := range 70 {
+		for i := range findDirsCap + 10 {
 			for j := range 3 {
 				fmt.Fprintf(&b, "./dir%02d/file%d.go\n", i, j)
 			}
@@ -69,8 +71,8 @@ func TestFindFormatterAggressive(t *testing.T) {
 			t.Fatalf("Aggressive: %v", err)
 		}
 		body := string(out.Body)
-		if out.Note != "210 paths" {
-			t.Errorf("Note = %q, want %q", out.Note, "210 paths")
+		if want := fmt.Sprintf("%d paths", 3*(findDirsCap+10)); out.Note != want {
+			t.Errorf("Note = %q, want %q", out.Note, want)
 		}
 		if !strings.Contains(body, "…+10 more dirs (30 paths)") {
 			t.Errorf("expected dir cap marker, got %q", body)
@@ -78,7 +80,7 @@ func TestFindFormatterAggressive(t *testing.T) {
 		if !shrunk(raw, body) {
 			t.Fatalf("body not smaller than raw: body=%d raw=%d", len(body), len(raw))
 		}
-		if strings.Count(body, "\n") >= 70 {
+		if strings.Count(body, "\n") > findDirsCap {
 			t.Errorf("expected the directory listing to be capped, got %d lines", strings.Count(body, "\n")+1)
 		}
 	})
@@ -125,8 +127,8 @@ func TestFindFormatterAggressiveTable(t *testing.T) {
 		if out.Note != "200 paths" {
 			t.Errorf("Note = %q, want %q", out.Note, "200 paths")
 		}
-		if !strings.Contains(body, "…+30 more files in pkg00") {
-			t.Errorf("expected explicit elision marker naming the directory, got %q", body)
+		if !strings.Contains(body, "pkg00 40") || !strings.Contains(body, "…+200 file names not listed") {
+			t.Errorf("expected per-dir counts and an explicit omitted-names marker, got %q", body)
 		}
 		if !shrunk(raw, body) {
 			t.Fatalf("body not smaller than raw: body=%d raw=%d", len(body), len(raw))
@@ -190,4 +192,83 @@ func TestFindFormatterRelaxed(t *testing.T) {
 	if out.FoldStderr {
 		t.Error("Relaxed must not fold stderr for find")
 	}
+}
+
+// TestFindGoRepoFixture runs a real `find . -name "*.go"` capture (a 600-file
+// Go repository, 16.6 KB) through the formatter: every directory holding a
+// match must appear with its count, and the render must stay tiny.
+func TestFindGoRepoFixture(t *testing.T) {
+	rawBytes, err := os.ReadFile("testdata/find-go.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+	raw := string(rawBytes)
+	out, err := (&findFormatter{}).Aggressive(testCtx, stdoutInput("find", raw))
+	if err != nil {
+		t.Fatalf("Aggressive: %v", err)
+	}
+	body := string(out.Body)
+	t.Logf("raw=%d body=%d", len(raw), len(body))
+
+	counts := map[string]int{}
+	for _, l := range strings.Split(strings.TrimSpace(raw), "\n") {
+		counts[path.Dir(l)]++
+	}
+	for d, n := range counts {
+		leaf := path.Base(d)
+		if d == "." {
+			leaf = "."
+		}
+		if want := fmt.Sprintf("%s %d", leaf, n); !strings.Contains(body, want) {
+			t.Errorf("dir %s missing %q", d, want)
+		}
+	}
+	if !strings.Contains(body, fmt.Sprintf("%d paths in %d dirs", strings.Count(raw, "\n"), len(counts))) {
+		t.Errorf("header missing totals: %q", strings.SplitN(body, "\n", 2)[0])
+	}
+	if len(body) > 1800 {
+		t.Errorf("body %d bytes, want <= 1800", len(body))
+	}
+}
+
+func TestFindCollapsesNoiseDirs(t *testing.T) {
+	f := &findFormatter{}
+	var sb strings.Builder
+	sb.WriteString("./main.go\n./util/a.go\n./util/b.go\n")
+	for i := 0; i < 30; i++ {
+		fmt.Fprintf(&sb, "./web/node_modules/pkg%d/index.js\n./web/node_modules/pkg%d/lib/x.js\n", i, i)
+	}
+	sb.WriteString("./web/node_modules\n./.git/HEAD\n./.git/objects/ab/cdef\n")
+	raw := sb.String()
+
+	t.Run("noise dir becomes one counted line", func(t *testing.T) {
+		out, err := f.Aggressive(testCtx, format.Input{Argv: []string{"find", ".", "-name", "*.js"}, Stdout: strings.NewReader(raw)})
+		if err != nil {
+			t.Fatalf("Aggressive: %v", err)
+		}
+		body := string(out.Body)
+		if !strings.Contains(body, "web/node_modules/ …+60 paths in 60 dirs") {
+			t.Errorf("missing counted node_modules line: %q", body)
+		}
+		if !strings.Contains(body, ".git/ …+2 paths in 2 dirs") {
+			t.Errorf("missing counted .git line: %q", body)
+		}
+		if strings.Contains(body, "pkg1/") {
+			t.Errorf("noise contents leaked: %q", body)
+		}
+		if !strings.Contains(body, "web 1 [node_modules]") || !strings.Contains(body, "util 2") {
+			t.Errorf("non-noise dirs lost: %q", body)
+		}
+		if !strings.HasPrefix(body, "66 paths in") {
+			t.Errorf("total path count must include collapsed paths: %q", body)
+		}
+	})
+
+	t.Run("an explicit noise root is never collapsed", func(t *testing.T) {
+		in := "web/node_modules/a/x.js\nweb/node_modules/a/y.js\nweb/node_modules/b/z.js\nweb/node_modules/b/w.js\n"
+		out, err := f.Aggressive(testCtx, format.Input{Argv: []string{"find", "web/node_modules", "-name", "*.js"}, Stdout: strings.NewReader(in)})
+		if err == nil && strings.Contains(string(out.Body), "noise dir collapsed") {
+			t.Errorf("collapsed an explicitly requested root: %q", out.Body)
+		}
+	})
 }

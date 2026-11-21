@@ -1,0 +1,81 @@
+…+47 lines (refresh ×8, progress ×7, completed ×14, legend ×4, blank ×14)
+[1m  # local_file.f["alpha"][0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "local_file" "f" {
+      [33m~[0m[0m content              = <<-EOT
+            hello bold-gecko
+            line2
+            line3
+        EOT -> (known after apply) [31m# forces replacement[0m[0m
+        [90m# (3 unchanged attributes hidden)[0m[0m
+      …+7 known after apply
+    }
+[1m  # local_file.f["beta"][0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "local_file" "f" {
+      [33m~[0m[0m content              = <<-EOT
+            hello cosmic-reindeer
+            line2
+            line3
+        EOT -> (known after apply) [31m# forces replacement[0m[0m
+        [90m# (3 unchanged attributes hidden)[0m[0m
+      …+7 known after apply
+    }
+[1m  # local_file.f["gamma"][0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "local_file" "f" {
+      [33m~[0m[0m content              = <<-EOT
+            hello engaged-mako
+            line2
+            line3
+        EOT -> (known after apply) [31m# forces replacement[0m[0m
+        [90m# (3 unchanged attributes hidden)[0m[0m
+      …+7 known after apply
+    }
+[1m  # null_resource.n[0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "null_resource" "n" {
+      [33m~[0m[0m triggers = { [31m# forces replacement[0m[0m
+          [33m~[0m[0m "v" = "1" [33m->[0m[0m "2"
+        }
+      …+1 known after apply
+    }
+[1m  # random_pet.p["alpha"][0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "random_pet" "p" {
+      [33m~[0m[0m length    = 2 [33m->[0m[0m 3 [31m# forces replacement[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+      …+1 known after apply
+    }
+[1m  # random_pet.p["beta"][0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "random_pet" "p" {
+      [33m~[0m[0m length    = 2 [33m->[0m[0m 3 [31m# forces replacement[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+      …+1 known after apply
+    }
+[1m  # random_pet.p["gamma"][0m must be [1m[31mreplaced[0m
+[0m[31m-[0m/[32m+[0m[0m resource "random_pet" "p" {
+      [33m~[0m[0m length    = 2 [33m->[0m[0m 3 [31m# forces replacement[0m[0m
+        [90m# (1 unchanged attribute hidden)[0m[0m
+      …+1 known after apply
+    }
+[1mPlan:[0m [0m7 to add, 0 to change, 7 to destroy.
+Changes to Outputs:
+  [33m~[0m[0m pets = {
+      [33m~[0m[0m alpha = "bold-gecko" -> (known after apply)
+      [33m~[0m[0m beta  = "cosmic-reindeer" -> (known after apply)
+      [33m~[0m[0m gamma = "engaged-mako" -> (known after apply)
+    }
+[0m[1mnull_resource.n: Destroying... [id=4646943268596394830][0m[0m
+[0m[1mlocal_file.f["gamma"]: Destroying... [id=7d76bfd182d5fa1c9031ab27706e5bf97e5d8dee][0m[0m
+[0m[1mlocal_file.f["beta"]: Destroying... [id=9aafb03ea6af86d94850a56c731fac6e52d043bf][0m[0m
+[0m[1mlocal_file.f["alpha"]: Destroying... [id=943b98459f0a7f0d44fd44ccc88633af2afa427a][0m[0m
+[0m[1mnull_resource.n: Provisioning with 'local-exec'...[0m[0m
+[0m[1mnull_resource.n (local-exec):[0m [0mExecuting: ["/bin/sh" "-c" "echo hi"]
+[0m[1mnull_resource.n (local-exec):[0m [0mhi
+[0m[1mrandom_pet.p["gamma"]: Destroying... [id=engaged-mako][0m[0m
+[0m[1mrandom_pet.p["alpha"]: Destroying... [id=bold-gecko][0m[0m
+[0m[1mrandom_pet.p["beta"]: Destroying... [id=cosmic-reindeer][0m[0m
+Apply complete! Resources: 7 added, 0 changed, 7 destroyed.[0m
+Outputs:
+[0mpets = {
+  "alpha" = "lively-clever-clam"
+  "beta" = "usually-useful-barnacle"
+  "gamma" = "externally-keen-walrus"
+}
+pw = <sensitive>

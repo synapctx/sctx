@@ -1,0 +1,30 @@
+UID          PID    PPID  C STIME TTY          TIME CMD
+root           1       0  0 02:39 ?        00:00:00 sh -c chmod +x /work/*; /work/capture.sh ubuntu /work/raw - ; /work/capture.sh ubuntu /work/before /work/sctx-before; /work/capture.sh ubuntu /work/after /work/sctx-after
+root           7       1  0 02:39 ?        00:00:00 /bin/sh /work/capture.sh ubuntu /work/raw -
+root          37       7  0 02:39 ?        00:00:00 sleep 600
+root          38       7  0 02:39 ?        00:00:00 sleep 600
+root          39       7  0 02:39 ?        00:00:00 sleep 600
+root          40       7  0 02:39 ?        00:00:00 sleep 600
+root          41       7  0 02:39 ?        00:00:00 sleep 600
+root          42       7  0 02:39 ?        00:00:00 sleep 600
+root          43       7  0 02:39 ?        00:00:00 sleep 600
+root          44       7  0 02:39 ?        00:00:00 sleep 600
+root          45       7  0 02:39 ?        00:00:00 sleep 600
+root          46       7  0 02:39 ?        00:00:00 sleep 600
+root          47       7  0 02:39 ?        00:00:00 sleep 600
+root          48       7  0 02:39 ?        00:00:00 sleep 600
+root          49       7  0 02:39 ?        00:00:00 sleep 600
+root          50       7  0 02:39 ?        00:00:00 sleep 600
+root          51       7  0 02:39 ?        00:00:00 sleep 600
+root          52       7  0 02:39 ?        00:00:00 sleep 600
+root          53       7  0 02:39 ?        00:00:00 sleep 600
+root          54       7  0 02:39 ?        00:00:00 sleep 600
+root          55       7  0 02:39 ?        00:00:00 sleep 600
+root          56       7  0 02:39 ?        00:00:00 sleep 600
+root          57       7  0 02:39 ?        00:00:00 sleep 600
+root          58       7  0 02:39 ?        00:00:00 sleep 600
+root          59       7  0 02:39 ?        00:00:00 sleep 600
+root          60       7  0 02:39 ?        00:00:00 sleep 600
+root          61       7  0 02:39 ?        00:00:00 sleep 600
+root         102       7  0 02:39 ?        00:00:00 sh -c ps -ef
+root         103     102  0 02:39 ?        00:00:00 ps -ef

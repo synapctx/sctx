@@ -1,0 +1,30 @@
+ WARNING  No locally installed `turbo` found in your repository. Using globally installed version (2.11.13). Using a specified version in your repository will result in more predictable behavior.
+
+   • turbo 2.11.13
+   • Packages in scope: @m/a, @m/b, @m/c
+   • Running build in 3 packages
+   • Remote caching disabled
+
+@m/b:build: cache hit, replaying logs 722c05cb44940b8a
+@m/a:build: cache hit, replaying logs 00a725985713afa9
+@m/b:build: 
+@m/b:build: > @m/b@1.0.0 build
+@m/b:build: > mkdir -p dist && echo built-b > dist/out.txt && echo compiling b && sleep 0.3
+@m/b:build: 
+@m/b:build: compiling b
+@m/a:build: 
+@m/a:build: > @m/a@1.0.0 build
+@m/a:build: > mkdir -p dist && echo built-a > dist/out.txt && echo compiling a && sleep 0.3
+@m/a:build: 
+@m/a:build: compiling a
+@m/c:build: cache hit, replaying logs d512dc2a8968aa45
+@m/c:build: 
+@m/c:build: > @m/c@1.0.0 build
+@m/c:build: > mkdir -p dist && echo built-c > dist/out.txt && echo compiling c && sleep 0.3
+@m/c:build: 
+@m/c:build: compiling c
+
+ Tasks:    3 successful, 3 total
+Cached:    3 cached, 3 total
+  Time:    44ms >>> FULL TURBO
+

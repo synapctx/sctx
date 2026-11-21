@@ -1,0 +1,29 @@
+** (Mix) mix format failed due to --check-formatted.
+The following files are not formatted:
+
+[1m[31m/work/ex/lib/ugly.ex
+[0m
+1 1  |defmodule Ugly do
+2   -|def f( a,b ) do a+b end
+  2 +|  def f(a, b) do
+  3 +|    a + b
+  4 +|  end
+3 5  |end
+4 6  |
+
+[1m[31m/work/ex/lib/demo.ex
+[0m
+ 1  1  |defmodule Demo do
+ 2  2  |  def add(a, b), do: a + b
+    3 +|
+ 3  4  |  def unused_var(x) do
+ 4  5  |    y = 1
+ 5  6  |    x
+ 6  7  |  end
+    8 +|
+ 7  9  |  def greet(name) do
+ 8 10  |    "hello #{name}"
+       |
+
+
+

@@ -1,0 +1,45 @@
+osv-scanner:
+Scanned /work/proj/py/requirements.txt file and found 9 packages
+Total 5 packages affected by 65 known vulnerabilities (9 Critical, 26 High, 26 Medium, 4 Low, 0 Unknown) from 1 ecosystem.
+65 vulnerabilities can be fixed.
+  django 2.2
+    PYSEC-2019-11 HIGH -> 2.2.4 aka GHSA-c4qh-4vgv-qc6g
+    PYSEC-2019-12 HIGH -> 2.2.4 aka GHSA-h5jv-4p7w-64jg
+    PYSEC-2019-13 CRITICAL -> 2.2.4 aka GHSA-6r97-cj55-9hrq
+    PYSEC-2019-14 HIGH -> 2.2.4 aka GHSA-v9qg-3j8p-r63v
+    PYSEC-2019-15 HIGH -> 2.2.8 aka GHSA-hvmf-r92r-27hr
+    PYSEC-2019-16 CRITICAL -> 2.2.9 aka GHSA-vfq6-hq5r-27r6
+    PYSEC-2020-31 HIGH -> 2.2.13 aka GHSA-wpjr-j57x-wxfw
+    PYSEC-2020-33 HIGH -> 2.2.16 aka GHSA-m6gj-h9gm-gw44
+    PYSEC-2020-34 HIGH -> 2.2.16 aka GHSA-fr28-569j-53c4
+    PYSEC-2020-35 CRITICAL -> 2.2.10 aka GHSA-hmr4-m2h5-33qx
+    PYSEC-2020-36 HIGH -> 2.2.11 aka GHSA-3gh2-xw74-jmcw
+    PYSEC-2021-439 HIGH -> 2.2.25 aka GHSA-v6rh-hp5x-86rv
+    PYSEC-2021-7 HIGH -> 2.2.21 aka GHSA-rxjp-mfm9-w4wr
+    PYSEC-2021-99 HIGH -> 2.2.24 aka GHSA-p99v-5w3c-jqq9
+    PYSEC-2022-1 HIGH -> 2.2.26 aka GHSA-53qw-q765-4fww
+    PYSEC-2022-190 CRITICAL -> 2.2.28 aka GHSA-2gwj-7jmv-h26r
+    PYSEC-2022-191 CRITICAL -> 2.2.28 aka GHSA-w24h-v9qh-8gxj
+    PYSEC-2022-2 HIGH -> 2.2.26 aka GHSA-8c5j-9r9f-c6w8
+    PYSEC-2022-20 HIGH -> 2.2.27 aka GHSA-6cw3-g6wv-c2xv
+    PYSEC-2026-4035 HIGH -> 5.2.17 aka GHSA-wvqv-fj8w-qmhm
+    GHSA-6w2r-r2m5-xq5w HIGH -> 4.2.24
+    GHSA-8x94-hmjh-97hq HIGH -> 3.2.15
+    GHSA-frmv-pr5f-9mcr CRITICAL -> 4.2.26
+    GHSA-qw25-v68c-qjf3 HIGH -> 4.2.26
+  idna 2.7
+    PYSEC-2024-60 HIGH -> 3.7 aka GHSA-jjg7-2v4v-x38h
+  pyyaml 5.1
+    PYSEC-2020-176 CRITICAL -> 5.2b1 aka GHSA-3pqx-4fqf-j49f
+    PYSEC-2020-96 CRITICAL -> 5.3.1 aka GHSA-6757-jp84-gxfx
+    PYSEC-2021-142 CRITICAL -> 5.4 aka GHSA-8q59-q68h-6hv4
+  requests 2.19.0
+    PYSEC-2018-28 HIGH -> 2.20.0 aka GHSA-x84v-xcm2-53pg
+  urllib3 1.23
+    PYSEC-2019-133 HIGH -> 1.24.2 aka GHSA-mh33-7rrq-662w
+    PYSEC-2023-192 HIGH -> 1.26.17 aka GHSA-v845-jxx5-vc9f
+    PYSEC-2026-141 HIGH -> 2.7.0 aka GHSA-qccp-gfcp-xxvc
+    PYSEC-2026-1994 HIGH -> 2.6.0 aka GHSA-2xpw-w6gg-jr37
+    PYSEC-2026-1996 HIGH -> 2.6.3 aka GHSA-38jv-5279-wg99
+    PYSEC-2026-4177 HIGH -> 2.8.0 aka GHSA-vxq7-64xx-v4gw
+  …+30 MEDIUM/LOW/NEGLIGIBLE/UNKNOWN (m=medium l=low n=negligible u=unknown): django 2.2 m×15,l×4; idna 2.7 m×1; requests 2.19.0 m×4; urllib3 1.23 m×6

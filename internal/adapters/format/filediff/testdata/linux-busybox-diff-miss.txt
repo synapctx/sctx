@@ -1,0 +1,1 @@
+diff: can't stat 'nosuch': No such file or directory

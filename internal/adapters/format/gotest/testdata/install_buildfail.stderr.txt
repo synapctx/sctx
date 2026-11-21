@@ -1,0 +1,2 @@
+# example.com/ts/buildpkg
+buildpkg/b.go:3:23: cannot use "x" (untyped string constant) as int value in return statement

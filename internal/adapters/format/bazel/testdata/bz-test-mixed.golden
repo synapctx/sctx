@@ -1,0 +1,7 @@
+FAIL: //pkg:fail_test (see /home/user/.cache/bazel/_bazel_root/0123456789abcdef0123456789abcdef/execroot/_main/bazel-out/aarch64-fastbuild/testlogs/pkg/fail_test/test.log)
+INFO: Elapsed time: 1.696s, Critical Path: 0.06s
+INFO: Build completed, 1 test FAILED, 11 total actions
+//pkg:pass_test                                                          PASSED in 0.0s
+//pkg:fail_test                                                          FAILED in 0.0s
+Executed 2 out of 2 tests: 1 test passes and 1 fails locally.
+…+14 lines (progress rows, banners, advice, blanks)

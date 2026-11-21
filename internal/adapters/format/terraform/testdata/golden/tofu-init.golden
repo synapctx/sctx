@@ -1,0 +1,1 @@
+tofu init: ok (providers hashicorp/null v3.3.2, hashicorp/local v2.9.1, hashicorp/random v3.9.1)

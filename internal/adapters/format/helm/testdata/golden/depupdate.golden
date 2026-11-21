@@ -1,0 +1,8 @@
+…+5 lines (progress ×1, repo lines ×4)
+...Successfully got an update from 5 chart repositories: repo-a, repo-b, repo-c, repo-d, bitnami
+Update Complete. ⎈Happy Helming!⎈
+Saving 1 charts
+Downloading common from repo https://charts.bitnami.com/bitnami
+Pulled: registry-1.docker.io/bitnamicharts/common:2.41.0
+Digest: sha256:669301594ad66a7401a47d26c6f0b763b95e44af667c57228e552920eb8feb66
+Deleting outdated charts

@@ -1,0 +1,17 @@
+Extracting Bazel installation...
+Starting local Bazel server and connecting to it...
+Computing main repo mapping: 
+Computing main repo mapping: 
+Computing main repo mapping: 
+Loading: 
+Loading: 0 packages loaded
+Analyzing: target //pkg:gen2 (1 packages loaded, 0 targets configured)
+Analyzing: target //pkg:gen2 (1 packages loaded, 0 targets configured)
+
+INFO: Analyzed target //pkg:gen2 (6 packages loaded, 10 targets configured).
+INFO: Found 1 target...
+Target //pkg:gen2 up-to-date:
+  bazel-bin/pkg/gen2.txt
+INFO: Elapsed time: 5.646s, Critical Path: 0.05s
+INFO: 3 processes: 1 internal, 2 processwrapper-sandbox.
+INFO: Build completed successfully, 3 total actions

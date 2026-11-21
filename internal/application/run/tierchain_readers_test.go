@@ -68,3 +68,48 @@ func TestEveryTierGetsItsOwnReaders(t *testing.T) {
 		t.Errorf("tier = %s, want relaxed: a working relaxed tier was skipped", got.Tier)
 	}
 }
+
+// fixedFormatter returns one canned render from both tiers.
+type fixedFormatter struct{ r format.Rendered }
+
+func (f fixedFormatter) Descriptor() format.Match { return format.Match{Command: "probe"} }
+func (f fixedFormatter) Aggressive(context.Context, format.Input) (format.Rendered, error) {
+	return f.r, nil
+}
+func (f fixedFormatter) Relaxed(context.Context, format.Input) (format.Rendered, error) {
+	return format.Rendered{}, format.ErrTierInapplicable
+}
+
+// With stdout EMPTY the anomaly guard used to be skipped entirely, so a failed
+// command's stderr could be replaced by nothing (or by something larger).
+func TestAnomalyGuardCoversEmptyStdout(t *testing.T) {
+	stderr := []byte("error: boom\n")
+	tests := []struct {
+		name        string
+		r           format.Rendered
+		wantVerbose bool // true: the render must be rejected and verbatim emitted
+	}{
+		{"empty fold body is silence", format.Rendered{FoldStderr: true}, true},
+		{"fold body larger than stderr", format.Rendered{Body: []byte("error: boom, and a much longer explanation\n"), FoldStderr: true}, true},
+		{"non-fold empty body leaves stderr as-is", format.Rendered{}, true},
+		{"fold body smaller than stderr", format.Rendered{Body: []byte("boom"), FoldStderr: true}, false},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			in := format.Input{Stdout: bytes.NewReader(nil), Stderr: bytes.NewReader(stderr), ExitCode: 1}
+			got := renderChain(context.Background(), fixedFormatter{tc.r}, in, nil, stderr, "", nil)
+			if tc.wantVerbose {
+				if got.Tier != format.TierVerbatim {
+					t.Fatalf("tier = %s body=%q, want verbatim", got.Tier, got.Body)
+				}
+				if got.Anomaly == "" {
+					t.Errorf("anomaly not recorded")
+				}
+				return
+			}
+			if got.Tier != format.TierAggressive || string(got.Body) != "boom\n" {
+				t.Fatalf("tier = %s body=%q, want accepted aggressive render", got.Tier, got.Body)
+			}
+		})
+	}
+}

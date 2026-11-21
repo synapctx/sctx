@@ -15,7 +15,7 @@ func oneMiBFixture() []byte {
 	words := []string{"connecting", "to", "host", "response", "status", "200", "OK", "retrying", "user", "session", "closed", "handler", "dispatch"}
 	var b strings.Builder
 	secrets := []string{
-		"AKIAABCDEFGHIJKLMNOP",
+		fakeAWSKey,
 		"Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0.dozjgNryP4J3jVmNHl0w5N_XgL0n3I9PlFUP0THsR8U",
 		"sk_live_" + strings.Repeat("a", 20),
 	}

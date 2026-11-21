@@ -1,0 +1,7 @@
+[ 33%] Built target a
+[ 50%] Building C object CMakeFiles/b.dir/src/b.c.o
+[ 66%] Linking C static library libb.a
+[ 66%] Built target b
+[ 83%] Building C object CMakeFiles/app.dir/src/main.c.o
+[100%] Linking C executable app
+[100%] Built target app

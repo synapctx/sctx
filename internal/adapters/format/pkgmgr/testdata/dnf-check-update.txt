@@ -1,0 +1,4 @@
+Updating and loading repositories:
+Repositories loaded.
+xz.aarch64      1:5.8.1-4.fc41 updates
+xz-libs.aarch64 1:5.8.1-4.fc41 updates

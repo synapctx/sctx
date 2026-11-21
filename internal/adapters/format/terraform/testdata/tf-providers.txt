@@ -1,0 +1,15 @@
+
+Providers required by configuration:
+.
+├── provider[registry.terraform.io/hashicorp/random] ~> 3.6
+├── provider[registry.terraform.io/hashicorp/local] ~> 2.5
+└── provider[registry.terraform.io/hashicorp/null] ~> 3.2
+
+Providers required by state:
+
+    provider[registry.terraform.io/hashicorp/local]
+
+    provider[registry.terraform.io/hashicorp/null]
+
+    provider[registry.terraform.io/hashicorp/random]
+

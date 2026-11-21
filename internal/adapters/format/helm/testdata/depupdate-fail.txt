@@ -1,0 +1,8 @@
+Hang tight while we grab the latest from your chart repositories...
+...Successfully got an update from the "repo-a" chart repository
+...Successfully got an update from the "repo-b" chart repository
+...Successfully got an update from the "repo-c" chart repository
+...Successfully got an update from the "repo-d" chart repository
+...Successfully got an update from the "bitnami" chart repository
+Update Complete. ⎈Happy Helming!⎈
+Error: can't get a valid version for 1 subchart(s): "common" (repository "https://charts.bitnami.com/bitnami", version "99.0.0"). Make sure a matching chart version exists in the repo, or change the version constraint in Chart.yaml

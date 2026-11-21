@@ -1,0 +1,25 @@
+####################################################
+##   _     _             _ _                      ##
+##  | |   (_)           (_) |                     ##
+##  | |    _  __ _ _   _ _| |__   __ _ ___  ___   ##
+##  | |   | |/ _` | | | | | '_ \ / _` / __|/ _ \  ##
+##  | |___| | (_| | |_| | | |_) | (_| \__ \  __/  ##
+##  \_____/_|\__, |\__,_|_|_.__/ \__,_|___/\___|  ##
+##              | |                               ##
+##              |_|                               ##
+##                                                ## 
+##  Get documentation at docs.liquibase.com       ##
+##  Get certified courses at learn.liquibase.com  ## 
+##                                                ##
+####################################################
+Starting Liquibase at 02:39:20 using Java 17.0.14 (version 4.31.1 #6739 built at 2025-02-13 13:46+0000)
+Liquibase Version: 4.31.1
+Liquibase Open Source 4.31.1 by Liquibase
+ERROR: Exception Details
+ERROR: Exception Primary Class:  PSQLException
+ERROR: Exception Primary Reason:  FATAL: password authentication failed for user "postgres"
+ERROR: Exception Primary Source:  4.31.1
+
+Unexpected error running Liquibase: Connection could not be created to jdbc:postgresql://db:5432/lbdb with driver org.postgresql.Driver.  FATAL: password authentication failed for user "postgres"
+
+For more information, please use the --log-level flag

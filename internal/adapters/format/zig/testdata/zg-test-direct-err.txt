@@ -1,0 +1,3 @@
+src/main.zig:2:45: error: use of undeclared identifier 'c'
+src/main.zig:6:9: error: unused local variable
+src/main.zig:4:11: error: unused local constant

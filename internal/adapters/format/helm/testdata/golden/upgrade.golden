@@ -1,0 +1,9 @@
+…+5 lines (notes ×5)
+Release "rel" has been upgraded. Happy Helming!
+NAME: rel
+LAST DEPLOYED: Sat Nov 21 02:03:16 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 2
+DESCRIPTION: Upgrade complete
+NOTES: …+5 lines

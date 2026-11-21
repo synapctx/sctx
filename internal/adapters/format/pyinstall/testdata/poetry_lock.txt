@@ -1,0 +1,5 @@
+Creating virtualenv poet in /work/poet/.venv
+Updating dependencies
+Resolving dependencies...
+
+Writing lock file

@@ -1,0 +1,17 @@
+…+14 lines (refresh ×2, legend ×5, blank ×7)
+  # local_file.bad will be created
+  + resource "local_file" "bad" {
+      + content              = "x"
+      + directory_permission = "0777"
+      + file_permission      = "0777"
+      + filename             = "/nonexistent-dir-sctx/x/y.txt"
+      …+7 known after apply
+    }
+  # null_resource.boom is tainted, so must be replaced
+-/+ resource "null_resource" "boom" {
+      …+1 known after apply
+    }
+Plan: 2 to add, 0 to change, 1 to destroy.
+─────────────────────────────────────────────────────────────────────────────
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

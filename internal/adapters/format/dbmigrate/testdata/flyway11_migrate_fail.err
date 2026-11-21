@@ -1,0 +1,20 @@
+ERROR: Migration of schema "public" to version "4 - broken" failed! Changes successfully rolled back.
+ERROR: Failed to execute script V4__broken.sql
+---------------------------------------
+SQL State  : 42P01
+Error Code : 0
+Message    : ERROR: relation "nosuch" does not exist
+Location   : /flyway/sql/V4__broken.sql (/flyway/sql/V4__broken.sql)
+Line       : 1
+Statement  : Run Flyway with -X option to see the actual statement causing the problem
+
+Caused by: Failed to execute script V4__broken.sql
+---------------------------------------
+SQL State  : 42P01
+Error Code : 0
+Message    : ERROR: relation "nosuch" does not exist
+Location   : /flyway/sql/V4__broken.sql (/flyway/sql/V4__broken.sql)
+Line       : 1
+Statement  : Run Flyway with -X option to see the actual statement causing the problem
+
+Caused by: org.postgresql.util.PSQLException: ERROR: relation "nosuch" does not exist

@@ -76,11 +76,17 @@ func TestNativeBuildKitSuccessAndFailure(t *testing.T) {
 
 	raw := dockerNativeFixture(t, "build-failure.stderr")
 	in := format.Input{Argv: []string{"docker", "build", "."}, Stderr: strings.NewReader(raw), ExitCode: 1}
-	if _, err := New().Aggressive(context.Background(), in); err != format.ErrTierInapplicable {
+	out, err := New().Aggressive(context.Background(), in)
+	if err != nil {
 		t.Fatalf("failure aggressive error = %v", err)
 	}
+	for _, want := range []string{"FAILING_LAYER_SENTINEL", "Dockerfile.fail:3", "exit code: 17", "github.com/docker/buildx/commands.runBuild"} {
+		if !strings.Contains(string(out.Body), want) {
+			t.Errorf("condensed failure lost %q:\n%s", want, out.Body)
+		}
+	}
 	in.Stderr = strings.NewReader(raw)
-	_, err := New().Relaxed(context.Background(), in)
+	_, err = New().Relaxed(context.Background(), in)
 	if err != format.ErrTierInapplicable {
 		t.Fatalf("failure relaxed error = %v, want verbatim", err)
 	}

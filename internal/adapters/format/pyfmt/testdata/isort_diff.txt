@@ -1,0 +1,12 @@
+ERROR: /work/proj/pkg/ugly.py Imports are incorrectly sorted and/or formatted.
+--- /work/proj/pkg/ugly.py:before	TS
++++ /work/proj/pkg/ugly.py:after	TS
+@@ -1,4 +1,7 @@
+-import  os,sys
++import os
++import sys
++
++
+ def f( a,b ):
+     return {'a':a,
+         'b':b}

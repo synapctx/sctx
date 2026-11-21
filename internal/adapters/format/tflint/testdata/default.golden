@@ -1,0 +1,10 @@
+tflint: 6 findings in 2 files (terraform_standard_module_structure=2 terraform_documented_variables=1 terraform_required_providers=1 terraform_required_version=1 terraform_unused_declarations=1)
+tf/main.tf (5)
+  1 warning terraform_required_version terraform "required_version" attribute is required
+  31 warning terraform_required_providers Missing version constraint for provider "aws" in `required_providers`
+  42 notice terraform_documented_variables `unused` variable has no description
+  42 warning terraform_unused_declarations [Fixable] variable "unused" is declared but not used
+  42 warning terraform_standard_module_structure variable "unused" should be moved from tf/main.tf to variables.tf
+tf/outputs.tf (1)
+  1 warning terraform_standard_module_structure Module should include an empty outputs.tf file
+…dropped: 11 reference links/source echoes

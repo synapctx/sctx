@@ -1,0 +1,20 @@
+pkg/core.py:12: error: Incompatible return value type (got "int", expected
+"str")  [return-value]
+        return x
+               ^
+pkg/core.py:16: error: Item "None" of "int | None" has no attribute
+"bit_length"  [union-attr]
+        return [y.bit_length()]
+                ^~~~~~~~~~~~
+pkg/core.py:18: error: Incompatible types in assignment (expression has type
+"str", variable has type "int")  [assignment]
+    result: int = greet("x")
+                  ^~~~~~~~~~
+pkg/core.py:19: error: Name "undefined_fn" is not defined  [name-defined]
+    undefined_fn(3)
+    ^~~~~~~~~~~~
+pkg/core.py:20: error: Argument 1 to "add" has incompatible type "str";
+expected "int"  [arg-type]
+    add("a", 2)
+        ^~~
+Found 5 errors in 1 file (checked 3 source files)

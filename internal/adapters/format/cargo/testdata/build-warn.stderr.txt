@@ -1,0 +1,11 @@
+   Compiling demo v0.1.0 (/work/rs-ok)
+warning: unused variable: `a`
+ --> src/main.rs:1:29
+  |
+1 | fn main(){println!("x");let a=1;}
+  |                             ^ help: if this is intentional, prefix it with an underscore: `_a`
+  |
+  = note: `#[warn(unused_variables)]` (part of `#[warn(unused)]`) on by default
+
+warning: `demo` (bin "demo") generated 1 warning (run `cargo fix --bin "demo" -p demo` to apply 1 suggestion)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.27s

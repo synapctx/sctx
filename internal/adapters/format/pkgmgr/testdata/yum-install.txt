@@ -1,0 +1,69 @@
+Dependencies resolved.
+================================================================================
+ Package            Arch       Version                       Repository    Size
+================================================================================
+Installing:
+ git-core           aarch64    2.52.0-1.el9                  appstream    5.1 M
+ jq                 aarch64    1.6-21.el9_9                  baseos       180 k
+Installing dependencies:
+ libcbor            aarch64    0.7.0-5.el9                   baseos        55 k
+ libedit            aarch64    3.1-39.20210216cvs.el9        baseos       101 k
+ libfido2           aarch64    1.13.0-2.el9                  baseos        95 k
+ oniguruma          aarch64    6.9.6-1.el9.6                 baseos       213 k
+ openssh            aarch64    9.9p1-16.el9_9.rocky.0.1      baseos       413 k
+ openssh-clients    aarch64    9.9p1-16.el9_9.rocky.0.1      baseos       741 k
+
+Transaction Summary
+================================================================================
+Install  8 Packages
+
+Total download size: 6.8 M
+Installed size: 29 M
+Downloading Packages:
+(1/8): libcbor-0.7.0-5.el9.aarch64.rpm          188 kB/s |  55 kB     00:00    
+(2/8): jq-1.6-21.el9_9.aarch64.rpm              601 kB/s | 180 kB     00:00    
+(3/8): libedit-3.1-39.20210216cvs.el9.aarch64.r 332 kB/s | 101 kB     00:00    
+(4/8): libfido2-1.13.0-2.el9.aarch64.rpm        970 kB/s |  95 kB     00:00    
+(5/8): oniguruma-6.9.6-1.el9.6.aarch64.rpm      503 kB/s | 213 kB     00:00    
+(6/8): openssh-9.9p1-16.el9_9.rocky.0.1.aarch64 749 kB/s | 413 kB     00:00    
+(7/8): openssh-clients-9.9p1-16.el9_9.rocky.0.1 1.5 MB/s | 741 kB     00:00    
+(8/8): git-core-2.52.0-1.el9.aarch64.rpm        6.3 MB/s | 5.1 MB     00:00    
+--------------------------------------------------------------------------------
+Total                                           3.6 MB/s | 6.8 MB     00:01     
+Running transaction check
+Transaction check succeeded.
+Running transaction test
+Transaction test succeeded.
+Running transaction
+  Preparing        :                                                        1/1 
+  Running scriptlet: openssh-9.9p1-16.el9_9.rocky.0.1.aarch64               1/8 
+  Installing       : openssh-9.9p1-16.el9_9.rocky.0.1.aarch64               1/8 
+  Installing       : oniguruma-6.9.6-1.el9.6.aarch64                        2/8 
+  Installing       : libedit-3.1-39.20210216cvs.el9.aarch64                 3/8 
+  Installing       : libcbor-0.7.0-5.el9.aarch64                            4/8 
+  Installing       : libfido2-1.13.0-2.el9.aarch64                          5/8 
+  Installing       : openssh-clients-9.9p1-16.el9_9.rocky.0.1.aarch64       6/8 
+  Running scriptlet: openssh-clients-9.9p1-16.el9_9.rocky.0.1.aarch64       6/8 
+  Installing       : git-core-2.52.0-1.el9.aarch64                          7/8 
+  Installing       : jq-1.6-21.el9_9.aarch64                                8/8 
+  Running scriptlet: jq-1.6-21.el9_9.aarch64                                8/8 
+  Verifying        : jq-1.6-21.el9_9.aarch64                                1/8 
+  Verifying        : libcbor-0.7.0-5.el9.aarch64                            2/8 
+  Verifying        : libedit-3.1-39.20210216cvs.el9.aarch64                 3/8 
+  Verifying        : libfido2-1.13.0-2.el9.aarch64                          4/8 
+  Verifying        : oniguruma-6.9.6-1.el9.6.aarch64                        5/8 
+  Verifying        : openssh-9.9p1-16.el9_9.rocky.0.1.aarch64               6/8 
+  Verifying        : openssh-clients-9.9p1-16.el9_9.rocky.0.1.aarch64       7/8 
+  Verifying        : git-core-2.52.0-1.el9.aarch64                          8/8 
+
+Installed:
+  git-core-2.52.0-1.el9.aarch64                                                 
+  jq-1.6-21.el9_9.aarch64                                                       
+  libcbor-0.7.0-5.el9.aarch64                                                   
+  libedit-3.1-39.20210216cvs.el9.aarch64                                        
+  libfido2-1.13.0-2.el9.aarch64                                                 
+  oniguruma-6.9.6-1.el9.6.aarch64                                               
+  openssh-9.9p1-16.el9_9.rocky.0.1.aarch64                                      
+  openssh-clients-9.9p1-16.el9_9.rocky.0.1.aarch64                              
+
+Complete!

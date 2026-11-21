@@ -1,0 +1,5 @@
+--- FAIL: TestAddBroken (0.00s)
+    tiny_test.go:13: Add(2,2) = 4, want 5
+FAIL
+FAIL	example.com/tiny	0.002s
+FAIL

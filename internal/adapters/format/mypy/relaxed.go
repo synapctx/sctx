@@ -1,37 +1,21 @@
 package mypy
 
 import (
-	"regexp"
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
 )
 
-// locLineRe matches any line carrying a "file:line:" location prefix, mypy's
-// generic diagnostic shape regardless of severity.
-var locLineRe = regexp.MustCompile(`:\d+:`)
-
-// keepRelaxedLine reports whether a line carries diagnostic signal worth
-// retaining: a "file:line:" location, or an explicit error/note marker.
-func keepRelaxedLine(line string) bool {
-	if locLineRe.MatchString(line) {
-		return true
-	}
-	return strings.Contains(line, "error:") || strings.Contains(line, "note:") ||
-		strings.HasPrefix(line, "Found ") || strings.HasPrefix(line, "Success:")
-}
-
-// filterRelaxedLines drops blank/progress noise, keeps only lines carrying
-// diagnostic signal, and dedupes consecutive duplicates.
+// filterRelaxedLines drops blank lines and dedupes consecutive duplicates.
 func filterRelaxedLines(lines []string) []string {
 	var out []string
 	for _, line := range lines {
 		if strings.TrimSpace(line) == "" {
 			continue
 		}
-		if !keepRelaxedLine(line) {
-			continue
-		}
+		// mypy prints nothing that is not signal: --pretty continuation and
+		// snippet lines belong to their diagnostic, so every non-blank line is
+		// kept. Only blank lines and consecutive duplicates drop.
 		if len(out) > 0 && out[len(out)-1] == line {
 			continue
 		}

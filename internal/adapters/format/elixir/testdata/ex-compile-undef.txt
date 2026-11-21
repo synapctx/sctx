@@ -1,0 +1,16 @@
+==> jason
+Compiling 10 files (.ex)
+Generated jason app
+==> demo
+Compiling 1 file (.ex)
+    error: undefined function undefined_fn/1 (expected Demo to define such a function or for it to be imported, but none are available)
+    │
+  4 │     undefined_fn(1)
+    │     ^^^^^^^^^^^^
+    │
+    └─ lib/demo.ex:4:5: Demo.broken/0
+
+
+== Compilation error in file lib/demo.ex ==
+** (CompileError) lib/demo.ex: cannot compile module Demo (errors have been logged)
+

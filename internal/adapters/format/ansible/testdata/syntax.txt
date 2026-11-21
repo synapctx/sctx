@@ -1,0 +1,5 @@
+[ERROR]: YAML parsing failed: While parsing a flow mapping did not find expected ',' or '}'.
+Origin: /work/play/syntax.yml:5:1
+
+(source not shown: file truncated)
+

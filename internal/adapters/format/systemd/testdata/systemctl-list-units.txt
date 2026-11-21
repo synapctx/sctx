@@ -1,0 +1,89 @@
+  UNIT                                     LOAD   ACTIVE     SUB       DESCRIPTION
+  proc-sys-fs-binfmt_misc.automount        loaded active     running   Arbitrary Executable File Formats File System Automount Point
+  dev-vda1.device                          loaded activating tentative /dev/vda1
+  -.mount                                  loaded active     mounted   Root Mount
+  dev-hugepages.mount                      loaded active     mounted   Huge Pages File System
+  dev-mqueue.mount                         loaded active     mounted   POSIX Message Queue File System
+  etc-hostname.mount                       loaded active     mounted   /etc/hostname
+  etc-hosts.mount                          loaded active     mounted   /etc/hosts
+  etc-resolv.conf.mount                    loaded active     mounted   /etc/resolv.conf
+  proc-sys-fs-binfmt_misc.mount            loaded active     mounted   Arbitrary Executable File Formats File System
+  sys-fs-fuse-connections.mount            loaded active     mounted   FUSE Control File System
+  sys-kernel-config.mount                  loaded active     mounted   Kernel Configuration File System
+  sys-kernel-debug.mount                   loaded active     mounted   Kernel Debug File System
+  sys-kernel-tracing.mount                 loaded active     mounted   Kernel Trace File System
+  systemd-ask-password-console.path        loaded active     waiting   Dispatch Password Requests to Console Directory Watch
+  systemd-ask-password-wall.path           loaded active     waiting   Forward Password Requests to Wall Directory Watch
+  init.scope                               loaded active     running   System and Service Manager
+  app.service                              loaded active     running   Demo app with varied logs
+● broken.service                           loaded failed     failed    Demo broken worker
+  dbus.service                             loaded active     running   D-Bus System Message Bus
+  getty@tty1.service                       loaded active     running   Getty on tty1
+  ldconfig.service                         loaded active     exited    Rebuild Dynamic Linker Cache
+  oneshot.service                          loaded active     exited    Demo oneshot
+  pool.service                             loaded active     running   Demo prefork server
+  ssh.service                              loaded active     running   OpenBSD Secure Shell server
+  sysstat.service                          loaded active     exited    Resets System Activity Logs
+  systemd-binfmt.service                   loaded active     exited    Set Up Additional Binary Formats
+  systemd-journal-catalog-update.service   loaded active     exited    Rebuild Journal Catalog
+  systemd-journal-flush.service            loaded active     exited    Flush Journal to Persistent Storage
+  systemd-journald.service                 loaded active     running   Journal Service
+  systemd-logind.service                   loaded active     running   User Login Management
+  systemd-modules-load.service             loaded active     exited    Load Kernel Modules
+  systemd-remount-fs.service               loaded active     exited    Remount Root and Kernel File Systems
+  systemd-resolved.service                 loaded active     running   Network Name Resolution
+  systemd-sysctl.service                   loaded active     exited    Apply Kernel Variables
+  systemd-sysusers.service                 loaded active     exited    Create System Users
+  systemd-tmpfiles-setup-dev-early.service loaded active     exited    Create Static Device Nodes in /dev gracefully
+  systemd-tmpfiles-setup-dev.service       loaded active     exited    Create Static Device Nodes in /dev
+  systemd-tmpfiles-setup.service           loaded active     exited    Create Volatile Files and Directories
+  systemd-update-done.service              loaded active     exited    Update is Completed
+  systemd-update-utmp.service              loaded active     exited    Record System Boot/Shutdown in UTMP
+  systemd-user-sessions.service            loaded active     exited    Permit User Sessions
+  ufw.service                              loaded active     exited    Uncomplicated firewall
+  web.service                              loaded active     running   Demo web service
+  -.slice                                  loaded active     active    Root Slice
+  system-getty.slice                       loaded active     active    Slice /system/getty
+  system-modprobe.slice                    loaded active     active    Slice /system/modprobe
+  system.slice                             loaded active     active    System Slice
+  user.slice                               loaded active     active    User and Session Slice
+  dbus.socket                              loaded active     running   D-Bus System Message Bus Socket
+  ssh.socket                               loaded active     running   OpenBSD Secure Shell server socket
+  systemd-initctl.socket                   loaded active     listening initctl Compatibility Named Pipe
+  systemd-journald-dev-log.socket          loaded active     running   Journal Socket (/dev/log)
+  systemd-journald.socket                  loaded active     running   Journal Socket
+  systemd-sysext.socket                    loaded active     listening System Extension Image Management (Varlink)
+  basic.target                             loaded active     active    Basic System
+  cryptsetup.target                        loaded active     active    Local Encrypted Volumes
+  getty.target                             loaded active     active    Login Prompts
+  graphical.target                         loaded active     active    Graphical Interface
+  integritysetup.target                    loaded active     active    Local Integrity Protected Volumes
+  local-fs-pre.target                      loaded active     active    Preparation for Local File Systems
+  local-fs.target                          loaded active     active    Local File Systems
+  multi-user.target                        loaded active     active    Multi-User System
+  network-pre.target                       loaded active     active    Preparation for Network
+  nss-lookup.target                        loaded active     active    Host and Network Name Lookups
+  paths.target                             loaded active     active    Path Units
+  remote-fs.target                         loaded active     active    Remote File Systems
+  slices.target                            loaded active     active    Slice Units
+  sockets.target                           loaded active     active    Socket Units
+  swap.target                              loaded active     active    Swaps
+  sysinit.target                           loaded active     active    System Initialization
+  time-set.target                          loaded active     active    System Time Set
+  timers.target                            loaded active     active    Timer Units
+  veritysetup.target                       loaded active     active    Local Verity Protected Volumes
+  apt-daily-upgrade.timer                  loaded active     waiting   Daily apt upgrade and clean activities
+  apt-daily.timer                          loaded active     waiting   Daily apt download activities
+  dpkg-db-backup.timer                     loaded active     waiting   Daily dpkg database backup timer
+  e2scrub_all.timer                        loaded active     waiting   Periodic ext4 Online Metadata Check for All Filesystems
+  motd-news.timer                          loaded active     waiting   Message of the Day
+  sysstat-collect.timer                    loaded active     waiting   Run system activity accounting tool every 10 minutes
+  sysstat-summary.timer                    loaded active     waiting   Generate summary of yesterday's process accounting
+  systemd-tmpfiles-clean.timer             loaded active     waiting   Daily Cleanup of Temporary Directories
+
+Legend: LOAD   → Reflects whether the unit definition was properly loaded.
+        ACTIVE → The high-level unit activation state, i.e. generalization of SUB.
+        SUB    → The low-level unit activation state, values depend on unit type.
+
+81 loaded units listed. Pass --all to see loaded but inactive units, too.
+To show all installed unit files use 'systemctl list-unit-files'.

@@ -1,0 +1,2 @@
+-: # example.com/sc
+./x.go:2:23: cannot use "s" (untyped string constant) as int value in return statement (compile)

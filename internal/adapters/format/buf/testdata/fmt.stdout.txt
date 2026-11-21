@@ -1,0 +1,15 @@
+diff -u proto/demo/v1/demo.proto.orig proto/demo/v1/demo.proto
+--- proto/demo/v1/demo.proto.orig	2026-11-21 02:05:00
++++ proto/demo/v1/demo.proto	2026-11-21 02:05:00
+@@ -10,7 +10,10 @@
+ 
+ message GetResponse {
+   string name = 1;
+-  enum kind { A = 0; B = 1; }
++  enum kind {
++    A = 0;
++    B = 1;
++  }
+ }
+ 
+ service Demo {

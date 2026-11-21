@@ -1,0 +1,61 @@
+ WARNING  No locally installed `turbo` found in your repository. Using globally installed version (2.11.13). Using a specified version in your repository will result in more predictable behavior.
+
+   • turbo 2.11.13
+   • Packages in scope: @m/a, @m/b, @m/c
+   • Running test in 3 packages
+   • Remote caching disabled
+
+@m/b:build: cache miss, executing a99580bb4ae6c760
+@m/a:build: cache hit, replaying logs 00a725985713afa9
+@m/a:build: 
+@m/a:build: > @m/a@1.0.0 build
+@m/a:build: > mkdir -p dist && echo built-a > dist/out.txt && echo compiling a && sleep 0.3
+@m/a:build: 
+@m/a:build: compiling a
+@m/a:test: cache miss, executing 75adad4d0c74f6c7
+@m/c:build: cache hit, replaying logs d512dc2a8968aa45
+@m/c:build: 
+@m/c:build: > @m/c@1.0.0 build
+@m/c:build: > mkdir -p dist && echo built-c > dist/out.txt && echo compiling c && sleep 0.3
+@m/c:build: 
+@m/c:build: compiling c
+@m/c:test: cache miss, executing 0a0140923e0db969
+@m/a:test: 
+@m/a:test: > @m/a@1.0.0 test
+@m/a:test: > echo running tests a && echo ok
+@m/a:test: 
+@m/b:build: 
+@m/b:build: > @m/b@1.0.0 build
+@m/b:build: > mkdir -p dist && echo built-b > dist/out.txt && echo compiling b && sleep 0.3
+@m/b:build: 
+@m/c:test: 
+@m/c:test: > @m/c@1.0.0 test
+@m/c:test: > echo running tests c && echo ok
+@m/c:test: 
+@m/a:test: running tests a
+@m/a:test: ok
+@m/c:test: running tests c
+@m/c:test: ok
+@m/b:build: compiling b
+@m/b:test: cache miss, executing 25876df8519797e8
+@m/b:test: 
+@m/b:test: > @m/b@1.0.0 test
+@m/b:test: > echo running tests b && echo FAIL: expected 1 got 2 >&2 && exit 1
+@m/b:test: 
+@m/b:test: FAIL: expected 1 got 2
+@m/b:test: running tests b
+@m/b:test: npm error Lifecycle script `test` failed with error:
+@m/b:test: npm error code 1
+@m/b:test: npm error path /repo/packages/b
+@m/b:test: npm error workspace @m/b@1.0.0
+@m/b:test: npm error location /repo/packages/b
+@m/b:test: npm error command failed
+@m/b:test: npm error command sh -c echo running tests b && echo FAIL: expected 1 got 2 >&2 && exit 1
+@m/b#test:  ERROR  command (/repo/packages/b) /opt/homebrew/bin/npm run test exited (1)
+
+ Tasks:    5 successful, 6 total
+Cached:    2 cached, 6 total
+  Time:    771ms 
+Failed:    @m/b#test
+
+ ERROR  run failed: command  exited (1)

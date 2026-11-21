@@ -4,11 +4,11 @@ import "testing"
 
 func TestAll(t *testing.T) {
 	formatters := All()
-	if len(formatters) != 3 {
-		t.Fatalf("All() returned %d formatters, want 3", len(formatters))
+	if len(formatters) != 8 {
+		t.Fatalf("All() returned %d formatters, want 8", len(formatters))
 	}
 
-	want := map[string]bool{"ls": false, "find": false, "tree": false}
+	want := map[string]bool{"ls": false, "find": false, "tree": false, "env": false, "printenv": false, "df": false, "wc": false, "lsof": false}
 	for _, f := range formatters {
 		cmd := f.Descriptor().Command
 		if _, ok := want[cmd]; !ok {

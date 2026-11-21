@@ -1,0 +1,2 @@
+svn: E200009: Commit failed (details follow):
+svn: E200009: '/tmp/wc/nonexist' is not under version control

@@ -1,0 +1,19 @@
+error[invalid-syntax]: Expected a parameter or the end of the parameter list
+ --> bad.py:1:7
+  |
+1 | def f(:
+  |       ^
+
+error[invalid-syntax]: Expected `)`, found newline
+ --> bad.py:1:8
+  |
+1 | def f(:
+  |        ^
+
+error[invalid-syntax]: Expected an expression
+ --> bad.py:3:5
+  |
+3 | x = = 1
+  |     ^
+
+Found 3 diagnostics

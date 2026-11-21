@@ -1,0 +1,40 @@
+t.cpp:3:33: error: no matching member function for call to 'push_back'
+    3 | void f(std::vector<int>& v) { v.push_back("x"); }
+      |                               ~~^~~~~~~~~
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__vector/vector.h:464:60: note: candidate function not viable: no known conversion from 'const char[2]' to 'const value_type' (aka 'const int') for 1st argument
+  464 |   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void push_back(const_reference __x) { emplace_back(__x); }
+      |                                                            ^         ~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/__vector/vector.h:466:60: note: candidate function not viable: no known conversion from 'const char[2]' to 'value_type' (aka 'int') for 1st argument
+  466 |   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_HIDE_FROM_ABI void push_back(value_type&& __x) { emplace_back(std::move(__x)); }
+      |                                                            ^         ~~~~~~~~~~~~~~~~
+t.cpp:4:26: error: no viable conversion from 'int' to 'std::string' (aka 'basic_string<char>')
+    4 | int main() { std::string s = 5; f(s); undefined_call(); }
+      |                          ^   ~
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/string:1013:71: note: candidate constructor not viable: no known conversion from 'int' to 'const string &' for 1st argument
+ 1013 |   _LIBCPP_CONSTEXPR_SINCE_CXX20 _LIBCPP_STRING_INTERNAL_MEMORY_ACCESS basic_string(const basic_string& __str)
+      |                                                                       ^            ~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/string:1033:55: note: candidate constructor not viable: no known conversion from 'int' to 'string &&' for 1st argument
+ 1033 |   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 basic_string(basic_string&& __str)
+      |                                                       ^            ~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/string:1073:55: note: candidate constructor template not viable: no known conversion from 'int' to 'const char * _Nonnull' for 1st argument
+ 1073 |   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 basic_string(const _CharT* _LIBCPP_DIAGNOSE_NULLPTR __s) {
+      |                                                       ^            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/string:1208:55: note: candidate constructor not viable: no known conversion from 'int' to 'initializer_list<char>' for 1st argument
+ 1208 |   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 basic_string(initializer_list<_CharT> __il) {
+      |                                                       ^            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/string:998:64: note: explicit constructor is not a candidate
+  998 |   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 explicit basic_string(const allocator_type& __a)
+      |                                                                ^
+/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include/c++/v1/string:1167:64: note: explicit constructor is not a candidate
+ 1167 |   _LIBCPP_HIDE_FROM_ABI _LIBCPP_CONSTEXPR_SINCE_CXX20 explicit basic_string(const _Tp& __t) {
+      |                                                                ^
+t.cpp:4:33: error: no matching function for call to 'f'
+    4 | int main() { std::string s = 5; f(s); undefined_call(); }
+      |                                 ^
+t.cpp:3:6: note: candidate function not viable: no known conversion from 'std::string' (aka 'basic_string<char>') to 'std::vector<int> &' for 1st argument
+    3 | void f(std::vector<int>& v) { v.push_back("x"); }
+      |      ^ ~~~~~~~~~~~~~~~~~~~
+t.cpp:4:39: error: use of undeclared identifier 'undefined_call'
+    4 | int main() { std::string s = 5; f(s); undefined_call(); }
+      |                                       ^~~~~~~~~~~~~~
+4 errors generated.

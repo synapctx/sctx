@@ -1,0 +1,36 @@
+Using Python 3.15.2 environment at: /work/.venv
+error: Failed to build `requests==0.14.2`
+  cause: The build backend returned an error
+  cause: Call to `setuptools.build_meta:__legacy__.get_requires_for_build_wheel` failed (exit status: 1)
+
+         [stderr]
+         Traceback (most recent call last):
+           File "<string>", line 14, in <module>
+             requires = get_requires_for_build({})
+           File "/work/uvcache/builds-v0/.tmpRF7xOs/lib/python3.15/site-packages/setuptools/build_meta.py", line 333, in get_requires_for_build_wheel
+             return self._get_build_requires(config_settings, requirements=[])
+                    ~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           File "/work/uvcache/builds-v0/.tmpRF7xOs/lib/python3.15/site-packages/setuptools/build_meta.py", line 301, in _get_build_requires
+             self.run_setup()
+             ~~~~~~~~~~~~~~^^
+           File "/work/uvcache/builds-v0/.tmpRF7xOs/lib/python3.15/site-packages/setuptools/build_meta.py", line 520, in run_setup
+             super().run_setup(setup_script=setup_script)
+             ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^
+           File "/work/uvcache/builds-v0/.tmpRF7xOs/lib/python3.15/site-packages/setuptools/build_meta.py", line 317, in run_setup
+             exec(code, locals())  # noqa: S102 # exec is intentional here
+             ~~~~^^^^^^^^^^^^^^^^
+           File "<string>", line 6, in <module>
+             sys.path = [] + sys.path
+             ^^^^^^^^^^^^^^^
+           File "/work/uvcache/sdists-v11/pypi/requests/0.14.2/nGnOr5x10PIICtP_/src/requests/__init__.py", line 52, in <module>
+             from . import utils
+           File "/work/uvcache/sdists-v11/pypi/requests/0.14.2/nGnOr5x10PIICtP_/src/requests/utils.py", line 12, in <module>
+             import cgi
+         ModuleNotFoundError: No module named 'cgi'
+
+hint: This error likely indicates that `requests@0.14.2` depends on `cgi`, but doesn't declare it as a build dependency. If `requests` is a first-party package, consider adding `cgi` to its `build-system.requires`. Otherwise, either add it to your `pyproject.toml` under:
+
+[tool.uv.extra-build-dependencies]
+requests = ["cgi"]
+
+or `uv pip install cgi` into the environment and re-run with `--no-build-isolation`.

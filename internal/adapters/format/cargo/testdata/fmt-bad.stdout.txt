@@ -1,0 +1,12 @@
+Diff in /work/rs-clippy/src/lib.rs:15:
+ }
+ 
+ pub fn d(x: bool) -> i32 {
+[31m-    if x == true { 1 } else { 1 }
+(B[m[32m+    if x == true {
+(B[m[32m+        1
+(B[m[32m+    } else {
+(B[m[32m+        1
+(B[m[32m+    }
+(B[m }
+ 

@@ -1,0 +1,76 @@
+IMAGE                                                                                                       ID             DISK USAGE   CONTENT SIZE   EXTRA
+alpine/k8s:1.29.4                                                                                           ed410d899e43       1.12GB          292MB        
+alpine/k8s:1.33.13                                                                                          e521cee1f1cb       1.26GB          315MB        
+alpine/k8s:1.36.5                                                                                           094adf64cdc4       1.31GB          296MB        
+alpine/socat@sha256:5ffbd6ae916cbad86a58fabe0d6d5a6fd5c2b47ddf031e82996baac9300e732f                        5ffbd6ae916c       15.8MB         4.75MB        
+alpine:3                                                                                                    294b683cb724       13.6MB         4.28MB        
+alpine:3.20                                                                                                 d9e853e87e55       13.7MB         4.17MB        
+alpine:latest                                                                                               f59abe656b69       13.6MB         4.28MB        
+axllent/mailpit@sha256:23a2ef85bc50853ab3093645d1d64679afd8887e89da5e48a88940c172591a4e                     23a2ef85bc50       51.4MB         14.6MB   U    
+busybox:1.36                                                                                                a416a98b71e2       6.48MB         1.99MB        
+busybox:latest                                                                                              3b0f3b2a7c18       6.48MB         1.99MB        
+busybox@sha256:9e2f1a8c7b3d5046e1a9c2f7b8d3054e6a1c9f2b7d8e3a5046c1b9f2e7a8d3c5                             9e2f1a8c7b3d       6.48MB         1.99MB   U    
+caddy@sha256:4851e54a46b206517c574821bb5cc67f170d2156041e9fbc4c9193b45e84a75b                               4851e54a46b2         88MB         23.9MB   U    
+chrislusf/seaweedfs@sha256:57877e32bb90073b37dc109b438ba66e84fd5ed9ced5f5c04f56444ef243ce59                 57877e32bb90       1.01GB          266MB   U    
+clamav/clamav-debian@sha256:cb2b6fa0bf480a3c243117204b751f062c5350569d088dc269ebeef6b4331823                cb2b6fa0bf48        570MB          193MB   U    
+debian:trixie                                                                                               9cc080028c43        209MB         52.9MB        
+debian:trixie-slim                                                                                          d7e12182ce18        261MB         63.9MB        
+docker.elastic.co/elasticsearch/elasticsearch:9.0.3                                                         b21843a4a2ef       1.45GB          517MB        
+docker.elastic.co/elasticsearch/elasticsearch:9.3.2                                                         d2f73c2f0547       1.57GB          576MB        
+docker.elastic.co/kibana/kibana:9.0.3                                                                       c4c00a485fbc       2.14GB          432MB        
+elastic/metricbeat:9.0.2                                                                                    8a43c6cb1ba7        478MB          103MB        
+elasticsearch:8.15.3                                                                                        54468761d3c8       1.33GB          497MB        
+elasticsearch:9.0.2                                                                                         9681044f2e26       1.47GB          539MB        
+fortio/fortio@sha256:942c86131c24ee9bd4a7754610be417ac1b9fe2f11d1860620a9f6932ceb712f                       942c86131c24       25.1MB         6.93MB        
+gcr.io/distroless/static-debian13@sha256:e2e927ec666bae08560abb3c55d0659eceabb657f56b6782ab500a9fc7f555e3   e2e927ec666b       6.64MB          862kB        
+ghcr.io/sigstore/cosign/cosign:v3.1.3                                                                       9e5c2f2edc34        196MB         57.8MB        
+golang:1.23                                                                                                 6a1e0d2f9b34       1.18GB          297MB        
+golang:1.23-alpine                                                                                          c5d8e91a2b70        357MB         69.4MB        
+golang:1.26                                                                                                 079e59808d2d        1.3GB          316MB        
+golang:1.26-alpine                                                                                          70b46548e42d        357MB         68.9MB        
+golang:1.27                                                                                                 512690a56605       1.32GB          319MB        
+golang:1.27.1                                                                                               e0174e51e812       2.62GB          636MB        
+golang:1.27.3                                                                                               f20d83a83e18       1.31GB          327MB        
+haproxy:3.2                                                                                                 e2b397cdbd61        191MB           47MB        
+kibana:9.0.2                                                                                                017aa777f8ae       2.12GB          441MB        
+kindest/node@sha256:a1ed56cfb0e7b93589bdf97c8cd566405a265939e3620fc4f5de89adff580ae5                        a1ed56cfb0e7        1.3GB          355MB        
+moby/buildkit:buildx-stable-1                                                                               832fa7aa1eb3        312MB         95.3MB        
+mongo:7                                                                                                     b6421fd6d1c5       1.13GB          286MB        
+mongo:7.0                                                                                                   8bb4442761a6       1.13GB          287MB   U    
+mongo:8                                                                                                     d731d77bfd7a       1.14GB          293MB   U    
+mongo:8.0                                                                                                   d0d926f94df0       1.26GB          308MB        
+mongo:8.0.4                                                                                                 aaad67f2dca9       1.16GB          277MB        
+nats:2.11-alpine                                                                                            e4bf19f15fd3       38.7MB         10.5MB        
+natsio/nats-box:latest                                                                                      ffce8bd10338        126MB         41.2MB        
+networkstatic/iperf3:latest                                                                                 bc267517f534        154MB         34.3MB        
+nginx:1.27                                                                                                  2f6b8d4a0c13        192MB         50.3MB        
+nginx:1.27-alpine                                                                                           9a3c1e7d5b82       62.2MB         20.1MB        
+nginx:1.29.4-trixie                                                                                         9dd288848f44        258MB         64.1MB        
+nginx:latest                                                                                                d4e8f0a2b671        259MB         64.3MB        
+nginx:stable                                                                                                b972f831f200        259MB         64.3MB        
+nicolaka/netshoot@sha256:b09d9b21381f47a79b3cbcb30da25266dc17186ea00ae65e99fdc51396f48e70                   b09d9b21381f        918MB          213MB        
+node:20                                                                                                     b7e2c4d19a85        1.1GB          352MB        
+node:22                                                                                                     e9f3a6b81c42       1.13GB          360MB        
+node:22-alpine                                                                                              41d7a2c5e0b9        228MB         55.6MB        
+node:22-slim                                                                                                7c0e5b93d1f6        264MB         64.2MB        
+opensearchproject/opensearch@sha256:02d6d6e40c820ae08233b60540aa5d3d9364d64e2dc724e38d6c8c794879b2a0        02d6d6e40c82       2.23GB          886MB   U    
+postgres:15-alpine                                                                                          58b2d6e9f3a0        397MB          111MB        
+postgres:16-alpine                                                                                          44c4ee9810ef        411MB          115MB        
+postgres:17                                                                                                 0e7a4c9d2b15        456MB          152MB        
+postgres:17-alpine                                                                                          dc17045ccfd3        415MB          116MB        
+postgres@sha256:eb63372c1e05c755f55fa30cbd07aecc443676fc6c0fa90b9002d01537841e1a                            eb63372c1e05        701MB          173MB   U    
+python:3.12-slim                                                                                            6e4b1d8a3f09        197MB         41.9MB        
+python:3.13-slim-bookworm                                                                                   61169c2bdb8e        206MB         43.8MB        
+rabbitmq:4-management                                                                                       1d7dfbe6c30e        412MB          121MB        
+rabbitmq@sha256:d1150154e5bb43773513548d2b1f541bb6d63bb49377baf2e21de303c2c62bb3                            d1150154e5bb        404MB          119MB   U    
+redis:7                                                                                                     c6eabf748fc7        192MB         45.9MB        
+redis:7-alpine                                                                                              f1a5c8e3d907       61.4MB         17.8MB        
+redis:7.2                                                                                                   83d0b6a4e5c2        173MB         41.5MB        
+redis:7.2-alpine                                                                                            a2c9e7f10b46       61.2MB         17.6MB        
+redis:8-alpine                                                                                              9d317178ecea        154MB         37.8MB        
+registry.k8s.io/pause@sha256:3d38b5c1f7e92a4608d1b5e3c9f0a7d24e68b13c5a9f0d7e2b4a6c8e1f3d5b79               3d38b5c1f7e9       1.03MB          301kB   U    
+ubuntu:24.04                                                                                                a853f94d2263        261MB         62.6MB        
+valkey/valkey@sha256:80def298b278d20a574e6b68d34e244c785f4600c7902fccd5f22c55743d5420                       80def298b278        189MB         44.6MB   U    
+<none>:<none>                                                                                               1b9d4f7a2c60       1.13GB          360MB        
+<none>:<none>                                                                                               c37e0a5d9b18        357MB         69.1MB        
+<none>:<none>                                                                                               8f6a2d1e4b93        192MB         50.1MB        

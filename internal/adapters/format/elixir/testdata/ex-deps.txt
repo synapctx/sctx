@@ -1,0 +1,5 @@
+Resolving Hex dependencies...
+Resolution completed in 0.025s
+New:
+  jason 1.4.5
+* Getting jason (Hex package)

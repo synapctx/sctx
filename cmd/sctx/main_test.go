@@ -210,7 +210,7 @@ func TestRunInitAcceptsTheKeyFlagWithoutReadingStdin(t *testing.T) {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_ = json.MarshalEncode(jsontext.NewEncoder(w), map[string]string{"organization": "parlitrack"})
+		_ = json.MarshalEncode(jsontext.NewEncoder(w), map[string]string{"organization": "acme"})
 	}))
 	defer srv.Close()
 
@@ -240,7 +240,7 @@ func TestRunInitAcceptsTheKeyFlagWithoutReadingStdin(t *testing.T) {
 		t.Error("stdin was consumed even though --key was given")
 	}
 	// The org comes from the server's ping, never from the caller.
-	if !strings.Contains(got, "[org.parlitrack]") {
+	if !strings.Contains(got, "[org.acme]") {
 		t.Errorf("config missing the org section the server reported:\n%s", got)
 	}
 }
@@ -263,7 +263,7 @@ func TestRunInitStillAcceptsPipedStdin(t *testing.T) {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		_ = json.MarshalEncode(jsontext.NewEncoder(w), map[string]string{"organization": "cloudresty"})
+		_ = json.MarshalEncode(jsontext.NewEncoder(w), map[string]string{"organization": "globex"})
 	}))
 	defer srv.Close()
 
@@ -278,7 +278,7 @@ func TestRunInitStillAcceptsPipedStdin(t *testing.T) {
 		t.Fatalf("runInit exit = %d, want 0", code)
 	}
 	data, _ := os.ReadFile(cfg.ConfigFilePath)
-	if !strings.Contains(string(data), "[org.cloudresty]") {
+	if !strings.Contains(string(data), "[org.globex]") {
 		t.Errorf("piped init did not write the org section:\n%s", string(data))
 	}
 }

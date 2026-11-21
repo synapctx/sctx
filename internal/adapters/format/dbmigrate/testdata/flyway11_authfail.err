@@ -1,0 +1,7 @@
+ERROR: Unable to obtain connection from database (jdbc:postgresql://db:5432/migr) for user 'postgres': FATAL: password authentication failed for user "postgres"
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL State  : 28P01
+Error Code : 0
+Message    : FATAL: password authentication failed for user "postgres"
+
+Caused by: org.postgresql.util.PSQLException: FATAL: password authentication failed for user "postgres"

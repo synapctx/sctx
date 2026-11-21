@@ -24,6 +24,13 @@ import (
 // started at all (mirrors the shell's 127 "command not found").
 const ExitInternalError = 127
 
+// waitDelay bounds how long Wait lingers on the output pipes after the command
+// itself has exited. A background grandchild (`(sleep 600 &)`, a daemonised
+// helper) inherits stdout/stderr and keeps them open, and without a bound sctx
+// would block on the copy goroutines until it exited, long after the command the
+// agent asked for was done. Output written within the delay is still captured.
+const waitDelay = 3 * time.Second
+
 type Runner struct {
 	spillThreshold int64
 }
@@ -42,6 +49,7 @@ func (r *Runner) Run(ctx context.Context, c exec.Command) (exec.Outcome, error) 
 
 	cmd := osexec.CommandContext(ctx, c.Argv[0], c.Argv[1:]...)
 	cmd.Dir = c.Dir
+	cmd.WaitDelay = waitDelay
 	cmd.Env = c.Env
 	cmd.Stdin = c.Stdin
 	if c.Stdin == nil {
@@ -88,6 +96,12 @@ func (r *Runner) Run(ctx context.Context, c exec.Command) (exec.Outcome, error) 
 		Duration: time.Since(start),
 	}
 
+	// ErrWaitDelay means the command exited 0 but a background descendant held its
+	// output pipes past waitDelay: the command succeeded, only the pipe copy was cut.
+	if errors.Is(waitErr, osexec.ErrWaitDelay) {
+		out.OutputCut = true
+		return out, nil
+	}
 	if waitErr == nil {
 		return out, nil
 	}

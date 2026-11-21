@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/synapctx/sctx/internal/adapters/format/jsonpack"
 	"github.com/synapctx/sctx/internal/domain/format"
 )
 
@@ -151,9 +152,38 @@ func TestFormatter_Aggressive(t *testing.T) {
 		}
 	})
 
-	t.Run("homogeneous object array keeps 3 plus same-shape marker", func(t *testing.T) {
+	t.Run("relaxed tier packs a homogeneous array losslessly", func(t *testing.T) {
 		var items []string
 		for i := range 500 {
+			items = append(items, fmt.Sprintf(`{"id":%d,"status":"ok"}`, i))
+		}
+		raw := fmt.Sprintf(`{"results":[%s]}`, strings.Join(items, ","))
+		out, err := New().Relaxed(context.Background(), input(raw))
+		if err != nil {
+			t.Fatalf("Aggressive() error = %v", err)
+		}
+		if out.Elided {
+			t.Fatal("lossless pack reported elision")
+		}
+		got, err := jsonpack.Unpack(string(out.Body))
+		if err != nil {
+			t.Fatalf("Unpack: %v", err)
+		}
+		want, err := jsonpack.Parse([]byte(raw))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !jsonpack.Equal(got, want) {
+			t.Fatal("packed output does not decode to the input")
+		}
+		if len(out.Body) >= len(raw)/2 {
+			t.Fatalf("body %d bytes, want well under half of %d", len(out.Body), len(raw))
+		}
+	})
+
+	t.Run("homogeneous object array too big to pack keeps 3 plus same-shape marker", func(t *testing.T) {
+		var items []string
+		for i := range 8000 {
 			items = append(items, fmt.Sprintf(`{"id":%d,"status":"ok"}`, i))
 		}
 		raw := fmt.Sprintf(`{"results":[%s]}`, strings.Join(items, ","))
@@ -177,7 +207,7 @@ func TestFormatter_Aggressive(t *testing.T) {
 			t.Fatalf("len(arr) = %d, want %d", len(arr), keepHomogeneous+1)
 		}
 		last, ok := arr[len(arr)-1].(string)
-		if !ok || !strings.Contains(last, "+497 more items (same shape)") {
+		if !ok || !strings.Contains(last, "+7997 more items (same shape)") {
 			t.Fatalf("last element = %v, want same-shape marker with +497", arr[len(arr)-1])
 		}
 		if len(out.Body) >= len(raw) {

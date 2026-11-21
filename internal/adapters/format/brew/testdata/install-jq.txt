@@ -1,0 +1,17 @@
+==> Downloading bottle manifests
+✔︎ Bottle Manifest jq (1.8.2)
+==> Would install 1 formula:
+jq 1.8.2 (511.9KB)
+==> Would install 1 dependency for jq:
+oniguruma 6.9.10
+==> Fetching downloads for: jq
+✔︎ Bottle Manifest oniguruma (6.9.10)
+Warning: Landlock ABI 10 or later is required to deny all network access; found ABI 8. Applying the network restrictions supported by this kernel.
+✔︎ Bottle oniguruma (6.9.10)
+✔︎ Bottle jq (1.8.2)
+==> Installing jq dependency: oniguruma (6.9.10)
+==> Pouring oniguruma--6.9.10.arm64_linux.bottle.tar.gz
+🍺  /home/linuxbrew/.linuxbrew/Cellar/oniguruma/6.9.10: 16 files, 1.8MB
+==> Installing jq
+==> Pouring jq--1.8.2.arm64_linux.bottle.1.tar.gz
+🍺  /home/linuxbrew/.linuxbrew/Cellar/jq/1.8.2: 21 files, 1.7MB

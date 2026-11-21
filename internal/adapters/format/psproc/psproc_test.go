@@ -15,20 +15,20 @@ import (
 // truncation and dupe-collapsing have something to do.
 const psAuxFixture = `USER               PID  %CPU %MEM      VSZ    RSS   TT  STAT STARTED      TIME COMMAND
 root                 1  44.0  0.0 435245744  23856   ??  Us   Thu10p.m.  68:52.12 /sbin/launchd
-sebastiangogoasa  1316   2.6  0.4 436063056 251888   ??  S    Thu10p.m. 548:39.42 /Applications/iTerm.app/Contents/MacOS/iTerm2
+devuser           1316   2.6  0.4 436063056 251888   ??  S    Thu10p.m. 548:39.42 /Applications/iTerm.app/Contents/MacOS/iTerm2
 _coreaudiod        633   1.3  0.1 435395024  66016   ??  Ss   Thu10p.m.  66:57.85 /usr/sbin/coreaudiod
-sebastiangogoasa  1205   1.1  0.1 435675104  99728   ??  S    Thu10p.m.  23:11.88 /System/Library/CoreServices/ControlCenter.app/Contents/MacOS/ControlCenter
+devuser           1205   1.1  0.1 435675104  99728   ??  S    Thu10p.m.  23:11.88 /System/Library/CoreServices/ControlCenter.app/Contents/MacOS/ControlCenter
 root               589   0.7  0.0 435363184  22704   ??  Ss   Thu10p.m.   7:46.93 /usr/libexec/opendirectoryd
 root               706   0.4  0.0 435358160  10752   ??  Ss   Thu10p.m.   2:29.82 /usr/libexec/audioanalyticsd
-sebastiangogoasa 75311   0.4  0.5 1951658560 310480   ??  S    Fri10p.m.  19:01.28 /Applications/Visual Studio Code.app/Contents/MacOS/Code .
+devuser          75311   0.4  0.5 1951658560 310480   ??  S    Fri10p.m.  19:01.28 /Applications/Visual Studio Code.app/Contents/MacOS/Code .
 root               742   0.3  0.0 435392752  32400   ??  Ss   Thu10p.m.  11:35.36 /usr/libexec/searchpartyd
 root               614   0.3  0.0 435321952   5168   ??  Ss   Thu10p.m.   4:33.81 /usr/sbin/notifyd
 _locationd         596   0.2  0.0 435393120  32880   ??  Ss   Thu10p.m.  19:28.84 /usr/libexec/locationd
 root               616   0.1  0.0 435357824  15184   ??  Ss   Thu10p.m.  22:25.91 /usr/libexec/corebrightnessd --launchd
-sebastiangogoasa  1330   0.1  0.2 435822256 164016   ??  S    Thu10p.m.   5:48.85 /System/Library/CoreServices/Finder.app/Contents/MacOS/Finder
+devuser           1330   0.1  0.2 435822256 164016   ??  S    Thu10p.m.   5:48.85 /System/Library/CoreServices/Finder.app/Contents/MacOS/Finder
 root               548   0.1  0.1 435585120  60608   ??  Ss   Thu10p.m.  16:45.33 /usr/libexec/logd
-sebastiangogoasa 56258   0.1  0.0 435311136   4896 s003  S+   Fri11a.m.   0:30.39 -zsh
-sebastiangogoasa 56258   0.1  0.0 435311136   4896 s003  S+   Fri11a.m.   0:30.39 -zsh
+devuser          56258   0.1  0.0 435311136   4896 s003  S+   Fri11a.m.   0:30.39 -zsh
+devuser          56258   0.1  0.0 435311136   4896 s003  S+   Fri11a.m.   0:30.39 -zsh
 `
 
 const psPlainFixture = `  PID TTY           TIME CMD

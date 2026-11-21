@@ -1,0 +1,40 @@
+error[invalid-explicit-return]: Return type does not match returned value
+  --> pkg/core.py:12:12
+   |
+11 | def bad(x: int) -> str:
+   |                    --- Expected `str` because of return type
+12 |     return x
+   |            ^ expected `str`, found `int`
+
+error[missing-attribute]: Object of type `None` has no attribute `bit_length`
+  --> pkg/core.py:16:13
+   |
+16 |     return [y.bit_length()]
+   |             ^^^^^^^^^^^^
+
+error[invalid-assignment]: Object of type `str` is not assignable to `int`
+  --> pkg/core.py:18:15
+   |
+18 | result: int = greet("x")
+   |         ---   ^^^^^^^^^^ Incompatible value of type `str`
+   |         |
+   |         Declared type
+
+error[unresolved-reference]: Name `undefined_fn` used when not defined
+  --> pkg/core.py:19:1
+   |
+19 | undefined_fn(3)
+   | ^^^^^^^^^^^^
+
+error[invalid-argument-type]: Argument to function `add` is incorrect
+  --> pkg/core.py:20:5
+   |
+20 | add("a", 2)
+   |     ^^^ Expected `int`, found `Literal["a"]`
+info: Function defined here
+ --> pkg/core.py:5:5
+  |
+5 | def add(a: int, b: int) -> int:
+  |     ^^^ ------ Parameter declared here
+
+Found 5 diagnostics

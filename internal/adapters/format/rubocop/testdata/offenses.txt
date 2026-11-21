@@ -1,0 +1,82 @@
+Inspecting 3 files
+CWC
+
+Offenses:
+
+lib/calc.rb:1:1: C: Style/Documentation: Missing top-level documentation comment for class Calc.
+class Calc
+^^^^^^^^^^
+lib/calc.rb:1:1: C: [Correctable] Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+class Calc
+^
+lib/calc.rb:2:11: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  def add(a, b) = a + b
+          ^
+lib/calc.rb:2:14: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  def add(a, b) = a + b
+             ^
+lib/calc.rb:3:3: C: [Correctable] Layout/EmptyLineBetweenDefs: Expected 1 empty line between method definitions; found 0.
+  def div(a, b)
+  ^^^^^^^
+lib/calc.rb:3:11: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  def div(a, b)
+          ^
+lib/calc.rb:3:14: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  def div(a, b)
+             ^
+lib/calc.rb:6:3: C: [Correctable] Layout/EmptyLineBetweenDefs: Expected 1 empty line between method definitions; found 0.
+  def name
+  ^^^^^^^^
+lib/calc.rb:7:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+    "calc"
+    ^^^^^^
+lib/messy.rb:1:1: C: Style/Documentation: Missing top-level documentation comment for class Messy.
+class Messy
+^^^^^^^^^^^
+lib/messy.rb:1:1: C: [Correctable] Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+class Messy
+^
+lib/messy.rb:2:11: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+  def foo( a,b )
+          ^
+lib/messy.rb:2:12: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  def foo( a,b )
+           ^
+lib/messy.rb:2:13: C: [Correctable] Layout/SpaceAfterComma: Space missing after comma.
+  def foo( a,b )
+            ^
+lib/messy.rb:2:14: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  def foo( a,b )
+             ^
+lib/messy.rb:2:15: C: [Correctable] Layout/SpaceInsideParens: Space inside parentheses detected.
+  def foo( a,b )
+              ^
+lib/messy.rb:3:5: W: [Correctable] Lint/UselessAssignment: Useless assignment to variable - x.
+    x = 1
+    ^
+lib/messy.rb:4:5: C: [Correctable] Style/IfUnlessModifier: Favor modifier if usage when having a single-line body. Another good alternative is the usage of control flow &&/||.
+    if a == 1 then
+    ^^
+lib/messy.rb:4:15: C: [Correctable] Style/MultilineIfThen: Do not use then for multi-line if.
+    if a == 1 then
+              ^^^^
+lib/messy.rb:5:12: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+      puts "hi"
+           ^^^^
+lib/messy.rb:7:5: C: [Correctable] Style/RedundantReturn: Redundant return detected.
+    return b
+    ^^^^^^
+lib/messy.rb:9:3: C: [Correctable] Layout/EmptyLineBetweenDefs: Expected 1 empty line between method definitions; found 0.
+  def bar; end
+  ^^^^^^^
+lib/messy2.rb:1:1: C: [Correctable] Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+def baz(a)
+^
+lib/messy2.rb:1:9: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+def baz(a)
+        ^
+lib/messy2.rb:2:16: C: [Correctable] Layout/TrailingWhitespace: Trailing whitespace detected.
+  puts 'single'  
+               ^^
+
+3 files inspected, 25 offenses detected, 16 offenses autocorrectable

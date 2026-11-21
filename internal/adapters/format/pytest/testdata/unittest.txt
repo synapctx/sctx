@@ -1,0 +1,23 @@
+.FE
+======================================================================
+ERROR: test_c (tests.test_unit.T.test_c)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/work/proj/tests/test_unit.py", line 5, in test_c
+    def test_c(self): raise RuntimeError("x")
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: x
+
+======================================================================
+FAIL: test_b (tests.test_unit.T.test_b)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/work/proj/tests/test_unit.py", line 4, in test_b
+    def test_b(self): self.assertEqual(1, 2)
+                      ~~~~~~~~~~~~~~~~^^^^^^
+AssertionError: 1 != 2
+
+----------------------------------------------------------------------
+Ran 3 tests in 0.002s
+
+FAILED (failures=1, errors=1)

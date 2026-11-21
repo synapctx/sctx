@@ -1,0 +1,42 @@
+Run options: --seed 28608
+
+# Running:
+
+FFFEF.
+
+Finished in 0.012469s, 481.1934 runs/s, 400.9945 assertions/s.
+
+  1) Failure:
+BadTest#test_multi [test/bad_test.rb:7]:
+Expected: {a: 1, b: [1, 2, 3]}
+  Actual: {a: 1, b: [1, 2, 4]}
+
+  2) Failure:
+BadTest#test_text [test/bad_test.rb:11]:
+--- expected
++++ actual
+@@ -1,4 +1,4 @@
+ "line1
+-line2
++lineX
+ line3
+ "
+
+
+  3) Failure:
+BadTest#test_add_wrong [test/bad_test.rb:4]:
+Expected: 4
+  Actual: 3
+
+  4) Error:
+BadTest#test_div_zero:
+ZeroDivisionError: divided by 0
+    lib/calc.rb:4:in 'Integer#/'
+    lib/calc.rb:4:in 'Calc#div'
+    test/bad_test.rb:5:in 'BadTest#test_div_zero'
+
+  5) Failure:
+BadTest#test_nil [test/bad_test.rb:9]:
+Expected "x" to be nil.
+
+6 runs, 5 assertions, 4 failures, 1 errors, 0 skips

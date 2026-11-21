@@ -1,0 +1,63 @@
+warning[no-console]: Do not use console.log
+  ┌─ a.js:2:3
+  │
+2 │   console.log("a", x);
+  │   ^^^^^^^^^^^^^^^^^^^
+
+warning[no-console]: Do not use console.log
+  ┌─ a.js:3:12
+  │
+3 │   if (x) { console.log("b"); }
+  │            ^^^^^^^^^^^^^^^^
+
+warning[no-console]: Do not use console.log
+  ┌─ a.js:6:19
+  │
+6 │ const g = () => { console.log("deep"); };
+  │                   ^^^^^^^^^^^^^^^^^^^
+
+error[no-console-error]: console.error is banned
+  ┌─ c.js:6:10
+  │
+6 │   return console.error("z");
+  │          ^^^^^^^^^^^^^^^^^^
+  │
+  = use the logger
+
+error[no-console-error]: console.error is banned
+  ┌─ a.js:4:10
+  │
+4 │   return console.error("c");
+  │          ^^^^^^^^^^^^^^^^^^
+  │
+  = use the logger
+
+warning[no-if-block]: avoid braces-if
+  ┌─ a.js:3:3
+  │
+3 │   if (x) { console.log("b"); }
+  │   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+warning[no-if-block]: avoid braces-if
+  ┌─ c.js:2:3
+  │  
+2 │ ╭   if (x) {
+  · │
+5 │ │   }
+  │ ╰───^
+
+warning[no-console]: Do not use console.log
+  ┌─ c.js:3:5
+  │
+3 │     console.log("one");
+  │     ^^^^^^^^^^^^^^^^^^
+
+warning[no-console]: Do not use console.log
+  ┌─ c.js:4:5
+  │
+4 │     console.log("two");
+  │     ^^^^^^^^^^^^^^^^^^
+
+Error: 2 error(s) found in code.
+Help: Scan succeeded and found error level diagnostics in the codebase.
+

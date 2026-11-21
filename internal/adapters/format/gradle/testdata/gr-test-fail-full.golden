@@ -1,0 +1,20 @@
+FAILED :test
+CalcTest > adds() FAILED
+    org.opentest4j.AssertionFailedError: sum is wrong ==> expected: <6> but was: <5>
+    …+5 framework frames
+        at app//demo.CalcTest.adds(CalcTest.java:5)
+CalcTest > divs() FAILED
+    java.lang.ArithmeticException: / by zero
+        at demo.Calc.div(Calc.java:4)
+        at demo.CalcTest.divs(CalcTest.java:6)
+CalcTest > nulls() FAILED
+    org.opentest4j.AssertionFailedError: expected: not <null>
+    …+6 framework frames
+        at app//demo.CalcTest.nulls(CalcTest.java:8)
+4 tests completed, 3 failed
+What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: build/reports/tests/test/index.html
+BUILD FAILED in 1s
+3 actionable tasks: 3 executed
+…+24 lines elided (6 task lines, 2 noise, 11 framework frames, 5 help)

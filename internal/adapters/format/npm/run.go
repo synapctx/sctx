@@ -3,6 +3,7 @@ package npm
 import (
 	"strings"
 
+	"github.com/synapctx/sctx/internal/adapters/format/npx"
 	"github.com/synapctx/sctx/internal/domain/format"
 )
 
@@ -17,6 +18,12 @@ func aggressiveRun(in format.Input) (format.Rendered, error) {
 	rawErr := readAll(in.Stderr)
 	if len(rawOut) == 0 && len(rawErr) == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	// A script that runs jest/vitest/tsc/eslint prints that tool's own report;
+	// argv cannot say so, only the output shape can. Each tool formatter
+	// declines unless it recognises its exact summary.
+	if r, err := npx.SniffBytes(in, rawOut, rawErr); err == nil {
+		return r, nil
 	}
 
 	outLines, outStripped := stripWrapperLines(splitLines(rawOut))

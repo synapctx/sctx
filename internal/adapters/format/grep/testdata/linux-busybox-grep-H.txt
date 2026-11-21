@@ -1,0 +1,1 @@
+logs/app.log:401:2026-11-21T10:01:00 ERROR db timeout id=7

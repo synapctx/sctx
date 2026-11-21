@@ -1,0 +1,96 @@
+[m[1mNAME[m
+    gcloud compute instances list - list Compute Engine instances
+
+[m[1mSYNOPSIS[m
+    [1mgcloud compute instances list[m [[4mNAME[m ...] [[1m--regexp[m=[4mREGEXP[m, [1m-r[m [4mREGEXP[m]
+        [[1m--zones[m=[4mZONE[m,[[4mZONE[m,...]] [[1m--filter[m=[4mEXPRESSION[m] [[1m--limit[m=[4mLIMIT[m]
+        [[1m--page-size[m=[4mPAGE_SIZE[m] [[1m--sort-by[m=[[4mFIELD[m,...]] [[1m--uri[m]
+        [[4mGCLOUD_WIDE_FLAG ...[m]
+
+[m[1mDESCRIPTION[m
+    [1mgcloud compute instances list[m displays all Compute Engine instances in a
+    project.
+
+[m[1mEXAMPLES[m
+    To list all instances in a project in table form, run:
+
+        $ gcloud compute instances list
+
+    To list the URIs of all instances in a project, run:
+
+        $ gcloud compute instances list --uri
+
+    To list the IPv6 info of all instances in a project, run:
+
+        $ gcloud compute instances list --format="table(
+        name,
+        zone.basename(),
+        networkInterfaces[].stackType.notnull().list(),
+        networkInterfaces[].ipv6AccessConfigs[0].externalIpv6.notnull().list():label=EXTERNAL_IPV6,
+        networkInterfaces[].ipv6Address.notnull().list():label=INTERNAL_IPV6)"
+
+[m[1mPOSITIONAL ARGUMENTS[m
+     [[4mNAME[m ...]
+        (DEPRECATED) If provided, show details for the specified names and/or
+        URIs of resources.
+
+        Argument [1mNAME[m is deprecated. Use [1m--filter="name=( 'NAME' ... )"[m
+        instead.
+
+[m[1mFLAGS[m
+     [1m--regexp[m=[4mREGEXP[m, [1m-r[m [4mREGEXP[m
+        (DEPRECATED) Regular expression to filter the names of the results on.
+        Any names that do not match the entire regular expression will be
+        filtered out.
+
+        Flag [1m--regexp[m is deprecated. Use [1m--filter="name~'REGEXP'"[m instead.
+
+     [1m--zones[m=[4mZONE[m,[[4mZONE[m,...]
+        If provided, only resources from the given zones are queried.
+
+[m[1mLIST COMMAND FLAGS[m
+     [1m--filter[m=[4mEXPRESSION[m
+        Apply a Boolean filter [4mEXPRESSION[m to each resource item to be listed.
+        If the expression evaluates [1mTrue[m, then that item is listed. For more
+        details and examples of filter expressions, run $ gcloud topic filters.
+        This flag interacts with other flags that are applied in this order:
+        [1m--flatten[m, [1m--sort-by[m, [1m--filter[m, [1m--limit[m.
+
+     [1m--limit[m=[4mLIMIT[m
+        Maximum number of resources to list. The default is [1munlimited[m. This
+        flag interacts with other flags that are applied in this order:
+        [1m--flatten[m, [1m--sort-by[m, [1m--filter[m, [1m--limit[m.
+
+     [1m--page-size[m=[4mPAGE_SIZE[m
+        Some services group resource list output into pages. This flag
+        specifies the maximum number of resources per page. The default is
+        determined by the service if it supports paging, otherwise it is
+        [1munlimited[m (no paging). Paging may be applied before or after [1m--filter[m
+        and [1m--limit[m depending on the service.
+
+     [1m--sort-by[m=[[4mFIELD[m,...]
+        Comma-separated list of resource field key names to sort by. The
+        default order is ascending. Prefix a field with ``~'' for descending
+        order on that field. This flag interacts with other flags that are
+        applied in this order: [1m--flatten[m, [1m--sort-by[m, [1m--filter[m, [1m--limit[m.
+
+     [1m--uri[m
+        Print a list of resource URIs instead of the default output, and change
+        the command output to a list of URIs. If this flag is used with
+        [1m--format[m, the formatting is applied on this URI list. To display URIs
+        alongside other keys instead, use the [1muri()[m transform.
+
+[m[1mGCLOUD WIDE FLAGS[m
+    These flags are available to all commands: --access-token-file, --account,
+    --billing-project, --configuration, --flags-file, --flatten, --format,
+    --help, --impersonate-service-account, --log-http, --project, --quiet,
+    --trace-token, --user-output-enabled, --verbosity.
+
+    Run [1m$ gcloud help[m for details.
+
+[m[1mNOTES[m
+    This variant is also available:
+
+        $ gcloud alpha compute instances list
+
+[m

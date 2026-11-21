@@ -1,0 +1,8 @@
+5	I001 	[*] unsorted-imports
+5	F401 	[*] unused-import
+1	UP035	[ ] deprecated-import
+1	UP006	[*] non-pep585-annotation
+1	UP045	[*] non-pep604-annotation-optional
+1	F821 	[ ] undefined-name
+Found 14 errors.
+[*] 12 fixable with `--fix`.

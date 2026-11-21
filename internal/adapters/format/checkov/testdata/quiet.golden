@@ -1,0 +1,53 @@
+checkov:
+terraform: Passed checks: 15, Failed checks: 25, Skipped checks: 0
+CKV_AWS_23 Ensure every security group and rule has a description (1)
+  aws_security_group.open /main.tf:10-20
+CKV_AWS_24 Ensure no security groups allow ingress from 0.0.0.0:0 to port 22 (1)
+  aws_security_group.open /main.tf:10-20
+CKV_AWS_8 Ensure all data stored in the Launch configuration or instance Elastic Blocks Store is securely encrypted (1)
+  aws_instance.web /main.tf:22-29
+CKV_AWS_135 Ensure that EC2 is EBS optimized (1)
+  aws_instance.web /main.tf:22-29
+CKV_AWS_126 Ensure that detailed monitoring is enabled for EC2 instances (1)
+  aws_instance.web /main.tf:22-29
+CKV_AWS_79 Ensure Instance Metadata Service Version 1 is not enabled (1)
+  aws_instance.web /main.tf:22-29
+CKV_AWS_293 Ensure that AWS database instances have deletion protection enabled (1)
+  aws_db_instance.db /main.tf:31-40
+CKV_AWS_226 Ensure DB instance gets all minor upgrades automatically (1)
+  aws_db_instance.db /main.tf:31-40
+CKV_AWS_17 Ensure all data stored in RDS is not publicly accessible (1)
+  aws_db_instance.db /main.tf:31-40
+CKV_AWS_118 Ensure that enhanced monitoring is enabled for Amazon RDS instances (1)
+  aws_db_instance.db /main.tf:31-40
+CKV_AWS_129 Ensure that respective logs of Amazon Relational Database Service (Amazon RDS) are enabled (1)
+  aws_db_instance.db /main.tf:31-40
+CKV_AWS_161 Ensure RDS database has IAM authentication enabled (1)
+  aws_db_instance.db /main.tf:31-40
+CKV_AWS_157 Ensure that RDS instances have Multi-AZ enabled (1)
+  aws_db_instance.db /main.tf:31-40
+CKV_AWS_16 Ensure all data stored in the RDS is securely encrypted at rest (1)
+  aws_db_instance.db /main.tf:31-40
+CKV2_AWS_5 Ensure that Security Groups are attached to another resource (1)
+  aws_security_group.open /main.tf:10-20
+CKV2_AWS_61 Ensure that an S3 bucket has a lifecycle configuration (1)
+  aws_s3_bucket.data /main.tf:5-8
+CKV2_AWS_6 Ensure that S3 bucket has a Public Access block (1)
+  aws_s3_bucket.data /main.tf:5-8
+CKV2_AWS_60 Ensure RDS instance with copy tags to snapshots is enabled (1)
+  aws_db_instance.db /main.tf:31-40
+CKV2_AWS_41 Ensure an IAM role is attached to EC2 instance (1)
+  aws_instance.web /main.tf:22-29
+CKV_AWS_144 Ensure that S3 bucket has cross-region replication enabled (1)
+  aws_s3_bucket.data /main.tf:5-8
+CKV2_AWS_62 Ensure S3 buckets should have event notifications enabled (1)
+  aws_s3_bucket.data /main.tf:5-8
+CKV_AWS_145 Ensure that S3 buckets are encrypted with KMS by default (1)
+  aws_s3_bucket.data /main.tf:5-8
+CKV_AWS_20 S3 Bucket has an ACL defined which allows public READ access. (1)
+  aws_s3_bucket.data /main.tf:5-8
+CKV_AWS_18 Ensure the S3 bucket has access logging enabled (1)
+  aws_s3_bucket.data /main.tf:5-8
+CKV_AWS_21 Ensure all data stored in the S3 bucket have versioning enabled (1)
+  aws_s3_bucket.data /main.tf:5-8
+…+0 passed checks, 25 guide/code/detail lines, banner (0 lines) dropped

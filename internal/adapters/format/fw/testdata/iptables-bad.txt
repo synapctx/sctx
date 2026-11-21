@@ -1,0 +1,2 @@
+iptables v1.8.10 (nf_tables): table 'nosuch' does not exist
+Perhaps iptables or your kernel needs to be upgraded.

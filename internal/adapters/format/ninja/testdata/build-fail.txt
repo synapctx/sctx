@@ -1,0 +1,14 @@
+[1/6] Building C object CMakeFiles/b.dir/src/b.c.o
+FAILED: [code=1] CMakeFiles/b.dir/src/b.c.o 
+/usr/bin/cc   -arch arm64 -Wall -Wextra -MD -MT CMakeFiles/b.dir/src/b.c.o -MF CMakeFiles/b.dir/src/b.c.o.d -o CMakeFiles/b.dir/src/b.c.o -c /work/proj/src/b.c
+/work/proj/src/b.c:1:24: error: use of undeclared identifier 'nope'
+    1 | int fb(int x){return x+nope;}
+      |                        ^~~~
+1 error generated.
+[2/6] Building C object CMakeFiles/app.dir/src/main.c.o
+[3/6] Building C object CMakeFiles/a.dir/src/a.c.o
+/work/proj/src/a.c:1:19: warning: unused variable 'u' [-Wunused-variable]
+    1 | int fa(int x){int u; return x;}
+      |                   ^
+1 warning generated.
+ninja: build stopped: subcommand failed.

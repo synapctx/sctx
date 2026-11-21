@@ -1,0 +1,4 @@
+ M      .
+M       git/new1.txt
+D       git/new2.txt
+?       untracked.txt

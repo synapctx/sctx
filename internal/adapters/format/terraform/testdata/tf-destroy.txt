@@ -1,0 +1,145 @@
+[0m[1mrandom_pet.p["gamma"]: Refreshing state... [id=externally-keen-walrus][0m
+[0m[1mrandom_password.pw: Refreshing state... [id=none][0m
+[0m[1mnull_resource.n: Refreshing state... [id=1708258351975758010][0m
+[0m[1mrandom_pet.p["alpha"]: Refreshing state... [id=lively-clever-clam][0m
+[0m[1mrandom_pet.p["beta"]: Refreshing state... [id=usually-useful-barnacle][0m
+[0m[1mlocal_file.f["alpha"]: Refreshing state... [id=ed6f952a077a8feb66a683aa3b009214a44c3432][0m
+[0m[1mlocal_file.f["gamma"]: Refreshing state... [id=ebb34f9931e649947c455c35682ecddf764fb47e][0m
+[0m[1mlocal_file.f["beta"]: Refreshing state... [id=e299c03d1881e5d0f4d5b218a84e942172617ec3][0m
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  [31m-[0m destroy[0m
+
+Terraform will perform the following actions:
+
+[1m  # local_file.f["alpha"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "local_file" "f" {
+      [31m-[0m[0m content              = <<-EOT
+            hello lively-clever-clam
+            line2
+            line3
+        EOT [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha256 = "aNeiPvlVjYGd+RPUhraJFeaQmzfayYZyEPNol3tuJBE=" [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha512 = "L8RLNlgKI4vS1hWVPDKyWTOXEERkpmZg4Q6j5x93QcpI3DswQMyM9YzWS1D/5MZdpr7Wcb4rFvQQqxPX6WUDMQ==" [90m-> null[0m[0m
+      [31m-[0m[0m content_md5          = "9024d879cd5c1884b775e9a71412dc90" [90m-> null[0m[0m
+      [31m-[0m[0m content_sha1         = "ed6f952a077a8feb66a683aa3b009214a44c3432" [90m-> null[0m[0m
+      [31m-[0m[0m content_sha256       = "68d7a23ef9558d819df913d486b68915e6909b37dac9867210f368977b6e2411" [90m-> null[0m[0m
+      [31m-[0m[0m content_sha512       = "2fc44b36580a238bd2d615953c32b2593397104464a66660e10ea3e71f7741ca48dc3b3040cc8cf58cd64b50ffe4c65da6bed671be2b16f410ab13d7e9650331" [90m-> null[0m[0m
+      [31m-[0m[0m directory_permission = "0777" [90m-> null[0m[0m
+      [31m-[0m[0m file_permission      = "0777" [90m-> null[0m[0m
+      [31m-[0m[0m filename             = "./out/alpha.txt" [90m-> null[0m[0m
+      [31m-[0m[0m id                   = "ed6f952a077a8feb66a683aa3b009214a44c3432" [90m-> null[0m[0m
+    }
+
+[1m  # local_file.f["beta"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "local_file" "f" {
+      [31m-[0m[0m content              = <<-EOT
+            hello usually-useful-barnacle
+            line2
+            line3
+        EOT [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha256 = "PU5LD7DeSRoIb6pO0kK3MOIn4Vg68RncUBM8NWtvIrE=" [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha512 = "chiwc6oSKZv0YfLkAZW0fjOciqaeSMgML5nDrMSMi3YKigR32L6kyar6MelQe2YbpqLUlHe7K4ouCkRcmLLcjg==" [90m-> null[0m[0m
+      [31m-[0m[0m content_md5          = "2c113e072295e40bce47bfa739a179ce" [90m-> null[0m[0m
+      [31m-[0m[0m content_sha1         = "e299c03d1881e5d0f4d5b218a84e942172617ec3" [90m-> null[0m[0m
+      [31m-[0m[0m content_sha256       = "3d4e4b0fb0de491a086faa4ed242b730e227e1583af119dc50133c356b6f22b1" [90m-> null[0m[0m
+      [31m-[0m[0m content_sha512       = "7218b073aa12299bf461f2e40195b47e339c8aa69e48c80c2f99c3acc48c8b760a8a0477d8bea4c9aafa31e9507b661ba6a2d49477bb2b8a2e0a445c98b2dc8e" [90m-> null[0m[0m
+      [31m-[0m[0m directory_permission = "0777" [90m-> null[0m[0m
+      [31m-[0m[0m file_permission      = "0777" [90m-> null[0m[0m
+      [31m-[0m[0m filename             = "./out/beta.txt" [90m-> null[0m[0m
+      [31m-[0m[0m id                   = "e299c03d1881e5d0f4d5b218a84e942172617ec3" [90m-> null[0m[0m
+    }
+
+[1m  # local_file.f["gamma"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "local_file" "f" {
+      [31m-[0m[0m content              = <<-EOT
+            hello externally-keen-walrus
+            line2
+            line3
+        EOT [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha256 = "cyY5OK1Vi0Wf1xK8qnGwVWzatpiF05B2DawqGPs/fPc=" [90m-> null[0m[0m
+      [31m-[0m[0m content_base64sha512 = "9/S2fbRCCaMbpQJRMXhMEcJ8ZgIepX1XSmnenkrHoyFeuYGr4p/z7QmN4NIhuXUPmaijtMLZoiI1JhQKl9sldQ==" [90m-> null[0m[0m
+      [31m-[0m[0m content_md5          = "bc73930ffd003c30b06925e7f3f88a3e" [90m-> null[0m[0m
+      [31m-[0m[0m content_sha1         = "ebb34f9931e649947c455c35682ecddf764fb47e" [90m-> null[0m[0m
+      [31m-[0m[0m content_sha256       = "73263938ad558b459fd712bcaa71b0556cdab69885d390760dac2a18fb3f7cf7" [90m-> null[0m[0m
+      [31m-[0m[0m content_sha512       = "f7f4b67db44209a31ba5025131784c11c27c66021ea57d574a69de9e4ac7a3215eb981abe29ff3ed098de0d221b9750f99a8a3b4c2d9a2223526140a97db2575" [90m-> null[0m[0m
+      [31m-[0m[0m directory_permission = "0777" [90m-> null[0m[0m
+      [31m-[0m[0m file_permission      = "0777" [90m-> null[0m[0m
+      [31m-[0m[0m filename             = "./out/gamma.txt" [90m-> null[0m[0m
+      [31m-[0m[0m id                   = "ebb34f9931e649947c455c35682ecddf764fb47e" [90m-> null[0m[0m
+    }
+
+[1m  # null_resource.n[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "null_resource" "n" {
+      [31m-[0m[0m id       = "1708258351975758010" [90m-> null[0m[0m
+      [31m-[0m[0m triggers = {
+          [31m-[0m[0m "v" = "2"
+        } [90m-> null[0m[0m
+    }
+
+[1m  # random_password.pw[0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "random_password" "pw" {
+      [31m-[0m[0m bcrypt_hash = (sensitive value) [90m-> null[0m[0m
+      [31m-[0m[0m id          = "none" [90m-> null[0m[0m
+      [31m-[0m[0m length      = 16 [90m-> null[0m[0m
+      [31m-[0m[0m lower       = true [90m-> null[0m[0m
+      [31m-[0m[0m min_lower   = 0 [90m-> null[0m[0m
+      [31m-[0m[0m min_numeric = 0 [90m-> null[0m[0m
+      [31m-[0m[0m min_special = 0 [90m-> null[0m[0m
+      [31m-[0m[0m min_upper   = 0 [90m-> null[0m[0m
+      [31m-[0m[0m number      = true [90m-> null[0m[0m
+      [31m-[0m[0m numeric     = true [90m-> null[0m[0m
+      [31m-[0m[0m result      = (sensitive value) [90m-> null[0m[0m
+      [31m-[0m[0m special     = true [90m-> null[0m[0m
+      [31m-[0m[0m upper       = true [90m-> null[0m[0m
+    }
+
+[1m  # random_pet.p["alpha"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "random_pet" "p" {
+      [31m-[0m[0m id        = "lively-clever-clam" [90m-> null[0m[0m
+      [31m-[0m[0m length    = 3 [90m-> null[0m[0m
+      [31m-[0m[0m separator = "-" [90m-> null[0m[0m
+    }
+
+[1m  # random_pet.p["beta"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "random_pet" "p" {
+      [31m-[0m[0m id        = "usually-useful-barnacle" [90m-> null[0m[0m
+      [31m-[0m[0m length    = 3 [90m-> null[0m[0m
+      [31m-[0m[0m separator = "-" [90m-> null[0m[0m
+    }
+
+[1m  # random_pet.p["gamma"][0m will be [1m[31mdestroyed[0m
+[0m  [31m-[0m[0m resource "random_pet" "p" {
+      [31m-[0m[0m id        = "externally-keen-walrus" [90m-> null[0m[0m
+      [31m-[0m[0m length    = 3 [90m-> null[0m[0m
+      [31m-[0m[0m separator = "-" [90m-> null[0m[0m
+    }
+
+[1mPlan:[0m [0m0 to add, 0 to change, 8 to destroy.
+
+Changes to Outputs:
+  [31m-[0m[0m pets = {
+      [31m-[0m[0m alpha = "lively-clever-clam"
+      [31m-[0m[0m beta  = "usually-useful-barnacle"
+      [31m-[0m[0m gamma = "externally-keen-walrus"
+    } [90m-> null[0m[0m
+  [31m-[0m[0m pw   = (sensitive value) [90m-> null[0m[0m
+[0m[1mnull_resource.n: Destroying... [id=1708258351975758010][0m[0m
+[0m[1mrandom_password.pw: Destroying... [id=none][0m[0m
+[0m[1mrandom_password.pw: Destruction complete after 0s[0m
+[0m[1mlocal_file.f["beta"]: Destroying... [id=e299c03d1881e5d0f4d5b218a84e942172617ec3][0m[0m
+[0m[1mlocal_file.f["alpha"]: Destroying... [id=ed6f952a077a8feb66a683aa3b009214a44c3432][0m[0m
+[0m[1mlocal_file.f["gamma"]: Destroying... [id=ebb34f9931e649947c455c35682ecddf764fb47e][0m[0m
+[0m[1mnull_resource.n: Destruction complete after 0s[0m
+[0m[1mlocal_file.f["beta"]: Destruction complete after 0s[0m
+[0m[1mlocal_file.f["alpha"]: Destruction complete after 0s[0m
+[0m[1mlocal_file.f["gamma"]: Destruction complete after 0s[0m
+[0m[1mrandom_pet.p["beta"]: Destroying... [id=usually-useful-barnacle][0m[0m
+[0m[1mrandom_pet.p["gamma"]: Destroying... [id=externally-keen-walrus][0m[0m
+[0m[1mrandom_pet.p["beta"]: Destruction complete after 0s[0m
+[0m[1mrandom_pet.p["alpha"]: Destroying... [id=lively-clever-clam][0m[0m
+[0m[1mrandom_pet.p["gamma"]: Destruction complete after 0s[0m
+[0m[1mrandom_pet.p["alpha"]: Destruction complete after 0s[0m
+[0m[1m[32m
+Destroy complete! Resources: 8 destroyed.[0m

@@ -1,0 +1,11 @@
+kube-linter: 7 findings in 1 file (latest-tag=1 no-read-only-root-fs=1 privilege-escalation-container=1 privileged-container=1 run-as-non-root=1 unset-cpu-requirements=1 unset-memory-requirements=1)
+/work/proj/k8s/deploy.yaml (7)
+  - latest-tag Deployment/web: The container "web" is using an invalid container image, "nginx:latest". Please use images that are not blocked by the `BlockList` criteria : [".*:(latest)$" "^[^:]*$" "(.*/[^:]+)$"]
+  - no-read-only-root-fs Deployment/web: container "web" does not have a read-only root file system
+  - privilege-escalation-container Deployment/web: container "web" is Privileged hence allows privilege escalation.
+  - privileged-container Deployment/web: container "web" is privileged
+  - run-as-non-root Deployment/web: container "web" is not set to runAsNonRoot
+  - unset-cpu-requirements Deployment/web: container "web" has cpu request 0
+  - unset-memory-requirements Deployment/web: container "web" has memory limit 0
+…dropped: 7 remediation hints, 1 banner line
+Error: found 7 lint errors

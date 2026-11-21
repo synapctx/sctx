@@ -1,0 +1,6 @@
+ status   count(*)  sum(total)
+--------  --------  ----------
+failed         500   1585000.0
+paid           500   1588170.0
+pending        500   1583415.0
+refunded       500   1586585.0

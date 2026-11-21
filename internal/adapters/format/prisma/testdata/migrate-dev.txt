@@ -1,0 +1,27 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": SQLite database "dev.db" at "file:./dev.db"
+
+SQLite database dev.db created at file:./dev.db
+
+Applying migration `20261121020602_init`
+
+The following migration(s) have been created and applied from new schema changes:
+
+prisma/migrations/
+  └─ 20261121020602_init/
+    └─ migration.sql
+
+Your database is now in sync with your schema.
+┌─────────────────────────────────────────────────────────┐
+│  Update available 7.10.1 -> 8.0.0-rc.34                 │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+

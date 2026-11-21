@@ -1,0 +1,4 @@
+  Determining projects to restore...
+  Restored /work/dn-dep/Lib/Lib.csproj (in 9 ms).
+/work/dn-dep/Lib.Tests/Lib.Tests.csproj : error NU1101: Unable to find package Nonexistent.Package.Xyz. No packages exist with this id in source(s): /opt/homebrew/Cellar/dotnet/11.0.100/libexec/library-packs, nuget.org [/work/dn-dep/Demo.slnx]
+  Failed to restore /work/dn-dep/Lib.Tests/Lib.Tests.csproj (in 282 ms).

@@ -1,0 +1,79 @@
+trivy:
+  py/requirements.txt (pip): vulnerabilities=51
+  k8s/deploy.yaml (kubernetes): misconfigurations=37
+  tf/main.tf (terraform): misconfigurations=20
+  secrets/app.env (text): secrets=1
+  secrets/config.py (text): secrets=2
+  clean (2): k8s/ok.yaml, tf
+py/requirements.txt (pip)
+Total: 51 (UNKNOWN: 0, LOW: 4, MEDIUM: 21, HIGH: 17, CRITICAL: 9)
+  django 2.2.0
+    CVE-2019-14234 CRITICAL -> 1.11.23, 2.1.11, 2.2.4
+    CVE-2019-19844 CRITICAL -> 1.11.27, 2.2.9, 3.0.1
+    CVE-2020-7471 CRITICAL -> 1.11.28, 2.2.10, 3.0.3
+    CVE-2022-28346 CRITICAL -> 2.2.28, 3.2.13, 4.0.4
+    CVE-2022-28347 CRITICAL -> 2.2.28, 3.2.13, 4.0.4
+    CVE-2025-64459 CRITICAL -> 5.2.8, 5.1.14, 4.2.26
+    CVE-2019-14232 HIGH -> 1.11.23, 2.1.11, 2.2.4
+    CVE-2019-14233 HIGH -> 1.11.23, 2.1.11, 2.2.4
+    CVE-2019-14235 HIGH -> 1.11.23, 2.1.11, 2.2.4
+    CVE-2019-19118 HIGH -> 2.1.15, 2.2.8
+    CVE-2020-13254 HIGH -> 2.2.13, 3.0.7
+    CVE-2020-24583 HIGH -> 2.2.16, 3.0.10, 3.1.1
+    CVE-2020-9402 HIGH -> 1.11.29, 2.2.11, 3.0.4
+    CVE-2021-31542 HIGH -> 2.2.21, 3.1.9, 3.2.1
+    CVE-2021-33571 HIGH -> 2.2.24, 3.1.12, 3.2.4
+    CVE-2021-45115 HIGH -> 2.2.26, 3.2.11, 4.0.1
+    CVE-2021-45116 HIGH -> 2.2.26, 3.2.11, 4.0.1
+    CVE-2022-23833 HIGH -> 2.2.27, 3.2.12, 4.0.2
+    CVE-2022-36359 HIGH -> 3.2.15, 4.0.7
+    CVE-2025-57833 HIGH -> 4.2.24, 5.1.12, 5.2.6
+    CVE-2025-64458 HIGH -> 5.2.8, 5.1.14, 4.2.26
+    CVE-2026-15307 HIGH -> 5.2.17, 6.0.8
+  pyyaml 5.1
+    CVE-2019-20477 CRITICAL -> 5.2
+    CVE-2020-14343 CRITICAL -> 5.4
+    CVE-2020-1747 CRITICAL -> 5.3.1
+  requests 2.19.0
+    CVE-2018-18074 HIGH -> 2.20.0
+  …+25 MEDIUM/LOW/UNKNOWN (m=medium l=low u=unknown): django 2.2.0 m×17,l×4; requests 2.19.0 m×4
+k8s/deploy.yaml (kubernetes)
+Tests: 135 (SUCCESSES: 98, FAILURES: 37)
+Failures: 37 (UNKNOWN: 0, LOW: 23, MEDIUM: 8, HIGH: 6, CRITICAL: 0)
+  HIGH AVD-KSV-0014 Container 'bad' of Deployment 'bad' should set 'securityContext.readOnlyRootFilesystem' to true @ k8s/deploy.yaml:49-50
+  HIGH AVD-KSV-0014 Container 'web' of Deployment 'web' should set 'securityContext.readOnlyRootFilesystem' to true @ k8s/deploy.yaml:16-20
+  HIGH AVD-KSV-0017 Container 'web' of Deployment 'web' should set 'securityContext.privileged' to false @ k8s/deploy.yaml:16-20
+  HIGH AVD-KSV-0118 container bad in default namespace is using the default security context @ k8s/deploy.yaml:49-50
+  HIGH AVD-KSV-0118 deployment bad in default namespace is using the default security context, which allows root privileges @ k8s/deploy.yaml:48-50
+  HIGH AVD-KSV-0118 deployment web in default namespace is using the default security context, which allows root privileges @ k8s/deploy.yaml:15-20
+  …+31 MEDIUM/LOW/UNKNOWN checks: AVD-KSV-0001×2 AVD-KSV-0003×2 AVD-KSV-0004×2 AVD-KSV-0011×2 AVD-KSV-0012×2 AVD-KSV-0013×2 AVD-KSV-0015×2 AVD-KSV-0016×2 AVD-KSV-0018×2 AVD-KSV-0020×2 AVD-KSV-0021×2 AVD-KSV-0030×2 AVD-KSV-0104×2 AVD-KSV-0106×2 AVD-KSV-0110×2 AVD-KSV-0105×1
+…+199 description/code lines dropped
+tf/main.tf (terraform)
+Tests: 20 (SUCCESSES: 0, FAILURES: 20)
+Failures: 20 (UNKNOWN: 0, LOW: 4, MEDIUM: 4, HIGH: 12, CRITICAL: 0)
+  HIGH AVD-AWS-0028 Instance does not require IMDS access to require a token. @ tf/main.tf:22-29
+  HIGH AVD-AWS-0080 Instance does not have storage encryption enabled. @ tf/main.tf:38 (aws_db_instance.db)
+  HIGH AVD-AWS-0086 No public access block so not blocking public acls @ tf/main.tf:5-8
+  HIGH AVD-AWS-0087 No public access block so not blocking public policies @ tf/main.tf:5-8
+  HIGH AVD-AWS-0088 Bucket does not have encryption enabled @ tf/main.tf:5-8
+  HIGH AVD-AWS-0091 No public access block so not blocking public acls @ tf/main.tf:5-8
+  HIGH AVD-AWS-0092 Bucket has a public ACL: "public-read" @ tf/main.tf:7 (aws_s3_bucket.data)
+  HIGH AVD-AWS-0093 No public access block so not restricting public buckets @ tf/main.tf:5-8
+  HIGH AVD-AWS-0107 Security group rule allows unrestricted ingress from any IP address. @ tf/main.tf:18 (aws_security_group.open)
+  HIGH AVD-AWS-0131 Root block device is not encrypted. @ tf/main.tf:27 (aws_instance.web)
+  HIGH AVD-AWS-0132 Bucket does not encrypt data with a customer managed key. @ tf/main.tf:5-8
+  HIGH AVD-AWS-0180 Instance has Public Access enabled @ tf/main.tf:37 (aws_db_instance.db)
+  …+8 MEDIUM/LOW/UNKNOWN checks: AVD-AWS-0077×1 AVD-AWS-0089×1 AVD-AWS-0090×1 AVD-AWS-0094×1 AVD-AWS-0124×1 AVD-AWS-0133×1 AVD-AWS-0176×1 AVD-AWS-0177×1
+…+186 description/code lines dropped
+secrets/app.env (secrets)
+Total: 1 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 0, CRITICAL: 1)
+  CRITICAL secret AWS (aws-access-key-id) @ secrets/app.env:1 (offset: 18 bytes)
+…+3 description/code lines dropped
+secrets/config.py (secrets)
+Total: 2 (UNKNOWN: 0, LOW: 0, MEDIUM: 0, HIGH: 1, CRITICAL: 1)
+  CRITICAL secret GitHub (github-pat) @ secrets/config.py:2 (offset: 26 bytes)
+  HIGH secret Slack (slack-access-token) @ secrets/config.py:3 (offset: 77 bytes)
+…+9 description/code lines dropped
+WARN [pip] Unable to find python `site-packages` directory. License detection is skipped. err="unable to find path to Python executable"
+WARN [terraform parser] Variable values were not found in the environment or variable files. Evaluating may not work correctly. module="root" variables="unused"
+…+12 stderr lines (progress, INFO logs, update notice)

@@ -1,0 +1,1 @@
+error: target not found: nosuchpkg-xyz

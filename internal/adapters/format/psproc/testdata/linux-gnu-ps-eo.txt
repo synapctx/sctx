@@ -1,0 +1,30 @@
+    PID    PPID USER     %CPU %MEM COMMAND
+      1       0 root      0.0  0.0 sh -c chmod +x /work/*; /work/capture.sh ubuntu /work/raw - ; /work/capture.sh ubuntu /work/before /work/sctx-before; /work/capture.sh ubuntu /work/after /work/sctx-after
+      7       1 root      0.3  0.0 /bin/sh /work/capture.sh ubuntu /work/raw -
+     37       7 root      0.0  0.0 sleep 600
+     38       7 root      0.0  0.0 sleep 600
+     39       7 root      0.0  0.0 sleep 600
+     40       7 root      0.0  0.0 sleep 600
+     41       7 root      0.0  0.0 sleep 600
+     42       7 root      0.0  0.0 sleep 600
+     43       7 root      0.0  0.0 sleep 600
+     44       7 root      0.0  0.0 sleep 600
+     45       7 root      0.0  0.0 sleep 600
+     46       7 root      0.0  0.0 sleep 600
+     47       7 root      0.0  0.0 sleep 600
+     48       7 root      0.0  0.0 sleep 600
+     49       7 root      0.0  0.0 sleep 600
+     50       7 root      0.0  0.0 sleep 600
+     51       7 root      0.0  0.0 sleep 600
+     52       7 root      0.0  0.0 sleep 600
+     53       7 root      0.0  0.0 sleep 600
+     54       7 root      0.0  0.0 sleep 600
+     55       7 root      0.0  0.0 sleep 600
+     56       7 root      0.0  0.0 sleep 600
+     57       7 root      0.0  0.0 sleep 600
+     58       7 root      0.0  0.0 sleep 600
+     59       7 root      0.0  0.0 sleep 600
+     60       7 root      0.0  0.0 sleep 600
+     61       7 root      0.0  0.0 sleep 600
+    231       7 root      0.0  0.0 sh -c ps -eo pid,ppid,user,pcpu,pmem,args
+    232     231 root      0.0  0.0 ps -eo pid,ppid,user,pcpu,pmem,args

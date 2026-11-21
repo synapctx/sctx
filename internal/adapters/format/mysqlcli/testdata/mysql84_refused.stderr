@@ -1,0 +1,2 @@
+mysql: [Warning] Using a password on the command line interface can be insecure.
+ERROR 2005 (HY000): Unknown MySQL server host 'db' (-2)

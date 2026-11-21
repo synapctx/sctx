@@ -1,0 +1,44 @@
+Updating and loading repositories:
+ Fedora 41 - aarch64 - Updates          ???% |   0.0   B/s |   0.0   B |  00m00s
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Cannot prepare internal mirrorlist: Curl error (6): Could not resolve hostna
+ Fedora 41 - aarch64                    ???% |   0.0   B/s |   0.0   B |  00m00s
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Cannot prepare internal mirrorlist: Curl error (6): Could not resolve hostna
+ Fedora 41 openh264 (From Cisco) - aarc ???% |   0.0   B/s |   0.0   B |  00m00s
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject
+>>> Cannot prepare internal mirrorlist: Curl error (6): Could not resolve hostna
+Failed to download metadata (metalink: "https://mirrors.fedoraproject.org/metalink?repo=updates-released-f41&arch=aarch64") for repository "updates": Cannot prepare internal mirrorlist: Curl error (6): Could not resolve hostname for https://mirrors.fedoraproject.org/metalink?repo=updates-released-f41&arch=aarch64 [Could not resolve host: mirrors.fedoraproject.org]

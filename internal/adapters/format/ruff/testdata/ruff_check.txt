@@ -1,0 +1,211 @@
+I001 [*] Import block is un-sorted or un-formatted
+ --> pkg/core.py:1:1
+  |
+1 | / import os
+2 | | import sys
+3 | | from typing import List, Optional
+  | |_________________________________^
+4 |
+5 |   def add(a: int, b: int) -> int:
+  |
+help: Organize imports
+  |
+4 |
+5 +
+6 | def add(a: int, b: int) -> int:
+  |
+
+F401 [*] `os` imported but unused
+ --> pkg/core.py:1:8
+  |
+1 | import os
+  |        ^^
+2 | import sys
+3 | from typing import List, Optional
+  |
+help: Remove unused import: `os`
+  |
+  - import os
+1 | import sys
+  |
+
+F401 [*] `sys` imported but unused
+ --> pkg/core.py:2:8
+  |
+1 | import os
+2 | import sys
+  |        ^^^
+3 | from typing import List, Optional
+  |
+help: Remove unused import: `sys`
+  |
+1 | import os
+  - import sys
+2 | from typing import List, Optional
+  |
+
+UP035 `typing.List` is deprecated, use `list` instead
+ --> pkg/core.py:3:1
+  |
+1 | import os
+2 | import sys
+3 | from typing import List, Optional
+  | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+4 |
+5 | def add(a: int, b: int) -> int:
+  |
+
+UP006 [*] Use `list` instead of `List` for type annotation
+  --> pkg/core.py:14:14
+   |
+12 |     return x
+13 |
+14 | def lst() -> List[int]:
+   |              ^^^^
+15 |     y: Optional[int] = None
+16 |     return [y.bit_length()]
+   |
+help: Replace with `list`
+   |
+13 |
+   - def lst() -> List[int]:
+14 + def lst() -> list[int]:
+15 |     y: Optional[int] = None
+   |
+
+UP045 [*] Use `X | None` for type annotations
+  --> pkg/core.py:15:8
+   |
+14 | def lst() -> List[int]:
+15 |     y: Optional[int] = None
+   |        ^^^^^^^^^^^^^
+16 |     return [y.bit_length()]
+   |
+help: Convert to `X | None`
+   |
+14 | def lst() -> List[int]:
+   -     y: Optional[int] = None
+15 +     y: int | None = None
+16 |     return [y.bit_length()]
+   |
+
+F821 Undefined name `undefined_fn`
+  --> pkg/core.py:19:1
+   |
+18 | result: int = greet("x")
+19 | undefined_fn(3)
+   | ^^^^^^^^^^^^
+20 | add("a", 2)
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> pkg/ugly.py:1:1
+  |
+1 | import  os,sys
+  | ^^^^^^^^^^^^^^
+2 | def f( a,b ):
+3 |     return {'a':a,
+  |
+help: Organize imports
+  |
+  - import  os,sys
+1 + import os
+2 + import sys
+3 +
+4 +
+5 | def f( a,b ):
+  |
+
+F401 [*] `os` imported but unused
+ --> pkg/ugly.py:1:9
+  |
+1 | import  os,sys
+  |         ^^
+2 | def f( a,b ):
+3 |     return {'a':a,
+  |
+help: Remove unused import
+  |
+  - import  os,sys
+1 | def f( a,b ):
+  |
+
+F401 [*] `sys` imported but unused
+ --> pkg/ugly.py:1:12
+  |
+1 | import  os,sys
+  |            ^^^
+2 | def f( a,b ):
+3 |     return {'a':a,
+  |
+help: Remove unused import
+  |
+  - import  os,sys
+1 | def f( a,b ):
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> tests/test_broken.py:1:1
+  |
+1 | import nonexistent_mod
+  | ^^^^^^^^^^^^^^^^^^^^^^
+2 | def test_x(): pass
+  |
+help: Organize imports
+  |
+1 | import nonexistent_mod
+2 +
+3 +
+4 | def test_x(): pass
+  |
+
+F401 [*] `nonexistent_mod` imported but unused
+ --> tests/test_broken.py:1:8
+  |
+1 | import nonexistent_mod
+  |        ^^^^^^^^^^^^^^^
+2 | def test_x(): pass
+  |
+help: Remove unused import: `nonexistent_mod`
+  |
+  - import nonexistent_mod
+1 | def test_x(): pass
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> tests/test_core.py:1:1
+  |
+1 | / import pytest
+2 | | from pkg.core import add
+  | |________________________^
+3 |
+4 |   def test_ok():
+  |
+help: Organize imports
+  |
+1 | import pytest
+2 +
+3 | from pkg.core import add
+4 |
+5 +
+6 | def test_ok():
+  |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> tests/test_unit.py:1:1
+  |
+1 | import unittest
+  | ^^^^^^^^^^^^^^^
+2 | class T(unittest.TestCase):
+3 |     def test_a(self): self.assertEqual(1, 1)
+  |
+help: Organize imports
+  |
+1 | import unittest
+2 +
+3 +
+4 | class T(unittest.TestCase):
+  |
+
+Found 14 errors.
+[*] 12 fixable with `--fix`.

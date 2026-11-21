@@ -1,0 +1,24 @@
+=== RUN   TestTable
+=== RUN   TestTable/one
+=== RUN   TestTable/two
+=== RUN   TestTable/three
+=== RUN   TestTable/four
+=== RUN   TestTable/five
+=== RUN   TestTable/six
+=== RUN   TestTable/seven
+=== RUN   TestTable/eight
+--- PASS: TestTable (0.00s)
+    --- PASS: TestTable/one (0.00s)
+    --- PASS: TestTable/two (0.00s)
+    --- PASS: TestTable/three (0.00s)
+    --- PASS: TestTable/four (0.00s)
+    --- PASS: TestTable/five (0.00s)
+    --- PASS: TestTable/six (0.00s)
+    --- PASS: TestTable/seven (0.00s)
+    --- PASS: TestTable/eight (0.00s)
+=== RUN   TestBad
+--- PASS: TestBad (0.00s)
+=== RUN   TestGood
+--- PASS: TestGood (0.00s)
+PASS
+ok  	example.com/demo	(cached)

@@ -1,0 +1,5 @@
+# Test fixtures are captured byte-for-byte from real binaries (some contain
+# CRLF on purpose, e.g. redis-cli INFO). Never let a Windows checkout rewrite
+# their line endings: goldens would stop matching and parsers would see input
+# no real tool produced.
+**/testdata/** -text

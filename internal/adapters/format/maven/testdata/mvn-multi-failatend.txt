@@ -1,0 +1,192 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for demo:core:jar:1.0
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-compiler-plugin is missing. @ demo:parent:1.0, /work/mvn-multi/pom.xml, line 7, column 27
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for demo:web:jar:1.0
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-compiler-plugin is missing. @ demo:parent:1.0, /work/mvn-multi/pom.xml, line 7, column 27
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for demo:cli:jar:1.0
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-compiler-plugin is missing. @ demo:parent:1.0, /work/mvn-multi/pom.xml, line 7, column 27
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for demo:parent:pom:1.0
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-compiler-plugin is missing. @ line 7, column 27
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] parent                                                             [pom]
+[INFO] core                                                               [jar]
+[INFO] web                                                                [jar]
+[INFO] cli                                                                [jar]
+[INFO] 
+[INFO] ----------------------------< demo:parent >-----------------------------
+[INFO] Building parent 1.0                                                [1/4]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] Loaded 24564 auto-discovered prefixes for remote repository central (prefixes-central.txt)
+[WARNING] Ignoring incompatible plugin version 4.0.0-beta-5: 
+The plugin org.apache.maven.plugins:maven-compiler-plugin:4.0.0-beta-5 has unmet prerequisites: 
+	Required Maven version 4.0.0-rc-6 is not met by current version 3.10.1
+[INFO] Latest version of plugin org.apache.maven.plugins:maven-compiler-plugin failed compatibility check
+[INFO] Looking for compatible RELEASE version of plugin org.apache.maven.plugins:maven-compiler-plugin
+[WARNING] Ignoring incompatible plugin version 4.0.0-beta-4: 
+The plugin org.apache.maven.plugins:maven-compiler-plugin:4.0.0-beta-4 has unmet prerequisites: 
+	Required Maven version 4.0.0-rc-4 is not met by current version 3.10.1
+[WARNING] Ignoring incompatible plugin version 4.0.0-beta-3: 
+The plugin org.apache.maven.plugins:maven-compiler-plugin:4.0.0-beta-3 has unmet prerequisites: 
+	Required Maven version 4.0.0-rc-4 is not met by current version 3.10.1
+[WARNING] Ignoring incompatible plugin version 4.0.0-beta-2: 
+The plugin org.apache.maven.plugins:maven-compiler-plugin:4.0.0-beta-2 has unmet prerequisites: 
+	Required Maven version 4.0.0-rc-2 is not met by current version 3.10.1
+[WARNING] Ignoring incompatible plugin version 4.0.0-beta-1: 
+The plugin org.apache.maven.plugins:maven-compiler-plugin:4.0.0-beta-1 has unmet prerequisites: 
+	Required Maven version 4.0.0-beta-3 is not met by current version 3.10.1
+[INFO] Selected plugin org.apache.maven.plugins:maven-compiler-plugin:3.16.0
+[INFO] 
+[INFO] -----------------------------< demo:core >------------------------------
+[INFO] Building core 1.0                                                  [2/4]
+[INFO]   from core/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ core ---
+[INFO] skip non existing resourceDirectory /work/mvn-multi/core/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.16.0:compile (default-compile) @ core ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ core ---
+[INFO] skip non existing resourceDirectory /work/mvn-multi/core/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.16.0:testCompile (default-testCompile) @ core ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.6.1:test (default-test) @ core ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running demo.SvcTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.031 s -- in demo.SvcTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] ------------------------------< demo:web >------------------------------
+[INFO] Building web 1.0                                                   [3/4]
+[INFO]   from web/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ web ---
+[INFO] skip non existing resourceDirectory /work/mvn-multi/web/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.16.0:compile (default-compile) @ web ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ web ---
+[INFO] skip non existing resourceDirectory /work/mvn-multi/web/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.16.0:testCompile (default-testCompile) @ web ---
+[INFO] Nothing to compile - all classes are up to date.
+[INFO] 
+[INFO] --- surefire:3.6.1:test (default-test) @ web ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running demo.SvcTest
+[ERROR] Tests run: 2, Failures: 1, Errors: 0, Skipped: 0, Time elapsed: 0.037 s <<< FAILURE! -- in demo.SvcTest
+[ERROR] demo.SvcTest.a -- Time elapsed: 0.022 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: expected: <2> but was: <1>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertionFailureBuilder.buildAndThrow(AssertionFailureBuilder.java:132)
+	at org.junit.jupiter.api.AssertEquals.failNotEqual(AssertEquals.java:197)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:150)
+	at org.junit.jupiter.api.AssertEquals.assertEquals(AssertEquals.java:145)
+	at org.junit.jupiter.api.Assertions.assertEquals(Assertions.java:531)
+	at demo.SvcTest.a(SvcTest.java:4)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:583)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1612)
+
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   SvcTest.a:4 expected: <2> but was: <1>
+[INFO] 
+[ERROR] Tests run: 2, Failures: 1, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] 
+[INFO] ------------------------------< demo:cli >------------------------------
+[INFO] Building cli 1.0                                                   [4/4]
+[INFO]   from cli/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- resources:3.5.0:resources (default-resources) @ cli ---
+[INFO] skip non existing resourceDirectory /work/mvn-multi/cli/src/main/resources
+[INFO] 
+[INFO] --- compiler:3.16.0:compile (default-compile) @ cli ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 1 source file with javac [debug release 17] to target/classes
+[WARNING] /work/mvn-multi/cli/src/main/java/demo/cliSvc.java:[3,71] found raw type: java.util.List
+  missing type arguments for generic class java.util.List<E>
+[WARNING] /work/mvn-multi/cli/src/main/java/demo/cliSvc.java:[3,95] found raw type: java.util.ArrayList
+  missing type arguments for generic class java.util.ArrayList<E>
+[INFO] 
+[INFO] --- resources:3.5.0:testResources (default-testResources) @ cli ---
+[INFO] skip non existing resourceDirectory /work/mvn-multi/cli/src/test/resources
+[INFO] 
+[INFO] --- compiler:3.16.0:testCompile (default-testCompile) @ cli ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug release 17] to target/test-classes
+[WARNING] /work/mvn-multi/cli/src/test/java/demo/SvcTest.java:[4,62] v() in demo.cliSvc has been deprecated
+[INFO] 
+[INFO] --- surefire:3.6.1:test (default-test) @ cli ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running demo.SvcTest
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.030 s -- in demo.SvcTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for parent 1.0:
+[INFO] 
+[INFO] parent ............................................. SUCCESS [  0.158 s]
+[INFO] core ............................................... SUCCESS [  0.623 s]
+[INFO] cli ................................................ SUCCESS [  0.638 s]
+[ERROR] web ................................................ FAILURE [  0.332 s]
+[INFO] ------------------------------------------------------------------------
+[ERROR] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  1.810 s
+[INFO] Finished at: 2026-11-21T02:04:15Z
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.6.1:test (default-test) on project web: There are test failures.
+[ERROR] 
+[ERROR] See /work/mvn-multi/web/target/surefire-reports for the individual test results.
+[ERROR] See dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
+[ERROR] 
+[ERROR] After correcting the problems, you can resume the build with the command
+[ERROR]   mvn <args> -rf :web

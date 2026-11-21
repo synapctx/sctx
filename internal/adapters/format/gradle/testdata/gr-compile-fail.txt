@@ -1,0 +1,45 @@
+
+> Task :compileJava FAILED
+/work/gr-compile/src/main/java/demo/Calc.java:3: error: cannot find symbol
+    public int add(int a, int b) { return a + c; }
+                                              ^
+  symbol:   variable c
+  location: class Calc
+/work/gr-compile/src/main/java/demo/Calc.java:4: error: incompatible types: int cannot be converted to String
+    public String div(int a, int b) { return a / b; }
+                                               ^
+/work/gr-compile/src/main/java/demo/Calc.java:5: error: cannot find symbol
+    void x() { undefined(); }
+               ^
+  symbol:   method undefined()
+  location: class Calc
+3 errors
+
+[Incubating] Problems report is available at: file:///work/gr-compile/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava' (registered by plugin class 'org.gradle.api.plugins.JavaBasePlugin').
+> Compilation failed; see the compiler output below.
+  /work/gr-compile/src/main/java/demo/Calc.java:3: error: cannot find symbol
+      public int add(int a, int b) { return a + c; }
+                                                ^
+    symbol:   variable c
+    location: class Calc
+  /work/gr-compile/src/main/java/demo/Calc.java:4: error: incompatible types: int cannot be converted to String
+      public String div(int a, int b) { return a / b; }
+                                                 ^
+  /work/gr-compile/src/main/java/demo/Calc.java:5: error: cannot find symbol
+      void x() { undefined(); }
+                 ^
+    symbol:   method undefined()
+    location: class Calc
+  3 errors
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 571ms
+1 actionable task: 1 executed

@@ -1,0 +1,29 @@
+err.c: In function 'add':
+err.c:2:36: error: 'undefined_var' undeclared (first use in this function)
+    2 | int add(int a, int b) { return a + undefined_var; }
+      |                                    ^~~~~~~~~~~~~
+err.c:2:36: note: each undeclared identifier is reported only once for each function it appears in
+err.c: In function 'main':
+err.c:4:13: error: initialization of 'int' from 'char *' makes integer from pointer without a cast [-Wint-conversion]
+    4 |     int x = "str";
+      |             ^~~~~
+err.c:5:20: error: 'y' undeclared (first use in this function)
+    5 |     printf("%d\n", y);
+      |                    ^
+err.c:6:5: error: implicit declaration of function 'foo' [-Wimplicit-function-declaration]
+    6 |     foo(3);
+      |     ^~~
+err.c:7:15: error: implicit declaration of function 'malloc' [-Wimplicit-function-declaration]
+    7 |     char *p = malloc(4)
+      |               ^~~~~~
+err.c:2:1: note: include '<stdlib.h>' or provide a declaration of 'malloc'
+    1 | #include <stdio.h>
+  +++ |+#include <stdlib.h>
+    2 | int add(int a, int b) { return a + undefined_var; }
+err.c:7:15: warning: incompatible implicit declaration of built-in function 'malloc' [-Wbuiltin-declaration-mismatch]
+    7 |     char *p = malloc(4)
+      |               ^~~~~~
+err.c:7:15: note: include '<stdlib.h>' or provide a declaration of 'malloc'
+err.c:8:5: error: expected ',' or ';' before 'return'
+    8 |     return 0;
+      |     ^~~~~~

@@ -1,0 +1,36 @@
+null_resource.boom: Refreshing state... [id=6335194876911290076]
+null_resource.a: Refreshing state... [id=8067118695588076596]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+-/+ destroy and then create replacement
+
+Terraform will perform the following actions:
+
+  # local_file.bad will be created
+  + resource "local_file" "bad" {
+      + content              = "x"
+      + content_base64sha256 = (known after apply)
+      + content_base64sha512 = (known after apply)
+      + content_md5          = (known after apply)
+      + content_sha1         = (known after apply)
+      + content_sha256       = (known after apply)
+      + content_sha512       = (known after apply)
+      + directory_permission = "0777"
+      + file_permission      = "0777"
+      + filename             = "/nonexistent-dir-sctx/x/y.txt"
+      + id                   = (known after apply)
+    }
+
+  # null_resource.boom is tainted, so must be replaced
+-/+ resource "null_resource" "boom" {
+      ~ id = "6335194876911290076" -> (known after apply)
+    }
+
+Plan: 2 to add, 0 to change, 1 to destroy.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.

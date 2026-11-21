@@ -2,6 +2,7 @@ package brew
 
 import (
 	"context"
+	"os"
 	"strings"
 	"testing"
 
@@ -27,6 +28,8 @@ func TestSubcommand(t *testing.T) {
 		{"install", []string{"brew", "install", "wget"}, "install"},
 		{"upgrade", []string{"brew", "upgrade", "wget"}, "upgrade"},
 		{"install with flag", []string{"brew", "install", "--verbose", "wget"}, "install"},
+		{"update", []string{"brew", "update"}, "update"},
+		{"reinstall", []string{"brew", "reinstall", "wget"}, "reinstall"},
 		{"list unsupported", []string{"brew", "list"}, ""},
 		{"info unsupported", []string{"brew", "info", "wget"}, ""},
 		{"bare", []string{"brew"}, ""},
@@ -211,5 +214,68 @@ func TestRelaxedKeepsErrorSignal(t *testing.T) {
 	}
 	if !strings.Contains(body, "curl: (6) Could not resolve host: ghcr.io") {
 		t.Errorf("curl error dropped: %q", body)
+	}
+}
+
+func readTestdata(t *testing.T, name string) string {
+	t.Helper()
+	b, err := os.ReadFile("testdata/" + name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(b)
+}
+
+// Real captures from Homebrew on Linux (homebrew/brew image): current brew
+// prints one "✔︎ Bottle ..." line per fetched item and a "#=#=#" curl spinner.
+func TestAggressiveRealCaptures(t *testing.T) {
+	cases := []struct {
+		file string
+		argv []string
+		keep []string
+		drop []string
+	}{
+		{"install-deps.txt", []string{"brew", "install", "hello"},
+			[]string{"==> Would install 12 dependencies for hello:", "==> Installing hello dependency: gcc (16.2.0)",
+				"Warning: Landlock ABI 10 or later is required", "🍺  /home/linuxbrew/.linuxbrew/Cellar/hello/2.12.3: 58 files, 879KB", "fetch/progress lines"},
+			[]string{"✔︎ Bottle", "==> Pouring"}},
+		{"install-jq.txt", []string{"brew", "install", "jq"},
+			[]string{"==> Installing jq", "🍺  /home/linuxbrew/.linuxbrew/Cellar/jq/1.8.2: 21 files, 1.7MB"}, []string{"✔︎"}},
+		{"update.txt", []string{"brew", "update"},
+			[]string{"Already up-to-date."}, []string{"#=#=#", "analytics", "unpaid volunteers", "brew analytics on", "JSON API"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.file, func(t *testing.T) {
+			raw := readTestdata(t, tc.file)
+			out, err := New().Aggressive(context.Background(), format.Input{Argv: tc.argv, Stdout: strings.NewReader(raw)})
+			if err != nil {
+				t.Fatal(err)
+			}
+			body := string(out.Body)
+			if len(body) >= len(raw) {
+				t.Errorf("not smaller: %d >= %d", len(body), len(raw))
+			}
+			for _, k := range tc.keep {
+				if !strings.Contains(body, k) {
+					t.Errorf("lost %q:\n%s", k, body)
+				}
+			}
+			for _, d := range tc.drop {
+				if strings.Contains(body, d) {
+					t.Errorf("kept %q", d)
+				}
+			}
+		})
+	}
+}
+
+func TestFailedInstallAndOtherSubcommandsDecline(t *testing.T) {
+	fail := readTestdata(t, "install-fail.txt")
+	out, err := New().Aggressive(context.Background(), format.Input{Argv: []string{"brew", "install", "nonexistentformulazz"}, Stdout: strings.NewReader(fail), ExitCode: 1})
+	if err == nil && !strings.Contains(string(out.Body), "Error: No formulae or casks found for nonexistentformulazz.") {
+		t.Errorf("error line lost:\n%s", out.Body)
+	}
+	if _, err := New().Aggressive(context.Background(), format.Input{Argv: []string{"brew", "doctor"}, Stdout: strings.NewReader(readTestdata(t, "doctor.txt"))}); err == nil {
+		t.Error("doctor must decline at the aggressive tier")
 	}
 }

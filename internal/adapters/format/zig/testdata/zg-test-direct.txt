@@ -1,0 +1,35 @@
+1/4 main.test.adds... OK
+2/4 main.test.adds wrong... expected 4, found 3
+FAIL (TestExpectedEqual)
+/usr/lib/zig/std/testing.zig:93:17: 0x104e61f in expectEqualInner__anon_1051 (test)
+                return error.TestExpectedEqual;
+                ^
+/work/proj/src/main.zig:5:21: 0x104e887 in test.adds wrong (test)
+test "adds wrong" { try std.testing.expectEqual(@as(i32, 4), add(1, 2)); }
+                    ^
+3/4 main.test.slices... 
+====== expected this output: =========
+hello␃
+
+======== instead found this: =========
+hellp␃
+
+======================================
+First difference occurs on line 1:
+expected:
+hello
+    ^ ('\x6f')
+found:
+hellp
+    ^ ('\x70')
+FAIL (TestExpectedEqual)
+/usr/lib/zig/std/testing.zig:622:9: 0x104ea3b in expectEqualStrings (test)
+        return error.TestExpectedEqual;
+        ^
+/work/proj/src/main.zig:6:17: 0x104f5ef in test.slices (test)
+test "slices" { try std.testing.expectEqualStrings("hello", "hellp"); }
+                ^
+4/4 main.test.ok2... OK
+2 passed; 0 skipped; 2 failed.
+error: the following test command failed with exit code 1:
+/tmp/zl/o/3641b18392990033e601756acf388be8/test

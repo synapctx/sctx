@@ -1,0 +1,44 @@
+
+ NX   Running target test for 3 projects and 3 tasks they depend on:
+
+- @m/a
+- @m/b
+- @m/c
+
+
+✔  nx run @m/a:build  [local cache]
+✔  nx run @m/b:build  [local cache]
+✔  nx run @m/c:build  [local cache]
+
+> nx run @m/b:test
+
+
+> @m/b@1.0.0 test
+> echo running tests b && echo FAIL expected 1 got 2 >&2 && exit 1
+
+running tests b
+FAIL expected 1 got 2
+npm error Lifecycle script `test` failed with error:
+npm error code 1
+npm error path /repo/packages/b
+npm error workspace @m/b@1.0.0
+npm error location /repo/packages/b
+npm error command failed
+npm error command sh -c echo running tests b && echo FAIL expected 1 got 2 >&2 && exit 1
+✔  nx run @m/c:test
+✔  nx run @m/a:test
+
+
+
+ NX   Running target test for 3 projects and 3 tasks they depend on failed
+
+Failed tasks:
+
+- @m/b:test
+
+Output of 5 successful tasks were not shown. Run with --verbose or --output-style=static to see it.
+
+  Run duration:      1.0s
+  Cache:             3/5 hit (60%)
+  Critical path:     1.0s (2 tasks)
+  Recoverable time:  <1ms

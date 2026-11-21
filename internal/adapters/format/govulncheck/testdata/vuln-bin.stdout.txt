@@ -1,0 +1,27 @@
+=== Symbol Results ===
+
+Vulnerability #1: GO-2022-1059
+    Denial of service via crafted Accept-Language header in
+    golang.org/x/text/language
+  More info: https://pkg.go.dev/vuln/GO-2022-1059
+  Module: golang.org/x/text
+    Found in: golang.org/x/text@v0.3.0
+    Fixed in: golang.org/x/text@v0.3.8
+    Vulnerable symbols found:
+      #1: language.ParseAcceptLanguage
+
+Vulnerability #2: GO-2021-0113
+    Out-of-bounds read in golang.org/x/text/language
+  More info: https://pkg.go.dev/vuln/GO-2021-0113
+  Module: golang.org/x/text
+    Found in: golang.org/x/text@v0.3.0
+    Fixed in: golang.org/x/text@v0.3.7
+    Vulnerable symbols found:
+      #1: language.Parse
+      #2: language.ParseAcceptLanguage
+
+Your code is affected by 2 vulnerabilities from 1 module.
+This scan also found 0 vulnerabilities in packages you import and 3
+vulnerabilities in modules you require, but your code doesn't appear to call
+these vulnerabilities.
+Use '-show verbose' for more details.

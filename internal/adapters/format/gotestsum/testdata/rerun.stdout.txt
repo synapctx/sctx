@@ -1,0 +1,25 @@
+✖  failpkg (81ms)
+
+DONE 5 tests, 3 failures in 0.081s
+
+✖  failpkg (76ms)
+✖  failpkg (79ms)
+
+=== Failed
+=== FAIL: failpkg TestMulBad (0.00s)
+    f_test.go:14: Mul(2,3) = 6, want 7
+
+=== FAIL: failpkg TestTable/two (0.00s)
+    f_test.go:22: got 4 want 5
+
+=== FAIL: failpkg TestTable (0.00s)
+
+=== FAIL: failpkg TestMulBad (re-run 1) (0.00s)
+    f_test.go:14: Mul(2,3) = 6, want 7
+
+=== FAIL: failpkg TestTable/two (re-run 1) (0.00s)
+    f_test.go:22: got 4 want 5
+
+=== FAIL: failpkg TestTable (re-run 1) (0.00s)
+
+DONE 2 runs, 8 tests, 6 failures in 0.579s

@@ -1,0 +1,6 @@
+[0m02:41:05  Running with dbt=1.12.7
+[0m02:41:05  Registered adapter: postgres=1.9.1
+[0m02:41:06  Found 14 models, 5 data tests, 476 macros
+[0m02:41:06  
+[0m02:41:06  Concurrency: 4 threads (target='dev')
+[0m02:41:06  

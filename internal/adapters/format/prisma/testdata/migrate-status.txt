@@ -1,0 +1,8 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+Datasource "db": SQLite database "dev.db" at "file:./dev.db"
+
+1 migration found in prisma/migrations
+
+Database schema is up to date!

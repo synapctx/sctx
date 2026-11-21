@@ -1,0 +1,3 @@
+Fetching gem metadata from https://rubygems.org/...........
+Could not find gem 'nonexistent-gem-xyz' in rubygems repository
+https://rubygems.org/ or installed locally.

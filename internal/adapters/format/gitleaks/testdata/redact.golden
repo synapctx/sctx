@@ -1,0 +1,14 @@
+gitleaks: 6 leaks in 3 files (slack-bot-token=2 aws-access-token=1 generic-api-key=1 github-pat=1 hashicorp-tf-password=1)
+secrets/app.env (2)
+  2 generic-api-key a5b5c0c3
+  1 aws-access-token a5b5c0c3
+secrets/config.py (3)
+  2 github-pat a5b5c0c3
+  3 slack-bot-token a5b5c0c3
+  3 slack-bot-token aad0583c
+tf/main.tf (1)
+  36 hashicorp-tf-password aad0583c
+…+42 lines withheld (secret/match values, entropy, author, email, date, fingerprint)
+INF 2 commits scanned.
+INF scanned ~3101 bytes (3.10 KB) in 887ms
+WRN leaks found: 6

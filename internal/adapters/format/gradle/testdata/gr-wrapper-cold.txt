@@ -1,0 +1,18 @@
+Fetching distribution.
+Downloading https://services.gradle.org/distributions/gradle-9.9.2-bin.zip
+............10%.............20%.............30%.............40%.............50%.............60%.............70%............80%.............90%.............100%
+> Task :compileJava
+> Task :processResources NO-SOURCE
+> Task :classes
+> Task :jar
+> Task :assemble
+> Task :compileTestJava
+> Task :processTestResources NO-SOURCE
+> Task :testClasses
+> Task :test
+> Task :check
+> Task :build
+
+BUILD SUCCESSFUL in 4s
+4 actionable tasks: 4 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.9.2/userguide/configuration_cache_enabling.html

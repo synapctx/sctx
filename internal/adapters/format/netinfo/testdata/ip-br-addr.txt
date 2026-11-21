@@ -1,0 +1,37 @@
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+tunl0@NONE       DOWN           
+gre0@NONE        DOWN           
+gretap0@NONE     DOWN           
+erspan0@NONE     DOWN           
+ip_vti0@NONE     DOWN           
+ip6_vti0@NONE    DOWN           
+sit0@NONE        DOWN           
+ip6tnl0@NONE     DOWN           
+ip6gre0@NONE     DOWN           
+eth0@if252       UP             10.0.0.2/16 
+br0              UP             10.0.1.1/16 fe80::c454:53ff:fe68:86e3/64 
+vpeer1@veth1     UP             fe80::34ad:1bff:feed:c1cb/64 
+veth1@vpeer1     UP             fe80::fc3e:6eff:fe2b:c974/64 
+vpeer2@veth2     UP             fe80::48ff:a9ff:fe3e:e638/64 
+veth2@vpeer2     UP             fe80::cc66:3dff:feb7:874/64 
+vpeer3@veth3     UP             fe80::24a2:e0ff:fe18:4921/64 
+veth3@vpeer3     UP             fe80::d030:31ff:fe63:b3fe/64 
+vpeer4@veth4     UP             fe80::94fe:45ff:feb5:3c52/64 
+veth4@vpeer4     UP             fe80::28f1:98ff:fecb:5d03/64 
+vpeer5@veth5     UP             fe80::403e:91ff:fedc:b07f/64 
+veth5@vpeer5     UP             fe80::d491:79ff:fee5:a31e/64 
+vpeer6@veth6     UP             fe80::405d:69ff:fe31:35df/64 
+veth6@vpeer6     UP             fe80::b4eb:a9ff:fec9:a57a/64 
+vpeer7@veth7     UP             fe80::7c57:c2ff:feb7:33d1/64 
+veth7@vpeer7     UP             fe80::55:6ff:feb9:1a1/64 
+vpeer8@veth8     UP             fe80::d4cd:33ff:fe8d:2225/64 
+veth8@vpeer8     UP             fe80::986c:69ff:fe15:7ce0/64 
+vpeer9@veth9     UP             fe80::c824:6bff:feba:a702/64 
+veth9@vpeer9     UP             fe80::98be:d6ff:fe60:dc9b/64 
+vpeer10@veth10   UP             fe80::c8a1:3fff:fe43:46b4/64 
+veth10@vpeer10   UP             fe80::bc19:e2ff:fe16:a0f6/64 
+vpeer11@veth11   UP             fe80::47f:57ff:fef6:c73b/64 
+veth11@vpeer11   UP             fe80::80c4:d3ff:fe4f:7ad7/64 
+vpeer12@veth12   UP             fe80::5474:79ff:fe48:7437/64 
+veth12@vpeer12   UP             fe80::7886:14ff:fe9a:26b5/64 
+dummy0           UNKNOWN        10.0.0.5/24 10.0.0.6/24 fe80::ec2d:6aff:fe87:c69c/64 

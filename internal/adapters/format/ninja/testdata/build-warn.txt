@@ -1,0 +1,4 @@
+[1/4] Building C object CMakeFiles/b.dir/src/b.c.o
+[2/4] Linking C static library liba.a
+[3/4] Linking C static library libb.a
+[4/4] Linking C executable app

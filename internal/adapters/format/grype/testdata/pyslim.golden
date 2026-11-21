@@ -1,0 +1,337 @@
+grype: 771 vulnerabilities (critical=33 high=255 medium=317 low=51 negligible=91 unknown=24)
+  libc-bin 2.36-9+deb12u1
+    CVE-2023-4911 HIGH -> 2.36-9+deb12u3 KEV
+    CVE-2024-2961 HIGH -> 2.36-9+deb12u6
+    CVE-2023-6246 HIGH -> 2.36-9+deb12u4
+    CVE-2023-6779 HIGH -> 2.36-9+deb12u4
+    CVE-2024-33599 HIGH -> 2.36-9+deb12u7
+    CVE-2024-33601 HIGH -> 2.36-9+deb12u7
+    CVE-2026-5450 CRITICAL (won't fix)
+    CVE-2026-0915 HIGH -> 2.36-9+deb12u14
+    CVE-2025-4802 HIGH -> 2.36-9+deb12u11
+    CVE-2025-15281 HIGH -> 2.36-9+deb12u14
+    CVE-2026-0861 HIGH -> 2.36-9+deb12u14
+    CVE-2024-33602 HIGH -> 2.36-9+deb12u7
+    CVE-2026-4046 HIGH -> 2.36-9+deb12u14
+    CVE-2026-4437 HIGH -> 2.36-9+deb12u14
+    CVE-2026-5928 HIGH (won't fix)
+    CVE-2026-19499 HIGH (won't fix)
+    CVE-2026-84243 HIGH (no fix)
+    CVE-2026-5435 HIGH (won't fix)
+  libc6 2.36-9+deb12u1
+    CVE-2023-4911 HIGH -> 2.36-9+deb12u3 KEV
+    CVE-2024-2961 HIGH -> 2.36-9+deb12u6
+    CVE-2023-6246 HIGH -> 2.36-9+deb12u4
+    CVE-2023-6779 HIGH -> 2.36-9+deb12u4
+    CVE-2024-33599 HIGH -> 2.36-9+deb12u7
+    CVE-2024-33601 HIGH -> 2.36-9+deb12u7
+    CVE-2026-5450 CRITICAL (won't fix)
+    CVE-2026-0915 HIGH -> 2.36-9+deb12u14
+    CVE-2025-4802 HIGH -> 2.36-9+deb12u11
+    CVE-2025-15281 HIGH -> 2.36-9+deb12u14
+    CVE-2026-0861 HIGH -> 2.36-9+deb12u14
+    CVE-2024-33602 HIGH -> 2.36-9+deb12u7
+    CVE-2026-4046 HIGH -> 2.36-9+deb12u14
+    CVE-2026-4437 HIGH -> 2.36-9+deb12u14
+    CVE-2026-5928 HIGH (won't fix)
+    CVE-2026-19499 HIGH (won't fix)
+    CVE-2026-84243 HIGH (no fix)
+    CVE-2026-5435 HIGH (won't fix)
+  libsystemd0 252.12-1~deb12u1
+    CVE-2023-50387 HIGH -> 252.23-1~deb12u1
+    CVE-2023-50868 HIGH -> 252.23-1~deb12u1
+  libudev1 252.12-1~deb12u1
+    CVE-2023-50387 HIGH -> 252.23-1~deb12u1
+    CVE-2023-50868 HIGH -> 252.23-1~deb12u1
+  libssl3 3.0.9-1
+    CVE-2025-15467 CRITICAL -> 3.0.18-1~deb12u2
+    CVE-2024-6119 HIGH -> 3.0.14-1~deb12u2
+    CVE-2024-9143 HIGH -> 3.0.15-1~deb12u1
+    CVE-2024-5535 CRITICAL -> 3.0.15-1~deb12u1
+    CVE-2026-45447 HIGH -> 3.0.20-1~deb12u2
+    CVE-2024-4741 CRITICAL -> 3.0.14-1~deb12u1
+    CVE-2023-5363 HIGH -> 3.0.11-1~deb12u2
+    CVE-2025-9230 CRITICAL -> 3.0.17-1~deb12u3
+    CVE-2026-63076 HIGH -> 3.0.22-1~deb12u1
+    CVE-2026-34182 CRITICAL -> 3.0.20-1~deb12u2
+    CVE-2026-31790 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-34180 HIGH -> 3.0.20-1~deb12u2
+    CVE-2026-84782 HIGH -> 3.0.22-1~deb12u2
+    CVE-2025-69421 HIGH -> 3.0.18-1~deb12u2
+    CVE-2025-69420 HIGH -> 3.0.18-1~deb12u2
+    CVE-2026-28388 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-63072 HIGH -> 3.0.22-1~deb12u1
+    CVE-2026-7383 HIGH -> 3.0.20-1~deb12u2
+    CVE-2026-28389 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-28390 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-28387 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-9076 HIGH -> 3.0.20-1~deb12u2
+    CVE-2026-45445 HIGH -> 3.0.20-1~deb12u2
+    CVE-2026-54874 HIGH -> 3.0.22-1~deb12u1
+    CVE-2025-69419 HIGH -> 3.0.18-1~deb12u2
+    CVE-2026-107496 HIGH (no fix)
+    CVE-2026-31789 CRITICAL -> 3.0.19-1~deb12u2
+    CVE-2026-75803 CRITICAL -> 3.0.22-1~deb12u1
+    CVE-2026-107493 HIGH (no fix)
+    CVE-2026-84786 HIGH (no fix)
+  openssl 3.0.9-1
+    CVE-2025-15467 CRITICAL -> 3.0.18-1~deb12u2
+    CVE-2024-6119 HIGH -> 3.0.14-1~deb12u2
+    CVE-2024-9143 HIGH -> 3.0.15-1~deb12u1
+    CVE-2024-5535 CRITICAL -> 3.0.15-1~deb12u1
+    CVE-2026-45447 HIGH -> 3.0.20-1~deb12u2
+    CVE-2024-4741 CRITICAL -> 3.0.14-1~deb12u1
+    CVE-2023-5363 HIGH -> 3.0.11-1~deb12u2
+    CVE-2025-9230 CRITICAL -> 3.0.17-1~deb12u3
+    CVE-2026-63076 HIGH -> 3.0.22-1~deb12u1
+    CVE-2026-34182 CRITICAL -> 3.0.20-1~deb12u2
+    CVE-2026-31790 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-34180 HIGH -> 3.0.20-1~deb12u2
+    CVE-2026-84782 HIGH -> 3.0.22-1~deb12u2
+    CVE-2025-69421 HIGH -> 3.0.18-1~deb12u2
+    CVE-2025-69420 HIGH -> 3.0.18-1~deb12u2
+    CVE-2026-28388 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-63072 HIGH -> 3.0.22-1~deb12u1
+    CVE-2026-7383 HIGH -> 3.0.20-1~deb12u2
+    CVE-2026-28389 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-28390 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-28387 HIGH -> 3.0.19-1~deb12u2
+    CVE-2026-9076 HIGH -> 3.0.20-1~deb12u2
+    CVE-2026-45445 HIGH -> 3.0.20-1~deb12u2
+    CVE-2026-54874 HIGH -> 3.0.22-1~deb12u1
+    CVE-2025-69419 HIGH -> 3.0.18-1~deb12u2
+    CVE-2026-107496 HIGH (no fix)
+    CVE-2026-31789 CRITICAL -> 3.0.19-1~deb12u2
+    CVE-2026-75803 CRITICAL -> 3.0.22-1~deb12u1
+    CVE-2026-107493 HIGH (no fix)
+    CVE-2026-84786 HIGH (no fix)
+  libsqlite3-0 3.40.1-2
+    CVE-2025-6965 HIGH -> 3.40.1-2+deb12u2
+    CVE-2023-7104 HIGH -> 3.40.1-2+deb12u1
+    CVE-2025-7458 CRITICAL (won't fix)
+    CVE-2026-119379 HIGH (no fix)
+    CVE-2026-119374 HIGH (no fix)
+    CVE-2026-11824 HIGH (won't fix)
+    CVE-2026-119373 HIGH (no fix)
+  python 3.7.17
+    CVE-2019-9674 HIGH (no fix)
+    CVE-2024-7592 HIGH -> *3.8.20, 3.9.20, 3.10.15, 3.11.10, ...
+    CVE-2024-6232 HIGH -> *3.8.20, 3.9.20, 3.10.15, 3.11.10, ...
+    CVE-2025-4517 CRITICAL -> *3.9.23, 3.10.18, 3.11.13, 3.12.11, ...
+    CVE-2025-13836 HIGH -> *3.10.20, 3.11.15, 3.12.13, 3.13.11, ...
+    CVE-2023-36632 HIGH (no fix)
+    CVE-2025-4138 HIGH -> *3.9.23, 3.10.18, 3.11.13, 3.12.11, ...
+    CVE-2024-8088 HIGH -> *3.8.20, 3.9.20, 3.10.15, 3.11.10, ...
+    CVE-2024-4032 HIGH -> *3.8.20, 3.9.20, 3.10.15, 3.11.10, ...
+    CVE-2025-4330 HIGH -> *3.9.23, 3.10.18, 3.11.13, 3.12.11, ...
+    CVE-2024-0397 HIGH -> *3.8.20, 3.9.20, 3.10.14, 3.11.9, ...
+    CVE-2026-11940 HIGH -> *3.10.21, 3.11.16, 3.12.14, 3.13.15, ...
+    CVE-2025-8194 HIGH -> *3.9.24, 3.10.19, 3.11.14, 3.12.12, ...
+    CVE-2026-11972 HIGH -> *3.10.21, 3.11.16, 3.12.14, 3.13.15, ...
+    CVE-2026-4224 HIGH -> *3.10.21, 3.11.16, 3.12.14, 3.13.13, ...
+    CVE-2026-15308 HIGH -> *3.10.21, 3.11.16, 3.12.14, 3.13.15, ...
+    CVE-2026-115557 CRITICAL -> *3.11.18, 3.12.16, 3.13.18, 3.14.10, ...
+    CVE-2026-7210 HIGH -> *3.10.22, 3.11.16, 3.12.14, 3.13.14, ...
+    CVE-2026-19445 CRITICAL -> *3.10.22, 3.11.17, 3.12.15, 3.13.16, ...
+    CVE-2026-6100 HIGH -> *3.10.21, 3.11.16, 3.12.14, 3.13.14, ...
+    CVE-2025-4435 HIGH -> *3.9.23, 3.10.18, 3.11.13, 3.12.11, ...
+    CVE-2024-9287 HIGH -> *3.9.21, 3.10.16, 3.11.11, 3.12.8, ...
+    CVE-2026-19553 HIGH -> *3.10.22, 3.11.17, 3.12.15, 3.13.16, ...
+    CVE-2026-3644 HIGH -> *3.10.21, 3.11.16, 3.12.14, 3.13.13, ...
+    CVE-2026-9669 HIGH -> *3.10.21, 3.11.16, 3.12.14, 3.13.14, ...
+    CVE-2023-6597 HIGH -> *3.8.19, 3.9.19, 3.10.14, 3.11.8, ...
+    CVE-2026-4786 HIGH -> *3.10.21, 3.11.16, 3.12.14, 3.13.14, ...
+    CVE-2026-82049 HIGH -> *3.10.22, 3.11.17, 3.12.15, 3.13.16, ...
+  setuptools 57.5.0
+    GHSA-r9hx-vwmv-q579 HIGH -> 65.5.1
+    GHSA-cx63-2mw6-8hw5 HIGH -> 70.0.0
+    GHSA-5rjg-fvgr-3xxf HIGH -> 78.1.1
+  libgnutls30 3.7.9-2
+    CVE-2026-33845 CRITICAL -> 3.7.9-2+deb12u7
+    CVE-2024-0553 HIGH -> 3.7.9-2+deb12u2
+    CVE-2025-32988 HIGH -> 3.7.9-2+deb12u5
+    CVE-2024-0567 HIGH -> 3.7.9-2+deb12u2
+    CVE-2026-42009 HIGH -> 3.7.9-2+deb12u7
+    CVE-2026-42010 CRITICAL -> 3.7.9-2+deb12u7
+    CVE-2026-33846 HIGH -> 3.7.9-2+deb12u7
+    CVE-2025-32990 HIGH -> 3.7.9-2+deb12u5
+    CVE-2026-5260 HIGH -> 3.7.9-2+deb12u7
+    CVE-2026-3833 HIGH -> 3.7.9-2+deb12u7
+    CVE-2026-42011 HIGH -> 3.7.9-2+deb12u7
+    CVE-2026-42013 HIGH -> 3.7.9-2+deb12u7
+    CVE-2026-42012 HIGH -> 3.7.9-2+deb12u7
+  libgssapi-krb5-2 1.20.1-2
+    CVE-2024-37371 CRITICAL -> 1.20.1-2+deb12u2
+    CVE-2026-112314 HIGH (no fix)
+    CVE-2026-112321 HIGH (no fix)
+    CVE-2026-112322 HIGH (no fix)
+    CVE-2026-112320 HIGH (no fix)
+    CVE-2026-112323 HIGH (no fix)
+    CVE-2026-119079 HIGH (no fix)
+    CVE-2024-37370 HIGH -> 1.20.1-2+deb12u2
+    CVE-2026-40355 HIGH -> 1.20.1-2+deb12u5
+    CVE-2026-40356 HIGH -> 1.20.1-2+deb12u5
+    CVE-2025-24528 HIGH -> 1.20.1-2+deb12u3
+    CVE-2026-107778 HIGH (won't fix)
+  libk5crypto3 1.20.1-2
+    CVE-2024-37371 CRITICAL -> 1.20.1-2+deb12u2
+    CVE-2026-112314 HIGH (no fix)
+    CVE-2026-112321 HIGH (no fix)
+    CVE-2026-112322 HIGH (no fix)
+    CVE-2026-112320 HIGH (no fix)
+    CVE-2026-112323 HIGH (no fix)
+    CVE-2026-119079 HIGH (no fix)
+    CVE-2024-37370 HIGH -> 1.20.1-2+deb12u2
+    CVE-2026-40355 HIGH -> 1.20.1-2+deb12u5
+    CVE-2026-40356 HIGH -> 1.20.1-2+deb12u5
+    CVE-2025-24528 HIGH -> 1.20.1-2+deb12u3
+    CVE-2026-107778 HIGH (won't fix)
+  libkrb5-3 1.20.1-2
+    CVE-2024-37371 CRITICAL -> 1.20.1-2+deb12u2
+    CVE-2026-112314 HIGH (no fix)
+    CVE-2026-112321 HIGH (no fix)
+    CVE-2026-112322 HIGH (no fix)
+    CVE-2026-112320 HIGH (no fix)
+    CVE-2026-112323 HIGH (no fix)
+    CVE-2026-119079 HIGH (no fix)
+    CVE-2024-37370 HIGH -> 1.20.1-2+deb12u2
+    CVE-2026-40355 HIGH -> 1.20.1-2+deb12u5
+    CVE-2026-40356 HIGH -> 1.20.1-2+deb12u5
+    CVE-2025-24528 HIGH -> 1.20.1-2+deb12u3
+    CVE-2026-107778 HIGH (won't fix)
+  libkrb5support0 1.20.1-2
+    CVE-2024-37371 CRITICAL -> 1.20.1-2+deb12u2
+    CVE-2026-112314 HIGH (no fix)
+    CVE-2026-112321 HIGH (no fix)
+    CVE-2026-112322 HIGH (no fix)
+    CVE-2026-112320 HIGH (no fix)
+    CVE-2026-112323 HIGH (no fix)
+    CVE-2026-119079 HIGH (no fix)
+    CVE-2024-37370 HIGH -> 1.20.1-2+deb12u2
+    CVE-2026-40355 HIGH -> 1.20.1-2+deb12u5
+    CVE-2026-40356 HIGH -> 1.20.1-2+deb12u5
+    CVE-2025-24528 HIGH -> 1.20.1-2+deb12u3
+    CVE-2026-107778 HIGH (won't fix)
+  libexpat1 2.5.0-1
+    CVE-2023-52425 HIGH -> 2.5.0-1+deb12u2
+    CVE-2024-28757 HIGH -> 2.5.0-1+deb12u4
+    CVE-2024-45492 CRITICAL -> 2.5.0-1+deb12u1
+    CVE-2024-45490 HIGH -> 2.5.0-1+deb12u1
+    CVE-2025-59375 HIGH -> 2.5.0-1+deb12u5
+    CVE-2024-45491 CRITICAL -> 2.5.0-1+deb12u1
+    CVE-2024-8176 HIGH -> 2.5.0-1+deb12u2
+    CVE-2026-66046 HIGH -> 2.5.0-1+deb12u4
+    CVE-2026-113351 HIGH (won't fix)
+    CVE-2026-115506 HIGH (won't fix)
+    CVE-2026-45186 HIGH -> 2.5.0-1+deb12u4
+    CVE-2026-93990 HIGH -> 2.5.0-1+deb12u4
+    CVE-2026-117610 HIGH (no fix)
+    CVE-2026-102633 HIGH -> 2.5.0-1+deb12u5
+    CVE-2026-118370 HIGH (no fix)
+    CVE-2026-41080 HIGH (won't fix)
+    CVE-2026-77214 HIGH -> 2.5.0-1+deb12u5
+    CVE-2026-25210 HIGH -> 2.5.0-1+deb12u4
+    CVE-2026-76957 HIGH -> 2.5.0-1+deb12u3
+  perl-base 5.36.0-7
+    CVE-2023-31484 HIGH -> 5.36.0-7+deb12u3
+    CVE-2023-47038 HIGH -> 5.36.0-7+deb12u1
+    CVE-2026-8376 CRITICAL -> 5.36.0-7+deb12u4
+    CVE-2026-12087 CRITICAL -> 5.36.0-7+deb12u4
+    CVE-2026-57433 CRITICAL -> 5.36.0-7+deb12u4
+    CVE-2026-13221 CRITICAL -> 5.36.0-7+deb12u4
+    CVE-2026-82560 HIGH (won't fix)
+    CVE-2026-42496 CRITICAL -> 5.36.0-7+deb12u4
+    CVE-2026-48959 HIGH -> 5.36.0-7+deb12u4
+    CVE-2024-56406 HIGH -> 5.36.0-7+deb12u2
+    CVE-2026-9538 HIGH (won't fix)
+    CVE-2026-42497 HIGH -> 5.36.0-7+deb12u4
+    CVE-2026-48962 HIGH -> 5.36.0-7+deb12u4
+    CVE-2026-7017 HIGH -> 5.36.0-7+deb12u4
+    CVE-2026-57432 HIGH -> 5.36.0-7+deb12u4
+  libtasn1-6 4.19.0-2
+    CVE-2025-13151 HIGH (won't fix)
+  apt 2.6.1
+    CVE-2026-109518 HIGH -> 2.6.2
+  libapt-pkg6.0 2.6.1
+    CVE-2026-109518 HIGH -> 2.6.2
+  liblzma5 5.4.1-0.2
+    CVE-2025-31115 HIGH -> 5.4.1-1
+  gzip 1.12-1
+    CVE-2026-41992 HIGH (won't fix)
+  libncursesw6 6.4-4
+    CVE-2025-69720 HIGH (won't fix)
+  libtinfo6 6.4-4
+    CVE-2025-69720 HIGH (won't fix)
+  ncurses-base 6.4-4
+    CVE-2025-69720 HIGH (won't fix)
+  ncurses-bin 6.4-4
+    CVE-2025-69720 HIGH (won't fix)
+  libpam-modules 1.5.2-6
+    CVE-2025-6020 HIGH (no fix)
+  libpam-modules-bin 1.5.2-6
+    CVE-2025-6020 HIGH (no fix)
+  libpam-runtime 1.5.2-6
+    CVE-2025-6020 HIGH (no fix)
+  libpam0g 1.5.2-6
+    CVE-2025-6020 HIGH (no fix)
+  dpkg 1.21.22
+    CVE-2025-6297 HIGH -> 1.21.23
+    CVE-2026-2219 HIGH -> 1.21.23
+  zlib1g 1:1.2.13.dfsg-1
+    CVE-2026-85091 HIGH (no fix)
+  gcc-12-base 12.2.0-14
+    CVE-2026-95619 HIGH (won't fix)
+    CVE-2026-102010 HIGH (won't fix)
+  libgcc-s1 12.2.0-14
+    CVE-2026-95619 HIGH (won't fix)
+    CVE-2026-102010 HIGH (won't fix)
+  libstdc++6 12.2.0-14
+    CVE-2026-95619 HIGH (won't fix)
+    CVE-2026-102010 HIGH (won't fix)
+  libpcre2-8-0 10.42-1
+    CVE-2026-86145 HIGH -> 10.42-1+deb12u1
+    CVE-2026-89157 HIGH -> 10.42-1+deb12u1
+    CVE-2026-103111 HIGH -> 10.42-1+deb12u2
+    CVE-2026-89161 HIGH -> 10.42-1+deb12u1
+  wheel 0.41.2
+    GHSA-8rrh-rw8j-w5fx HIGH -> 0.46.2
+  libcap2 1:2.66-4
+    CVE-2026-4878 HIGH -> 1:2.66-4+deb12u3
+  bsdutils 1:2.38.1-5+b1
+    CVE-2026-78410 HIGH (no fix)
+    CVE-2026-53615 HIGH (no fix)
+    CVE-2026-53613 HIGH (no fix)
+  libblkid1 2.38.1-5+b1
+    CVE-2026-78410 HIGH (no fix)
+    CVE-2026-53615 HIGH (no fix)
+    CVE-2026-53613 HIGH (no fix)
+  libmount1 2.38.1-5+b1
+    CVE-2026-78410 HIGH (no fix)
+    CVE-2026-53615 HIGH (no fix)
+    CVE-2026-53613 HIGH (no fix)
+  libsmartcols1 2.38.1-5+b1
+    CVE-2026-78410 HIGH (no fix)
+    CVE-2026-53615 HIGH (no fix)
+    CVE-2026-53613 HIGH (no fix)
+  libuuid1 2.38.1-5+b1
+    CVE-2026-78410 HIGH (no fix)
+    CVE-2026-53615 HIGH (no fix)
+    CVE-2026-53613 HIGH (no fix)
+  mount 2.38.1-5+b1
+    CVE-2026-78410 HIGH (no fix)
+    CVE-2026-53615 HIGH (no fix)
+    CVE-2026-53613 HIGH (no fix)
+  util-linux 2.38.1-5+b1
+    CVE-2026-78410 HIGH (no fix)
+    CVE-2026-53615 HIGH (no fix)
+    CVE-2026-53613 HIGH (no fix)
+  util-linux-extra 2.38.1-5+b1
+    CVE-2026-78410 HIGH (no fix)
+    CVE-2026-53615 HIGH (no fix)
+    CVE-2026-53613 HIGH (no fix)
+  libacl1 2.3.1-3
+    CVE-2026-54369 HIGH (won't fix)
+    CVE-2026-54370 HIGH (won't fix)
+  gpgv 2.2.40-1.1
+    CVE-2025-68973 HIGH -> 2.2.40-1.1+deb12u2
+  …+483 MEDIUM/LOW/NEGLIGIBLE/UNKNOWN (m=medium l=low n=negligible u=unknown): libssl3 3.0.9-1 m×23,l×3,n×1; openssl 3.0.9-1 m×23,l×3,n×1; python 3.7.17 m×43,l×9,n×2; libgnutls30 3.7.9-2 m×13,l×1,n×6; libgssapi-krb5-2 1.20.1-2 m×9,n×4,u×6; libk5crypto3 1.20.1-2 m×9,n×4,u×6; libkrb5-3 1.20.1-2 m×9,n×4,u×6; libkrb5support0 1.20.1-2 m×9,n×4,u×6; libc-bin 2.36-9+deb12u1 m×20,l×5,n×7; libc6 2.36-9+deb12u1 m×20,l×5,n×7; tar 1.34+dfsg-1.2 m×5,n×1; bsdutils 1:2.38.1-5+b1 m×3,l×1,n×2; libblkid1 2.38.1-5+b1 m×3,l×1,n×2; libmount1 2.38.1-5+b1 m×3,l×1,n×2; libsmartcols1 2.38.1-5+b1 m×3,l×1,n×2; libuuid1 2.38.1-5+b1 m×3,l×1,n×2; mount 2.38.1-5+b1 m×3,l×1,n×2; util-linux 2.38.1-5+b1 m×3,l×1,n×2; util-linux-extra 2.38.1-5+b1 m×3,l×1,n×2; libsystemd0 252.12-1~deb12u1 m×8,l×1,n×4; libudev1 252.12-1~deb12u1 m×8,l×1,n×4; libexpat1 2.5.0-1 m×21,l×1,n×1; libncursesw6 6.4-4 m×2; libtinfo6 6.4-4 m×2; ncurses-base 6.4-4 m×2; ncurses-bin 6.4-4 m×2; libtasn1-6 4.19.0-2 m×1; gcc-12-base 12.2.0-14 m×3,l×1,n×2; libgcc-s1 12.2.0-14 m×3,l×1,n×2; libstdc++6 12.2.0-14 m×3,l×1,n×2; perl-base 5.36.0-7 m×5,n×2; setuptools 57.5.0 m×1,l×1; liblzma5 5.4.1-0.2 m×1; pip 23.0.1 m×6,l×1; libpam-modules 1.5.2-6 m×3; libpam-modules-bin 1.5.2-6 m×3; libpam-runtime 1.5.2-6 m×3; libpam0g 1.5.2-6 m×3; libsqlite3-0 3.40.1-2 m×10,l×1,n×3; libtirpc-common 1.3.3+ds-1 m×2; libtirpc3 1.3.3+ds-1 m×2; libpcre2-8-0 10.42-1 m×3; login 1:4.13+dfsg1-1+b1 m×1,l×2,n×1; passwd 1:4.13+dfsg1-1+b1 m×1,l×2,n×1; dpkg 1.21.22 m×1; coreutils 9.1-1 l×1,n×4; zlib1g 1:1.2.13.dfsg-1 m×1; libgcrypt20 1.10.1-3 m×1,n×2; libcap2 1:2.66-4 m×1; gpgv 2.2.40-1.1 m×2,l×2,n×1; libp11-kit0 0.24.1-2 m×2; libattr1 1:2.5.1-4 m×1; libbz2-1.0 1.0.8-5+b1 m×1; apt 2.6.1 n×1; libapt-pkg6.0 2.6.1 n×1; gzip 1.12-1 m×1; sed 4.9-1 l×1; diffutils 1:3.8-4 n×1; dash 0.5.12-2 n×2

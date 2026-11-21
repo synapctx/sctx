@@ -1,0 +1,107 @@
+unformatted: File would be reformatted
+  --> pkg/core.py:5:1
+   |
+4  |
+5  +
+6  | def add(a: int, b: int) -> int:
+7  |     return a + b
+8  |
+9  +
+10 | def greet(name: str) -> str:
+11 |     return "hi " + name
+12 |
+13 +
+14 | def bad(x: int) -> str:
+15 |     return x
+16 |
+17 +
+18 | def lst() -> List[int]:
+19 |     y: Optional[int] = None
+20 |     return [y.bit_length()]
+21 |
+22 +
+23 | result: int = greet("x")
+   |
+
+unformatted: File would be reformatted
+ --> pkg/ugly.py:1:8
+  |
+  - import  os,sys
+  - def f( a,b ):
+  -     return {'a':a,
+  -         'b':b}
+  - x = [1,2,
+  -   3]
+1 + import os, sys
+2 +
+3 +
+4 + def f(a, b):
+5 +     return {"a": a, "b": b}
+6 +
+7 +
+8 + x = [1, 2, 3]
+  |
+
+unformatted: File would be reformatted
+ --> tests/test_broken.py:2:1
+  |
+1 | import nonexistent_mod
+  - def test_x(): pass
+2 +
+3 +
+4 + def test_x():
+5 +     pass
+  |
+
+unformatted: File would be reformatted
+  --> tests/test_core.py:4:1
+   |
+3  |
+4  +
+5  | def test_ok():
+6  |     assert add(1, 2) == 3
+7  |
+8  +
+9  | def test_fail():
+10 |     assert add(1, 2) == 4
+11 |
+12 +
+13 | @pytest.mark.parametrize("a,b,e", [(1, 1, 2), (2, 2, 5), (0, 0, 0)])
+14 | def test_param(a, b, e):
+15 |     assert add(a, b) == e
+16 |
+17 +
+18 | @pytest.mark.xfail
+19 | def test_xf():
+20 |     assert False
+21 |
+22 +
+23 | @pytest.mark.skip(reason="no")
+24 | def test_skip():
+25 |     pass
+26 |
+27 +
+28 | def test_err():
+   |
+
+unformatted: File would be reformatted
+  --> tests/test_unit.py:2:1
+   |
+1  | import unittest
+2  +
+3  +
+4  | class T(unittest.TestCase):
+   -     def test_a(self): self.assertEqual(1, 1)
+   -     def test_b(self): self.assertEqual(1, 2)
+   -     def test_c(self): raise RuntimeError("x")
+5  +     def test_a(self):
+6  +         self.assertEqual(1, 1)
+7  +
+8  +     def test_b(self):
+9  +         self.assertEqual(1, 2)
+10 +
+11 +     def test_c(self):
+12 +         raise RuntimeError("x")
+   |
+
+5 files would be reformatted, 1 file already formatted

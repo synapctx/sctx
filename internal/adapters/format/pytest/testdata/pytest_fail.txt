@@ -1,0 +1,62 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.15.2, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/proj
+configfile: pyproject.toml
+plugins: platformdirs-4.14.8
+collected 11 items
+
+tests/test_core.py .F.F.xsF                                              [ 72%]
+tests/test_unit.py .FF                                                   [100%]
+
+=================================== FAILURES ===================================
+__________________________________ test_fail ___________________________________
+
+    def test_fail():
+>       assert add(1, 2) == 4
+E       assert 3 == 4
+E        +  where 3 = add(1, 2)
+
+tests/test_core.py:8: AssertionError
+______________________________ test_param[2-2-5] _______________________________
+
+a = 2, b = 2, e = 5
+
+    @pytest.mark.parametrize("a,b,e", [(1, 1, 2), (2, 2, 5), (0, 0, 0)])
+    def test_param(a, b, e):
+>       assert add(a, b) == e
+E       assert 4 == 5
+E        +  where 4 = add(2, 2)
+
+tests/test_core.py:12: AssertionError
+___________________________________ test_err ___________________________________
+
+    def test_err():
+>       raise ValueError("boom")
+E       ValueError: boom
+
+tests/test_core.py:23: ValueError
+___________________________________ T.test_b ___________________________________
+
+self = <test_unit.T testMethod=test_b>
+
+>   def test_b(self): self.assertEqual(1, 2)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: 1 != 2
+
+tests/test_unit.py:4: AssertionError
+___________________________________ T.test_c ___________________________________
+
+self = <test_unit.T testMethod=test_c>
+
+>   def test_c(self): raise RuntimeError("x")
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+E   RuntimeError: x
+
+tests/test_unit.py:5: RuntimeError
+=========================== short test summary info ============================
+FAILED tests/test_core.py::test_fail - assert 3 == 4
+FAILED tests/test_core.py::test_param[2-2-5] - assert 4 == 5
+FAILED tests/test_core.py::test_err - ValueError: boom
+FAILED tests/test_unit.py::T::test_b - AssertionError: 1 != 2
+FAILED tests/test_unit.py::T::test_c - RuntimeError: x
+============== 5 failed, 4 passed, 1 skipped, 1 xfailed in 0.04s ===============

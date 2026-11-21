@@ -1,0 +1,52 @@
+[0m02:41:19  Running with dbt=1.12.7
+[0m02:41:19  Registered adapter: postgres=1.9.1
+[0m02:41:19  Found 16 models, 5 data tests, 476 macros
+[0m02:41:19  
+[0m02:41:19  Concurrency: 4 threads (target='dev')
+[0m02:41:19  
+[0m02:41:20  1 of 16 START sql table model dbt_dev.broken ................................... [RUN]
+[0m02:41:20  3 of 16 START sql view model dbt_dev.stg_customers_10 .......................... [RUN]
+[0m02:41:20  4 of 16 START sql view model dbt_dev.stg_customers_11 .......................... [RUN]
+[0m02:41:20  2 of 16 START sql view model dbt_dev.stg_customers_1 ........................... [RUN]
+[0m02:41:20  1 of 16 ERROR creating sql table model dbt_dev.broken .......................... [[31mERROR[0m in 0.16s]
+[0m02:41:20  5 of 16 START sql view model dbt_dev.stg_customers_12 .......................... [RUN]
+[0m02:41:20  2 of 16 OK created sql view model dbt_dev.stg_customers_1 ...................... [[32mCREATE VIEW[0m in 0.25s]
+[0m02:41:20  6 of 16 START sql view model dbt_dev.stg_customers_2 ........................... [RUN]
+[0m02:41:20  3 of 16 OK created sql view model dbt_dev.stg_customers_10 ..................... [[32mCREATE VIEW[0m in 0.27s]
+[0m02:41:20  4 of 16 OK created sql view model dbt_dev.stg_customers_11 ..................... [[32mCREATE VIEW[0m in 0.33s]
+[0m02:41:20  7 of 16 START sql view model dbt_dev.stg_customers_3 ........................... [RUN]
+[0m02:41:20  8 of 16 START sql view model dbt_dev.stg_customers_4 ........................... [RUN]
+[0m02:41:20  5 of 16 OK created sql view model dbt_dev.stg_customers_12 ..................... [[32mCREATE VIEW[0m in 0.34s]
+[0m02:41:20  9 of 16 START sql view model dbt_dev.stg_customers_5 ........................... [RUN]
+[0m02:41:20  7 of 16 OK created sql view model dbt_dev.stg_customers_3 ...................... [[32mCREATE VIEW[0m in 0.20s]
+[0m02:41:20  6 of 16 OK created sql view model dbt_dev.stg_customers_2 ...................... [[32mCREATE VIEW[0m in 0.26s]
+[0m02:41:20  10 of 16 START sql view model dbt_dev.stg_customers_6 .......................... [RUN]
+[0m02:41:20  11 of 16 START sql view model dbt_dev.stg_customers_7 .......................... [RUN]
+[0m02:41:20  8 of 16 OK created sql view model dbt_dev.stg_customers_4 ...................... [[32mCREATE VIEW[0m in 0.22s]
+[0m02:41:20  12 of 16 START sql view model dbt_dev.stg_customers_8 .......................... [RUN]
+[0m02:41:20  9 of 16 OK created sql view model dbt_dev.stg_customers_5 ...................... [[32mCREATE VIEW[0m in 0.13s]
+[0m02:41:20  13 of 16 START sql view model dbt_dev.stg_customers_9 .......................... [RUN]
+[0m02:41:20  10 of 16 OK created sql view model dbt_dev.stg_customers_6 ..................... [[32mCREATE VIEW[0m in 0.17s]
+[0m02:41:20  11 of 16 OK created sql view model dbt_dev.stg_customers_7 ..................... [[32mCREATE VIEW[0m in 0.18s]
+[0m02:41:20  14 of 16 START sql view model dbt_dev.stg_orders ............................... [RUN]
+[0m02:41:20  15 of 16 SKIP relation dbt_dev.downstream ...................................... [[33mSKIP[0m]
+[0m02:41:20  12 of 16 OK created sql view model dbt_dev.stg_customers_8 ..................... [[32mCREATE VIEW[0m in 0.19s]
+[0m02:41:20  13 of 16 OK created sql view model dbt_dev.stg_customers_9 ..................... [[32mCREATE VIEW[0m in 0.13s]
+[0m02:41:20  14 of 16 OK created sql view model dbt_dev.stg_orders .......................... [[32mCREATE VIEW[0m in 0.06s]
+[0m02:41:20  16 of 16 START sql table model dbt_dev.revenue_by_country ...................... [RUN]
+[0m02:41:21  16 of 16 OK created sql table model dbt_dev.revenue_by_country ................. [[32mSELECT 5[0m in 0.06s]
+[0m02:41:21  
+[0m02:41:21  Finished running 3 table models, 13 view models in 0 hours 0 minutes and 1.05 seconds (1.05s).
+[0m02:41:21  
+[0m02:41:21  [31mCompleted with 1 error, 0 partial successes, and 0 warnings:[0m
+[0m02:41:21  
+[0m02:41:21  [[31mERROR[0m]: in model broken (models/marts/broken.sql)
+[0m02:41:21    Database Error in model broken (models/marts/broken.sql)
+  relation "public.nosuch_tbl" does not exist
+  LINE 12:     select * from public.nosuch_tbl
+                             ^
+  compiled code at target/run/shop/models/marts/broken.sql
+[0m02:41:21  
+[0m02:41:21    compiled code at target/compiled/shop/models/marts/broken.sql
+[0m02:41:21  
+[0m02:41:21  Done. PASS=14 WARN=0 ERROR=1 SKIP=1 NO-OP=0 REUSED=0 TOTAL=16

@@ -1,0 +1,61 @@
+Inspecting 2 files
+WC
+
+Offenses:
+
+ac/messy.rb:1:1: C: Style/Documentation: Missing top-level documentation comment for class Messy.
+class Messy
+^^^^^^^^^^^
+ac/messy.rb:1:1: C: [Correctable] Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+class Messy
+^
+ac/messy.rb:2:11: C: [Corrected] Layout/SpaceInsideParens: Space inside parentheses detected.
+  def foo( a,b )
+          ^
+ac/messy.rb:2:11: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  def foo(a, b)
+          ^
+ac/messy.rb:2:13: C: [Corrected] Layout/SpaceAfterComma: Space missing after comma.
+  def foo( a,b )
+            ^
+ac/messy.rb:2:14: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  def foo(a, b)
+             ^
+ac/messy.rb:2:15: C: [Corrected] Layout/SpaceInsideParens: Space inside parentheses detected.
+  def foo( a,b )
+              ^
+ac/messy.rb:3:5: W: [Corrected] Lint/UselessAssignment: Useless assignment to variable - x.
+    x = 1
+    ^
+ac/messy.rb:3:5: W: [Corrected] Lint/Void: Literal 1 used in void context.
+    1
+    ^
+ac/messy.rb:4:5: C: [Corrected] Style/IfUnlessModifier: Favor modifier if usage when having a single-line body. Another good alternative is the usage of control flow &&/||.
+    if a == 1 then
+    ^^
+ac/messy.rb:4:10: C: [Corrected] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+    puts "hi" if a == 1
+         ^^^^
+ac/messy.rb:4:15: C: [Corrected] Style/MultilineIfThen: Do not use then for multi-line if.
+    if a == 1 then
+              ^^^^
+ac/messy.rb:5:12: C: [Corrected] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+      puts "hi"
+           ^^^^
+ac/messy.rb:7:5: C: [Corrected] Style/RedundantReturn: Redundant return detected.
+    return b
+    ^^^^^^
+ac/messy.rb:9:3: C: [Corrected] Layout/EmptyLineBetweenDefs: Expected 1 empty line between method definitions; found 0.
+  def bar; end
+  ^^^^^^^
+ac/messy2.rb:1:1: C: [Correctable] Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+def baz(a)
+^
+ac/messy2.rb:1:9: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+def baz(a)
+        ^
+ac/messy2.rb:2:16: C: [Corrected] Layout/TrailingWhitespace: Trailing whitespace detected.
+  puts 'single'  
+               ^^
+
+2 files inspected, 18 offenses detected, 12 offenses corrected, 2 more offenses can be corrected with `rubocop -A`

@@ -2,10 +2,12 @@ package git
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/synapctx/sctx/internal/domain/format"
+	"github.com/synapctx/sctx/internal/platform/difffloor"
 )
 
 // gitDateLayout matches the default `git log` author date format, e.g.
@@ -66,7 +68,16 @@ func aggressiveLog(in format.Input, args []string) (format.Rendered, error) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
+	if hasAnyArg(args, "-p", "-u", "--patch") {
+		return aggressiveLogPatch(raw, lines, args)
+	}
+
 	if logArgsAlreadyCompact(args) {
+		if hasAnyArg(args, "--stat", "--shortstat", "--numstat", "--name-only", "--name-status") {
+			// Per-file lines interleave with the one-line records; counting
+			// lines as commits would be wrong.
+			return format.Rendered{}, format.ErrTierInapplicable
+		}
 		return aggressiveLogCompact(raw, lines)
 	}
 
@@ -75,6 +86,7 @@ func aggressiveLog(in format.Input, args []string) (format.Rendered, error) {
 		author  string
 		date    string
 		subject string
+		files   []string // --stat / --name-only / --numstat lines, in order
 	}
 
 	var commits []commit
@@ -111,6 +123,13 @@ func aggressiveLog(in format.Input, args []string) (format.Rendered, error) {
 			if subject != "" {
 				cur.subject = subject
 			}
+		case strings.HasPrefix(line, "Merge:"), strings.TrimSpace(line) == "":
+		default:
+			// A per-file line requested by --stat/--numstat/--name-only/
+			// --name-status: keep it under its commit.
+			if cur != nil {
+				cur.files = append(cur.files, strings.TrimSpace(line))
+			}
 		}
 	}
 	if cur != nil {
@@ -141,6 +160,7 @@ func aggressiveLog(in format.Input, args []string) (format.Rendered, error) {
 			when = relativeTime(t)
 		}
 		fmt.Fprintf(&b, "%s %s (%s, %s)", short, c.subject, c.author, when)
+		writeLogFiles(&b, c.files)
 	}
 	if extra > 0 {
 		fmt.Fprintf(&b, "\n…+%d more commits", extra)
@@ -154,12 +174,57 @@ func logArgsUnsafeToParse(args []string) bool {
 		switch {
 		case strings.HasPrefix(a, "--format"), strings.HasPrefix(a, "--pretty") && a != "--pretty=oneline":
 			return true
-		case a == "-p", a == "-u", a == "--patch", a == "--stat", a == "--shortstat", a == "--numstat",
-			a == "--name-only", a == "--name-status", a == "--raw", a == "--summary", a == "--graph":
+		case a == "--raw", a == "--summary", a == "--graph",
+			strings.HasPrefix(a, "--stat="), strings.HasPrefix(a, "--dirstat"):
 			return true
 		}
 	}
 	return false
+}
+
+// logFilesPerCommitCap bounds the per-file lines kept under each commit when
+// the log was asked for --stat/--numstat/--name-only; the trailing "N files
+// changed" summary is always kept.
+const logFilesPerCommitCap = 12
+
+var logStatSummaryRe = regexp.MustCompile(`^\d+ files? changed`)
+
+// squeezeStatPadding removes the column alignment git pads a --stat line
+// with ("name      |  16 ++--" becomes "name | 16 ++--"); the name is untouched.
+func squeezeStatPadding(l string) string {
+	i := strings.Index(l, " | ")
+	if i < 0 {
+		return l
+	}
+	return strings.TrimRight(l[:i], " ") + " | " + strings.TrimLeft(l[i+3:], " ")
+}
+
+// writeLogFiles writes a commit's per-file lines, indented under its header
+// line, eliding the excess with an explicit marker.
+func writeLogFiles(b *strings.Builder, files []string) {
+	shown := 0
+	extra := 0
+	for _, f := range files {
+		if logStatSummaryRe.MatchString(f) {
+			continue
+		}
+		if shown >= logFilesPerCommitCap {
+			extra++
+			continue
+		}
+		b.WriteString("\n  ")
+		b.WriteString(squeezeStatPadding(f))
+		shown++
+	}
+	if extra > 0 {
+		fmt.Fprintf(b, "\n  …+%d files", extra)
+	}
+	for _, f := range files {
+		if logStatSummaryRe.MatchString(f) {
+			b.WriteString("\n  ")
+			b.WriteString(f)
+		}
+	}
 }
 
 // relativeTime renders a coarse human-relative duration from t to now,
@@ -192,4 +257,79 @@ func plural(n int, unit string) string {
 		return fmt.Sprintf("1 %s", unit)
 	}
 	return fmt.Sprintf("%d %ss", n, unit)
+}
+
+var logCommitLineRe = regexp.MustCompile(`^commit [0-9a-f]{40,64}\b`)
+
+// aggressiveLogPatch renders `git log -p`: each commit's metadata collapses to
+// the one-line header, and its diff is compacted exactly like `git diff`
+// (one line of context around each change). Below the diff fidelity floor, or
+// for anything that does not parse, the output passes through verbatim.
+func aggressiveLogPatch(raw []byte, lines []string, args []string) (format.Rendered, error) {
+	if hasAnyArg(args, "--stat", "--shortstat", "--numstat", "--name-only", "--name-status", "--oneline") || logArgsUnsafeToParse(args) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	if !difffloor.Text(raw) || difffloor.Below(len(lines)) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	type block struct {
+		hash, author, date, subject string
+		diff                        []string
+	}
+	var blocks []*block
+	var cur *block
+	inDiff := false
+	for _, line := range lines {
+		switch {
+		case logCommitLineRe.MatchString(line):
+			cur = &block{hash: strings.Fields(strings.TrimPrefix(line, "commit "))[0]}
+			blocks = append(blocks, cur)
+			inDiff = false
+		case cur == nil:
+			return format.Rendered{}, format.ErrTierInapplicable
+		case strings.HasPrefix(line, "diff --git"):
+			inDiff = true
+			cur.diff = append(cur.diff, line)
+		case inDiff:
+			cur.diff = append(cur.diff, line)
+		case strings.HasPrefix(line, "Author:"):
+			a := strings.TrimSpace(strings.TrimPrefix(line, "Author:"))
+			if i := strings.Index(a, "<"); i >= 0 {
+				a = strings.TrimSpace(a[:i])
+			}
+			cur.author = a
+		case strings.HasPrefix(line, "Date:"):
+			cur.date = strings.TrimSpace(strings.TrimPrefix(line, "Date:"))
+		case strings.HasPrefix(line, "    "):
+			if cur.subject == "" {
+				cur.subject = strings.TrimSpace(line)
+			}
+		}
+	}
+	if len(blocks) == 0 {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	var out []string
+	for _, b := range blocks {
+		short := b.hash
+		if len(short) > 7 {
+			short = short[:7]
+		}
+		when := b.date
+		if t, err := time.Parse(gitDateLayout, b.date); err == nil {
+			when = relativeTime(t)
+		}
+		out = append(out, fmt.Sprintf("%s %s (%s, %s)", short, b.subject, b.author, when))
+		for i, l := range b.diff {
+			if keepDiffBodyLine(b.diff, i) {
+				out = append(out, l)
+			}
+		}
+	}
+	out = append([]string{difffloor.Stamp(len(lines), len(out)+1)}, out...)
+	body := strings.Join(out, "\n")
+	if len(body) >= len(raw) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	return format.Rendered{Body: []byte(body), Note: fmt.Sprintf("%d commits", len(blocks))}, nil
 }

@@ -1,0 +1,4 @@
+total 48
+-rw-r--r-- 1 root root  4480 Nov 21 02:39 dups.log
+-rw-r--r-- 1 root root  5500 Nov 21 02:39 events.jsonl
+-rw-r--r-- 1 root root 31752 Nov 21 02:39 app.log

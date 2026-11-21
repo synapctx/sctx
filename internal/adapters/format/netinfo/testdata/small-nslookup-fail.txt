@@ -1,0 +1,5 @@
+Server:		10.0.0.2
+Address:	10.0.0.2#53
+
+** server can't find nosuch.invalid: NXDOMAIN
+

@@ -1,0 +1,45 @@
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-compiler-plugin is missing. @ demo:parent:1.0, pom.xml, line 7, column 27 ×3
+[WARNING] 'build.plugins.plugin.version' for org.apache.maven.plugins:maven-compiler-plugin is missing. @ line 7, column 27
+parent 1.0 [1/4]
+[WARNING] Ignoring incompatible plugin version 4.0.0-beta-5: 
+The plugin org.apache.maven.plugins:maven-compiler-plugin:4.0.0-beta-5 has unmet prerequisites: 
+	Required Maven version 4.0.0-rc-6 is not met by current version 3.10.1
+[WARNING] Ignoring incompatible plugin version 4.0.0-beta-4: 
+The plugin org.apache.maven.plugins:maven-compiler-plugin:4.0.0-beta-4 has unmet prerequisites: 
+	Required Maven version 4.0.0-rc-4 is not met by current version 3.10.1
+[WARNING] Ignoring incompatible plugin version 4.0.0-beta-3: 
+The plugin org.apache.maven.plugins:maven-compiler-plugin:4.0.0-beta-3 has unmet prerequisites: 
+	Required Maven version 4.0.0-rc-4 is not met by current version 3.10.1
+[WARNING] Ignoring incompatible plugin version 4.0.0-beta-2: 
+The plugin org.apache.maven.plugins:maven-compiler-plugin:4.0.0-beta-2 has unmet prerequisites: 
+	Required Maven version 4.0.0-rc-2 is not met by current version 3.10.1
+[WARNING] Ignoring incompatible plugin version 4.0.0-beta-1: 
+The plugin org.apache.maven.plugins:maven-compiler-plugin:4.0.0-beta-1 has unmet prerequisites: 
+	Required Maven version 4.0.0-beta-3 is not met by current version 3.10.1
+Selected plugin org.apache.maven.plugins:maven-compiler-plugin:3.16.0
+core 1.0 [2/4] (resources compiler:compile resources:testResources compiler:testCompile surefire:test)
+[WARNING] core/src/main/java/demo/coreSvc.java:[3,72] found raw type: java.util.List
+  missing type arguments for generic class java.util.List<E>
+[WARNING] core/src/main/java/demo/coreSvc.java:[3,96] found raw type: java.util.ArrayList
+  missing type arguments for generic class java.util.ArrayList<E>
+[WARNING] core/src/test/java/demo/SvcTest.java:[4,63] v() in demo.coreSvc has been deprecated
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+web 1.0 [3/4] (resources compiler:compile resources:testResources compiler:testCompile surefire:test)
+[WARNING] web/src/main/java/demo/webSvc.java:[3,71] found raw type: java.util.List
+  missing type arguments for generic class java.util.List<E>
+[WARNING] web/src/main/java/demo/webSvc.java:[3,95] found raw type: java.util.ArrayList
+  missing type arguments for generic class java.util.ArrayList<E>
+[WARNING] web/src/test/java/demo/SvcTest.java:[4,62] v() in demo.webSvc has been deprecated
+FAIL demo.SvcTest.a
+org.opentest4j.AssertionFailedError: expected: <2> but was: <1>
+	…+6 framework frames
+	at demo.SvcTest.a(SvcTest.java:4)
+	…+3 framework frames
+[ERROR] Tests run: 2, Failures: 1, Errors: 0, Skipped: 0
+Reactor: cli SKIPPED; parent SUCCESS 0.987s; core SUCCESS 0.998s; web FAILURE 0.842s
+BUILD FAILURE
+Total time: 2.888 s
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.6.1:test (default-test) on project web: There are test failures.
+[ERROR] See web/target/surefire-reports for the individual test results.
+[ERROR]   mvn <args> -rf :web
+…+306 lines elided (180 download, 107 noise, 9 framework frames, 3 duplicate, 7 help)

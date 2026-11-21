@@ -1,0 +1,105 @@
+terraform scan results:
+
+Passed checks: 15, Failed checks: 25, Skipped checks: 0
+
+Check: CKV_AWS_23: "Ensure every security group and rule has a description"
+	FAILED for resource: aws_security_group.open
+	File: /main.tf:10-20
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/networking-31
+Check: CKV_AWS_24: "Ensure no security groups allow ingress from 0.0.0.0:0 to port 22"
+	FAILED for resource: aws_security_group.open
+	File: /main.tf:10-20
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/networking-1-port-security
+Check: CKV_AWS_8: "Ensure all data stored in the Launch configuration or instance Elastic Blocks Store is securely encrypted"
+	FAILED for resource: aws_instance.web
+	File: /main.tf:22-29
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/general-13
+Check: CKV_AWS_135: "Ensure that EC2 is EBS optimized"
+	FAILED for resource: aws_instance.web
+	File: /main.tf:22-29
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/ensure-that-ec2-is-ebs-optimized
+Check: CKV_AWS_126: "Ensure that detailed monitoring is enabled for EC2 instances"
+	FAILED for resource: aws_instance.web
+	File: /main.tf:22-29
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-logging-policies/ensure-that-detailed-monitoring-is-enabled-for-ec2-instances
+Check: CKV_AWS_79: "Ensure Instance Metadata Service Version 1 is not enabled"
+	FAILED for resource: aws_instance.web
+	File: /main.tf:22-29
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/bc-aws-general-31
+Check: CKV_AWS_293: "Ensure that AWS database instances have deletion protection enabled"
+	FAILED for resource: aws_db_instance.db
+	File: /main.tf:31-40
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/bc-aws-293
+Check: CKV_AWS_226: "Ensure DB instance gets all minor upgrades automatically"
+	FAILED for resource: aws_db_instance.db
+	File: /main.tf:31-40
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/ensure-aws-db-instance-gets-all-minor-upgrades-automatically
+Check: CKV_AWS_17: "Ensure all data stored in RDS is not publicly accessible"
+	FAILED for resource: aws_db_instance.db
+	File: /main.tf:31-40
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/public-policies/public-2
+Check: CKV_AWS_118: "Ensure that enhanced monitoring is enabled for Amazon RDS instances"
+	FAILED for resource: aws_db_instance.db
+	File: /main.tf:31-40
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-logging-policies/ensure-that-enhanced-monitoring-is-enabled-for-amazon-rds-instances
+Check: CKV_AWS_129: "Ensure that respective logs of Amazon Relational Database Service (Amazon RDS) are enabled"
+	FAILED for resource: aws_db_instance.db
+	File: /main.tf:31-40
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/ensure-that-respective-logs-of-amazon-relational-database-service-amazon-rds-are-enabled
+Check: CKV_AWS_161: "Ensure RDS database has IAM authentication enabled"
+	FAILED for resource: aws_db_instance.db
+	File: /main.tf:31-40
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/ensure-rds-database-has-iam-authentication-enabled
+Check: CKV_AWS_157: "Ensure that RDS instances have Multi-AZ enabled"
+	FAILED for resource: aws_db_instance.db
+	File: /main.tf:31-40
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/general-73
+Check: CKV_AWS_16: "Ensure all data stored in the RDS is securely encrypted at rest"
+	FAILED for resource: aws_db_instance.db
+	File: /main.tf:31-40
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/general-4
+Check: CKV2_AWS_5: "Ensure that Security Groups are attached to another resource"
+	FAILED for resource: aws_security_group.open
+	File: /main.tf:10-20
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/ensure-that-security-groups-are-attached-to-ec2-instances-or-elastic-network-interfaces-enis
+Check: CKV2_AWS_61: "Ensure that an S3 bucket has a lifecycle configuration"
+	FAILED for resource: aws_s3_bucket.data
+	File: /main.tf:5-8
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-logging-policies/bc-aws-2-61
+Check: CKV2_AWS_6: "Ensure that S3 bucket has a Public Access block"
+	FAILED for resource: aws_s3_bucket.data
+	File: /main.tf:5-8
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-networking-policies/s3-bucket-should-have-public-access-blocks-defaults-to-false-if-the-public-access-block-is-not-attached
+Check: CKV2_AWS_60: "Ensure RDS instance with copy tags to snapshots is enabled"
+	FAILED for resource: aws_db_instance.db
+	File: /main.tf:31-40
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/bc-aws-2-60
+Check: CKV2_AWS_41: "Ensure an IAM role is attached to EC2 instance"
+	FAILED for resource: aws_instance.web
+	File: /main.tf:22-29
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-iam-policies/ensure-an-iam-role-is-attached-to-ec2-instance
+Check: CKV_AWS_144: "Ensure that S3 bucket has cross-region replication enabled"
+	FAILED for resource: aws_s3_bucket.data
+	File: /main.tf:5-8
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/ensure-that-s3-bucket-has-cross-region-replication-enabled
+Check: CKV2_AWS_62: "Ensure S3 buckets should have event notifications enabled"
+	FAILED for resource: aws_s3_bucket.data
+	File: /main.tf:5-8
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-logging-policies/bc-aws-2-62
+Check: CKV_AWS_145: "Ensure that S3 buckets are encrypted with KMS by default"
+	FAILED for resource: aws_s3_bucket.data
+	File: /main.tf:5-8
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/aws-general-policies/ensure-that-s3-buckets-are-encrypted-with-kms-by-default
+Check: CKV_AWS_20: "S3 Bucket has an ACL defined which allows public READ access."
+	FAILED for resource: aws_s3_bucket.data
+	File: /main.tf:5-8
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/s3-policies/s3-1-acl-read-permissions-everyone
+Check: CKV_AWS_18: "Ensure the S3 bucket has access logging enabled"
+	FAILED for resource: aws_s3_bucket.data
+	File: /main.tf:5-8
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/s3-policies/s3-13-enable-logging
+Check: CKV_AWS_21: "Ensure all data stored in the S3 bucket have versioning enabled"
+	FAILED for resource: aws_s3_bucket.data
+	File: /main.tf:5-8
+	Guide: https://docs.prismacloud.io/en/enterprise-edition/policy-reference/aws-policies/s3-policies/s3-16-enable-versioning
+

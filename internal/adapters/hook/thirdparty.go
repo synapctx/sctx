@@ -5,11 +5,9 @@
 //
 //   - `sctx hook cursor` speaks Cursor's `preToolUse` hook (Cursor >= 1.7,
 //     Oct 2025 — NOT the older `beforeShellExecution`, which is allow/deny
-//     only and cannot rewrite). Verified against the rtk reference
-//     implementation (github.com/rtk-ai/rtk, src/hooks/hook_cmd.rs,
-//     `run_cursor`/`cursor_allow`, and hooks/cursor/README.md) rather than
-//     Cursor's own docs page, which this agent could not fetch (no WebFetch
-//     tool). Input is Claude-shaped (`tool_input.command`, snake_case);
+//     only and cannot rewrite). Verified against a working third-party
+//     integration's source, not Cursor's docs page (cursor.com renders
+//     nothing usable without a browser). Input is Claude-shaped (`tool_input.command`, snake_case);
 //     output is Cursor's OWN envelope — `updated_input` (snake_case), under
 //     `permission: "allow"` — never `hookSpecificOutput`/`updatedInput`.
 //     Cursor requires JSON on every code path, so a miss prints `{}`, not
@@ -19,13 +17,13 @@
 //     fetched 2026-09-04) accept the event key in EITHER case
 //     (`preToolUse`/`PreToolUse`) and document a camelCase
 //     `toolName`/`toolArgs` (JSON-encoded string) payload answered with
-//     `modifiedArgs`. rtk's source disagrees on which shape the CLI actually
-//     honours: its own comment records a LIVE verification (Copilot CLI
+//     `modifiedArgs`. that integration's source disagrees on which shape the CLI actually
+//     honours: its source comment records a LIVE verification (Copilot CLI
 //     1.0.73+, Linux+Windows 11) that the CLI remaps its shell tool to the
 //     Claude-shaped `tool_name`/`tool_input.command` schema and honours
-//     `updatedInput` there — and rtk's installer stopped registering the
+//     `updatedInput` there — and its installer stopped registering the
 //     camelCase hook for exactly that reason (a second, redundant process
-//     spawn per command once both were registered). This file follows rtk's
+//     spawn per command once both were registered). This file follows the
 //     live-verified path: Claude-shaped input answered with `updatedInput`.
 //     The camelCase `toolName`/`toolArgs` shape is decoded too, for JetBrains'
 //     Copilot plugin and any install that has not migrated off it, and is
@@ -33,15 +31,15 @@
 //     second path is UNVERIFIED against a live CLI by this change and is
 //     recorded here as such.
 //   - `sctx hook droid` speaks Factory Droid's `PreToolUse` hook (matcher
-//     `Execute`). Verified against rtk (`run_droid`/`process_droid_payload`,
-//     Droid v0.164.0) and docs.factory.ai/cli/configuration/hooks-guide. The
+//     `Execute`). Verified against a working third-party integration's source (not
+//     the vendor docs; Droid v0.164.0) and docs.factory.ai/cli/configuration/hooks-guide. The
 //     output envelope is byte-identical to Claude's — `updatedInput` under
 //     `hookSpecificOutput`, no `permissionDecision` (Droid's own verdict flow
 //     owns that) — but Droid additionally publishes deny lists
 //     (`commandDenylist`/`commandBlocklist`) across up to four settings
 //     scopes, and rewriting a command already on one would dodge Droid's own
-//     pattern matching. This file steps aside on any match, the same way rtk
-//     does.
+//     pattern matching. This file steps aside on any match, the same way that
+//     integration does.
 //
 // All three are FAIL-OPEN exactly like `hook claude`: unparseable input, an
 // unmatched command, a denylisted command, or an internal error leaves the
@@ -60,8 +58,8 @@ import (
 
 // cursorToolCall is Cursor's preToolUse payload, decoded leniently. Cursor's
 // own matcher ("Shell") already scopes invocation to the shell tool, so unlike
-// Claude's tool_name this file does not gate on it — verified against rtk's
-// `run_cursor`, which reads `/tool_input/command` unconditionally.
+// Claude's tool_name this file does not gate on it — verified against a working third-party
+// integration, which reads `/tool_input/command` unconditionally.
 type cursorToolCall struct {
 	ToolInput map[string]any `json:"tool_input"`
 }
@@ -202,7 +200,7 @@ func RunCopilot(_ []string, in io.Reader, out io.Writer, version string) int {
 	return 0
 }
 
-// isShellTool accepts the tool-name spellings GitHub's docs and rtk's live
+// isShellTool accepts the tool-name spellings GitHub's docs and the live
 // verification both attribute to a shell invocation, in either casing.
 func isShellTool(name string) bool {
 	switch name {
@@ -247,7 +245,7 @@ func RunDroid(_ []string, in io.Reader, out io.Writer, version string) int {
 	}
 	// Never rewrite past Droid's own deny lists: rewriting first would dodge
 	// the pattern matching Droid would otherwise apply to the command as
-	// written, exactly the reason rtk steps aside here.
+	// written, exactly the reason this steps aside.
 	if droidDenylisted(cmd, droidDenylistPatterns()) {
 		return 0
 	}

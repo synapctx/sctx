@@ -1,0 +1,16 @@
+PASS failpkg.TestMulOK (0.00s)
+=== RUN   TestMulBad
+    f_test.go:14: Mul(2,3) = 6, want 7
+--- FAIL: TestMulBad (0.00s)
+FAIL failpkg.TestMulBad (0.00s)
+PASS failpkg.TestTable/one (0.00s)
+=== RUN   TestTable/two
+    f_test.go:22: got 4 want 5
+--- FAIL: TestTable/two (0.00s)
+FAIL failpkg.TestTable/two (0.00s)
+=== RUN   TestTable
+--- FAIL: TestTable (0.00s)
+FAIL failpkg.TestTable (0.00s)
+FAIL failpkg
+
+DONE 5 tests, 3 failures in 0.076s

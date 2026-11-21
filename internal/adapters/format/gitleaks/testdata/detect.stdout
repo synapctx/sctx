@@ -1,0 +1,72 @@
+Finding:     AWS_ACCESS_KEY_ID=[1;3;mAKIAXXXXXXXXXXXXXXXX[0m
+Secret:      [1;3;mAKIAXXXXXXXXXXXXXXXX[0m
+RuleID:      aws-access-token
+Entropy:     4.221928
+File:        secrets/app.env
+Line:        1
+Commit:      a5b5c0c3a3b65f80fc6d91f92dab709323d34430
+Author:      dev
+Email:       dev@example.com
+Date:        2026-11-21T02:27:52Z
+Fingerprint: a5b5c0c3a3b65f80fc6d91f92dab709323d34430:secrets/app.env:aws-access-token:1
+
+Finding:     AWS_SECRET_ACCESS_KEY=[1;3;mxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx[0m
+Secret:      [1;3;mxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx[0m
+RuleID:      generic-api-key
+Entropy:     5.162430
+File:        secrets/app.env
+Line:        2
+Commit:      a5b5c0c3a3b65f80fc6d91f92dab709323d34430
+Author:      dev
+Email:       dev@example.com
+Date:        2026-11-21T02:27:52Z
+Fingerprint: a5b5c0c3a3b65f80fc6d91f92dab709323d34430:secrets/app.env:generic-api-key:2
+
+Finding:     GITHUB_TOKEN = "[1;3;mghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx[0m
+Secret:      [1;3;mghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx[0m
+RuleID:      github-pat
+Entropy:     4.734184
+File:        secrets/config.py
+Line:        2
+Commit:      a5b5c0c3a3b65f80fc6d91f92dab709323d34430
+Author:      dev
+Email:       dev@example.com
+Date:        2026-11-21T02:27:52Z
+Fingerprint: a5b5c0c3a3b65f80fc6d91f92dab709323d34430:secrets/config.py:github-pat:2
+
+Finding:     SLACK = "[1;3;mxoxb-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx[0m
+Secret:      [1;3;mxoxb-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx[0m
+RuleID:      slack-bot-token
+Entropy:     4.818354
+File:        secrets/config.py
+Line:        3
+Commit:      a5b5c0c3a3b65f80fc6d91f92dab709323d34430
+Author:      dev
+Email:       dev@example.com
+Date:        2026-11-21T02:27:52Z
+Fingerprint: a5b5c0c3a3b65f80fc6d91f92dab709323d34430:secrets/config.py:slack-bot-token:3
+
+Finding:     password             = [1;3;m"xxxxxxxxxxxxxx"[0m
+Secret:      [1;3;m"xxxxxxxxxxxxxx"[0m
+RuleID:      hashicorp-tf-password
+Entropy:     3.000000
+File:        tf/main.tf
+Line:        36
+Commit:      aad0583ca8c1c9037b2133afc88fe95daa264535
+Author:      dev
+Email:       dev@example.com
+Date:        2026-11-21T02:27:26Z
+Fingerprint: aad0583ca8c1c9037b2133afc88fe95daa264535:tf/main.tf:hashicorp-tf-password:36
+
+Finding:     SLACK = "[1;3;mxoxb-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx[0m
+Secret:      [1;3;mxoxb-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx[0m
+RuleID:      slack-bot-token
+Entropy:     4.945486
+File:        secrets/config.py
+Line:        3
+Commit:      aad0583ca8c1c9037b2133afc88fe95daa264535
+Author:      dev
+Email:       dev@example.com
+Date:        2026-11-21T02:27:26Z
+Fingerprint: aad0583ca8c1c9037b2133afc88fe95daa264535:secrets/config.py:slack-bot-token:3
+

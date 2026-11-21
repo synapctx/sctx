@@ -1,0 +1,12 @@
+[ 12%] Building C object CMakeFiles/core.dir/src/core.c.o
+[ 25%] Linking C static library libcore.a
+[ 25%] Built target core
+[ 37%] Building C object CMakeFiles/app.dir/src/main.c.o
+[ 50%] Linking C executable app
+[ 50%] Built target app
+[ 62%] Building C object CMakeFiles/t_pass.dir/src/t_pass.c.o
+[ 75%] Linking C executable t_pass
+[ 75%] Built target t_pass
+[ 87%] Building C object CMakeFiles/t_fail.dir/src/t_fail.c.o
+[100%] Linking C executable t_fail
+[100%] Built target t_fail

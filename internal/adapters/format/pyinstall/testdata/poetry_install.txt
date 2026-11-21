@@ -1,0 +1,13 @@
+Installing dependencies from lock file
+
+Package operations: 9 installs, 0 updates, 0 removals
+
+  - Installing certifi (2026.11.20)
+  - Installing charset-normalizer (3.5.2)
+  - Installing idna (3.20)
+  - Installing markdown-it-py (4.3.0)
+  - Installing mdurl (0.1.2)
+  - Installing pygments (2.21.0)
+  - Installing requests (2.34.2)
+  - Installing rich (15.0.0)
+  - Installing urllib3 (2.8.0)

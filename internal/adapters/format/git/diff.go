@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/synapctx/sctx/internal/domain/format"
+	"github.com/synapctx/sctx/internal/platform/difffloor"
 )
 
 // diffStatSummaryRe matches the trailing summary line of `git diff --stat`
@@ -23,7 +24,11 @@ const diffStatFileCap = 30
 // output is a `--stat` summary instead (no unified-diff headers at all),
 // the per-file stat lines are capped and the summary line is always kept.
 func aggressiveDiff(in format.Input, args []string) (format.Rendered, error) {
-	if diffArgsUnsafeToParse(args) {
+	if diffArgsUnsafeToParse(args) || machineReadableInvocation(in.Argv) {
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
+	if sub, _ := subcommand(in.Argv); opaqueOutputInvocation(sub, args) {
+		// `git show REV:path` is blob content, never a diff.
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 	raw := readAll(in.Stdout)
@@ -31,12 +36,16 @@ func aggressiveDiff(in format.Input, args []string) (format.Rendered, error) {
 	if len(lines) == 0 {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
+	if !difffloor.Text(raw) {
+		// Binary or non-UTF-8 content is never rewritten.
+		return format.Rendered{}, format.ErrTierInapplicable
+	}
 
 	var kept []string
 	filesChanged := 0
 	sawDiff := false
 
-	for _, line := range lines {
+	for i, line := range lines {
 		switch {
 		case strings.HasPrefix(line, "diff --git"):
 			sawDiff = true
@@ -46,30 +55,21 @@ func aggressiveDiff(in format.Input, args []string) (format.Rendered, error) {
 			// `git show` prints commit metadata (commit/Author/Date/message)
 			// before the first diff --git header; keep it verbatim.
 			kept = append(kept, line)
-		case strings.HasPrefix(line, "index "),
-			strings.HasPrefix(line, "new file mode"),
-			strings.HasPrefix(line, "deleted file mode"),
-			strings.HasPrefix(line, "old mode"),
-			strings.HasPrefix(line, "new mode"),
-			strings.HasPrefix(line, "similarity index"),
-			strings.HasPrefix(line, "dissimilarity index"),
-			strings.HasPrefix(line, "copy from"),
-			strings.HasPrefix(line, "copy to"),
-			strings.HasPrefix(line, "rename from"),
-			strings.HasPrefix(line, "rename to"),
-			strings.HasPrefix(line, "Binary files "),
-			strings.HasPrefix(line, "Submodule "),
-			strings.HasPrefix(line, "\\ No newline at end of file"),
-			strings.HasPrefix(line, "+++"),
-			strings.HasPrefix(line, "---"),
-			strings.HasPrefix(line, "@@"):
-			kept = append(kept, line)
-		case strings.HasPrefix(line, "+"), strings.HasPrefix(line, "-"):
-			kept = append(kept, line)
 		default:
-			// Unchanged context line (starts with a space) or a
-			// "\ No newline at end of file" marker: drop it.
+			// Unchanged context is trimmed to one anchor line; everything
+			// else (headers, hunks, changes, --summary lines, a following
+			// commit's header, blank separators) is kept rather than dropped
+			// silently.
+			if keepDiffBodyLine(lines, i) {
+				kept = append(kept, line)
+			}
 		}
+	}
+
+	if sawDiff && difffloor.Below(len(lines)) {
+		// Fidelity floor: agents derive edits from hunks, so a small diff
+		// passes through verbatim rather than risk a wrong edit.
+		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
 	if filesChanged == 0 && !sawDiff {
@@ -87,6 +87,9 @@ func aggressiveDiff(in format.Input, args []string) (format.Rendered, error) {
 	}
 
 	note := fmt.Sprintf("%d files changed", filesChanged)
+	// kept grows by the stamp and the note: report the final line count.
+	stamp := difffloor.Stamp(len(lines), len(kept)+2)
+	kept = append([]string{stamp}, kept...)
 	kept = append(kept, note)
 
 	return format.Rendered{
@@ -95,10 +98,30 @@ func aggressiveDiff(in format.Input, args []string) (format.Rendered, error) {
 	}, nil
 }
 
+// keepDiffBodyLine reports whether lines[i], inside a diff, survives
+// compaction: every line except unchanged context that is not adjacent to a
+// change (one line of context around each change stays as an edit anchor; the
+// stamp states the trim).
+func keepDiffBodyLine(lines []string, i int) bool {
+	if strings.HasPrefix(lines[i], " ") {
+		return diffChangeLine(lines, i-1) || diffChangeLine(lines, i+1)
+	}
+	return true
+}
+
+// diffChangeLine reports whether lines[i] is an added or removed line.
+func diffChangeLine(lines []string, i int) bool {
+	if i < 0 || i >= len(lines) {
+		return false
+	}
+	return strings.HasPrefix(lines[i], "+") || strings.HasPrefix(lines[i], "-")
+}
+
 func diffArgsUnsafeToParse(args []string) bool {
 	for _, a := range args {
 		switch {
-		case a == "--binary", a == "--raw", a == "--numstat", a == "--shortstat",
+		case a == "--binary", a == "--raw", a == "--summary", a == "--porcelain",
+			a == "--patch-with-raw", a == "--patch-with-stat", a == "--dirstat", strings.HasPrefix(a, "--dirstat="), a == "--numstat", a == "--shortstat",
 			a == "--name-only", a == "--name-status", a == "--check", a == "--cc",
 			a == "-c", a == "--combined-all-paths", strings.HasPrefix(a, "--word-diff"):
 			return true

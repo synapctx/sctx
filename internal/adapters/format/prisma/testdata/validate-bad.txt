@@ -1,0 +1,17 @@
+Loaded Prisma config from prisma.config.ts.
+
+Prisma schema loaded from prisma/schema.prisma.
+
+Error: Prisma schema validation - (validate wasm)
+Error code: P1012
+[1;91merror[0m: [1mType "Strin" is neither a built-in type, nor refers to another model, composite type, or enum.[0m
+  [1;94m-->[0m  [4mprisma/schema.prisma:21[0m
+[1;94m   | [0m
+[1;94m20 | [0m id Int @id
+[1;94m21 | [0m x [1;91mStrin[0m
+[1;94m   | [0m
+
+Validation Error Count: 1
+[Context: validate]
+
+Prisma CLI Version : 7.10.1

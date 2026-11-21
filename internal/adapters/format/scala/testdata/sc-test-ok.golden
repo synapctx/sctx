@@ -1,0 +1,8 @@
+[warn] -- [E029] Pattern Match Exhaustivity Warning: /work/proj/src/main/scala/Demo.scala:3:41
+[warn]   |                                       match may not be exhaustive.
+[warn]   |                                       It would fail on pattern case: None
+[warn] one warning found
+Tests: succeeded 2, failed 0, canceled 0, ignored 0, pending 0
+All tests passed.
+[success] Total time: 7 s, completed Nov 21, 2026, 2:32:00 AM
+…+19 lines (sbt chatter, passing tests, source echoes, framework frames)

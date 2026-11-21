@@ -1,0 +1,8 @@
+
+Running 3 tests using 1 worker
+
+  ✓  1 tests/ok.spec.js:2:1 › o1 (1ms)
+  ✓  2 tests/ok.spec.js:2:20 › o2 (0ms)
+  ✓  3 tests/ok.spec.js:2:39 › o3 (0ms)
+
+  3 passed (359ms)

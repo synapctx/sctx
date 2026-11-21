@@ -12,6 +12,14 @@ import (
 // rest behind a "…+N" marker.
 const maxInstalledPackages = 30
 
+// A failed install keeps every non-noise line up to maxFailureLines; beyond
+// that the head and tail survive and the middle is counted.
+const (
+	maxFailureLines = 60
+	failureHead     = 20
+	failureTail     = 30
+)
+
 // aggressiveInstall collapses `pip install` output, which is dominated by
 // progress noise (Collecting/Downloading/Requirement already satisfied/
 // build steps), down to: the Successfully-installed summary (capped), a
@@ -25,6 +33,9 @@ func aggressiveInstall(in format.Input) (format.Rendered, error) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
+	// errorLines keeps every non-noise line in order — ERROR lines, but also
+	// the build backend's output ("error: subprocess-exited-with-error", the
+	// compiler's own messages) that explains a failed wheel build.
 	var errorLines []string
 	var installedLine, builtLine string
 	satisfied, downloading, collecting, building := 0, 0, 0, 0
@@ -49,6 +60,14 @@ func aggressiveInstall(in format.Input) (format.Rendered, error) {
 			strings.HasPrefix(t, "Installing build dependencies"),
 			strings.HasPrefix(t, "Getting requirements to build wheel"):
 			building++
+		case t == "", strings.HasPrefix(t, "Installing collected packages"),
+			strings.HasPrefix(t, "Attempting uninstall"), strings.HasPrefix(t, "Found existing installation"),
+			strings.HasPrefix(t, "Uninstalling "), strings.HasPrefix(t, "Successfully uninstalled"),
+			strings.HasPrefix(t, "Obtaining "), strings.HasPrefix(t, "Looking in "), strings.HasPrefix(t, "Created wheel"),
+			strings.HasPrefix(t, "Stored in directory"), strings.HasPrefix(t, "━"), strings.HasPrefix(t, "Preparing editable"):
+			// progress chatter: nothing to keep
+		default:
+			errorLines = append(errorLines, strings.TrimRight(l, " \t\r"))
 		}
 	}
 	for _, l := range outLines {
@@ -64,9 +83,18 @@ func aggressiveInstall(in format.Input) (format.Rendered, error) {
 			// whatever stderr/stdout actually says.
 			return format.Rendered{}, format.ErrTierInapplicable
 		}
+		elided := false
+		if len(errorLines) > maxFailureLines {
+			more := len(errorLines) - failureHead - failureTail
+			kept := append([]string{}, errorLines[:failureHead]...)
+			kept = append(kept, fmt.Sprintf("…+%d lines", more))
+			errorLines = append(kept, errorLines[len(errorLines)-failureTail:]...)
+			elided = true
+		}
 		return format.Rendered{
 			Body:       []byte(strings.Join(errorLines, "\n")),
 			FoldStderr: len(rawErr) > 0,
+			Elided:     elided,
 		}, nil
 	}
 
@@ -80,12 +108,19 @@ func aggressiveInstall(in format.Input) (format.Rendered, error) {
 		b.WriteString("pip install: no changes")
 	}
 
+	for _, l := range errorLines {
+		b.WriteByte('\n')
+		b.WriteString(l)
+	}
+
 	noiseTotal := satisfied + downloading + collecting + building
 	if noiseTotal > 0 {
 		fmt.Fprintf(&b, "\n…+%d (%d satisfied, %d downloaded, %d build steps)", noiseTotal, satisfied, downloading, collecting+building)
 	}
 
-	return format.Rendered{Body: []byte(b.String())}, nil
+	// Stderr lines are part of Body above, so stderr must be folded or the
+	// caller would print them a second time.
+	return format.Rendered{Body: []byte(b.String()), FoldStderr: len(rawErr) > 0}, nil
 }
 
 // capPackageLine truncates a "Successfully installed a-1 b-2 ..." line to

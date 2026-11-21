@@ -1,0 +1,8 @@
+✖  mainpkg (192ms)
+
+=== Failed
+=== FAIL: mainpkg  (0.00s)
+setup failed
+FAIL	example.com/ts/mainpkg	0.191s
+
+DONE 0 tests, 1 failure in 0.192s

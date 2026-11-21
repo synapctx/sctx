@@ -1,0 +1,4 @@
+Building dependency release=demo, chart=demo
+Building dependency release=demo2, chart=demo
+Templating release=demo, chart=demo
+Templating release=demo2, chart=demo

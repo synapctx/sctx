@@ -1,0 +1,29 @@
+  Determining projects to restore...
+  Restored /work/dn-warn/Lib/Lib.csproj (in 0.7 ms).
+  Restored /work/dn-warn/Lib.Tests/Lib.Tests.csproj (in 38 ms).
+/work/dn-warn/Lib/Class1.cs(7,42): warning CS8602: Dereference of a possibly null reference. [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(13,19): warning CS8618: Non-nullable property 'A' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(14,19): warning CS8618: Non-nullable property 'B' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(9,29): warning CS0219: The variable 'x' is assigned but its value is never used [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(4,19): warning CS8618: Non-nullable property 'Name' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(5,19): warning CS8618: Non-nullable property 'Email' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(6,19): warning CS8618: Non-nullable property 'City' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(8,9): warning CS0169: The field 'Person.unused' is never used [/work/dn-warn/Lib/Lib.csproj]
+  Lib -> /work/dn-warn/Lib/bin/Debug/net11.0/Lib.dll
+/work/dn-warn/Lib.Tests/UnitTest1.cs(4,54): error CS0246: The type or namespace name 'Calc' could not be found (are you missing a using directive or an assembly reference?) [/work/dn-warn/Lib.Tests/Lib.Tests.csproj]
+
+Build FAILED.
+
+/work/dn-warn/Lib/Class1.cs(7,42): warning CS8602: Dereference of a possibly null reference. [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(13,19): warning CS8618: Non-nullable property 'A' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(14,19): warning CS8618: Non-nullable property 'B' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(9,29): warning CS0219: The variable 'x' is assigned but its value is never used [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(4,19): warning CS8618: Non-nullable property 'Name' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(5,19): warning CS8618: Non-nullable property 'Email' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(6,19): warning CS8618: Non-nullable property 'City' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable. [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib/Class1.cs(8,9): warning CS0169: The field 'Person.unused' is never used [/work/dn-warn/Lib/Lib.csproj]
+/work/dn-warn/Lib.Tests/UnitTest1.cs(4,54): error CS0246: The type or namespace name 'Calc' could not be found (are you missing a using directive or an assembly reference?) [/work/dn-warn/Lib.Tests/Lib.Tests.csproj]
+    8 Warning(s)
+    1 Error(s)
+
+Time Elapsed 00:00:00.32

@@ -1,0 +1,2 @@
+tar: nonexist.tar: Cannot open: No such file or directory
+tar: Error is not recoverable: exiting now

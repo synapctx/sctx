@@ -289,3 +289,24 @@ func padInt(i int) string {
 	}
 	return string(rune('0'+i/10)) + string(rune('0'+i%10))
 }
+
+// A script that runs jest prints jest's report; `npm test` argv cannot say so, the output shape can.
+func TestRunDelegatesToJSToolByOutputShape(t *testing.T) {
+	jest := "PASS src/a.test.ts\n\nTest Suites: 2 passed, 2 total\nTests:       9 passed, 9 total\nTime:        1.2 s\n"
+	out := "> app@1.0.0 test\n> jest\n"
+	got, err := New().Aggressive(context.Background(), input("npm test", []string{"npm", "test"}, out, jest, 0))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := "jest: 9 passed, 2 suites, 1.2s"; !strings.Contains(string(got.Body), want) {
+		t.Fatalf("body = %q, want it to contain %q", got.Body, want)
+	}
+}
+
+func TestRunBinaryFormsAreClaimed(t *testing.T) {
+	tsc := "src/a.ts(1,2): error TS2322: bad\n"
+	got, err := New().Aggressive(context.Background(), input("pnpm tsc", []string{"pnpm", "tsc", "--noEmit"}, tsc, "", 2))
+	if err != nil || !strings.Contains(string(got.Body), "1 error in 1 file") {
+		t.Fatalf("err=%v body=%s", err, got.Body)
+	}
+}

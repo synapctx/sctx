@@ -1,0 +1,17 @@
+
+PLAY [dead] ********************************************************************
+
+TASK [ping] ********************************************************************
+[ERROR]: Task failed: Failed to connect to the host via ssh: ssh: connect to host 127.0.0.1 port 1: Connection refused
+Origin: /work/play/unreach.yml:4:7
+
+2   gather_facts: false
+3   tasks:
+4     - name: ping
+        ^ column 7
+
+fatal: [unreach]: UNREACHABLE! => {"changed": false, "msg": "Task failed: Failed to connect to the host via ssh: ssh: connect to host 127.0.0.1 port 1: Connection refused", "unreachable": true}
+
+PLAY RECAP *********************************************************************
+unreach                    : ok=0    changed=0    unreachable=1    failed=0    skipped=0    rescued=0    ignored=0   
+

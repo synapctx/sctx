@@ -1,0 +1,7 @@
+Error: ERR_PNPM_PACKAGE_MANAGER_ADD_RESOLVE_LATEST
+
+  × adding a new package
+  ╰─▶ Failed to resolve the latest version of nonexistent-zzzz-pkg-12345:
+      Failed to fetch metadata from https://registry.npmjs.org/nonexistent-
+      zzzz-pkg-12345: HTTP status client error (404 Not Found)
+

@@ -1,0 +1,10 @@
+[error] /work/proj/src/main/scala/Demo.scala:2:38: not found: value c
+[error] /work/proj/src/main/scala/Demo.scala:3:19: type mismatch;
+[error]  found   : Int(42)
+[error]  required: String
+[warn] /work/proj/src/main/scala/Demo.scala:4:35: local val y in method unused is never used
+[warn] one warning found
+[error] two errors found
+[error] (Compile / compileIncremental) Compilation failed
+[error] Total time: 2 s, completed Nov 21, 2026, 2:32:49 AM
+…+12 lines (sbt chatter, passing tests, source echoes, framework frames)

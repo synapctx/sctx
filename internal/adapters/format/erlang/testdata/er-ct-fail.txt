@@ -1,0 +1,39 @@
+===> Verifying dependencies...
+===> Analyzing applications...
+===> Compiling demo
+   ┌─ src/demo.erl:
+   │
+ 6 │  unused_fn() -> ok.
+   │  ╰── Warning: function unused_fn/0 is unused
+
+   ┌─ src/demo.erl:
+   │
+ 7 │  shadow(X) -> Y = 1, X.
+   │  ╰── Warning: function shadow/1 is unused
+
+   ┌─ src/demo.erl:
+   │
+ 7 │  shadow(X) -> Y = 1, X.
+   │               ╰── Warning: variable 'Y' is unused
+
+
+   ┌─ test/demo_SUITE.erl:
+   │
+ 2 │  -compile(export_all).
+   │   ╰── Warning: export_all flag enabled - all functions will be exported
+
+
+===> Running Common Test suites...
+%%% demo_SUITE: .
+%%% demo_SUITE ==> bad_case: FAILED
+%%% demo_SUITE ==> {{badmatch,3},
+ [{demo_SUITE,bad_case,1,[{file,"/work/proj/test/demo_SUITE.erl"},{line,6}]},
+  {test_server,ts_tc,3,[{file,"test_server.erl"},{line,1794}]},
+  {test_server,run_test_case_eval1,6,[{file,"test_server.erl"},{line,1303}]},
+  {test_server,run_test_case_eval,9,[{file,"test_server.erl"},{line,1235}]}]}
+
+EXPERIMENTAL: Writing retry specification at /work/proj/_build/test/logs/retry.spec
+              call rebar3 ct with '--retry' to re-run failing cases.
+Failed 1 tests. Passed 1 tests. 
+Results written to "/work/proj/_build/test/logs/index.html".
+===> Failures occurred running tests: 1

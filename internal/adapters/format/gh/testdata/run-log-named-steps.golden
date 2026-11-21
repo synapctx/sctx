@@ -1,0 +1,206 @@
+run log: 500 lines, 2 jobs; timestamps omitted; runner setup ×59; blank lines ×11
+== docs
+-- Set up job
+-- Checkout repository
+▸ Run actions/checkout@v7 (+15 lines)
+Syncing repository: BurntSushi/ripgrep
+▸ Getting Git version info (+3 lines)
+Temporarily overriding HOME='/home/runner/work/_temp/8da5974c-0592-4d70-94e9-8e015d7a1153' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory
+[command]/usr/bin/git config --global --add safe.directory /home/runner/work/ripgrep/ripgrep
+Deleting the contents of '/home/runner/work/ripgrep/ripgrep'
+▸ Determining repository object format
+▸ Initializing the repository
+[command]/usr/bin/git init /home/runner/work/ripgrep/ripgrep
+hint: Using 'master' as the name for the initial branch. This default branch name
+hint: will change to "main" in Git 3.0. To configure the initial branch name
+hint: to use in all of your new repositories, which will suppress this warning,
+hint: call:
+hint:
+hint: 	git config --global init.defaultBranch <name>
+hint:
+hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+hint: 'development'. The just-created branch can be renamed via this command:
+hint:
+hint: 	git branch -m <name>
+hint:
+hint: Disable this message with "git config set advice.defaultBranchName false"
+Initialized empty Git repository in /home/runner/work/ripgrep/ripgrep/.git/
+[command]/usr/bin/git remote add origin https://github.com/BurntSushi/ripgrep
+▸ Disabling automatic garbage collection (+1 lines)
+▸ Setting up auth (+14 lines)
+▸ Fetching the repository (+3 lines)
+▸ Determining the checkout info
+[command]/usr/bin/git sparse-checkout disable
+[command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+▸ Checking out the ref (+12 lines)
+[command]/usr/bin/git log -1 --format=%H
+4f8d0aed448d3c610d2f9c11176850ab0b414f68
+-- Install Rust
+▸ Run dtolnay/rust-toolchain@master (+2 lines)
+##[start-action display=Parse toolchain version;id=__dtolnay_rust-toolchain.parse]
+▸ Run if [[ -z $toolchain ]]; then (+22 lines)
+##[end-action id=__dtolnay_rust-toolchain.parse;outcome=success;conclusion=success;duration_ms=40]
+##[start-action display=Set $CARGO_HOME;id=__dtolnay_rust-toolchain.__run]
+▸ Run echo CARGO_HOME=${CARGO_HOME:-"$HOME/.cargo"} >> $GITHUB_ENV (+2 lines)
+##[end-action id=__dtolnay_rust-toolchain.__run;outcome=success;conclusion=success;duration_ms=19]
+##[start-action display=Install rustup if needed;id=__dtolnay_rust-toolchain.__run_2]
+▸ Run if ! command -v rustup &>/dev/null; then
+^[[36;1mif ! command -v rustup &>/dev/null; then^[[0m
+^[[36;1m  curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused --location --silent --show-error --fail https://sh.rustup.rs | sh -s -- --default-toolchain none -y^[[0m
+^[[36;1m  echo "$CARGO_HOME/bin" >> $GITHUB_PATH^[[0m
+^[[36;1mfi^[[0m
+shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+env:
+  CARGO_HOME: /home/runner/.cargo
+##[end-action id=__dtolnay_rust-toolchain.__run_2;outcome=success;conclusion=success;duration_ms=19]
+##[start-action display=Install rustup if needed on windows;id=__dtolnay_rust-toolchain.__run_3]
+##[end-action id=__dtolnay_rust-toolchain.__run_3;outcome=skipped;conclusion=skipped;duration_ms=0]
+##[start-action display=rustup toolchain install stable;id=__dtolnay_rust-toolchain.__run_4]
+▸ Run set -f  # split targets and components on commas and whitespace, without glob expansion
+^[[36;1mset -f  # split targets and components on commas and whitespace, without glob expansion^[[0m
+^[[36;1mflags=()^[[0m
+^[[36;1mfor t in ${targets//,/ }; do flags+=(--target "$t"); done^[[0m
+^[[36;1mfor c in ${components//,/ }; do flags+=(--component "$c"); done^[[0m
+^[[36;1mif [[ $toolchain == nightly && -n $components ]]; then flags+=(--allow-downgrade); fi^[[0m
+^[[36;1mlog=$(mktemp)^[[0m
+^[[36;1mtrap 'rm -f "$log"' EXIT^[[0m
+^[[36;1mfor attempt in 1 2 3 4 5; do^[[0m
+^[[36;1m  if rustup toolchain install "$toolchain" "${flags[@]}" --profile minimal --no-self-update --force-non-host 2>&1 | tee "$log"; then^[[0m
+^[[36;1m    break^[[0m
+^[[36;1m  else^[[0m
+^[[36;1m    status=$?^[[0m
+^[[36;1m  fi^[[0m
+^[[36;1m  if [[ $attempt == 5 ]] || ! grep -Fq 'checksum failed for ' "$log" \^[[0m
+^[[36;1m      || ! grep -Fq 'this is likely due to an ongoing update of the official release server' "$log"; then^[[0m
+^[[36;1m    exit "$status"^[[0m
+^[[36;1m  fi^[[0m
+^[[36;1m  echo "Retrying rustup toolchain install in 30 seconds (retry $attempt of 4)" >&2^[[0m
+^[[36;1m  sleep 30^[[0m
+^[[36;1mdone^[[0m
+shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+env:
+  CARGO_HOME: /home/runner/.cargo
+  toolchain: stable
+  targets:
+  components:
+  RUSTUP_PERMIT_COPY_RENAME: 1
+info: syncing channel updates for stable-x86_64-unknown-linux-gnu
+  stable-x86_64-unknown-linux-gnu unchanged - rustc 1.100.0 (0ef1bc386 2026-11-09)
+##[end-action id=__dtolnay_rust-toolchain.__run_4;outcome=success;conclusion=success;duration_ms=560]
+##[start-action display=rustup default stable;id=__dtolnay_rust-toolchain.__run_5]
+▸ Run rustup default "$toolchain" --force-non-host (+5 lines)
+info: using existing install for stable-x86_64-unknown-linux-gnu
+info: default toolchain set to stable-x86_64-unknown-linux-gnu
+  stable-x86_64-unknown-linux-gnu unchanged - rustc 1.100.0 (0ef1bc386 2026-11-09)
+##[end-action id=__dtolnay_rust-toolchain.__run_5;outcome=success;conclusion=success;duration_ms=34]
+##[start-action display=Create cachekey;id=__dtolnay_rust-toolchain.rustc-version]
+▸ Run DATE=$(rustc +"$toolchain" --version --verbose | sed -ne 's/^commit-date: \(20[0-9][0-9]\)-\([01][0-9]\)-\([0-3][0-9]\)$/\1\2\3/p') (+7 lines)
+##[end-action id=__dtolnay_rust-toolchain.rustc-version;outcome=success;conclusion=success;duration_ms=50]
+##[start-action display=Disable incremental compilation;id=__dtolnay_rust-toolchain.__run_6]
+▸ Run if [ -z "${CARGO_INCREMENTAL+set}" ]; then (+6 lines)
+##[end-action id=__dtolnay_rust-toolchain.__run_6;outcome=success;conclusion=success;duration_ms=33]
+##[start-action display=Enable colors in Cargo output;id=__dtolnay_rust-toolchain.__run_7]
+▸ Run if [ -z "${CARGO_TERM_COLOR+set}" ]; then (+7 lines)
+##[end-action id=__dtolnay_rust-toolchain.__run_7;outcome=success;conclusion=success;duration_ms=19]
+##[start-action display=Enable Cargo sparse registry;id=__dtolnay_rust-toolchain.__run_8]
+▸ Run # implemented in 1.66, stabilized in 1.68, made default in 1.70 (+16 lines)
+##[end-action id=__dtolnay_rust-toolchain.__run_8;outcome=success;conclusion=success;duration_ms=47]
+##[start-action display=Work around spurious network errors in curl 8.0;id=__dtolnay_rust-toolchain.__run_9]
+▸ Run # https://rust-lang.zulipchat.com/#narrow/stream/246057-t-cargo/topic/timeout.20investigation (+10 lines)
+##[end-action id=__dtolnay_rust-toolchain.__run_9;outcome=success;conclusion=success;duration_ms=31]
+##[start-action display=rustc +stable --version --verbose;id=__dtolnay_rust-toolchain.__run_10]
+▸ Run rustc +"$toolchain" --version --verbose (+7 lines)
+rustc 1.100.0 (0ef1bc386 2026-11-09)
+binary: rustc
+commit-hash: 0ef1bc386059596dada8fb65b50425aab2ea637a
+commit-date: 2026-11-09
+host: x86_64-unknown-linux-gnu
+release: 1.100.0
+LLVM version: 23.1.5
+##[end-action id=__dtolnay_rust-toolchain.__run_10;outcome=success;conclusion=success;duration_ms=30]
+-- Check documentation
+▸ Run cargo doc --no-deps --document-private-items --workspace (+7 lines)
+^[[1m^[[92m    Updating^[[0m crates.io index
+^[[1m^[[92m Downloading^[[0m crates ...
+^[[1m^[[92m  Downloaded^[[0m crossbeam-utils v0.8.22
+^[[1m^[[92m  Downloaded^[[0m crossbeam-deque v0.8.7
+^[[1m^[[92m  Downloaded^[[0m anyhow v1.0.104
+^[[1m^[[92m  Downloaded^[[0m cfg-if v1.0.4
+^[[1m^[[92m  Downloaded^[[0m find-msvc-tools v0.1.9
+^[[1m^[[92m  Downloaded^[[0m itoa v1.0.18
+^[[1m^[[92m  Downloaded^[[0m aho-corasick v1.1.5
+^[[1m^[[92m  Downloaded^[[0m encoding_rs_io v0.1.8
+…+47 lines
+^[[1m^[[92m   Compiling^[[0m shlex v2.0.1
+^[[1m^[[92m   Compiling^[[0m cc v1.4.0
+^[[1m^[[92m    Checking^[[0m grep-searcher v0.1.17 (/home/runner/work/ripgrep/ripgrep/crates/searcher)
+^[[1m^[[92m   Compiling^[[0m crossbeam-deque v0.8.7
+^[[1m^[[92m   Compiling^[[0m pkg-config v0.3.33
+^[[1m^[[92m    Checking^[[0m same-file v1.0.6
+^[[1m^[[92m    Checking^[[0m walkdir v2.5.0
+^[[1m^[[92m    Checking^[[0m grep-printer v0.3.1 (/home/runner/work/ripgrep/ripgrep/crates/printer)
+^[[1m^[[92m    Checking^[[0m grep-cli v0.1.12 (/home/runner/work/ripgrep/ripgrep/crates/cli)
+^[[1m^[[92m    Checking^[[0m grep-regex v0.1.14 (/home/runner/work/ripgrep/ripgrep/crates/regex)
+^[[1m^[[92m   Compiling^[[0m anyhow v1.0.104
+^[[1m^[[92m   Compiling^[[0m ripgrep v15.2.0 (/home/runner/work/ripgrep/ripgrep)
+^[[1m^[[92m    Checking^[[0m grep v0.4.1 (/home/runner/work/ripgrep/ripgrep/crates/grep)
+^[[1m^[[92m    Checking^[[0m ignore v0.4.34 (/home/runner/work/ripgrep/ripgrep/crates/ignore)
+^[[1m^[[92m    Checking^[[0m lexopt v0.3.2
+^[[1m^[[92m    Checking^[[0m textwrap v0.16.2
+^[[1m^[[92m   Compiling^[[0m pcre2-sys v0.2.10
+^[[1m^[[92m Documenting^[[0m grep v0.4.1 (/home/runner/work/ripgrep/ripgrep/crates/grep)
+^[[1m^[[92m Documenting^[[0m ignore v0.4.34 (/home/runner/work/ripgrep/ripgrep/crates/ignore)
+^[[1m^[[92m    Checking^[[0m pcre2 v0.2.11
+^[[1m^[[92m Documenting^[[0m grep-pcre2 v0.1.10 (/home/runner/work/ripgrep/ripgrep/crates/pcre2)
+^[[1m^[[92m Documenting^[[0m ripgrep v15.2.0 (/home/runner/work/ripgrep/ripgrep)
+^[[1m^[[92m Documenting^[[0m grep-printer v0.3.1 (/home/runner/work/ripgrep/ripgrep/crates/printer)
+^[[1m^[[92m Documenting^[[0m grep-cli v0.1.12 (/home/runner/work/ripgrep/ripgrep/crates/cli)
+^[[1m^[[92m Documenting^[[0m grep-regex v0.1.14 (/home/runner/work/ripgrep/ripgrep/crates/regex)
+^[[1m^[[92m Documenting^[[0m grep-searcher v0.1.17 (/home/runner/work/ripgrep/ripgrep/crates/searcher)
+^[[1m^[[92m Documenting^[[0m globset v0.4.21 (/home/runner/work/ripgrep/ripgrep/crates/globset)
+^[[1m^[[92m Documenting^[[0m grep-matcher v0.1.9 (/home/runner/work/ripgrep/ripgrep/crates/matcher)
+^[[1m^[[92m    Finished^[[0m `dev` profile [unoptimized + debuginfo] target(s) in 12.74s
+^[[1m^[[92m   Generated^[[0m /home/runner/work/ripgrep/ripgrep/target/doc/globset/index.html and 9 other files
+-- Post Checkout repository
+Post job cleanup.
+[command]/usr/bin/git version
+git version 2.56.1
+Temporarily overriding HOME='/home/runner/work/_temp/3e34e273-b91c-440d-92be-5e4df27db597' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory
+[command]/usr/bin/git config --global --add safe.directory /home/runner/work/ripgrep/ripgrep
+Removing SSH command configuration
+[command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+[command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+Removing HTTP extra header
+[command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+[command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+Removing includeIf entries pointing to credentials config files
+[command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+includeif.gitdir:/home/runner/work/ripgrep/ripgrep/.git.path
+includeif.gitdir:/home/runner/work/ripgrep/ripgrep/.git/worktrees/*.path
+includeif.gitdir:/github/workspace/.git.path
+includeif.gitdir:/github/workspace/.git/worktrees/*.path
+[command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/ripgrep/ripgrep/.git.path
+/home/runner/work/_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config
+[command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/ripgrep/ripgrep/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-20b5093c\-93b2\-45be\-baf5\-7e363da2ac31\.config
+[command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/ripgrep/ripgrep/.git/worktrees/*.path
+/home/runner/work/_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config
+[command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/ripgrep/ripgrep/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-20b5093c\-93b2\-45be\-baf5\-7e363da2ac31\.config
+[command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+/github/runner_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config
+[command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-20b5093c\-93b2\-45be\-baf5\-7e363da2ac31\.config
+[command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+/github/runner_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config
+[command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-20b5093c\-93b2\-45be\-baf5\-7e363da2ac31\.config
+[command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+Removing credentials config '/home/runner/work/_temp/git-credentials-20b5093c-93b2-45be-baf5-7e363da2ac31.config'
+-- Complete job
+== Compile Fuzz Test Targets
+-- Set up job
+-- Checkout repository
+▸ Run actions/checkout@v7 (+15 lines)
+Syncing repository: BurntSushi/ripgrep
+▸ Getting Git version info (+3 lines)
+Temporarily overriding HOME='/home/runner/work/_temp/e22b9480-bf6f-462a-9a90-73a4d7ef09d4' before making global git config changes
+Adding repository directory to the temporary git global config as a safe directory

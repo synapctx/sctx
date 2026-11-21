@@ -1,0 +1,141 @@
+[96msrc/AIProviderManager.ts[0m:[93m33[0m:[93m17[0m - [91merror[0m[90m TS6138: [0mProperty 'openaiApiKey' is declared but its value is never read.
+
+[7m33[0m         private openaiApiKey?: string
+[7m  [0m [91m                ~~~~~~~~~~~~[0m
+
+[96msrc/AIProviderManager.ts[0m:[93m293[0m:[93m65[0m - [91merror[0m[90m TS6133: [0m'key' is declared but its value is never read.
+
+[7m293[0m         return Array.from(this.providerConfigs.entries()).map(([key, config]) => ({
+[7m   [0m [91m                                                                ~~~[0m
+
+[96msrc/AutonomousOrchestrator.ts[0m:[93m1[0m:[93m29[0m - [91merror[0m[90m TS6133: [0m'PlanningResult' is declared but its value is never read.
+
+[7m1[0m import { AIProviderManager, PlanningResult, ExecutionResult } from './AIProviderManager';
+[7m [0m [91m                            ~~~~~~~~~~~~~~[0m
+
+[96msrc/AutonomousOrchestrator.ts[0m:[93m1[0m:[93m45[0m - [91merror[0m[90m TS6133: [0m'ExecutionResult' is declared but its value is never read.
+
+[7m1[0m import { AIProviderManager, PlanningResult, ExecutionResult } from './AIProviderManager';
+[7m [0m [91m                                            ~~~~~~~~~~~~~~~[0m
+
+[96msrc/AutonomousOrchestrator.ts[0m:[93m4[0m:[93m1[0m - [91merror[0m[90m TS6133: [0m'ulid' is declared but its value is never read.
+
+[7m4[0m import { ulid } from 'ulid';
+[7m [0m [91m~~~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/AutonomousOrchestrator.ts[0m:[93m268[0m:[93m42[0m - [91merror[0m[90m TS6133: [0m'stepIndex' is declared but its value is never read.
+
+[7m268[0m     private async executeStep(step: any, stepIndex: number): Promise<boolean> {
+[7m   [0m [91m                                         ~~~~~~~~~[0m
+
+[96msrc/AutonomousOrchestrator.ts[0m:[93m324[0m:[93m53[0m - [91merror[0m[90m TS6133: [0m'execution' is declared but its value is never read.
+
+[7m324[0m                 vscode.tasks.executeTask(task).then(execution => {
+[7m   [0m [91m                                                    ~~~~~~~~~[0m
+
+[96msrc/EnhancedAutonomousOrchestrator.ts[0m:[93m213[0m:[93m84[0m - [91merror[0m[90m TS6133: [0m'config' is declared but its value is never read.
+
+[7m213[0m     private async executeStructuredCommand(parsedStep: any, workspacePath: string, config: AutonomousExecutionConfig): Promise<void> {
+[7m   [0m [91m                                                                                   ~~~~~~[0m
+
+[96msrc/EnhancedAutonomousOrchestrator.ts[0m:[93m724[0m:[93m35[0m - [91merror[0m[90m TS6133: [0m'goal' is declared but its value is never read.
+
+[7m724[0m     private async verifyExecution(goal: string, workspacePath: string): Promise<void> {
+[7m   [0m [91m                                  ~~~~[0m
+
+[96msrc/EnhancedAutonomousOrchestrator.ts[0m:[93m725[0m:[93m15[0m - [91merror[0m[90m TS6133: [0m'workspaceAnalysis' is declared but its value is never read.
+
+[7m725[0m         const workspaceAnalysis = await this.analyzeWorkspace(workspacePath);
+[7m   [0m [91m              ~~~~~~~~~~~~~~~~~[0m
+
+[96msrc/EnhancedMemory.ts[0m:[93m1[0m:[93m32[0m - [91merror[0m[90m TS6133: [0m'SessionRecord' is declared but its value is never read.
+
+[7m1[0m import { Memory as BaseMemory, SessionRecord, TaskRecord } from './Memory';
+[7m [0m [91m                               ~~~~~~~~~~~~~[0m
+
+[96msrc/EnhancedMemory.ts[0m:[93m1[0m:[93m47[0m - [91merror[0m[90m TS6133: [0m'TaskRecord' is declared but its value is never read.
+
+[7m1[0m import { Memory as BaseMemory, SessionRecord, TaskRecord } from './Memory';
+[7m [0m [91m                                              ~~~~~~~~~~[0m
+
+[96msrc/EnhancedMemory.ts[0m:[93m300[0m:[93m57[0m - [91merror[0m[90m TS6133: [0m'language' is declared but its value is never read.
+
+[7m300[0m     public async findBestPracticesForGoal(goal: string, language: string): Promise<any[]> {
+[7m   [0m [91m                                                        ~~~~~~~~[0m
+
+[96msrc/EnhancedOrchestratorViewProvider.ts[0m:[93m4[0m:[93m37[0m - [91merror[0m[90m TS6133: [0m'ChatMessage' is declared but its value is never read.
+
+[7m4[0m import { MultiProjectMemoryManager, ChatMessage } from './MultiProjectMemoryManager';
+[7m [0m [91m                                    ~~~~~~~~~~~[0m
+
+[96msrc/EnhancedOrchestratorViewProvider.ts[0m:[93m12[0m:[93m13[0m - [91merror[0m[90m TS6133: [0m'_aiManager' is declared but its value is never read.
+
+[7m12[0m     private _aiManager!: AIProviderManager;
+[7m  [0m [91m            ~~~~~~~~~~[0m
+
+[96msrc/EnhancedOrchestratorViewProvider.ts[0m:[93m16[0m:[93m13[0m - [91merror[0m[90m TS6133: [0m'_isExecuting' is declared but its value is never read.
+
+[7m16[0m     private _isExecuting = false;
+[7m  [0m [91m            ~~~~~~~~~~~~[0m
+
+[96msrc/EnhancedOrchestratorViewProvider.ts[0m:[93m132[0m:[93m9[0m - [91merror[0m[90m TS6133: [0m'context' is declared but its value is never read.
+
+[7m132[0m         context: vscode.WebviewViewResolveContext,
+[7m   [0m [91m        ~~~~~~~[0m
+
+[96msrc/EnhancedOrchestratorViewProvider.ts[0m:[93m133[0m:[93m9[0m - [91merror[0m[90m TS6133: [0m'token' is declared but its value is never read.
+
+[7m133[0m         token: vscode.CancellationToken,
+[7m   [0m [91m        ~~~~~[0m
+
+[96msrc/EnhancedOrchestratorViewProvider.ts[0m:[93m175[0m:[93m52[0m - [91merror[0m[90m TS6133: [0m'config' is declared but its value is never read.
+
+[7m175[0m     private async handleGeneratePlan(goal: string, config: Partial<AutonomousExecutionConfig>) {
+[7m   [0m [91m                                                   ~~~~~~[0m
+
+[96msrc/MultiProjectMemoryManager.ts[0m:[93m210[0m:[93m15[0m - [91merror[0m[90m TS6133: [0m'projectContext' is declared but its value is never read.
+
+[7m210[0m         const projectContext = db.collection('project_context');
+[7m   [0m [91m              ~~~~~~~~~~~~~~[0m
+
+[96msrc/MultiProjectMemoryManager.ts[0m:[93m354[0m:[93m13[0m - [91merror[0m[90m TS6133: [0m'db' is declared but its value is never read.
+
+[7m354[0m     private db: Db;
+[7m   [0m [91m            ~~[0m
+
+[96msrc/MultiProjectMemoryManager.ts[0m:[93m361[0m:[93m13[0m - [91merror[0m[90m TS6133: [0m'tasks' is declared but its value is never read.
+
+[7m361[0m     private tasks: Collection;
+[7m   [0m [91m            ~~~~~[0m
+
+[96msrc/MultiProjectMemoryManager.ts[0m:[93m363[0m:[93m13[0m - [91merror[0m[90m TS6133: [0m'projectContext' is declared but its value is never read.
+
+[7m363[0m     private projectContext: Collection;
+[7m   [0m [91m            ~~~~~~~~~~~~~~[0m
+
+[96msrc/OrchestratorViewProvider.ts[0m:[93m30[0m:[93m34[0m - [91merror[0m[90m TS6138: [0mProperty 'context' is declared but its value is never read.
+
+[7m30[0m     constructor(private readonly context: vscode.ExtensionContext) {
+[7m  [0m [91m                                 ~~~~~~~[0m
+
+[96msrc/OrchestratorViewProvider.ts[0m:[93m36[0m:[93m9[0m - [91merror[0m[90m TS6133: [0m'context' is declared but its value is never read.
+
+[7m36[0m         context: vscode.WebviewViewResolveContext,
+[7m  [0m [91m        ~~~~~~~[0m
+
+[96msrc/OrchestratorViewProvider.ts[0m:[93m279[0m:[93m13[0m - [91merror[0m[90m TS6133: [0m'_getOrCreateSharedTerminal' is declared but its value is never read.
+
+[7m279[0m     private _getOrCreateSharedTerminal(): vscode.Terminal {
+[7m   [0m [91m            ~~~~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+
+Found 26 errors in 7 files.
+
+Errors  Files
+     2  src/AIProviderManager.ts[90m:33[0m
+     5  src/AutonomousOrchestrator.ts[90m:1[0m
+     3  src/EnhancedAutonomousOrchestrator.ts[90m:213[0m
+     3  src/EnhancedMemory.ts[90m:1[0m
+     6  src/EnhancedOrchestratorViewProvider.ts[90m:4[0m
+     4  src/MultiProjectMemoryManager.ts[90m:210[0m
+     3  src/OrchestratorViewProvider.ts[90m:30[0m

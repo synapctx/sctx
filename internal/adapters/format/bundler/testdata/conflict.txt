@@ -1,0 +1,9 @@
+
+[!] There was an error parsing `Gemfile`: You cannot specify the same gem twice with different version requirements.
+You specified: rack (>= 0) and rack (< 1). Bundler cannot continue.
+
+ #  from /app/Gemfile:8
+ #  -------------------------------------------
+ #  gem "rack"
+ >  gem "rack", "< 1"
+ #  -------------------------------------------

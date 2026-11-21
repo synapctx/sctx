@@ -98,7 +98,7 @@ func renderChain(ctx context.Context, f format.Formatter, in format.Input, raw, 
 			anomaly = appendAnomaly(anomaly, fmt.Sprintf("%s: %v", t.tier, err))
 			continue
 		}
-		if reason := anomalous(rendered, in, raw); reason != "" {
+		if reason := anomalous(rendered, in, raw, rawStderr); reason != "" {
 			anomaly = appendAnomaly(anomaly, fmt.Sprintf("%s: %s", t.tier, reason))
 			continue
 		}
@@ -121,7 +121,7 @@ func renderChain(ctx context.Context, f format.Formatter, in format.Input, raw, 
 		attempt.Stdout = bytes.NewReader(raw)
 		attempt.Stderr = bytes.NewReader(rawStderr)
 		rendered, err := safeRender(ctx, lossless.Relaxed, attempt)
-		if err == nil && anomalous(rendered, in, raw) == "" {
+		if err == nil && anomalous(rendered, in, raw, rawStderr) == "" {
 			return RenderResult{
 				Body:       ensureTrailingNewline(rendered.Body),
 				Tier:       format.TierRelaxed,
@@ -162,11 +162,29 @@ func safeRender(ctx context.Context, fn func(context.Context, format.Input) (for
 // an empty body for non-empty raw output, or a "compression" at least as
 // large as the raw output. Formatters must always emit at least a summary
 // line — silence is never a valid compression.
-func anomalous(r format.Rendered, in format.Input, raw []byte) string {
+//
+// A render that folds stderr into its body (FoldStderr) replaces BOTH streams, so
+// it is measured against stdout plus stderr: comparing it with stdout alone
+// rejected every formatter whose body carries stderr-derived lines (a linter
+// printing findings to stdout and its summary to stderr) as "not smaller" even
+// when it was well under what the agent would otherwise have received.
+func anomalous(r format.Rendered, in format.Input, raw, rawStderr []byte) string {
 	if len(r.Body) == 0 && len(raw) > 0 {
 		return "empty render for non-empty output"
 	}
-	if len(raw) > 0 && len(r.Body) >= len(raw) {
+	// What the agent would see is Body plus any stderr the render did not
+	// absorb; compare that with both raw streams. Gating on stdout alone let a
+	// failed command with empty stdout be rendered as silence (an empty
+	// FoldStderr body) or as something larger than its own stderr.
+	emitted := len(r.Body)
+	if !r.FoldStderr {
+		emitted += len(rawStderr)
+	}
+	total := len(raw) + len(rawStderr)
+	if total > 0 && emitted == 0 {
+		return "empty render for non-empty output"
+	}
+	if total > 0 && emitted >= total {
 		return "render not smaller than raw output"
 	}
 	return ""

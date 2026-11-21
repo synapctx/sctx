@@ -1,0 +1,26 @@
+…+5 lines (notes ×5)
+NAME: rel
+LAST DEPLOYED: Sat Nov 21 02:03:11 2026
+NAMESPACE: default
+STATUS: deployed
+REVISION: 1
+DESCRIPTION: Install complete
+RESOURCES:
+==> v1/Pod(related)
+NAME                     READY   STATUS    RESTARTS   AGE
+rel-web-8dfb5dc4-4t88p   1/1     Running   0          5s
+
+==> v1/ServiceAccount
+NAME      AGE
+rel-web   5s
+
+==> v1/Service
+NAME      TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+rel-web   ClusterIP   10.96.169.15   <none>        80/TCP    5s
+
+==> v1/Deployment
+NAME      READY   UP-TO-DATE   AVAILABLE   AGE
+rel-web   1/1     1            1           5s
+
+
+NOTES: …+5 lines

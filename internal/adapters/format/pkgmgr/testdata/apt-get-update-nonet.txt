@@ -1,0 +1,26 @@
+Ign:1 http://ports.ubuntu.com/ubuntu-ports noble InRelease
+Ign:2 http://ports.ubuntu.com/ubuntu-ports noble-updates InRelease
+Ign:3 http://ports.ubuntu.com/ubuntu-ports noble-backports InRelease
+Ign:4 http://ports.ubuntu.com/ubuntu-ports noble-security InRelease
+Ign:1 http://ports.ubuntu.com/ubuntu-ports noble InRelease
+Ign:2 http://ports.ubuntu.com/ubuntu-ports noble-updates InRelease
+Ign:3 http://ports.ubuntu.com/ubuntu-ports noble-backports InRelease
+Ign:4 http://ports.ubuntu.com/ubuntu-ports noble-security InRelease
+Ign:1 http://ports.ubuntu.com/ubuntu-ports noble InRelease
+Ign:2 http://ports.ubuntu.com/ubuntu-ports noble-updates InRelease
+Ign:3 http://ports.ubuntu.com/ubuntu-ports noble-backports InRelease
+Ign:4 http://ports.ubuntu.com/ubuntu-ports noble-security InRelease
+Err:1 http://ports.ubuntu.com/ubuntu-ports noble InRelease
+  Temporary failure resolving 'ports.ubuntu.com'
+Err:2 http://ports.ubuntu.com/ubuntu-ports noble-updates InRelease
+  Temporary failure resolving 'ports.ubuntu.com'
+Err:3 http://ports.ubuntu.com/ubuntu-ports noble-backports InRelease
+  Temporary failure resolving 'ports.ubuntu.com'
+Err:4 http://ports.ubuntu.com/ubuntu-ports noble-security InRelease
+  Temporary failure resolving 'ports.ubuntu.com'
+Reading package lists...
+W: Failed to fetch http://ports.ubuntu.com/ubuntu-ports/dists/noble/InRelease  Temporary failure resolving 'ports.ubuntu.com'
+W: Failed to fetch http://ports.ubuntu.com/ubuntu-ports/dists/noble-updates/InRelease  Temporary failure resolving 'ports.ubuntu.com'
+W: Failed to fetch http://ports.ubuntu.com/ubuntu-ports/dists/noble-backports/InRelease  Temporary failure resolving 'ports.ubuntu.com'
+W: Failed to fetch http://ports.ubuntu.com/ubuntu-ports/dists/noble-security/InRelease  Temporary failure resolving 'ports.ubuntu.com'
+W: Some index files failed to download. They have been ignored, or old ones used instead.

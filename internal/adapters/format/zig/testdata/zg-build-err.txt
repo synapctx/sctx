@@ -1,0 +1,14 @@
+install
++- install demo
+   +- zig build-exe demo Debug native 3 errors
+src/main.zig:2:45: error: use of undeclared identifier 'c'
+src/main.zig:6:9: error: unused local variable
+src/main.zig:4:11: error: unused local constant
+error: the following command failed with 3 compilation errors:
+/usr/bin/zig build-exe -ODebug -Mroot=/work/proj/src/main.zig --cache-dir /tmp/zl --global-cache-dir /tmp/zc --name demo --listen=- 
+Build Summary: 0/3 steps succeeded; 1 failed (disable with --summary none)
+install transitive failure
++- install demo transitive failure
+   +- zig build-exe demo Debug native 3 errors
+error: the following build command failed with exit code 1:
+/tmp/zl/o/302a58fa5fd2e30b70e37bc233413929/build /usr/bin/zig /work/proj /tmp/zl /tmp/zc --seed 0x5b59e05c -Z7dfb0b47dec1eadf

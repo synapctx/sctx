@@ -1,0 +1,30 @@
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+root           1  0.0  0.0   2392  1592 ?        Ss   02:39   0:00 sh -c chmod +x /work/*; /work/capture.sh ubuntu /work/raw - ; /work/capture.sh ubuntu /work/before /work/sctx-before; /work/capture.sh ubuntu /work/after /work/sctx-after
+root           7  0.3  0.0   2392  1616 ?        S    02:39   0:00 /bin/sh /work/capture.sh ubuntu /work/raw -
+root          37  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          38  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          39  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          40  0.0  0.0   2280  1272 ?        S    02:39   0:00 sleep 600
+root          41  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          42  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          43  0.0  0.0   2280  1288 ?        S    02:39   0:00 sleep 600
+root          44  0.0  0.0   2280  1288 ?        S    02:39   0:00 sleep 600
+root          45  0.0  0.0   2280  1288 ?        S    02:39   0:00 sleep 600
+root          46  0.0  0.0   2280  1288 ?        S    02:39   0:00 sleep 600
+root          47  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          48  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          49  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          50  0.0  0.0   2280  1276 ?        S    02:39   0:00 sleep 600
+root          51  0.0  0.0   2280  1288 ?        S    02:39   0:00 sleep 600
+root          52  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          53  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          54  0.0  0.0   2280  1276 ?        S    02:39   0:00 sleep 600
+root          55  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          56  0.0  0.0   2280  1288 ?        S    02:39   0:00 sleep 600
+root          57  0.0  0.0   2280  1288 ?        S    02:39   0:00 sleep 600
+root          58  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          59  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          60  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root          61  0.0  0.0   2280  1284 ?        S    02:39   0:00 sleep 600
+root         233  0.0  0.0   2392  1572 ?        S    02:39   0:00 sh -c ps auxww
+root         234  0.0  0.0   7640  3648 ?        R    02:39   0:00 ps auxww

@@ -42,14 +42,16 @@ func verboseMode(in format.Input) bool {
 // "before=0 after=1" rendered as "ok: 1 packages, 493ms". The log line, which was
 // the whole point of the run, was gone.
 //
-// So this keeps every per-test RESULT line and every log line, and drops only
-// "=== RUN"/"=== PAUSE"/"=== CONT", which are progress markers that carry no
-// information a result line does not already give. That is a real reduction —
-// those are roughly a third of a verbose run, more with subtests — without
-// touching anything the caller asked to see.
+// So this keeps every log line and drops the lines that carry no information a
+// count does not already give: "=== RUN"/"=== PAUSE"/"=== CONT" progress markers
+// and, since every test in an all-green run passed, the "--- PASS" result lines
+// (subtests included). Both are COUNTED in one marker, the same shape the
+// failing path uses (`…+N passing tests; progress lines ×M`), so the elision is
+// never silent. On a run with hundreds of subtests the PASS lines were most of
+// the remaining output; the indented lines under them (t.Log) are kept as-is.
 func renderPassingVerboseTest(lines []string, stderr []byte, dur time.Duration) format.Rendered {
 	var kept []string
-	var okCount, notfCount, cachedCount, dropped int
+	var okCount, notfCount, cachedCount, dropped, passedTests int
 
 	for _, l := range lines {
 		switch {
@@ -62,6 +64,8 @@ func renderPassingVerboseTest(lines []string, stderr []byte, dur time.Duration) 
 			}
 		case strings.Contains(l, "[no test files]"):
 			notfCount++
+		case strings.HasPrefix(strings.TrimLeft(l, " "), "--- PASS"):
+			passedTests++
 		case l == "PASS":
 			// Per-package terminator, redundant with the "ok" line that follows.
 			dropped++
@@ -76,6 +80,19 @@ func renderPassingVerboseTest(lines []string, stderr []byte, dur time.Duration) 
 		b.WriteByte('\n')
 	}
 
+	// The marker is the contract: an elision is always counted and never silent.
+	if passedTests > 0 || dropped > 0 {
+		var parts []string
+		if passedTests > 0 {
+			parts = append(parts, fmt.Sprintf("…+%d passing tests", passedTests))
+		}
+		if dropped > 0 {
+			parts = append(parts, fmt.Sprintf("progress lines ×%d", dropped))
+		}
+		b.WriteString(strings.Join(parts, "; "))
+		b.WriteByte('\n')
+	}
+
 	fmt.Fprintf(&b, "ok: %d packages", okCount)
 	if dur > 0 {
 		fmt.Fprintf(&b, ", %s", dur.Round(time.Millisecond))
@@ -85,10 +102,6 @@ func renderPassingVerboseTest(lines []string, stderr []byte, dur time.Duration) 
 	}
 	if cachedCount > 0 {
 		fmt.Fprintf(&b, "; %d cached", cachedCount)
-	}
-	// The marker is the contract: an elision is always counted and never silent.
-	if dropped > 0 {
-		fmt.Fprintf(&b, "; progress lines ×%d", dropped)
 	}
 	b.WriteByte('\n')
 

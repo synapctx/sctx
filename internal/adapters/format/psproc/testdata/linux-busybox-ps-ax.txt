@@ -1,0 +1,9 @@
+ps: unrecognized option: x
+BusyBox v1.36.1 (2025-11-23 14:32:18 UTC) multi-call binary.
+
+Usage: ps [-o COL1,COL2=HEADER] [-T]
+
+Show list of processes
+
+	-o COL1,COL2=HEADER	Select columns for display
+	-T			Show threads

@@ -1,0 +1,35 @@
+▲ Next.js 16.4.6 (Turbopack)
+✓ Running next.config.js took 9ms
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 2 errors:
+./fx-next/app/bad/page.tsx:1:1
+Error: Module not found: Can't resolve './missing-module'
+[31m[1m>[0m [90m1 |[0m [36mimport[0m x [36mfrom[0m [32m'./missing-module'[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m [36mimport[0m y [36mfrom[0m [32m'./missing-two'[0m;
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mP[0m(){[36mreturn[0m <h1>{x}{y}</h1>}
+  [90m4 |[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./fx-next/app/bad/page.tsx:2:1
+Error: Module not found: Can't resolve './missing-two'
+  [90m1 |[0m [36mimport[0m x [36mfrom[0m [32m'./missing-module'[0m;
+[31m[1m>[0m [90m2 |[0m [36mimport[0m y [36mfrom[0m [32m'./missing-two'[0m;
+  [90m  |[0m [31m[1m^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^[0m
+  [90m3 |[0m [36mexport[0m [36mdefault[0m [36mfunction[0m [33mP[0m(){[36mreturn[0m <h1>{x}{y}</h1>}
+  [90m4 |[0m
+
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)

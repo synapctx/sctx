@@ -5,9 +5,9 @@ package agentsetup
 // Cursor's `preToolUse` hook (matcher `"Shell"`) is a different, newer
 // contract than the older `beforeShellExecution` hook: that one is allow/deny
 // only and cannot rewrite a command. `preToolUse` shipped in Cursor 1.7 (Oct
-// 2025) and is verified here against the rtk reference implementation
-// (github.com/rtk-ai/rtk), not Cursor's own docs page — this change had no
-// WebFetch tool and cursor.com's docs render nothing usable from a plain GET.
+// 2025) and is verified here against a working third-party integration's
+// source, not Cursor's docs page — cursor.com renders nothing usable from a
+// plain HTTP GET.
 //
 // The config file is `hooks.json`, both `~/.cursor/hooks.json` (user/global)
 // and `<project>/.cursor/hooks.json`. This package writes the user scope

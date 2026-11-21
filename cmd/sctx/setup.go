@@ -12,6 +12,7 @@ import (
 
 	"golang.org/x/term"
 
+	"github.com/synapctx/sctx/internal/adapters/hook"
 	"github.com/synapctx/sctx/internal/platform/agentenv"
 	"github.com/synapctx/sctx/internal/platform/agentsetup"
 	"github.com/synapctx/sctx/internal/platform/config"
@@ -333,6 +334,29 @@ func probeCredential(cfg config.Config) (org, token string) {
 	return slugs[0], tokens[slugs[0]]
 }
 
+// printClaudePermissionWarnings flags a Claude Code allow rule that would
+// auto-approve every sctx-wrapped command (`Bash(sctx:*)`): the hook rewrites
+// `git push` to `sctx git push`, so such a rule pre-approves it whatever the
+// user decided about git push itself.
+func printClaudePermissionWarnings(w io.Writer, home string) {
+	cwd, _ := os.Getwd()
+	warnings := hook.ClaudeAllowRuleWarnings(home, cwd)
+	// The hook cannot print (its stdout/stderr must stay clean), so a settings
+	// file it could not read — which makes it leave every command unwrapped — is
+	// recorded to the spool and surfaced here.
+	stepAside, stepped := hook.ClaudeStepAsideNote(time.Now())
+	if len(warnings) == 0 && !stepped {
+		return
+	}
+	fmt.Fprintln(w, "\nclaude code permissions")
+	for _, msg := range warnings {
+		fmt.Fprintf(w, "  [warn]    %s\n", msg)
+	}
+	if stepped {
+		fmt.Fprintf(w, "  [warn]    sctx stepped aside: %s\n", stepAside)
+	}
+}
+
 // printWrappingStatus says, per agent, whether its commands are actually being
 // wrapped — and by what.
 //
@@ -484,7 +508,21 @@ func printAgentHookStatus(w io.Writer, home string, t agentsetup.Target, binary 
 			return false
 		}
 		return printSimpleHookLine(w, t.Name, "hook", cs.ConfigPath, cs.Installed, cs.Stale, cs.StaleReason, cs.Missing, false)
-	case "kilocode", "opencode":
+	case "trae":
+		cs, err := agentsetup.InspectTraeHooks(home, binary)
+		if err != nil {
+			fmt.Fprintf(w, "\n%s hook (%s)\n  [error] %v\n", t.Name, cs.ConfigPath, err)
+			return false
+		}
+		return printSimpleHookLine(w, t.Name, "hook", cs.ConfigPath, cs.Installed, cs.Stale, cs.StaleReason, cs.Missing, false)
+	case "vibe":
+		cs, err := agentsetup.InspectVibeHooks(home, binary)
+		if err != nil {
+			fmt.Fprintf(w, "\n%s hook (%s)\n  [error] %v\n", t.Name, cs.ConfigPath, err)
+			return false
+		}
+		return printSimpleHookLine(w, t.Name, "hook", cs.ConfigPath, cs.Installed, cs.Stale, cs.StaleReason, cs.Missing, false)
+	case "kilocode", "opencode", "pi":
 		ps, err := agentsetup.InspectPlugin(home, t.Agent, binary)
 		if err != nil {
 			fmt.Fprintf(w, "\n%s plugin (%s)\n  [error] %v\n", t.Name, ps.Path, err)
@@ -700,6 +738,7 @@ func printSetupStatus(w io.Writer, st agentsetup.Status, cfg config.Config, afte
 		}
 	}
 	printWrappingStatus(w, st, cfg)
+	printClaudePermissionWarnings(w, st.Home)
 	fmt.Fprintln(w, "\ninstruction documents")
 	fmt.Fprintln(w, "  written as sidecar files where includes are supported; otherwise inlined into the agent's root instructions")
 	for _, d := range st.Docs {

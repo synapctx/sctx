@@ -1,0 +1,33 @@
+.F.F.xsF                                                                 [100%]
+=================================== FAILURES ===================================
+__________________________________ test_fail ___________________________________
+
+    def test_fail():
+>       assert add(1, 2) == 4
+E       assert 3 == 4
+E        +  where 3 = add(1, 2)
+
+tests/test_core.py:8: AssertionError
+______________________________ test_param[2-2-5] _______________________________
+
+a = 2, b = 2, e = 5
+
+    @pytest.mark.parametrize("a,b,e", [(1, 1, 2), (2, 2, 5), (0, 0, 0)])
+    def test_param(a, b, e):
+>       assert add(a, b) == e
+E       assert 4 == 5
+E        +  where 4 = add(2, 2)
+
+tests/test_core.py:12: AssertionError
+___________________________________ test_err ___________________________________
+
+    def test_err():
+>       raise ValueError("boom")
+E       ValueError: boom
+
+tests/test_core.py:23: ValueError
+=========================== short test summary info ============================
+FAILED tests/test_core.py::test_fail - assert 3 == 4
+FAILED tests/test_core.py::test_param[2-2-5] - assert 4 == 5
+FAILED tests/test_core.py::test_err - ValueError: boom
+3 failed, 3 passed, 1 skipped, 1 xfailed in 0.02s

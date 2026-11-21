@@ -1,0 +1,90 @@
+==> Downloading bottle manifests
+✔︎ Bottle Manifest hello (2.12.3)
+==> Would install 1 formula:
+hello 2.12.3 (101.3KB)
+==> Would install 12 dependencies for hello:
+linux-headers@6.8  6.8.12_1
+glibc              2.39_2
+gmp                6.3.0
+isl                0.28
+mpfr               4.2.2
+libmpc             1.4.1
+lz4                1.11.1
+xz                 5.8.4
+zlib-ng-compat     2.3.3_1
+zstd               1.5.7_1
+binutils           2.47
+gcc                16.2.0
+==> Fetching downloads for: hello
+✔︎ Bottle Manifest linux-headers@6.8 (6.8.12_1)
+✔︎ Bottle Manifest glibc (2.39_2)
+✔︎ Bottle Manifest gmp (6.3.0)
+✔︎ Bottle Manifest isl (0.28)
+✔︎ Bottle Manifest mpfr (4.2.2)
+✔︎ Bottle Manifest libmpc (1.4.1)
+✔︎ Bottle Manifest lz4 (1.11.1)
+✔︎ Bottle Manifest zlib-ng-compat (2.3.3_1)
+✔︎ Bottle Manifest zlib-ng-compat (2.3.3_1)
+✔︎ Bottle Manifest xz (5.8.4)
+✔︎ Bottle Manifest xz (5.8.4)
+Warning: Landlock ABI 10 or later is required to deny all network access; found ABI 8. Applying the network restrictions supported by this kernel.
+✔︎ Bottle Manifest zstd (1.5.7_1)
+✔︎ Bottle Manifest binutils (2.47)
+✔︎ Bottle Manifest gcc (16.2.0)
+✔︎ Bottle libmpc (1.4.1)
+✔︎ Bottle hello (2.12.3)
+✔︎ Bottle gmp (6.3.0)
+✔︎ Bottle gmp (6.3.0)
+✔︎ Bottle lz4 (1.11.1)
+✔︎ Bottle zlib-ng-compat (2.3.3_1)
+✔︎ Bottle zlib-ng-compat (2.3.3_1)
+✔︎ Bottle isl (0.28)
+✔︎ Bottle mpfr (4.2.2)
+✔︎ Bottle xz (5.8.4)
+✔︎ Bottle linux-headers@6.8 (6.8.12_1)
+✔︎ Bottle glibc (2.39_2)
+✔︎ Bottle zstd (1.5.7_1)
+✔︎ Bottle binutils (2.47)
+✔︎ Bottle gcc (16.2.0)
+==> Installing dependencies for hello: linux-headers@6.8, glibc, gmp, isl, mpfr, libmpc, lz4, xz, zlib-ng-compat, zstd, binutils and gcc
+==> Installing hello dependency: linux-headers@6.8 (6.8.12_1)
+==> Pouring linux-headers@6.8--6.8.12_1.arm64_linux.bottle.tar.gz
+🍺  /home/linuxbrew/.linuxbrew/Cellar/linux-headers@6.8/6.8.12_1: 964 files, 6.6MB
+==> Installing hello dependency: glibc (2.39_2)
+==> Pouring glibc--2.39_2.arm64_linux.bottle.tar.gz
+[34m==>[0m [1mInstalling locale data for C.utf8 en_US.UTF-8[0m
+🍺  /home/linuxbrew/.linuxbrew/Cellar/glibc/2.39_2: 1,419 files, 58MB
+==> Installing hello dependency: gmp (6.3.0)
+==> Pouring gmp--6.3.0.arm64_linux.bottle.1.tar.gz
+🍺  /home/linuxbrew/.linuxbrew/Cellar/gmp/6.3.0: 24 files, 4.4MB
+==> Installing hello dependency: isl (0.28)
+==> Pouring isl--0.28.arm64_linux.bottle.tar.gz
+🍺  /home/linuxbrew/.linuxbrew/Cellar/isl/0.28: 81 files, 10.8MB
+==> Installing hello dependency: mpfr (4.2.2)
+==> Pouring mpfr--4.2.2.arm64_linux.bottle.tar.gz
+🍺  /home/linuxbrew/.linuxbrew/Cellar/mpfr/4.2.2: 32 files, 3.9MB
+==> Installing hello dependency: libmpc (1.4.1)
+==> Pouring libmpc--1.4.1.arm64_linux.bottle.tar.gz
+🍺  /home/linuxbrew/.linuxbrew/Cellar/libmpc/1.4.1: 15 files, 759.4KB
+==> Installing hello dependency: lz4 (1.11.1)
+==> Pouring lz4--1.11.1.arm64_linux.bottle.tar.gz
+🍺  /home/linuxbrew/.linuxbrew/Cellar/lz4/1.11.1: 28 files, 1.2MB
+==> Installing hello dependency: xz (5.8.4)
+==> Pouring xz--5.8.4.arm64_linux.bottle.tar.gz
+🍺  /home/linuxbrew/.linuxbrew/Cellar/xz/5.8.4: 97 files, 3.6MB
+==> Installing hello dependency: zlib-ng-compat (2.3.3_1)
+==> Pouring zlib-ng-compat--2.3.3_1.arm64_linux.bottle.1.tar.gz
+🍺  /home/linuxbrew/.linuxbrew/Cellar/zlib-ng-compat/2.3.3_1: 17 files, 576KB
+==> Installing hello dependency: zstd (1.5.7_1)
+==> Pouring zstd--1.5.7_1.arm64_linux.bottle.tar.gz
+🍺  /home/linuxbrew/.linuxbrew/Cellar/zstd/1.5.7_1: 32 files, 3.1MB
+==> Installing hello dependency: binutils (2.47)
+==> Pouring binutils--2.47.arm64_linux.bottle.tar.gz
+🍺  /home/linuxbrew/.linuxbrew/Cellar/binutils/2.47: 6,283 files, 139.2MB
+==> Installing hello dependency: gcc (16.2.0)
+==> Pouring gcc--16.2.0.arm64_linux.bottle.1.tar.gz
+[34m==>[0m [1mCreating the GCC specs file: /home/linuxbrew/.linuxbrew/Cellar/gcc/16.2.0/bi[0m
+🍺  /home/linuxbrew/.linuxbrew/Cellar/gcc/16.2.0: 2,143 files, 416.3MB
+==> Installing hello
+==> Pouring hello--2.12.3.arm64_linux.bottle.1.tar.gz
+🍺  /home/linuxbrew/.linuxbrew/Cellar/hello/2.12.3: 58 files, 879KB

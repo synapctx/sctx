@@ -1,0 +1,5 @@
+ b.bin     | Bin 7 -> 8 bytes
+ big.txt   |   6 +++---
+ latin.txt |   2 +-
+ small.txt |   2 +-
+ 4 files changed, 5 insertions(+), 5 deletions(-)

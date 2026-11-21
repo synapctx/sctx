@@ -1,0 +1,10 @@
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mNo value for required variable[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on main.tf line 7:
+[31m│[0m [0m   7: [4mvariable "req"[0m { type = string }[0m
+[31m│[0m [0m
+[31m│[0m [0mThe root module input variable "req" is not set, and has no default value.
+[31m│[0m [0mUse a -var or -var-file command line argument to provide a value for this
+[31m│[0m [0mvariable.
+[31m╵[0m[0m

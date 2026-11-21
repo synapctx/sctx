@@ -1,0 +1,10 @@
+╭────┬────────────┬─────────╮
+│ id │    name    │ country │
+╞════╪════════════╪═════════╡
+│  1 │ Customer 1 │ DE      │
+│  2 │ Customer 2 │ FR      │
+│  3 │ Customer 3 │ ES      │
+│  4 │ Customer 4 │ JP      │
+│  5 │ Customer 5 │ US      │
+│  6 │ Customer 6 │ DE      │
+╰────┴────────────┴─────────╯

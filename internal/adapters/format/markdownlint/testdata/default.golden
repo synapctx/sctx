@@ -1,0 +1,36 @@
+markdownlint: 32 findings in 2 files (MD032=10 MD012=4 MD022=4 MD004=2 MD009=2 MD029=2 MD031=2 MD033=2 MD040=2 MD059=2)
+bad.md (16)
+  1 error MD022 Headings should be surrounded by blank lines [Expected: 1; Actual: 0; Below] [Context: "# Title"]
+  2 error MD022 Headings should be surrounded by blank lines [Expected: 1; Actual: 0; Above] [Context: "## Skipped level"]
+  4:31 error MD009 Trailing spaces [Expected: 0 or 2; Actual: 3]
+  5 error MD032 Lists should be surrounded by blank lines [Context: "- item"]
+  5 error MD032
+  6:1 error MD004 Unordered list style [Expected: dash; Actual: asterisk]
+  6 error MD032 Lists should be surrounded by blank lines [Context: "* other item"]
+  6 error MD032
+  7 error MD032 Lists should be surrounded by blank lines [Context: "1. one"]
+  8:1 error MD029 Ordered list item prefix [Expected: 2; Actual: 3; Style: 1/2/3]
+  10 error MD012 Multiple consecutive blank lines [Expected: 1; Actual: 2]
+  11 error MD012 Multiple consecutive blank lines [Expected: 1; Actual: 3]
+  12 error MD040 Fenced code blocks should have a language specified [Context: "```"]
+  14 error MD031 Fenced code blocks should be surrounded by blank lines [Context: "```"]
+  15:2 error MD059 Link text should be descriptive [Context: "[link]"]
+  16:1 error MD033 Inline HTML [Element: div]
+big.md (16)
+  1 error MD022 Headings should be surrounded by blank lines [Expected: 1; Actual: 0; Below] [Context: "# Other"]
+  2 error MD022
+  4:31 error MD009
+  5 error MD032
+  5 error MD032
+  6:1 error MD004
+  6 error MD032
+  6 error MD032
+  7 error MD032
+  8:1 error MD029
+  10 error MD012
+  11 error MD012
+  12 error MD040
+  14 error MD031
+  15:2 error MD059
+  16:1 error MD033
+×17 findings without text repeat the message first shown for their code

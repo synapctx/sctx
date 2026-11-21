@@ -1,0 +1,8 @@
+[compute]
+region = us-central1
+zone = us-central1-a
+[core]
+account = dev.user@example.com
+disable_prompts = 1
+disable_usage_reporting = False
+project = acmecorp-production-0a1b2c

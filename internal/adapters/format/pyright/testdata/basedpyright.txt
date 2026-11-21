@@ -1,0 +1,28 @@
+/work/proj/pkg/core.py
+  /work/proj/pkg/core.py:1:8 - warning: Import "os" is not accessed (reportUnusedImport)
+  /work/proj/pkg/core.py:2:8 - warning: Import "sys" is not accessed (reportUnusedImport)
+  /work/proj/pkg/core.py:3:20 - warning: This type is deprecated as of Python 3.9; use "list" instead (reportDeprecated)
+  /work/proj/pkg/core.py:3:26 - warning: This type is deprecated as of Python 3.10; use "| None" instead (reportDeprecated)
+  /work/proj/pkg/core.py:12:12 - error: Type "int" is not assignable to return type "str"
+    "int" is not assignable to "str" (reportReturnType)
+  /work/proj/pkg/core.py:14:14 - warning: This type is deprecated as of Python 3.9; use "list" instead (reportDeprecated)
+  /work/proj/pkg/core.py:15:8 - warning: This type is deprecated as of Python 3.10; use "| None" instead (reportDeprecated)
+  /work/proj/pkg/core.py:16:13 - warning: Type of "bit_length" is unknown (reportUnknownMemberType)
+  /work/proj/pkg/core.py:16:15 - error: Cannot access attribute "bit_length" for class "None"
+    Attribute "bit_length" is unknown (reportAttributeAccessIssue)
+  /work/proj/pkg/core.py:18:15 - error: Type "str" is not assignable to declared type "int"
+    "str" is not assignable to "int" (reportAssignmentType)
+  /work/proj/pkg/core.py:19:1 - error: "undefined_fn" is not defined (reportUndefinedVariable)
+  /work/proj/pkg/core.py:20:1 - warning: Result of call expression is of type "int" and is not used; assign to variable "_" if this is intentional (reportUnusedCallResult)
+  /work/proj/pkg/core.py:20:5 - error: Argument of type "Literal['a']" cannot be assigned to parameter "a" of type "int" in function "add"
+    "Literal['a']" is not assignable to "int" (reportArgumentType)
+/work/proj/pkg/ugly.py
+  /work/proj/pkg/ugly.py:1:9 - warning: Import "os" is not accessed (reportUnusedImport)
+  /work/proj/pkg/ugly.py:1:12 - warning: Import "sys" is not accessed (reportUnusedImport)
+  /work/proj/pkg/ugly.py:2:5 - warning: Return type, "dict[str, Unknown]", is partially unknown (reportUnknownParameterType)
+  /work/proj/pkg/ugly.py:2:8 - warning: Type of parameter "a" is unknown (reportUnknownParameterType)
+  /work/proj/pkg/ugly.py:2:8 - warning: Type annotation is missing for parameter "a" (reportMissingParameterType)
+  /work/proj/pkg/ugly.py:2:10 - warning: Type of parameter "b" is unknown (reportUnknownParameterType)
+  /work/proj/pkg/ugly.py:2:10 - warning: Type annotation is missing for parameter "b" (reportMissingParameterType)
+  /work/proj/pkg/ugly.py:3:12 - warning: Return type, "dict[str, Unknown]", is partially unknown (reportUnknownVariableType)
+5 errors, 16 warnings, 0 notes

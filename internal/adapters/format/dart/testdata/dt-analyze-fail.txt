@@ -1,0 +1,11 @@
+Analyzing dt...
+
+  error - lib/demo.dart:12:11 - A value of type 'String' can't be assigned to a variable of type 'int'. Try changing the type of the variable, or casting the right-hand type to 'int'. - invalid_assignment
+  error - lib/demo.dart:13:3 - The function 'undefinedFn' isn't defined. Try importing the library that defines 'undefinedFn', correcting the name to the name of an existing function, or defining a function named 'undefinedFn'. - undefined_function
+  error - lib/demo.dart:14:9 - Undefined name 'missing'. Try correcting the name to one that is defined, or defining the name. - undefined_identifier
+warning - lib/demo.dart:1:8 - Unused import: 'dart:io'. Try removing the import directive. - unused_import
+warning - lib/demo.dart:2:8 - Unused import: 'package:collection/collection.dart'. Try removing the import directive. - unused_import
+warning - lib/demo.dart:7:7 - The value of the local variable 'unused' isn't used. Try removing the variable or using it. - unused_local_variable
+warning - lib/demo.dart:12:7 - The value of the local variable 'x' isn't used. Try removing the variable or using it. - unused_local_variable
+
+7 issues found.

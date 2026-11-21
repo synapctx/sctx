@@ -1,0 +1,7 @@
+ D docs/d2.md
+M  docs/d3.md
+ M src/pkg/api/h1.go
+A  src/staged_new.go
+?? logs/dups.log
+?? logs/events.jsonl
+?? src/new.go

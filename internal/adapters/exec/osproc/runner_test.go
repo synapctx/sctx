@@ -5,6 +5,7 @@ import (
 	"io"
 	"strings"
 	"testing"
+	"time"
 
 	domexec "github.com/synapctx/sctx/internal/domain/exec"
 )
@@ -100,5 +101,48 @@ func TestLargeOutputSpills(t *testing.T) {
 	// Bytes must be re-readable.
 	if again := readSpill(t, out.Stdout); again != content {
 		t.Fatal("second Bytes() read differs from the first")
+	}
+}
+
+// A background grandchild that inherits stdout must not hold sctx after the
+// command itself has exited: Wait is bounded by waitDelay, the output written
+// before that is kept and the exit code is the command's own.
+func TestBackgroundGrandchildDoesNotHang(t *testing.T) {
+	tests := []struct {
+		name     string
+		script   string
+		wantCode int
+	}{
+		{"success", "(sleep 6 &); echo main-exited", 0},
+		{"failure", "(sleep 6 &); echo main-exited; exit 7", 7},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			start := time.Now()
+			out := run(t, "sh", "-c", tt.script)
+			if d := time.Since(start); d >= 4*time.Second {
+				t.Fatalf("Run took %v, want < 4s", d)
+			}
+			if out.ExitCode != tt.wantCode {
+				t.Errorf("exit code = %d, want %d", out.ExitCode, tt.wantCode)
+			}
+			if got := readSpill(t, out.Stdout); got != "main-exited\n" {
+				t.Errorf("stdout = %q, want main-exited", got)
+			}
+		})
+	}
+}
+
+// When a background process holds the pipes past waitDelay and the command
+// itself succeeded, the cut is reported on the Outcome (the service prints the
+// notice after the command's own output); a clean run never sets it.
+func TestOutputCutIsReported(t *testing.T) {
+	cut := run(t, "sh", "-c", "(sleep 6 &); echo main-exited")
+	if !cut.OutputCut || cut.ExitCode != 0 {
+		t.Errorf("OutputCut=%v exit=%d, want true/0", cut.OutputCut, cut.ExitCode)
+	}
+	clean := run(t, "sh", "-c", "echo hi")
+	if clean.OutputCut {
+		t.Errorf("OutputCut set for a clean run")
 	}
 }

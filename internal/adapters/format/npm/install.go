@@ -51,6 +51,17 @@ func isInstallNoiseLine(t string) bool {
 	}
 }
 
+// isYarnWarnLine reports whether t is a yarn classic warning worth keeping.
+// "No license field" and "package.json:" notes are about the project's own
+// manifest and repeat on every run; everything else (deprecations phrased
+// without the word, peer-dependency problems, incompatible engines) is signal.
+func isYarnWarnLine(t string) bool {
+	if !strings.HasPrefix(t, "warning ") {
+		return false
+	}
+	return !strings.Contains(t, "No license field") && !strings.HasPrefix(t, "warning package.json:")
+}
+
 // aggressiveInstall collapses install/ci/i/add/update output, dominated by
 // progress spinners, deprecation warnings, and funding nags, down to: the
 // final summary line(s), a capped list of deprecation warnings, and a noise
@@ -64,8 +75,9 @@ func aggressiveInstall(in format.Input) (format.Rendered, error) {
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
-	var errorLines, summaryLines, deprecationLines []string
-	fundingCount, noiseCount := 0, 0
+	var errorLines, summaryLines, deprecationLines, warnLines []string
+	fundingCount, noiseCount, stackCount := 0, 0, 0
+	afterErr := false
 
 	classify := func(l string) {
 		t := strings.TrimSpace(l)
@@ -74,7 +86,17 @@ func aggressiveInstall(in format.Input) (format.Rendered, error) {
 		}
 		switch {
 		case isErrorLine(t):
+			afterErr = true
 			errorLines = append(errorLines, t)
+		case afterErr && in.ExitCode != 0 && strings.HasPrefix(t, "at "):
+			// A stack frame under the error; counted, not kept.
+			stackCount++
+		case afterErr && in.ExitCode != 0 && !strings.HasPrefix(t, "info Visit "):
+			// The lines after the first error line explain it (pnpm 10+
+			// prints the failing package and the registry status there).
+			errorLines = append(errorLines, strings.TrimRight(l, " \t"))
+		case isYarnWarnLine(t):
+			warnLines = append(warnLines, t)
 		case isInstallSummaryLine(t):
 			summaryLines = append(summaryLines, t)
 		case isFundingLine(t):
@@ -90,6 +112,7 @@ func aggressiveInstall(in format.Input) (format.Rendered, error) {
 	for _, l := range outLines {
 		classify(l)
 	}
+	afterErr = false
 	for _, l := range errLines {
 		classify(l)
 	}
@@ -100,9 +123,14 @@ func aggressiveInstall(in format.Input) (format.Rendered, error) {
 			// whatever stderr/stdout actually says.
 			return format.Rendered{}, format.ErrTierInapplicable
 		}
+		body := strings.Join(errorLines, "\n")
+		if stackCount > 0 {
+			body += fmt.Sprintf("\n…+%d stack frames", stackCount)
+		}
 		return format.Rendered{
-			Body:       []byte(strings.Join(errorLines, "\n")),
+			Body:       []byte(body),
 			FoldStderr: len(rawErr) > 0,
+			Elided:     stackCount > 0,
 		}, nil
 	}
 
@@ -124,6 +152,20 @@ func aggressiveInstall(in format.Input) (format.Rendered, error) {
 		}
 		if extra > 0 {
 			fmt.Fprintf(&b, "\n…+%d more deprecation warnings", extra)
+		}
+	}
+
+	if len(warnLines) > 0 {
+		shown, extra := warnLines, 0
+		if len(warnLines) > maxDeprecationWarnings {
+			shown, extra = warnLines[:maxDeprecationWarnings], len(warnLines)-maxDeprecationWarnings
+		}
+		for _, w := range shown {
+			b.WriteString("\n")
+			b.WriteString(w)
+		}
+		if extra > 0 {
+			fmt.Fprintf(&b, "\n…+%d more warnings", extra)
 		}
 	}
 

@@ -25,6 +25,17 @@ func TestSharedSecurityGrammar(t *testing.T) {
 		{"redirect", []string{"go test > result"}, "", false},
 		{"substitution", []string{"go test $(pwd)"}, "", false},
 		{"newline", []string{"go test\nprintf x"}, "", false},
+		{"quoted argument stays one word", []string{`sbt "~ test"`}, "sbt ~ test", true},
+		{"single quoted argument", []string{`go test -run 'A B'`}, "go test -run A B", true},
+		{"unterminated quote", []string{`sbt "~ test`}, "", false},
+		{"backslash", []string{`go test a\ b`}, "", false},
+		{"expansion in double quotes", []string{`go test "$HOME"`}, "", false},
+		{"trailing tail follow", []string{"ls | tail -f x"}, "", false},
+		{"trailing tail follow cluster", []string{"ls | tail -fn 5 x"}, "", false},
+		{"trailing tail follow long", []string{"ls | tail --follow=name x"}, "", false},
+		{"trailing less follow", []string{"ls | less +F"}, "", false},
+		{"trailing tail finite", []string{"ls | tail -n 5"}, "ls", true},
+		{"trailing tail value containing f", []string{"ls | tail -nf5"}, "ls", true},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -44,6 +55,21 @@ func TestDirectArgumentsAreNotMistakenForShellSyntax(t *testing.T) {
 	for _, argv := range [][]string{{"/bin/bash", "-c", "go test"}, {"sctx", "go", "test"}, nil} {
 		if _, ok := Direct(argv); ok {
 			t.Errorf("Direct(%v) accepted unsafe wrapper", argv)
+		}
+	}
+}
+
+func TestShortClusterStopsAtValueLetters(t *testing.T) {
+	tests := []struct {
+		arg  string
+		want bool
+	}{
+		{"-f", true}, {"-fu", true}, {"-fn", true}, {"-ufoo.service", false},
+		{"-tfoo", false}, {"-gfail", false}, {"-n", false}, {"--follow", false},
+	}
+	for _, tt := range tests {
+		if got := ShortCluster([]string{tt.arg}, "f", "utgpnSUDMobcFi"); got != tt.want {
+			t.Errorf("ShortCluster(%q) = %v, want %v", tt.arg, got, tt.want)
 		}
 	}
 }

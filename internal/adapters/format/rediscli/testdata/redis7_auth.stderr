@@ -1,0 +1,2 @@
+Warning: Using a password with '-a' or '-u' option on the command line interface may not be safe.
+AUTH failed: ERR AUTH <password> called without any password configured for the default user. Are you sure your configuration is correct?

@@ -1,0 +1,7 @@
+    Updating crates.io index
+     Locking 1 package to highest compatible version
+ Downloading crates ...
+  Downloaded itoa v1.0.19
+   Compiling itoa v1.0.19
+   Compiling demo v0.1.0 (/work/rs-ok)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 1.05s

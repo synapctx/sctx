@@ -1,0 +1,10 @@
+ERROR: /work/proj/pkg/BUILD:2:11: Compiling pkg/lib.cc failed: (Exit 1): gcc failed: error executing CppCompile command (from target //pkg:lib)
+pkg/lib.cc: In function 'int f()':
+pkg/lib.cc:1:18: error: 'nope' was not declared in this scope
+    1 | int f() { return nope; }
+      |                  ^~~~
+Target //pkg:lib failed to build
+INFO: Elapsed time: 1.425s, Critical Path: 0.02s
+ERROR: Build did NOT complete successfully
+…+12 lines (progress rows, banners, advice, blanks)
+…+195 chars (embedded command lines)

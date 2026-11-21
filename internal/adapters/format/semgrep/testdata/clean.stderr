@@ -1,0 +1,24 @@
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 2 files tracked by git with 3 Code rules:
+  Nothing to scan.
+                
+                
+┌──────────────┐
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 0 (0 blocking)
+ • Rules run: 3
+ • Targets scanned: 0
+ • Parsed lines: an unknown percentage
+ • Scan was limited to files tracked by git
+ • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
+Ran 3 rules on 0 files: 0 findings.
+
+A new version of Semgrep is available. See https://semgrep.dev/docs/upgrading
+If Semgrep missed a finding, please send us feedback to let us know!
+See https://semgrep.dev/docs/reporting-false-negatives/

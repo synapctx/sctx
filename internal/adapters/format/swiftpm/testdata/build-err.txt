@@ -1,0 +1,30 @@
+Building for debugging...
+[Planning deferred tasks]
+[4 / 13]
+[5 / 14] Demo
+error: SwiftCompile normal arm64 /work/proj/Sources/Demo/Bad.swift failed with a nonzero exit code. Command line:     cd /work/swift
+    builtin-SwiftPerFileCompile Bad.swift
+/work/proj/Sources/Demo/Bad.swift:2:21: [1;31merror: [1;39mcannot convert value of type 'Int' to specified type 'String'[0;0m
+[0;36m1 |[0;0m public func broken() -> Int {
+[0;36m2 |[0;0m     let s: String = [4;39m5[0;0m
+  [0;36m|[0;0m                     `- [1;31merror: [1;39mcannot convert value of type 'Int' to specified type 'String'[0;0m
+[0;36m3 |[0;0m     return undefinedThing + "x"
+[0;36m4 |[0;0m }
+
+/work/proj/Sources/Demo/Bad.swift:3:12: [1;31merror: [1;39mcannot find 'undefinedThing' in scope[0;0m
+[0;36m1 |[0;0m public func broken() -> Int {
+[0;36m2 |[0;0m     let s: String = 5
+[0;36m3 |[0;0m     return [4;39mundefinedThing[0;0m + "x"
+  [0;36m|[0;0m            `- [1;31merror: [1;39mcannot find 'undefinedThing' in scope[0;0m
+[0;36m4 |[0;0m }
+[0;36m5 |[0;0m public func other() { missingFn(1) }
+
+/work/proj/Sources/Demo/Bad.swift:5:23: [1;31merror: [1;39mcannot find 'missingFn' in scope[0;0m
+[0;36m3 |[0;0m     return undefinedThing + "x"
+[0;36m4 |[0;0m }
+[0;36m5 |[0;0m public func other() { [4;39mmissingFn[0;0m(1) }
+  [0;36m|[0;0m                       `- [1;31merror: [1;39mcannot find 'missingFn' in scope[0;0m
+[0;36m6 |[0;0m 
+Failed frontend command:
+/Library/Developer/CommandLineTools/usr/bin/swift-frontend -frontend -c -primary-file /work/proj/Sources/Demo/Bad.swift /work/proj/Sources/Demo/Demo.swift -emit-dependencies-path /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Bad.d -emit-const-values-path /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Bad.swiftconstvalues -emit-reference-dependencies-path /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Bad.swiftdeps -serialize-diagnostics-path /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Bad.dia -target arm64-apple-macos12.0 -disable-cross-import-overlay-search -load-resolved-plugin /Library/Developer/CommandLineTools/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#\#SwiftMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo-dependencies-1.json -Xllvm -aarch64-use-tbi -enable-objc-interop -stack-check -sdk /Library/Developer/CommandLineTools/SDKs/MacOSX27.2.sdk -I /work/proj/.build/out/Products/Debug -Isystem /Library/Developer/CommandLineTools/Developer/usr/lib -F /work/proj/.build/out/Products/Debug -F /Library/Developer/CommandLineTools/Library/Developer/Frameworks -F /Library/Developer/CommandLineTools/Developer/Library/Frameworks -module-cache-path /work/proj/.build/out/Intermediates.noindex/SwiftExplicitPrecompiledModules -color-diagnostics -Xcc -fcolor-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=4 -swift-version 6 -Onone -D SWIFT_PACKAGE -D DEBUG -D SWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE -D Xcode -serialize-debugging-options -enable-upcoming-feature ApproachableConcurrency -enable-experimental-feature DebugDescriptionMacro -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /work/proj/.build/out/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /work/swift -enable-anonymous-context-mangled-names -file-compilation-dir /work/swift -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /work/proj/.build/out/SDKStatCaches.noindex/macosx27.2-26B118-1aa54e4a50e311dbd51de5aafe7eca3d5818d34bafcb1249783cb8b2c4efe0a2.sdkstatcache -Xcc -fmodules-prune-interval\=86400 -Xcc -fmodules-prune-after\=345600 -Xcc -I/work/proj/.build/out/Products/Debug/include -Xcc -I/work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/Demo-t.build/DerivedSources-normal/arm64 -Xcc -I/work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/Demo-t.build/DerivedSources/arm64 -Xcc -I/work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/Demo-t.build/DerivedSources -Xcc -DSWIFT_PACKAGE -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name Demo -package-name pkg -const-gather-protocols-file /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo_const_extract_protocols.json -disable-clang-spi -clang-target arm64-apple-macos27.2 -target-sdk-version 27.2 -target-sdk-name macosx27.2 -in-process-plugin-server-path /Library/Developer/CommandLineTools/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -parse-as-library -o /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Bad.o -debug-module-path /work/proj/.build/out/Intermediates.noindex/Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Demo.swiftmodule -index-unit-output-path /Demo.build/Debug/Demo-t.build/Objects-normal/arm64/Bad.o -index-store-path /work/proj/.build/out -index-system-modules
+error: Build failed

@@ -1,0 +1,7 @@
+PROJECT_ID                  NAME                      PROJECT_NUMBER  ENVIRONMENT
+gen-lang-client-1234567890  Default Gemini Project    1234567890123
+acm-development-0a1b2c      Acme Corp. - Development  123456789012
+acm-management-0a1b2c       Acme Corp. - Management   123456789012
+acm-production-0a1b2c       Acme Corp. - Production   123456789012
+acm-registry-0a1b2c         Acme Corp. - Registry     123456789012
+acm-staging-0a1b2c          Acme Corp. - Staging      123456789012

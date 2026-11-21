@@ -1,0 +1,2 @@
+************* Module bad
+bad.py:1:7: E0001: Parsing failed: 'invalid syntax (bad, line 1)' (syntax-error)

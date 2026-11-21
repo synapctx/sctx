@@ -1,0 +1,5 @@
+In PackageDiscoveryTrait.php line 421:
+Could not find a matching version of package nonexistent-vendor/nope-xyz. C
+heck the package spelling, your version constraint and that the package is
+available in a stability which matches your minimum-stability (stable).
+…+2 lines (progress, boilerplate)

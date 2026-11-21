@@ -1,0 +1,16 @@
+tar: nonexistdir: Cannot stat: No such file or directory
+proj/ping/
+proj/ping/ping.go
+proj/ping/ping_test.go
+proj/ping/testdata/
+proj/ping/testdata/badhost.exit
+proj/ping/testdata/badhost.txt
+proj/ping/testdata/loss.exit
+proj/ping/testdata/loss.txt
+proj/ping/testdata/many.exit
+proj/ping/testdata/many.txt
+proj/ping/testdata/ok.exit
+proj/ping/testdata/ok.txt
+proj/ping/testdata/quiet.exit
+proj/ping/testdata/quiet.txt
+tar: Exiting with failure status due to previous errors

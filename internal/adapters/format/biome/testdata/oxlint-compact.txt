@@ -1,0 +1,4 @@
+src/b.ts:2:5: warning eslint(no-unused-vars): Variable 'z' is declared but never used. Unused variables should start with a '_'. help: Consider removing this declaration.
+src/a.js:1:7: warning eslint(no-unused-vars): Variable 'x' is declared but never used. Unused variables should start with a '_'. help: Consider removing this declaration.
+src/a.js:2:26: warning eslint(no-unused-vars): Variable 'unused' is declared but never used. Unused variables should start with a '_'. help: Consider removing this declaration.
+src/a.js:4:1: warning eslint(no-debugger): `debugger` statement is not allowed help: Remove the debugger statement

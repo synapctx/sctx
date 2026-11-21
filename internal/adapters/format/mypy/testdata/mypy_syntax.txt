@@ -1,0 +1,4 @@
+bad.py:1: error: Expected a parameter or the end of the parameter list  [syntax]
+bad.py:1: error: Expected `)`, found newline  [syntax]
+bad.py:3: error: Expected an expression  [syntax]
+Found 3 errors in 1 file (errors prevented further checking)

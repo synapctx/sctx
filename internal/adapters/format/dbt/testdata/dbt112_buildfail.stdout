@@ -1,0 +1,66 @@
+[0m02:41:23  Running with dbt=1.12.7
+[0m02:41:23  Registered adapter: postgres=1.9.1
+[0m02:41:23  Found 16 models, 5 data tests, 476 macros
+[0m02:41:23  
+[0m02:41:23  Concurrency: 4 threads (target='dev')
+[0m02:41:23  
+[0m02:41:23  1 of 21 START sql table model dbt_dev.broken ................................... [RUN]
+[0m02:41:23  2 of 21 START sql view model dbt_dev.stg_customers_1 ........................... [RUN]
+[0m02:41:23  3 of 21 START sql view model dbt_dev.stg_customers_10 .......................... [RUN]
+[0m02:41:23  4 of 21 START sql view model dbt_dev.stg_customers_11 .......................... [RUN]
+[0m02:41:23  1 of 21 ERROR creating sql table model dbt_dev.broken .......................... [[31mERROR[0m in 0.11s]
+[0m02:41:24  5 of 21 START sql view model dbt_dev.stg_customers_12 .......................... [RUN]
+[0m02:41:24  3 of 21 OK created sql view model dbt_dev.stg_customers_10 ..................... [[32mCREATE VIEW[0m in 0.15s]
+[0m02:41:24  4 of 21 OK created sql view model dbt_dev.stg_customers_11 ..................... [[32mCREATE VIEW[0m in 0.16s]
+[0m02:41:24  6 of 21 START sql view model dbt_dev.stg_customers_2 ........................... [RUN]
+[0m02:41:24  2 of 21 OK created sql view model dbt_dev.stg_customers_1 ...................... [[32mCREATE VIEW[0m in 0.17s]
+[0m02:41:24  7 of 21 START sql view model dbt_dev.stg_customers_3 ........................... [RUN]
+[0m02:41:24  8 of 21 START sql view model dbt_dev.stg_customers_4 ........................... [RUN]
+[0m02:41:24  5 of 21 OK created sql view model dbt_dev.stg_customers_12 ..................... [[32mCREATE VIEW[0m in 0.12s]
+[0m02:41:24  9 of 21 START sql view model dbt_dev.stg_customers_5 ........................... [RUN]
+[0m02:41:24  6 of 21 OK created sql view model dbt_dev.stg_customers_2 ...................... [[32mCREATE VIEW[0m in 0.11s]
+[0m02:41:24  7 of 21 OK created sql view model dbt_dev.stg_customers_3 ...................... [[32mCREATE VIEW[0m in 0.11s]
+[0m02:41:24  10 of 21 START sql view model dbt_dev.stg_customers_6 .......................... [RUN]
+[0m02:41:24  8 of 21 OK created sql view model dbt_dev.stg_customers_4 ...................... [[32mCREATE VIEW[0m in 0.12s]
+[0m02:41:24  11 of 21 START sql view model dbt_dev.stg_customers_7 .......................... [RUN]
+[0m02:41:24  12 of 21 START sql view model dbt_dev.stg_customers_8 .......................... [RUN]
+[0m02:41:24  9 of 21 OK created sql view model dbt_dev.stg_customers_5 ...................... [[32mCREATE VIEW[0m in 0.11s]
+[0m02:41:24  13 of 21 START sql view model dbt_dev.stg_customers_9 .......................... [RUN]
+[0m02:41:24  10 of 21 OK created sql view model dbt_dev.stg_customers_6 ..................... [[32mCREATE VIEW[0m in 0.14s]
+[0m02:41:24  11 of 21 OK created sql view model dbt_dev.stg_customers_7 ..................... [[32mCREATE VIEW[0m in 0.14s]
+[0m02:41:24  14 of 21 START sql view model dbt_dev.stg_orders ............................... [RUN]
+[0m02:41:24  12 of 21 OK created sql view model dbt_dev.stg_customers_8 ..................... [[32mCREATE VIEW[0m in 0.14s]
+[0m02:41:24  15 of 21 SKIP relation dbt_dev.downstream ...................................... [[33mSKIP[0m]
+[0m02:41:24  16 of 21 START test not_null_stg_customers_1_id ................................ [RUN]
+[0m02:41:24  17 of 21 START test unique_stg_customers_1_id .................................. [RUN]
+[0m02:41:24  13 of 21 OK created sql view model dbt_dev.stg_customers_9 ..................... [[32mCREATE VIEW[0m in 0.13s]
+[0m02:41:24  17 of 21 PASS unique_stg_customers_1_id ........................................ [[32mPASS[0m in 0.08s]
+[0m02:41:24  16 of 21 PASS not_null_stg_customers_1_id ...................................... [[32mPASS[0m in 0.09s]
+[0m02:41:24  14 of 21 OK created sql view model dbt_dev.stg_orders .......................... [[32mCREATE VIEW[0m in 0.11s]
+[0m02:41:24  18 of 21 START test accepted_values_stg_orders_status__paid__pending ........... [RUN]
+[0m02:41:24  19 of 21 START test not_null_stg_orders_id ..................................... [RUN]
+[0m02:41:24  20 of 21 START test unique_stg_orders_id ....................................... [RUN]
+[0m02:41:24  18 of 21 FAIL 2 accepted_values_stg_orders_status__paid__pending ............... [[31mFAIL 2[0m in 0.08s]
+[0m02:41:24  19 of 21 PASS not_null_stg_orders_id ........................................... [[32mPASS[0m in 0.09s]
+[0m02:41:24  20 of 21 PASS unique_stg_orders_id ............................................. [[32mPASS[0m in 0.09s]
+[0m02:41:24  21 of 21 SKIP relation dbt_dev.revenue_by_country .............................. [[33mSKIP[0m]
+[0m02:41:24  
+[0m02:41:24  Finished running 3 table models, 5 data tests, 13 view models in 0 hours 0 minutes and 0.88 seconds (0.88s).
+[0m02:41:24  
+[0m02:41:24  [31mCompleted with 2 errors, 0 partial successes, and 0 warnings:[0m
+[0m02:41:24  
+[0m02:41:24  [[31mERROR[0m]: in model broken (models/marts/broken.sql)
+[0m02:41:24    Database Error in model broken (models/marts/broken.sql)
+  relation "public.nosuch_tbl" does not exist
+  LINE 12:     select * from public.nosuch_tbl
+                             ^
+  compiled code at target/run/shop/models/marts/broken.sql
+[0m02:41:24  
+[0m02:41:24    compiled code at target/compiled/shop/models/marts/broken.sql
+[0m02:41:24  
+[0m02:41:24  [[31mERROR[0m]: in test accepted_values_stg_orders_status__paid__pending (models/staging/schema.yml)
+[0m02:41:24    Got 2 results, configured to fail if != 0
+[0m02:41:24  
+[0m02:41:24    compiled code at target/compiled/shop/models/staging/schema.yml/accepted_values_stg_orders_status__paid__pending.sql
+[0m02:41:24  
+[0m02:41:24  Done. PASS=17 WARN=0 ERROR=2 SKIP=2 NO-OP=0 REUSED=0 TOTAL=21

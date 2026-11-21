@@ -1,0 +1,3 @@
+proto/demo/v1/demo.proto:8:3:Field "1" with name "id" on message "GetRequest" changed type from "string" to "int32".
+proto/demo/v1/demo.proto:11:1:Previously present field "1" with name "name" on message "GetResponse" was deleted.
+proto/demo/v1/demo.proto:15:1:Previously present RPC "Get" on service "DemoService" was deleted.

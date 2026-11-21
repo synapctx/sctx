@@ -1,0 +1,28 @@
+trim trailing whitespace.................................................Passed
+fix end of files.........................................................Passed
+check yaml...............................................................Passed
+check for added large files..............................................Passed
+check for merge conflicts................................................Passed
+check json...............................................................Failed
+- hook id: check-json
+- exit code: 1
+
+b.json: Failed to json decode (Expecting property name enclosed in double quotes: line 1 column 2 (char 1))
+
+shellcheck...............................................................Failed
+- hook id: shellcheck-local
+- exit code: 1
+
+In a.sh line 1:
+echo $1
+^-- SC2148 (error): Tips depend on target shell and yours is unknown. Add a shebang or a 'shell' directive.
+     ^-- SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+echo "$1"
+
+For more information:
+  https://www.shellcheck.net/wiki/SC2148 -- Tips depend on target shell and y...
+  https://www.shellcheck.net/wiki/SC2086 -- Double quote to prevent globbing ...
+
+Skipped by no files..................................(no files to check)Skipped

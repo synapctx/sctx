@@ -1,0 +1,5 @@
+Installing 2: psr/log 3.0.2, monolog/monolog 3.13.0
+No composer.lock file present. Updating dependencies to latest instead of installing from lock file. See https://getcomposer.org/install for more information.
+Lock file operations: 2 installs, 0 updates, 0 removals
+Package operations: 2 installs, 0 updates, 0 removals
+…+16 lines (progress, boilerplate)

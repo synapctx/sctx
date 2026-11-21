@@ -1,0 +1,3 @@
+Found existing installation: rich 15.0.0
+Uninstalling rich-15.0.0:
+  Successfully uninstalled rich-15.0.0

@@ -1,0 +1,5 @@
+checkov:
+kubernetes: Passed checks: 0, Failed checks: 1, Skipped checks: 0
+CKV_K8S_21 The default namespace should not be used (1)
+  ConfigMap.default.ok /k8s/ok.yaml:1-6
+…+0 passed checks, 7 guide/code/detail lines, banner (13 lines) dropped

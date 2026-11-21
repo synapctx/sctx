@@ -1,0 +1,57 @@
+
+PLAY [local] *******************************************************************
+
+TASK [Ignored failure] *********************************************************
+[ERROR]: Task failed: Module failed: Error executing command: [Errno 2] No such file or directory: b'/bin/false'
+Origin: /work/play/ignore.yml:4:7
+
+2   gather_facts: false
+3   tasks:
+4     - name: Ignored failure
+        ^ column 7
+
+fatal: [localhost]: FAILED! => {"ansible_facts": {"discovered_interpreter_python": "/usr/bin/python3"}, "changed": false, "cmd": "/bin/false", "msg": "Error executing command.", "rc": 2, "stderr": "", "stderr_lines": [], "stdout": "", "stdout_lines": []}
+...ignoring
+
+TASK [Undefined var] ***********************************************************
+[ERROR]: Task failed: Finalization of task args for 'ansible.builtin.debug' failed: Error while resolving value for 'msg': 'nope' is undefined
+
+Task failed.
+Origin: /work/play/ignore.yml:7:7
+
+5       ansible.builtin.command: /bin/false
+6       ignore_errors: true
+7     - name: Undefined var
+        ^ column 7
+
+<<< caused by >>>
+
+Finalization of task args for 'ansible.builtin.debug' failed.
+Origin: /work/play/ignore.yml:8:7
+
+6       ignore_errors: true
+7     - name: Undefined var
+8       ansible.builtin.debug: { msg: "{{ nope }}" }
+        ^ column 7
+
+<<< caused by >>>
+
+Error while resolving value for 'msg': 'nope' is undefined
+Origin: /work/play/ignore.yml:8:37
+
+6       ignore_errors: true
+7     - name: Undefined var
+8       ansible.builtin.debug: { msg: "{{ nope }}" }
+                                      ^ column 37
+
+fatal: [localhost]: FAILED! => {"msg": "Task failed: Finalization of task args for 'ansible.builtin.debug' failed: Error while resolving value for 'msg': 'nope' is undefined"}
+...ignoring
+
+TASK [ok] **********************************************************************
+ok: [localhost] => {
+    "msg": "done"
+}
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=3    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=2   
+

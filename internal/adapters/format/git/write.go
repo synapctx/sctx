@@ -50,6 +50,17 @@ func isHintOrAdviceLine(line string) bool {
 	return false
 }
 
+// lastCarriageReturnSegment returns what a terminal would finally show for a
+// line git redraws with carriage returns ("Rebasing (1/3)\r\x1b[KSuccessfully
+// rebased ..."): the text after the last \r, minus the erase-line escape.
+func lastCarriageReturnSegment(line string) string {
+	i := strings.LastIndexByte(line, '\r')
+	if i < 0 {
+		return line
+	}
+	return strings.ReplaceAll(line[i+1:], "\x1b[K", "")
+}
+
 func isProgressLine(line string) bool {
 	if strings.ContainsRune(line, '\r') {
 		return true
@@ -72,6 +83,7 @@ func isProgressLine(line string) bool {
 func filterWriteNoise(lines []string) []string {
 	var out []string
 	for _, line := range lines {
+		line = lastCarriageReturnSegment(line)
 		if isHintOrAdviceLine(line) {
 			continue
 		}
@@ -128,6 +140,11 @@ func aggressiveWrite(sub string, in format.Input) (format.Rendered, error) {
 	var body []string
 	body = append(body, stdout...)
 	body = append(body, stderr...)
+
+	// A fully-understood success shape collapses to a one-line confirmation.
+	if one := confirmWrite(sub, in.Argv[min(1, len(in.Argv)):], body); one != nil && len(strings.Join(one, "\n")) < len(strings.Join(body, "\n")) {
+		body = one
+	}
 
 	return format.Rendered{
 		Body:       []byte(strings.Join(body, "\n")),

@@ -1,0 +1,24 @@
+REPOSITORY                              TAG          IMAGE ID      CREATED        SIZE
+<none>                                  <none>       ebb19eb22513  17 hours ago   3.43 MB
+<none>                                  <none>       d2095cf9e137  17 hours ago   3.43 MB
+docker.io/library/postgres              17           a90b2b787a20  2 days ago     505 MB
+docker.io/chrislusf/seaweedfs           latest       73abc42ba2cf  4 days ago     761 MB
+docker.io/rustfs/rustfs                 latest       97fef378336a  5 days ago     301 MB
+docker.io/opensearchproject/opensearch  3            4bf3df94af6c  8 days ago     1.32 GB
+ghcr.io/versity/versitygw               latest       660f88518d62  10 days ago    76.2 MB
+docker.io/openfga/openfga               latest       954e0a338e8b  3 weeks ago    78.3 MB
+docker.io/library/mongo                 8.0          4ceaf589fde8  3 weeks ago    940 MB
+<none>                                  <none>       1f3d6f777729  3 weeks ago    110 MB
+<none>                                  <none>       d68034329ce3  3 weeks ago    2.67 GB
+<none>                                  <none>       4193cb26937c  3 weeks ago    133 MB
+<none>                                  <none>       5b3e4c79d4ca  3 weeks ago    1.57 GB
+docker.io/library/golang                1.27-trixie  8f3205046813  4 weeks ago    913 MB
+docker.io/library/debian                trixie-slim  133aec7ab141  4 weeks ago    81.3 MB
+<none>                                  <none>       8069338966ef  5 weeks ago    941 MB
+<none>                                  <none>       00eb3c882069  7 weeks ago    947 MB
+docker.io/library/mongo                 8            850f64bd139c  7 weeks ago    841 MB
+<none>                                  <none>       997ed65ff26f  2 months ago   939 MB
+docker.io/library/mongo                 7            039796be5c9a  3 months ago   829 MB
+docker.io/library/alpine                3.20         ab3fe4defd29  7 months ago   9.12 MB
+gcr.io/k8s-minikube/kicbase             v0.0.46      0434cf58b6db  22 months ago  1.22 GB
+docker.io/library/mongo                 8.0.4        20f16add76df  23 months ago  874 MB

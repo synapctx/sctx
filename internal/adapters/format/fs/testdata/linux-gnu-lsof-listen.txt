@@ -1,0 +1,3 @@
+COMMAND PID USER   FD   TYPE  DEVICE SIZE/OFF NODE NAME
+perl      7 root    3u  IPv4 1256995      0t0  TCP *:8080 (LISTEN)
+perl      7 root    4u  IPv4 1256996      0t0  TCP *:9090 (LISTEN)

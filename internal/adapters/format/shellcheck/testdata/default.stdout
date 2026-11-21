@@ -1,0 +1,92 @@
+
+In bad.sh line 2:
+files=$(ls *.txt)
+           ^-- SC2035 (info): Use ./*glob* or -- *glob* so names with dashes won't become options.
+
+
+In bad.sh line 4:
+  echo $f
+       ^-- SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+  echo "$f"
+
+
+In bad.sh line 5:
+  cat $f | grep foo
+      ^-- SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+  cat "$f" | grep foo
+
+
+In bad.sh line 6:
+  [ $x == 1 ] && echo yes
+    ^-- SC2154 (warning): x is referenced but not assigned.
+    ^-- SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+  [ "$x" == 1 ] && echo yes
+
+
+In bad.sh line 8:
+rm -rf $DIR/*
+       ^----^ SC2115 (warning): Use "${var:?}" to ensure this never expands to /* .
+       ^--^ SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+rm -rf "$DIR"/*
+
+
+In bad.sh line 9:
+cd $d
+^---^ SC2164 (warning): Use 'cd ... || exit' or 'cd ... || return' in case cd fails.
+   ^-- SC2154 (warning): d is referenced but not assigned.
+   ^-- SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+cd "$d" || exit
+
+
+In bad.sh line 10:
+echo `date`
+     ^----^ SC2046 (warning): Quote this to prevent word splitting.
+     ^----^ SC2005 (style): Useless echo? Instead of 'echo $(cmd)', just use 'cmd'.
+     ^----^ SC2006 (style): Use $(...) notation instead of legacy backticks `...`.
+
+Did you mean:
+echo $(date)
+
+
+In bad.sh line 11:
+if [ -z $y ]; then echo $y; fi
+        ^-- SC2086 (info): Double quote to prevent globbing and word splitting.
+                        ^-- SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+if [ -z "$y" ]; then echo "$y"; fi
+
+
+In bad2.sh line 2:
+local x=1
+^-----^ SC3043 (warning): In POSIX sh, 'local' is undefined.
+      ^-- SC2034 (warning): x appears unused. Verify use (or export if used externally).
+
+
+In bad2.sh line 3:
+echo $1
+     ^-- SC2086 (info): Double quote to prevent globbing and word splitting.
+
+Did you mean:
+echo "$1"
+
+
+In bad2.sh line 4:
+arr=(1 2)
+^-^ SC2034 (warning): arr appears unused. Verify use (or export if used externally).
+    ^---^ SC3030 (warning): In POSIX sh, arrays are undefined.
+
+For more information:
+  https://www.shellcheck.net/wiki/SC2034 -- arr appears unused. Verify use (o...
+  https://www.shellcheck.net/wiki/SC2046 -- Quote this to prevent word splitt...
+  https://www.shellcheck.net/wiki/SC2115 -- Use "${var:?}" to ensure this nev...

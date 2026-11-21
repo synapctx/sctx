@@ -1,0 +1,29 @@
+warn.c: In function 'helper':
+warn.c:3:41: error: unused variable 'x' [-Werror=unused-variable]
+    3 | static int helper(int unused_arg) { int x; return 3; }
+      |                                         ^
+warn.c: In function 'main':
+warn.c:6:12: error: too many arguments for format [-Werror=format-extra-args]
+    6 |     printf("%d\n", argc, 3);
+      |            ^~~~~~
+warn.c:7:14: error: format '%s' expects argument of type 'char *', but argument 2 has type 'int' [-Werror=format=]
+    7 |     printf("%s\n", i);
+      |             ~^     ~
+      |              |     |
+      |              |     int
+      |              char *
+      |             %d
+warn.c:9:5: error: 'return' with no value, in function returning non-void [-Wreturn-mismatch]
+    9 |     return;
+      |     ^~~~~~
+warn.c:4:5: note: declared here
+    4 | int main(int argc, char **argv) {
+      |     ^~~~
+warn.c:8:11: error: unused variable 'p' [-Werror=unused-variable]
+    8 |     char *p = malloc(4);
+      |           ^
+warn.c: At top level:
+warn.c:3:12: error: 'helper' defined but not used [-Werror=unused-function]
+    3 | static int helper(int unused_arg) { int x; return 3; }
+      |            ^~~~~~
+cc1: all warnings being treated as errors

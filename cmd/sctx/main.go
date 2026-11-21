@@ -30,35 +30,122 @@ import (
 	"golang.org/x/term"
 
 	"github.com/synapctx/sctx/internal/adapters/exec/osproc"
+	actionlintfmt "github.com/synapctx/sctx/internal/adapters/format/actionlint"
+	"github.com/synapctx/sctx/internal/adapters/format/ansible"
+	ansiblelintfmt "github.com/synapctx/sctx/internal/adapters/format/ansiblelint"
+	"github.com/synapctx/sctx/internal/adapters/format/archive"
+	astgrepfmt "github.com/synapctx/sctx/internal/adapters/format/astgrep"
+	"github.com/synapctx/sctx/internal/adapters/format/awscli"
+	bazelfmt "github.com/synapctx/sctx/internal/adapters/format/bazel"
+	"github.com/synapctx/sctx/internal/adapters/format/biome"
 	"github.com/synapctx/sctx/internal/adapters/format/brew"
+	"github.com/synapctx/sctx/internal/adapters/format/buf"
+	"github.com/synapctx/sctx/internal/adapters/format/bun"
+	bundlerfmt "github.com/synapctx/sctx/internal/adapters/format/bundler"
+	"github.com/synapctx/sctx/internal/adapters/format/cargo"
+	ccfmt "github.com/synapctx/sctx/internal/adapters/format/cc"
+	checkovfmt "github.com/synapctx/sctx/internal/adapters/format/checkov"
+	clickhousefmt "github.com/synapctx/sctx/internal/adapters/format/clickhouse"
+	cmakefmt "github.com/synapctx/sctx/internal/adapters/format/cmake"
+	composerfmt "github.com/synapctx/sctx/internal/adapters/format/composer"
+	ctestfmt "github.com/synapctx/sctx/internal/adapters/format/ctest"
+	dartfmt "github.com/synapctx/sctx/internal/adapters/format/dart"
+	dbmigratefmt "github.com/synapctx/sctx/internal/adapters/format/dbmigrate"
+	dbtfmt "github.com/synapctx/sctx/internal/adapters/format/dbt"
+	"github.com/synapctx/sctx/internal/adapters/format/deno"
 	"github.com/synapctx/sctx/internal/adapters/format/dig"
 	dockerfmt "github.com/synapctx/sctx/internal/adapters/format/docker"
+	"github.com/synapctx/sctx/internal/adapters/format/dotnet"
 	"github.com/synapctx/sctx/internal/adapters/format/du"
+	elixirfmt "github.com/synapctx/sctx/internal/adapters/format/elixir"
+	erlangfmt "github.com/synapctx/sctx/internal/adapters/format/erlang"
+	"github.com/synapctx/sctx/internal/adapters/format/eslint"
 	"github.com/synapctx/sctx/internal/adapters/format/filediff"
 	"github.com/synapctx/sctx/internal/adapters/format/fs"
+	"github.com/synapctx/sctx/internal/adapters/format/fw"
+	"github.com/synapctx/sctx/internal/adapters/format/gcloud"
 	"github.com/synapctx/sctx/internal/adapters/format/generic"
 	ghfmt "github.com/synapctx/sctx/internal/adapters/format/gh"
 	gitfmt "github.com/synapctx/sctx/internal/adapters/format/git"
+	gitleaksfmt "github.com/synapctx/sctx/internal/adapters/format/gitleaks"
 	gofmtfmt "github.com/synapctx/sctx/internal/adapters/format/gofmt"
 	"github.com/synapctx/sctx/internal/adapters/format/golangcilint"
 	"github.com/synapctx/sctx/internal/adapters/format/gotest"
+	"github.com/synapctx/sctx/internal/adapters/format/gotestsum"
+	"github.com/synapctx/sctx/internal/adapters/format/govulncheck"
+	"github.com/synapctx/sctx/internal/adapters/format/gradle"
 	grepfmt "github.com/synapctx/sctx/internal/adapters/format/grep"
+	grypefmt "github.com/synapctx/sctx/internal/adapters/format/grype"
+	"github.com/synapctx/sctx/internal/adapters/format/hadolint"
+	haskellfmt "github.com/synapctx/sctx/internal/adapters/format/haskell"
+	"github.com/synapctx/sctx/internal/adapters/format/helm"
+	helmfilefmt "github.com/synapctx/sctx/internal/adapters/format/helmfile"
 	"github.com/synapctx/sctx/internal/adapters/format/jsoncompact"
+	"github.com/synapctx/sctx/internal/adapters/format/jstest"
 	kubectlfmt "github.com/synapctx/sctx/internal/adapters/format/kubectl"
+	kubelinterfmt "github.com/synapctx/sctx/internal/adapters/format/kubelinter"
 	"github.com/synapctx/sctx/internal/adapters/format/makefmt"
+	"github.com/synapctx/sctx/internal/adapters/format/markdownlint"
+	"github.com/synapctx/sctx/internal/adapters/format/maven"
+	minitestfmt "github.com/synapctx/sctx/internal/adapters/format/minitest"
 	"github.com/synapctx/sctx/internal/adapters/format/mongosh"
+	"github.com/synapctx/sctx/internal/adapters/format/monorepo"
 	"github.com/synapctx/sctx/internal/adapters/format/mypy"
+	mysqlclifmt "github.com/synapctx/sctx/internal/adapters/format/mysqlcli"
+	"github.com/synapctx/sctx/internal/adapters/format/netinfo"
+	"github.com/synapctx/sctx/internal/adapters/format/nextbuild"
+	ninjafmt "github.com/synapctx/sctx/internal/adapters/format/ninja"
+	nixfmt "github.com/synapctx/sctx/internal/adapters/format/nix"
 	npmfmt "github.com/synapctx/sctx/internal/adapters/format/npm"
+	"github.com/synapctx/sctx/internal/adapters/format/npx"
+	"github.com/synapctx/sctx/internal/adapters/format/openssl"
+	osvscannerfmt "github.com/synapctx/sctx/internal/adapters/format/osvscanner"
+	perlfmt "github.com/synapctx/sctx/internal/adapters/format/perl"
+	phpstanfmt "github.com/synapctx/sctx/internal/adapters/format/phpstan"
+	phpunitfmt "github.com/synapctx/sctx/internal/adapters/format/phpunit"
+	pingfmt "github.com/synapctx/sctx/internal/adapters/format/ping"
 	pipfmt "github.com/synapctx/sctx/internal/adapters/format/pip"
+	"github.com/synapctx/sctx/internal/adapters/format/pkgmgr"
+	"github.com/synapctx/sctx/internal/adapters/format/playwright"
+	"github.com/synapctx/sctx/internal/adapters/format/precommit"
+	"github.com/synapctx/sctx/internal/adapters/format/prettier"
+	"github.com/synapctx/sctx/internal/adapters/format/prisma"
 	"github.com/synapctx/sctx/internal/adapters/format/projectfilter"
 	"github.com/synapctx/sctx/internal/adapters/format/psproc"
 	"github.com/synapctx/sctx/internal/adapters/format/psql"
+	"github.com/synapctx/sctx/internal/adapters/format/pulumi"
+	"github.com/synapctx/sctx/internal/adapters/format/pyfmt"
+	"github.com/synapctx/sctx/internal/adapters/format/pyinstall"
+	pylintfmt "github.com/synapctx/sctx/internal/adapters/format/pylint"
+	"github.com/synapctx/sctx/internal/adapters/format/pyright"
 	"github.com/synapctx/sctx/internal/adapters/format/pytest"
 	"github.com/synapctx/sctx/internal/adapters/format/read"
+	rediscliformat "github.com/synapctx/sctx/internal/adapters/format/rediscli"
+	rspecfmt "github.com/synapctx/sctx/internal/adapters/format/rspec"
 	"github.com/synapctx/sctx/internal/adapters/format/rsync"
+	rubocopfmt "github.com/synapctx/sctx/internal/adapters/format/rubocop"
 	"github.com/synapctx/sctx/internal/adapters/format/ruff"
+	scalafmt "github.com/synapctx/sctx/internal/adapters/format/scala"
 	"github.com/synapctx/sctx/internal/adapters/format/sed"
+	semgrepfmt "github.com/synapctx/sctx/internal/adapters/format/semgrep"
+	"github.com/synapctx/sctx/internal/adapters/format/shellcheck"
+	"github.com/synapctx/sctx/internal/adapters/format/sqlfluff"
+	sqlite3fmt "github.com/synapctx/sctx/internal/adapters/format/sqlite3"
 	"github.com/synapctx/sctx/internal/adapters/format/ssh"
+	"github.com/synapctx/sctx/internal/adapters/format/staticcheck"
+	svnfmt "github.com/synapctx/sctx/internal/adapters/format/svn"
+	swiftpmfmt "github.com/synapctx/sctx/internal/adapters/format/swiftpm"
+	"github.com/synapctx/sctx/internal/adapters/format/sysinfo"
+	systemdfmt "github.com/synapctx/sctx/internal/adapters/format/systemd"
+	taskrunnerfmt "github.com/synapctx/sctx/internal/adapters/format/taskrunner"
+	"github.com/synapctx/sctx/internal/adapters/format/terraform"
+	tflintfmt "github.com/synapctx/sctx/internal/adapters/format/tflint"
+	tfsecfmt "github.com/synapctx/sctx/internal/adapters/format/tfsec"
+	trivyfmt "github.com/synapctx/sctx/internal/adapters/format/trivy"
+	"github.com/synapctx/sctx/internal/adapters/format/tsc"
+	"github.com/synapctx/sctx/internal/adapters/format/wget"
+	"github.com/synapctx/sctx/internal/adapters/format/yamllint"
+	zigfmt "github.com/synapctx/sctx/internal/adapters/format/zig"
 	"github.com/synapctx/sctx/internal/adapters/hook"
 	"github.com/synapctx/sctx/internal/adapters/stats/sqlite"
 	"github.com/synapctx/sctx/internal/adapters/telemetry/spool"
@@ -124,6 +211,8 @@ func realMain(args []string) int {
 		return runBench(ctx, cfg, args[1:])
 	case "filters":
 		return runFilters(args[1:])
+	case "discover":
+		return runDiscover(ctx, cfg, args[1:])
 	case "flush":
 		return runFlush(ctx, cfg)
 	case "init":
@@ -136,6 +225,16 @@ func realMain(args []string) int {
 		return runTelemetry(cfg, args[1:])
 	case "watch":
 		return runWatch(ctx, cfg, args[1:])
+	case "recall":
+		return runRecall(cfg, args[1:], os.Stdout, os.Stderr)
+	case "bypass":
+		if len(args) < 2 {
+			fmt.Fprintln(os.Stderr, "usage: sctx bypass <command> [args...]")
+			return 2
+		}
+		cfg.ForceTier = "verbatim"
+		nudgeSetup(cfg)
+		return runWrapped(ctx, cfg, args[1:], false, "bypass")
 	case "--":
 		args = args[1:]
 		if len(args) == 0 {
@@ -150,7 +249,7 @@ func realMain(args []string) int {
 	// and `sctx go test` is the first thing they run. Interactive-only and
 	// rate-limited — see nudgeSetup.
 	nudgeSetup(cfg)
-	return runWrapped(ctx, cfg, args, doubleDash)
+	return runWrapped(ctx, cfg, args, doubleDash, "")
 }
 
 // buildRegistry assembles the full formatter registry sctx wraps commands
@@ -176,10 +275,156 @@ func buildRegistry() *run.Registry {
 	registry.Register(pytest.New())
 	registry.Register(ruff.New())
 	registry.Register(mypy.New())
+	registry.Register(tsc.New())
+	registry.Register(eslint.New())
+	registry.Register(npx.New())
+	for _, f := range jstest.All() {
+		registry.Register(f)
+	}
 	registry.Register(brew.New())
 	registry.Register(mongosh.New())
 	registry.Register(du.New())
 	registry.Register(rsync.New())
+	registry.Register(cargo.New())
+	for _, f := range terraform.All() {
+		registry.Register(f)
+	}
+	// Coverage expansion. Resolution is by program, then longest subcommand
+	// prefix, then priority; registration order only breaks exact ties, and
+	// TestNewFormattersAreSelected pins that no new formatter is shadowed.
+	registry.Register(gotestsum.New())
+	registry.Register(govulncheck.New())
+	registry.Register(buf.New())
+	registry.Register(staticcheck.New())
+	registry.Register(pulumi.New())
+	registry.Register(helm.New())
+	registry.Register(ansible.New())
+	registry.Register(awscli.New())
+	registry.Register(gcloud.New())
+	registry.Register(shellcheck.New())
+	registry.Register(hadolint.New())
+	registry.Register(yamllint.New())
+	registry.Register(markdownlint.New())
+	registry.Register(actionlintfmt.New())
+	registry.Register(precommit.New())
+	registry.Register(dockerfmt.NewPodman(registry.ResolveBuiltInByArgv))
+	for _, f := range biome.All() {
+		registry.Register(f)
+	}
+	for _, f := range monorepo.All() {
+		registry.Register(f)
+	}
+	for _, f := range deno.All() {
+		registry.Register(f)
+	}
+	registry.Register(bun.New())
+	registry.Register(playwright.New())
+	registry.Register(nextbuild.New())
+	registry.Register(prettier.New())
+	registry.Register(prisma.New())
+	for _, f := range ccfmt.All() {
+		registry.Register(f)
+	}
+	registry.Register(cmakefmt.New())
+	registry.Register(ctestfmt.New())
+	registry.Register(ninjafmt.New())
+	registry.Register(swiftpmfmt.New())
+	registry.Register(pingfmt.New())
+	for _, f := range astgrepfmt.All() {
+		registry.Register(f)
+	}
+	registry.Register(pytest.NewUnittest())
+	registry.Register(sqlfluff.New())
+	for _, f := range pyright.All() {
+		registry.Register(f)
+	}
+	for _, f := range pyinstall.All() {
+		registry.Register(f)
+	}
+	for _, f := range pyfmt.All() {
+		registry.Register(f)
+	}
+	for _, f := range pylintfmt.All() {
+		registry.Register(f)
+	}
+	registry.Register(rspecfmt.New())
+	registry.Register(rubocopfmt.New())
+	registry.Register(minitestfmt.New())
+	registry.Register(minitestfmt.NewRails())
+	registry.Register(minitestfmt.NewRuby())
+	registry.Register(bundlerfmt.New(registry.ResolveBuiltInByArgv))
+	registry.Register(composerfmt.New())
+	registry.Register(phpunitfmt.New())
+	registry.Register(phpstanfmt.New())
+	for _, f := range maven.All() {
+		registry.Register(f)
+	}
+	for _, f := range gradle.All() {
+		registry.Register(f)
+	}
+	registry.Register(dotnet.New())
+	// Coverage expansion, wave 3: scanners, languages, data, Linux system tools,
+	// transfer and archive tools. Same resolution rules as above.
+	registry.Register(trivyfmt.New())
+	registry.Register(gitleaksfmt.New())
+	registry.Register(semgrepfmt.New())
+	registry.Register(checkovfmt.New())
+	registry.Register(tflintfmt.New())
+	registry.Register(kubelinterfmt.New())
+	registry.Register(grypefmt.New())
+	registry.Register(osvscannerfmt.New())
+	registry.Register(tfsecfmt.New())
+	registry.Register(ansiblelintfmt.New())
+	registry.Register(helmfilefmt.New())
+	registry.Register(wget.New())
+	registry.Register(openssl.New())
+	registry.Register(svnfmt.New())
+	for _, f := range archive.All() { // tar, bsdtar, gtar, zip, unzip
+		registry.Register(f)
+	}
+	registry.Register(elixirfmt.New())
+	registry.Register(scalafmt.New())
+	registry.Register(dartfmt.New())
+	registry.Register(perlfmt.New())
+	registry.Register(zigfmt.New())
+	registry.Register(erlangfmt.New())
+	for _, f := range haskellfmt.All() { // cabal, ghc
+		registry.Register(f)
+	}
+	for _, f := range bazelfmt.All() { // bazel, bazelisk
+		registry.Register(f)
+	}
+	for _, f := range nixfmt.All() { // nix, nix-build, nix-shell
+		registry.Register(f)
+	}
+	registry.Register(mysqlclifmt.New())
+	registry.Register(sqlite3fmt.New())
+	registry.Register(rediscliformat.New())
+	registry.Register(clickhousefmt.New())
+	registry.Register(dbtfmt.New())
+	for _, f := range dbmigratefmt.All() { // flyway, liquibase
+		registry.Register(f)
+	}
+	for _, f := range pkgmgr.All() { // apt apt-get dnf yum apk pacman
+		registry.Register(f)
+	}
+	for _, f := range systemdfmt.All() { // systemctl journalctl
+		registry.Register(f)
+	}
+	for _, f := range netinfo.All() { // ip ss netstat traceroute
+		registry.Register(f)
+	}
+	for _, f := range sysinfo.All() { // top dmesg mount lsblk
+		registry.Register(f)
+	}
+	for _, f := range fw.All() { // iptables ip6tables ufw
+		registry.Register(f)
+	}
+	// Task runners delegate recipe output to the formatter of the command the
+	// recipe runs, so they need the built-in resolver like ssh does.
+	for _, f := range taskrunnerfmt.All(registry.ResolveBuiltInByArgv) {
+		registry.Register(f)
+	}
 	// ssh delegates to the REMOTE command's formatter, so it needs to look formatters up.
 	// Registered last and given the built-in-only resolver as a method value: the resolver is
 	// bound to the registry that is being populated, so it sees every built-in formatter
@@ -206,7 +451,7 @@ func buildRegistry() *run.Registry {
 	return registry
 }
 
-func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDash bool) int {
+func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDash bool, forcedBypass string) int {
 	registry := buildRegistry()
 
 	// Stats and telemetry are auxiliary: a failure disables them with a
@@ -239,6 +484,8 @@ func runWrapped(ctx context.Context, cfg config.Config, argv []string, doubleDas
 	// formatting, while `sctx --` on its own still gets rewritten normally.
 	bypass := ""
 	switch {
+	case forcedBypass != "":
+		bypass = forcedBypass
 	case cfg.ForceTier == "verbatim" || cfg.ForceTier == "off":
 		bypass = "force_tier"
 	case doubleDash:
@@ -299,7 +546,8 @@ func registerProjectFilters(registry *run.Registry) {
 	}
 }
 
-const gainUsage = `usage: sctx gain [--project|-p] [--since <dur>] [--failures|-F] [--by-client] [--share] [--format text|json|markdown]`
+const gainUsage = `usage: sctx gain [--project|-p] [--since <dur>] [--failures|-F] [--by-client] [--share]
+            [--daily|--weekly|--monthly|--graph|--history [N]] [--format text|json|markdown|csv]`
 
 func runGain(ctx context.Context, cfg config.Config, args []string) int {
 	opts, err := parseGainArgs(args)
@@ -319,9 +567,15 @@ func runGain(ctx context.Context, cfg config.Config, args []string) int {
 	// Color is a TTY affordance: on only for the text renderers writing to an
 	// interactive stdout, and suppressed when NO_COLOR is set (https://no-color.org).
 	// --share is copy-pasteable by design, so it never carries ANSI escapes.
-	if opts.Format != "json" && !opts.Share {
+	machineFormat := opts.Format == "json" || opts.Format == "csv" || opts.Format == "markdown"
+	if !machineFormat && !opts.Share {
 		if _, noColor := os.LookupEnv("NO_COLOR"); !noColor {
 			opts.Color = term.IsTerminal(int(os.Stdout.Fd()))
+		}
+	}
+	if opts.Graph {
+		if w, _, err := term.GetSize(int(os.Stdout.Fd())); err == nil {
+			opts.Width = w
 		}
 	}
 	if err := report.Render(ctx, store, os.Stdout, opts); err != nil {
@@ -336,7 +590,7 @@ func runGain(ctx context.Context, cfg config.Config, args []string) int {
 	// nor conditional on detection. Suppressed for --format json (machine-read)
 	// and --share (a card meant to be copied verbatim), written to stderr so it
 	// can never corrupt either contract.
-	if opts.Format != "json" && !opts.Share {
+	if !machineFormat && !opts.Share {
 		if home, err := os.UserHomeDir(); err == nil {
 			if st, err := agentsetup.InspectWithCodexMCP(home, codexOrgTokens(cfg), cfg.WorkspaceProxyURL, docsFor(cfg)...); err == nil {
 				if notice := gainNotice(st); notice != "" {
@@ -381,23 +635,60 @@ func parseGainArgs(args []string) (report.Options, error) {
 			opts.ByClient = true
 		case "--share":
 			opts.Share = true
+		case "--daily", "--weekly", "--monthly":
+			if opts.Period != "" {
+				return report.Options{}, fmt.Errorf("%s: only one of --daily, --weekly, --monthly may be given", a)
+			}
+			opts.Period = strings.TrimPrefix(a, "--")
+		case "--graph":
+			opts.Graph = true
+		case "--history":
+			opts.History = true
+			// The row count is optional: consume the next arg only when numeric.
+			if i+1 < len(args) {
+				if n, err := strconv.Atoi(args[i+1]); err == nil {
+					if n <= 0 {
+						return report.Options{}, fmt.Errorf("--history: count must be positive, got %d", n)
+					}
+					opts.Limit = n
+					i++
+				}
+			}
 		case "--format":
 			i++
 			if i >= len(args) {
-				return report.Options{}, fmt.Errorf("--format requires a value: text, json or markdown")
+				return report.Options{}, fmt.Errorf("--format requires a value: text, json, markdown or csv")
 			}
 			switch args[i] {
-			case "text", "json", "markdown":
+			case "text", "json", "markdown", "csv":
 				opts.Format = args[i]
 			default:
-				return report.Options{}, fmt.Errorf("--format: unsupported value %q (want text, json or markdown)", args[i])
+				return report.Options{}, fmt.Errorf("--format: unsupported value %q (want text, json, markdown or csv)", args[i])
 			}
 		default:
 			return report.Options{}, fmt.Errorf("unknown flag %q", a)
 		}
 	}
-	if opts.Format == "markdown" && !opts.Share {
-		return report.Options{}, fmt.Errorf("--format markdown is only valid with --share")
+	views := 0
+	for _, on := range []bool{opts.Period != "", opts.Graph, opts.History} {
+		if on {
+			views++
+		}
+	}
+	if views > 1 {
+		return report.Options{}, fmt.Errorf("choose one of --daily/--weekly/--monthly, --graph or --history")
+	}
+	if views == 1 && (opts.Share || opts.Failures || opts.ByClient) {
+		return report.Options{}, fmt.Errorf("--daily/--weekly/--monthly, --graph and --history cannot be combined with --share, --failures or --by-client")
+	}
+	if opts.Format == "csv" && (opts.Share || opts.Failures || opts.ByClient) {
+		return report.Options{}, fmt.Errorf("--format csv cannot be combined with --share, --failures or --by-client")
+	}
+	if opts.Format == "markdown" && !opts.Share && views == 0 {
+		return report.Options{}, fmt.Errorf("--format markdown is only valid with --share or a --daily/--weekly/--monthly/--graph/--history view")
+	}
+	if opts.Share && opts.Format == "csv" {
+		return report.Options{}, fmt.Errorf("--share supports --format text or markdown, not csv")
 	}
 	if opts.Share && opts.Format == "json" {
 		return report.Options{}, fmt.Errorf("--share supports --format text or markdown, not json")
@@ -789,6 +1080,10 @@ func runHook(args []string) int {
 		return hook.RunCopilot(args[1:], os.Stdin, os.Stdout, version)
 	case "droid":
 		return hook.RunDroid(args[1:], os.Stdin, os.Stdout, version)
+	case "trae":
+		return hook.RunTrae(args[1:], os.Stdin, os.Stdout, version)
+	case "vibe":
+		return hook.RunVibe(args[1:], os.Stdin, os.Stdout, version)
 	case "claude-post-tool":
 		// Memory surfacing. Config is loaded HERE rather than in realMain's
 		// pre-hook branch because this hook needs an API key and the Bash hook
@@ -839,6 +1134,9 @@ func runDoctor(cfg config.Config) int {
 		printNoKeyOrgs(noKey)
 	}
 	printProjectFilters()
+	if home, err := os.UserHomeDir(); err == nil {
+		printClaudePermissionWarnings(os.Stdout, home)
+	}
 	fmt.Printf("telemetry:      enabled=%t mode=%s\n", cfg.TelemetryEnabled, telemetryMode(cfg))
 	fmt.Printf("endpoint:       %s\n", cfg.TelemetryEndpoint)
 	if host := endpointHost(cfg.TelemetryEndpoint); host != "" {
@@ -1002,6 +1300,14 @@ func printUsage() {
 Usage:
   sctx <command> [args...]   run a command with token-optimized output
   sctx -- <command>          force passthrough for a reserved name
+  sctx bypass <command>      run unfiltered (verbatim), still counted in gain
+  sctx recall <id>           print the byte-exact raw output behind a
+                              "sctx: raw output: sctx recall <id>" hint
+    --stderr | --all            stderr instead of stdout | both, labelled
+    --grep <re>                 matching lines, with line numbers
+    --from <n> --lines <m>      a line window (1-based)
+    --list                      recent entries: id, age, program, bytes, TTL left
+    --path                      print the entry's directory
   sctx hook claude           Claude Code PreToolUse Bash hook: rewrites covered
                               commands to "sctx <cmd>" (fail-open)
   sctx hook claude-session-start
@@ -1028,6 +1334,12 @@ Usage:
     --name <repo>               label the report (default "(unnamed)")
     --format text|json          output format (default text)
     --verbose                   include full argv (paths) per command
+  sctx discover              scan Claude Code transcripts (local, read-only) for
+                              commands that ran without sctx though a rule covers
+                              them, and the programs with no formatter
+    --since <dur>               only newer than <dur> (e.g. 7d)
+    --all                       every project, not just the current directory's
+    --format text|json          output format (default text)
   sctx flush                 force-drain the telemetry spool
   sctx init [--endpoint <url>] [--default]
                               authenticate against the SynapCTX platform for

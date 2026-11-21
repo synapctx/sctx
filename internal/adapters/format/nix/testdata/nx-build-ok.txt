@@ -1,0 +1,4 @@
+this derivation will be built:
+  /nix/store/d4mmgd56l93w53qbn2ka9z50cy3479nm-good.drv
+building '/nix/store/d4mmgd56l93w53qbn2ka9z50cy3479nm-good.drv'...
+/nix/store/v787bciq4fvppn7mgk4bvqi4i62m44h4-good

@@ -1,0 +1,35 @@
+tfsec: 21 findings in 1 file (aws-ec2-add-description-to-security-group-rule=1 aws-ec2-enable-at-rest-encryption=1 aws-ec2-enforce-http-token-imds=1 aws-ec2-no-public-ingress-sgr=1 aws-rds-enable-performance-insights=1 aws-rds-encrypt-instance-storage-data=1 aws-rds-no-public-db-access=1 aws-rds-specify-backup-retention=1 aws-s3-block-public-acls=1 aws-s3-block-public-policy=1 aws-s3-enable-bucket-encryption=1 aws-s3-enable-bucket-logging=1 aws-s3-enable-versioning=1 aws-s3-encryption-customer-key=1 aws-s3-ignore-public-acls=1 aws-s3-no-public-access-with-acl=1 aws-s3-no-public-buckets=1 aws-s3-specify-public-access-block=1 builtin.aws.rds.aws0176=1 builtin.aws.rds.aws0177=1 builtin.aws.rds.aws0180=1)
+main.tf (21)
+  18 critical aws-ec2-no-public-ingress-sgr Security group rule allows ingress from public internet.
+  37 critical aws-rds-no-public-db-access Instance is exposed publicly.
+  22 high aws-ec2-enforce-http-token-imds Instance does not require IMDS access to require a token
+  27 high aws-ec2-enable-at-rest-encryption Root block device is not encrypted.
+  37 high builtin.aws.rds.aws0180 Instance has Public Access enabled
+  38 high aws-rds-encrypt-instance-storage-data Instance does not have storage encryption enabled.
+  5 high aws-s3-block-public-acls No public access block so not blocking public acls
+  5 high aws-s3-block-public-policy No public access block so not blocking public policies
+  5 high aws-s3-enable-bucket-encryption Bucket does not have encryption enabled
+  5 high aws-s3-ignore-public-acls No public access block so not ignoring public acls
+  5 high aws-s3-no-public-buckets No public access block so not restricting public buckets
+  5 high aws-s3-encryption-customer-key Bucket does not encrypt data with a customer managed key.
+  7 high aws-s3-no-public-access-with-acl Bucket has a public ACL: 'public-read'.
+  31 medium aws-rds-specify-backup-retention Instance has very low backup retention period.
+  31 medium builtin.aws.rds.aws0176 Instance does not have IAM Authentication enabled
+  31 medium builtin.aws.rds.aws0177 Instance does not have Deletion Protection enabled
+  5 medium aws-s3-enable-bucket-logging Bucket does not have logging enabled
+  5 medium aws-s3-enable-versioning Bucket does not have versioning enabled
+  14 low aws-ec2-add-description-to-security-group-rule Security group rule does not have a description.
+  31 low aws-rds-enable-performance-insights Instance does not have performance insights enabled.
+  5 low aws-s3-specify-public-access-block Bucket does not have a corresponding public access block.
+…dropped: 338 code/impact/resolution/link/banner lines
+2 passed, 21 potential problem(s) detected.
+======================================================
+tfsec is joining the Trivy family
+
+tfsec will continue to remain available 
+for the time being, although our engineering 
+attention will be directed at Trivy going forward.
+
+You can read more here: 
+https://github.com/aquasecurity/tfsec/discussions/1994
+======================================================

@@ -31,8 +31,41 @@ func TestAggressive_PassingVerbose(t *testing.T) {
 		body := string(rendered.Body)
 		for _, want := range []string{
 			"leak_test.go:31: before=0 after=1", // the whole point of -v
-			"--- PASS: TestLeakDetected",
-			"--- PASS: TestOther",
+			"ok: 1 packages",
+		} {
+			if !strings.Contains(body, want) {
+				t.Errorf("Body missing %q; got:\n%s", want, body)
+			}
+		}
+	})
+
+	// An all-green run keeps no per-test result line: they are counted in the same
+	// marker the failing path uses, and a subtest's t.Log output survives.
+	t.Run("drops passing result lines into a counted marker", func(t *testing.T) {
+		stdout := "=== RUN   TestP\n" +
+			"=== RUN   TestP/a\n" +
+			"    p_test.go:7: logged in a\n" +
+			"    --- PASS: TestP/a (0.00s)\n" +
+			"=== RUN   TestP/b\n" +
+			"    --- PASS: TestP/b (0.00s)\n" +
+			"--- PASS: TestP (0.00s)\n" +
+			"PASS\n" +
+			"ok  \texample.com/mod\t0.249s\n"
+		in := newInput([]string{"go", "test", "-v", "./..."}, "go test", stdout, "", 0, 0)
+
+		rendered, err := f.Aggressive(context.Background(), in)
+		if err != nil {
+			t.Fatalf("Aggressive() error = %v", err)
+		}
+		body := string(rendered.Body)
+		for _, unwanted := range []string{"--- PASS", "=== RUN"} {
+			if strings.Contains(body, unwanted) {
+				t.Errorf("Body should drop %q; got:\n%s", unwanted, body)
+			}
+		}
+		for _, want := range []string{
+			"p_test.go:7: logged in a",
+			"…+3 passing tests; progress lines ×4", // 3 RUN + bare PASS
 			"ok: 1 packages",
 		} {
 			if !strings.Contains(body, want) {

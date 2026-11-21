@@ -1,6 +1,7 @@
 package fs
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -9,10 +10,10 @@ import (
 
 // lsLongFixture is captured `ls -la` output over a small tree.
 const lsLongFixture = `total 0
-drwxr-xr-x   4 sebastiangogoasa  wheel   128  6 Jul 22:31 .
-drwx------  48 sebastiangogoasa  wheel  1536  6 Jul 22:31 ..
--rw-r--r--   1 sebastiangogoasa  wheel     0  6 Jul 22:31 README.md
-drwxr-xr-x   4 sebastiangogoasa  wheel   128  6 Jul 22:31 src
+drwxr-xr-x   4 devuser           wheel   128  6 Jul 22:31 .
+drwx------  48 devuser           wheel  1536  6 Jul 22:31 ..
+-rw-r--r--   1 devuser           wheel     0  6 Jul 22:31 README.md
+drwxr-xr-x   4 devuser           wheel   128  6 Jul 22:31 src
 `
 
 // lsPlainFixture mirrors `ls -Cp` output in a wide terminal: dirs marked
@@ -103,5 +104,52 @@ func TestLsFormatterRelaxed(t *testing.T) {
 	}
 	if out.FoldStderr {
 		t.Error("Relaxed must not fold stderr for ls")
+	}
+}
+
+func TestLsRecursiveSections(t *testing.T) {
+	raw := "a\nb\nnode_modules\n\n./a:\nx.go\ny.go\n\n./b:\n\n./node_modules:\np1\np2\n\n./node_modules/p1:\nindex.js\n\n./node_modules/p2:\nindex.js\n"
+	in := format.Input{Argv: []string{"ls", "-R"}, Stdout: strings.NewReader(raw)}
+	out, err := (&lsFormatter{}).Aggressive(testCtx, in)
+	if err != nil {
+		t.Fatalf("Aggressive: %v", err)
+	}
+	body := string(out.Body)
+	for _, want := range []string{"./: a b node_modules", "a/: x.go y.go", "b/: (empty)", "node_modules/ …+4 entries in 3 dirs"} {
+		if !strings.Contains(body, want) {
+			t.Errorf("missing %q in %q", want, body)
+		}
+	}
+	if strings.Contains(body, "index.js") {
+		t.Errorf("noise contents leaked: %q", body)
+	}
+
+	t.Run("a non-section recursive listing is never flattened", func(t *testing.T) {
+		in := format.Input{Argv: []string{"ls", "-R"}, Stdout: strings.NewReader("a\nb\n\nstray\nline\n\nmore\nstuff\n")}
+		if _, err := (&lsFormatter{}).Aggressive(testCtx, in); err != format.ErrTierInapplicable {
+			t.Errorf("err = %v, want ErrTierInapplicable", err)
+		}
+	})
+}
+
+func TestLsRecursiveCaps(t *testing.T) {
+	var b strings.Builder
+	b.WriteString("top\n")
+	for i := 0; i < 70; i++ {
+		fmt.Fprintf(&b, "\n./d%02d:\n", i)
+		for j := 0; j < 40; j++ {
+			fmt.Fprintf(&b, "file%02d.go\n", j)
+		}
+	}
+	out, err := (&lsFormatter{}).Aggressive(testCtx, format.Input{Argv: []string{"ls", "-R"}, Stdout: strings.NewReader(b.String())})
+	if err != nil {
+		t.Fatalf("Aggressive: %v", err)
+	}
+	body := string(out.Body)
+	if !strings.Contains(body, "…+11 more dirs (440 entries) not listed") {
+		t.Errorf("missing remaining-dirs marker: %q", body[len(body)-200:])
+	}
+	if !strings.Contains(body, "file29.go …+10\n") {
+		t.Errorf("missing per-dir names marker")
 	}
 }

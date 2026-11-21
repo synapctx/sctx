@@ -1,0 +1,10 @@
+src/
+├── cmd/
+│   └── app/
+├── new.go
+├── pkg/
+│   ├── api/
+│   └── store/
+└── staged_new.go
+
+6 directories, 2 files

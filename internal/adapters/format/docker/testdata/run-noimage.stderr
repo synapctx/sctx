@@ -1,0 +1,4 @@
+Unable to find image 'registry.invalid/nope:1' locally
+docker: Error response from daemon: failed to resolve reference "registry.invalid/nope:1": failed to do request: Head "https://registry.invalid/v2/nope/manifests/1": dialing registry.invalid:443 container via direct connection because Docker Desktop has no HTTPS proxy: connecting to registry.invalid:443: dial tcp: lookup registry.invalid: no such host
+
+Run 'docker run --help' for more information

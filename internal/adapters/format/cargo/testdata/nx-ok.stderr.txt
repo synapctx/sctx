@@ -1,0 +1,10 @@
+   Compiling demo v0.1.0 (/work/rs-ok)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.63s
+────────────
+ Nextest run ID b4b01de1-fcc5-4850-814a-f03065f3b8ba with nextest profile: default
+    Starting 3 tests across 3 binaries (1 test skipped)
+        PASS [   0.011s] (1/3) demo tests::adds
+        PASS [   0.010s] (2/3) demo::it integration_add
+        PASS [   0.011s] (3/3) demo tests::formats
+────────────
+     Summary [   0.011s] 3 tests run: 3 passed, 1 skipped

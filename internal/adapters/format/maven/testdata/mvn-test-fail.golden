@@ -1,0 +1,22 @@
+app 1.0 (resources compiler:compile resources:testResources compiler:testCompile surefire:test)
+FAIL demo.CalcTest.adds
+org.opentest4j.AssertionFailedError: sum is wrong ==> expected: <6> but was: <5>
+	…+5 framework frames
+	at demo.CalcTest.adds(CalcTest.java:5)
+	…+3 framework frames
+ERROR demo.CalcTest.divs
+java.lang.ArithmeticException: / by zero
+	at demo.Calc.div(Calc.java:4)
+	at demo.CalcTest.divs(CalcTest.java:6)
+	…+3 framework frames
+FAIL demo.CalcTest.nulls
+org.opentest4j.AssertionFailedError: expected: not <null>
+	…+6 framework frames
+	at demo.CalcTest.nulls(CalcTest.java:8)
+	…+3 framework frames
+[ERROR] Tests run: 4, Failures: 2, Errors: 1, Skipped: 0
+BUILD FAILURE
+Total time: 1.079 s
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.6.1:test (default-test) on project app: There are test failures.
+[ERROR] See target/surefire-reports for the individual test results.
+…+76 lines elided (47 noise, 20 framework frames, 3 duplicate, 6 help)

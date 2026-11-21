@@ -1,0 +1,25 @@
+shellcheck: 20 findings in 2 files (SC2086=8 SC2034=2 SC2154=2 SC2005=1 SC2006=1 SC2035=1 SC2046=1 SC2115=1 SC2164=1 SC3030=1 SC3043=1)
+bad.sh (15)
+  2:12 info SC2035 Use ./*glob* or -- *glob* so names with dashes won't become options.
+  4:8 info SC2086 Double quote to prevent globbing and word splitting.
+  5:7 info SC2086
+  6:5 warning SC2154 x is referenced but not assigned.
+  6:5 info SC2086
+  8:8 warning SC2115 Use "${var:?}" to ensure this never expands to /* .
+  8:8 info SC2086
+  9:1 warning SC2164 Use 'cd ... || exit' or 'cd ... || return' in case cd fails.
+  9:4 warning SC2154 d is referenced but not assigned.
+  9:4 info SC2086
+  10:6 warning SC2046 Quote this to prevent word splitting.
+  10:6 style SC2005 Useless echo? Instead of 'echo $(cmd)', just use 'cmd'.
+  10:6 style SC2006 Use $(...) notation instead of legacy backticks `...`.
+  11:9 info SC2086
+  11:25 info SC2086
+bad2.sh (5)
+  2:1 warning SC3043 In POSIX sh, 'local' is undefined.
+  2:7 warning SC2034 x appears unused. Verify use (or export if used externally).
+  3:6 info SC2086
+  4:1 warning SC2034 arr appears unused. Verify use (or export if used externally).
+  4:5 warning SC3030 In POSIX sh, arrays are undefined.
+×7 findings without text repeat the message first shown for their code
+…dropped: 8 fix suggestions, 11 source excerpts, 3 wiki links

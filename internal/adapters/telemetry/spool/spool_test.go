@@ -285,16 +285,16 @@ func TestFlushDeliversPerOrgUnderDistinctTokens(t *testing.T) {
 	defer srv.Close()
 
 	dir := t.TempDir()
-	resolver := mapResolver{"parlitrack": "token-parlitrack", "synapctx": "token-synapctx"}
+	resolver := mapResolver{"acme": "token-acme", "synapctx": "token-synapctx"}
 	e := NewEmitter(dir, srv.URL, resolver, "1.2.3", "test-client")
-	e.Emit(eventForRepo("01A", "parlitrack/repo-a"))
+	e.Emit(eventForRepo("01A", "acme/repo-a"))
 	e.Emit(eventForRepo("01B", "synapctx/repo-b"))
 
 	if err := e.Flush(context.Background()); err != nil {
 		t.Fatalf("Flush: %v", err)
 	}
-	if got := authByOrg["Bearer token-parlitrack"]; len(got) != 1 || got[0] != "parlitrack/repo-a" {
-		t.Errorf("parlitrack group = %v, want [parlitrack/repo-a] under its own token", got)
+	if got := authByOrg["Bearer token-acme"]; len(got) != 1 || got[0] != "acme/repo-a" {
+		t.Errorf("acme group = %v, want [acme/repo-a] under its own token", got)
 	}
 	if got := authByOrg["Bearer token-synapctx"]; len(got) != 1 || got[0] != "synapctx/repo-b" {
 		t.Errorf("synapctx group = %v, want [synapctx/repo-b] under its own token", got)
@@ -325,9 +325,9 @@ func TestFlushRetainsOrgWithNoConfiguredKey(t *testing.T) {
 	defer srv.Close()
 
 	dir := t.TempDir()
-	resolver := mapResolver{"synapctx": "token-synapctx"} // no key for parlitrack
+	resolver := mapResolver{"synapctx": "token-synapctx"} // no key for acme
 	e := NewEmitter(dir, srv.URL, resolver, "1.2.3", "test-client")
-	e.Emit(eventForRepo("01A", "parlitrack/repo-a"))
+	e.Emit(eventForRepo("01A", "acme/repo-a"))
 	e.Emit(eventForRepo("01B", "synapctx/repo-b"))
 
 	if err := e.Flush(context.Background()); err != nil {
@@ -340,8 +340,8 @@ func TestFlushRetainsOrgWithNoConfiguredKey(t *testing.T) {
 	if err != nil {
 		t.Fatalf("spool must be retained for the unconfigured org: %v", err)
 	}
-	if !bytes.Contains(data, []byte("parlitrack/repo-a")) {
-		t.Errorf("retained spool = %q, want it to still contain the parlitrack event", data)
+	if !bytes.Contains(data, []byte("acme/repo-a")) {
+		t.Errorf("retained spool = %q, want it to still contain the acme event", data)
 	}
 	if bytes.Contains(data, []byte("synapctx/repo-b")) {
 		t.Errorf("retained spool = %q, must not contain the delivered synapctx event", data)
@@ -435,11 +435,11 @@ func TestFlushReattributesKeylessOrgToDefault(t *testing.T) {
 
 	dir := t.TempDir()
 	resolver := defaultOrgResolver{
-		mapResolver: mapResolver{"synapctx": "token-synapctx"}, // no key for podsteer
+		mapResolver: mapResolver{"synapctx": "token-synapctx"}, // no key for initech
 		defaultOrg:  "synapctx",
 	}
 	e := NewEmitter(dir, srv.URL, resolver, "1.2.3", "test-client")
-	e.Emit(eventForRepo("01A", "podsteer/repo-a")) // no key of its own
+	e.Emit(eventForRepo("01A", "initech/repo-a"))  // no key of its own
 	e.Emit(eventForRepo("01B", "synapctx/repo-b")) // has its own key
 
 	res, err := e.FlushWithTimeout(context.Background(), 5*time.Second)
@@ -461,12 +461,12 @@ func TestFlushReattributesKeylessOrgToDefault(t *testing.T) {
 		}
 		switch r.repo {
 		case "":
-			// The re-attributed podsteer event: repositoryName must be
-			// cleared so synapctx's key never learns podsteer's repo name.
+			// The re-attributed initech event: repositoryName must be
+			// cleared so synapctx's key never learns initech's repo name.
 		case "synapctx/repo-b":
 			// Untouched: synapctx delivering its own event under its own key.
 		default:
-			t.Errorf("unexpected repositoryName %q reached the server: podsteer's real name must never leave the machine", r.repo)
+			t.Errorf("unexpected repositoryName %q reached the server: initech's real name must never leave the machine", r.repo)
 		}
 	}
 	if _, err := os.Stat(filepath.Join(dir, pendingFile)); !os.IsNotExist(err) {
@@ -488,7 +488,7 @@ func TestFlushWithNoDefaultOrgLeavesKeylessEventsPending(t *testing.T) {
 	dir := t.TempDir()
 	resolver := mapResolver{} // no keys, no default org (DefaultOrgSlug ⇒ false)
 	e := NewEmitter(dir, srv.URL, resolver, "1.2.3", "test-client")
-	e.Emit(eventForRepo("01A", "podsteer/repo-a"))
+	e.Emit(eventForRepo("01A", "initech/repo-a"))
 	e.Emit(eventForRepo("01B", "k8sense/repo-b"))
 
 	res, err := e.FlushWithTimeout(context.Background(), 5*time.Second)
@@ -498,14 +498,14 @@ func TestFlushWithNoDefaultOrgLeavesKeylessEventsPending(t *testing.T) {
 	if res.Sent != 0 || res.Reattributed != 0 {
 		t.Errorf("Sent = %d, Reattributed = %d, want 0, 0: nothing is deliverable", res.Sent, res.Reattributed)
 	}
-	if res.NoKeyEvents["podsteer"] != 1 || res.NoKeyEvents["k8sense"] != 1 {
-		t.Errorf("NoKeyEvents = %v, want podsteer:1, k8sense:1", res.NoKeyEvents)
+	if res.NoKeyEvents["initech"] != 1 || res.NoKeyEvents["k8sense"] != 1 {
+		t.Errorf("NoKeyEvents = %v, want initech:1, k8sense:1", res.NoKeyEvents)
 	}
 	data, err := os.ReadFile(filepath.Join(dir, pendingFile))
 	if err != nil {
 		t.Fatalf("spool must retain undeliverable events: %v", err)
 	}
-	if !bytes.Contains(data, []byte("podsteer/repo-a")) || !bytes.Contains(data, []byte("k8sense/repo-b")) {
+	if !bytes.Contains(data, []byte("initech/repo-a")) || !bytes.Contains(data, []byte("k8sense/repo-b")) {
 		t.Errorf("retained spool = %q, want both events untouched (never delivered under a wrong key)", data)
 	}
 }
@@ -528,7 +528,7 @@ func TestFlushPurposeGateAppliesBeforeReattribution(t *testing.T) {
 	defer srv.Close()
 
 	dir := t.TempDir()
-	lines := `{"id":"a","kind":"coverage_gap","program":"go build","repositoryName":"podsteer/repo-a"}
+	lines := `{"id":"a","kind":"coverage_gap","program":"go build","repositoryName":"initech/repo-a"}
 `
 	if err := os.WriteFile(filepath.Join(dir, pendingFile), []byte(lines), 0o600); err != nil {
 		t.Fatal(err)

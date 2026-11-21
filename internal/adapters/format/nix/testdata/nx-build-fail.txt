@@ -1,0 +1,6 @@
+this derivation will be built:
+  /nix/store/zs7mq1c83gfbr54xd8g6czibqdbr4l31-failing.drv
+building '/nix/store/zs7mq1c83gfbr54xd8g6czibqdbr4l31-failing.drv'...
+compiling stuff
+error: widget missing
+error: builder for '/nix/store/zs7mq1c83gfbr54xd8g6czibqdbr4l31-failing.drv' failed with exit code 2

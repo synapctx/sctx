@@ -1,0 +1,17 @@
+Package     Arch    Version       Repository      Size
+Removing:
+ htop       aarch64 3.3.0-4.fc41  fedora     556.4 KiB
+Removing unused dependencies:
+ hwloc-libs aarch64 2.12.0-1.fc41 updates      2.9 MiB
+ libnl3     aarch64 3.11.0-1.fc41 updates      1.3 MiB
+
+Transaction Summary:
+ Removing:           3 packages
+
+After this operation, 5 MiB will be freed (install 0 B, remove 5 MiB).
+Running transaction
+[1/4] Prepare transaction               100% | 214.0   B/s |   3.0   B |  00m00s
+[2/4] Removing htop-0:3.3.0-4.fc41.aarc 100% | 666.0   B/s |  14.0   B |  00m00s
+[3/4] Removing hwloc-libs-0:2.12.0-1.fc 100% |   1.8 KiB/s |  32.0   B |  00m00s
+[4/4] Removing libnl3-0:3.11.0-1.fc41.a 100% | 202.0   B/s |  32.0   B |  00m00s
+Complete!

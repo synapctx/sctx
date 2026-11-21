@@ -1,0 +1,2 @@
+proto/demo/v1/broken.proto:3:1:imported file does not exist
+proto/demo/v1/broken.proto:4:13:cannot find `Y` in this scope

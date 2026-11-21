@@ -1,0 +1,22 @@
+src/demo.erl:6: Warning: function unused_fn/0 is unused
+src/demo.erl:7: Warning: function shadow/1 is unused
+src/demo.erl:7: Warning: variable 'Y' is unused
+test/demo_SUITE.erl:2: Warning: export_all flag enabled - all functions will be exported
+Failures:
+  1) demo_tests:add_wrong_test/0
+     Failure/Error: ?assertEqual(4, demo : add ( 1 , 2 ))
+       expected: 4
+            got: 3
+     %% /work/proj/test/demo_tests.erl:5:in `demo_tests:add_wrong_test/0`
+  2) demo_tests:greet_test/0
+     Failure/Error: ?assertEqual([104,105,32,98,111,98], demo : greet ( "bob" ))
+       expected: "hi bob"
+            got: "hello bob"
+     %% /work/proj/test/demo_tests.erl:6:in `demo_tests:greet_test/0`
+  3) demo_tests:boom_test/0
+     Failure/Error: {error,kaboom,
+                        [{demo_tests,boom_test,0,
+                             [{file,"/work/proj/test/demo_tests.erl"},{line,7}]},
+4 tests, 3 failures
+===> Error running tests
+…+45 lines (rebar3 chatter, progress, diagnostic box furniture, OTP frames, blanks)

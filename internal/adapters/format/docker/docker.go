@@ -56,6 +56,19 @@ func subcommand(argv []string) (sub string, rest []string) {
 		}
 		return "compose " + nested.Command, nested.Args
 	}
+	// `docker buildx build`, `docker builder build` and `docker image build`
+	// are the same BuildKit invocation as `docker build`.
+	if inv.Command == "buildx" || inv.Command == "builder" || inv.Command == "image" {
+		for i, arg := range inv.Args {
+			if strings.HasPrefix(arg, "-") {
+				continue
+			}
+			if arg == "build" {
+				return "build", inv.Args[i+1:]
+			}
+			break
+		}
+	}
 	if inv.Command == "network" || inv.Command == "volume" || inv.Command == "container" || inv.Command == "image" {
 		for i, arg := range inv.Args {
 			if !strings.HasPrefix(arg, "-") {
@@ -78,10 +91,20 @@ func (f *Formatter) Aggressive(ctx context.Context, in format.Input) (format.Ren
 		return f.aggressiveExec(ctx, in, sub, rest)
 	}
 
+	if sub == "run" || sub == "compose run" {
+		return f.aggressiveRun(ctx, in, sub, rest)
+	}
+
 	// A non-zero exit almost always means an error on stderr that these
 	// structured parsers don't understand; degrade to relaxed line
 	// filtering, which preserves it.
 	if in.ExitCode != 0 {
+		// A failed build is still BuildKit progress: finished steps collapse to
+		// one line while the failing step, its output and the error excerpt
+		// stay (parseHashProgress keeps every non-progress line).
+		if sub == "build" || sub == "compose build" {
+			return aggressiveBuild(in)
+		}
 		return format.Rendered{}, format.ErrTierInapplicable
 	}
 
@@ -132,6 +155,9 @@ func (f *Formatter) Relaxed(ctx context.Context, in format.Input) (format.Render
 	if sub == "exec" || sub == "compose exec" {
 		return f.relaxedExec(ctx, in, sub, rest)
 	}
+	if sub == "run" || sub == "compose run" {
+		return f.relaxedRun(ctx, in, sub, rest)
+	}
 	// Docker/daemon failures are already finite and diagnostic-heavy. Keep
 	// their native streams byte-for-byte instead of folding stderr into a
 	// human summary merely to claim a relaxed match.
@@ -144,7 +170,7 @@ func (f *Formatter) Relaxed(ctx context.Context, in format.Input) (format.Render
 func textSubcommand(sub string) bool {
 	switch sub {
 	case "ps", "container ls", "images", "image ls", "logs", "build", "pull", "push", "inspect", "stats", "history", "top", "network ls", "volume ls",
-		"compose ps", "compose up", "compose build", "compose logs", "compose down", "exec", "compose exec":
+		"compose ps", "compose up", "compose build", "compose logs", "compose down", "exec", "compose exec", "run", "compose run":
 		return true
 	default:
 		return false

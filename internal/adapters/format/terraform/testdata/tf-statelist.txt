@@ -1,0 +1,8 @@
+local_file.f["alpha"]
+local_file.f["beta"]
+local_file.f["gamma"]
+null_resource.n
+random_password.pw
+random_pet.p["alpha"]
+random_pet.p["beta"]
+random_pet.p["gamma"]

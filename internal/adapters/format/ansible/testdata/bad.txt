@@ -1,0 +1,22 @@
+
+PLAY [local] *******************************************************************
+
+TASK [fine task] ***************************************************************
+ok: [localhost] => {
+    "msg": "ok"
+}
+
+TASK [Failing command] *********************************************************
+[ERROR]: Task failed: Module failed: The command exited with a non-zero return code.
+Origin: /work/play/bad.yml:6:7
+
+4     - name: fine task
+5       ansible.builtin.debug: { msg: "ok" }
+6     - name: Failing command
+        ^ column 7
+
+fatal: [localhost]: FAILED! => {"ansible_facts": {"discovered_interpreter_python": "/usr/bin/python3"}, "changed": true, "cmd": ["/bin/sh", "-c", "echo to-stdout; echo to-stderr >&2; exit 3"], "delta": "0:00:00.006448", "end": "2026-11-21 02:09:05.343188", "msg": "The command exited with a non-zero return code.", "rc": 3, "start": "2026-11-21 02:09:05.336740", "stderr": "to-stderr", "stderr_lines": ["to-stderr"], "stdout": "to-stdout", "stdout_lines": ["to-stdout"]}
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=1    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   
+

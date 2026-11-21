@@ -1,0 +1,4 @@
+Test run for /work/dn-ok/Lib.Tests/bin/Debug/net11.0/Lib.Tests.dll (.NETCoreApp,Version=v11.0)
+A total of 1 test files matched the specified pattern.
+
+Passed!  - Failed:     0, Passed:     3, Skipped:     0, Total:     3, Duration: 11 ms - Lib.Tests.dll (net11.0)

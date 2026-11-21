@@ -1,0 +1,20 @@
+processed batch 25 in 175 ms
+processed batch 26 in 182 ms
+processed batch 27 in 189 ms
+processed batch 28 in 196 ms
+processed batch 29 in 203 ms
+processed batch 30 in 210 ms
+processed batch 31 in 217 ms
+processed batch 32 in 224 ms
+processed batch 33 in 231 ms
+processed batch 34 in 238 ms
+processed batch 35 in 245 ms
+processed batch 36 in 252 ms
+processed batch 37 in 259 ms
+processed batch 38 in 266 ms
+processed batch 39 in 273 ms
+processed batch 40 in 280 ms
+ERROR: upstream timeout after 30s (attempt 1)
+ERROR: upstream timeout after 30s (attempt 2)
+WARN: retrying in 5s
+listening on :8080

@@ -1,0 +1,12 @@
+Lib -> Lib/bin/Debug/net11.0/Lib.dll
+Lib.Tests/UnitTest1.cs(4,54): error CS0246: The type or namespace name 'Calc' could not be found (are you missing a using directive or an assembly reference?)
+Lib/Class1.cs(7,42): warning CS8602: Dereference of a possibly null reference.
+warning CS8618 ×5
+  Lib/Class1.cs(13,19): Non-nullable property 'A' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+  Lib/Class1.cs(14,19): Non-nullable property 'B' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+  Lib/Class1.cs(4,19): Non-nullable property 'Name' must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring the property as nullable.
+  …+2 more
+Lib/Class1.cs(9,29): warning CS0219: The variable 'x' is assigned but its value is never used
+Lib/Class1.cs(8,9): warning CS0169: The field 'Person.unused' is never used
+Build FAILED. 8 warnings, 1 errors (00:00:00.32)
+…+12 lines elided (3 restore, 9 duplicate)

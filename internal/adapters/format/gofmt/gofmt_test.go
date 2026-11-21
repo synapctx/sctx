@@ -28,6 +28,9 @@ const diffFixture = `diff j.go.orig j.go
  	variable_number_3 := 3
  	variable_number_4 := 4
  	variable_number_5 := 5
+ 	variable_number_6 := 6
+ 	variable_number_7 := 7
+ 	variable_number_8 := 8
 -	y:=2
 +	y := 2
  	fmt.Println(x, y)

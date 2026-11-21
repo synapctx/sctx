@@ -1,0 +1,34 @@
+Inspecting 1 file
+C
+
+Offenses:
+
+lib/calc.rb:1:1: C: Style/Documentation: Missing top-level documentation comment for class Calc.
+class Calc
+^^^^^^^^^^
+lib/calc.rb:1:1: C: [Correctable] Style/FrozenStringLiteralComment: Missing frozen string literal comment.
+class Calc
+^
+lib/calc.rb:2:11: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  def add(a, b) = a + b
+          ^
+lib/calc.rb:2:14: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  def add(a, b) = a + b
+             ^
+lib/calc.rb:3:3: C: [Correctable] Layout/EmptyLineBetweenDefs: Expected 1 empty line between method definitions; found 0.
+  def div(a, b)
+  ^^^^^^^
+lib/calc.rb:3:11: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  def div(a, b)
+          ^
+lib/calc.rb:3:14: C: Naming/MethodParameterName: Method parameter must be at least 3 characters long.
+  def div(a, b)
+             ^
+lib/calc.rb:6:3: C: [Correctable] Layout/EmptyLineBetweenDefs: Expected 1 empty line between method definitions; found 0.
+  def name
+  ^^^^^^^^
+lib/calc.rb:7:5: C: [Correctable] Style/StringLiterals: Prefer single-quoted strings when you don't need string interpolation or special symbols.
+    "calc"
+    ^^^^^^
+
+1 file inspected, 9 offenses detected, 4 offenses autocorrectable

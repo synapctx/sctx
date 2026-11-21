@@ -1,0 +1,35 @@
+yamllint: 31 findings in 2 files (trailing-spaces=13 line-length=12 document-start=2 empty-lines=1 indentation=1 key-duplicates=1)
+big.yml (27)
+  1:1 warning document-start missing document start "---"
+  4:10 error trailing-spaces trailing spaces
+  6:81 error line-length line too long (101 > 80 characters)
+  6:99 error trailing-spaces
+  7:81 error line-length
+  7:99 error trailing-spaces
+  8:81 error line-length
+  8:99 error trailing-spaces
+  9:81 error line-length
+  9:99 error trailing-spaces
+  10:81 error line-length
+  10:99 error trailing-spaces
+  11:81 error line-length
+  11:99 error trailing-spaces
+  12:81 error line-length
+  12:99 error trailing-spaces
+  13:81 error line-length
+  13:99 error trailing-spaces
+  14:81 error line-length
+  14:99 error trailing-spaces
+  15:81 error line-length
+  15:99 error trailing-spaces
+  16:81 error line-length line too long (102 > 80 characters)
+  16:100 error trailing-spaces
+  17:81 error line-length
+  17:100 error trailing-spaces
+  20:1 error empty-lines too many blank lines (2 > 0)
+bad.yml (4)
+  1:1 warning document-start
+  2:1 error key-duplicates duplication of key "key" in mapping
+  4:1 error indentation wrong indentation: expected at least 1
+  6:6 error syntax error: mapping values are not allowed here (syntax)
+×23 findings without text repeat the message first shown for their code

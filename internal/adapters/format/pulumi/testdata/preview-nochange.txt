@@ -1,0 +1,6 @@
+Previewing update (dev):
+
+    pulumi:pulumi:Stack demo-dev  
+Resources:
+    4 unchanged
+

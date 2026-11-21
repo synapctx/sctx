@@ -1,0 +1,18 @@
+t/03-ok.t .. 
+ok 1 - t1
+ok 2 - t2
+ok 3 - t3
+ok 4 - t4
+ok 5 - t5
+ok 6 - t6
+ok 7 - t7
+ok 8 - t8
+ok 9 - t9
+ok 10 - t10
+ok 11 - t11
+ok 12 - t12
+1..12
+ok
+All tests successful.
+Files=1, Tests=12,  0 wallclock secs ( 0.01 usr  0.00 sys +  0.02 cusr  0.00 csys =  0.03 CPU)
+Result: PASS

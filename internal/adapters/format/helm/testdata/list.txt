@@ -1,0 +1,2 @@
+NAME	NAMESPACE	REVISION	UPDATED                            	STATUS  	CHART    	APP VERSION
+rel 	default  	1       	2026-11-21 02:03:11.32464 +0000 UTC	deployed	web-0.1.0	1.16.0     

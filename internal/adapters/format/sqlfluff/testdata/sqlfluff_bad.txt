@@ -1,0 +1,16 @@
+== [bad.sql] FAIL
+L:   1 | P:   1 | LT09 | Select targets should be on a new line unless there is
+                       | only one select target. [layout.select_targets]
+L:   1 | P:  10 | LT01 | Expected single whitespace between comma ',' and naked
+                       | identifier. [layout.spacing]
+L:   1 | P:  12 | CP01 | Keywords must be consistently upper case.
+                       | [capitalisation.keywords]
+L:   1 | P:  21 | CP01 | Keywords must be consistently upper case.
+                       | [capitalisation.keywords]
+L:   1 | P:  21 | LT14 | The 'where' keyword should always start a new line.
+                       | [layout.keyword_newline]
+L:   1 | P:  28 | LT01 | Expected single whitespace between naked identifier and
+                       | raw comparison operator '='. [layout.spacing]
+L:   1 | P:  29 | LT01 | Expected single whitespace between raw comparison
+                       | operator '=' and numeric literal. [layout.spacing]
+All Finished!

@@ -1,0 +1,7 @@
+error: cannot parse: bad.py:1:6
+    def f(:
+         ^
+ParseError: bad input
+
+Oh no! 💥 💔 💥
+1 file would fail to reformat.

@@ -1,0 +1,18 @@
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1m[0mTerraform encountered problems during initialisation, including problems
+[31m│[0m [0mwith the configuration, described below.
+[31m│[0m [0m
+[31m│[0m [0mThe Terraform configuration must be valid before initialization so that
+[31m│[0m [0mTerraform can determine which modules and providers need to be installed.[0m[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m
+[31m╵[0m[0m
+[31m╷[0m[0m
+[31m│[0m [0m[1m[31mError: [0m[0m[1mUnclosed configuration block[0m
+[31m│[0m [0m
+[31m│[0m [0m[0m  on main.tf line 1, in resource "null_resource" "a":
+[31m│[0m [0m   1: resource "null_resource" "a" [4m{[0m[0m
+[31m│[0m [0m
+[31m│[0m [0mThere is no closing brace for this block before the end of the file. This
+[31m│[0m [0mmay be caused by incorrect brace nesting elsewhere in this file.
+[31m╵[0m[0m

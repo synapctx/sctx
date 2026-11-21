@@ -1,0 +1,66 @@
+===> Verifying dependencies...
+===> Analyzing applications...
+===> Compiling demo
+   ┌─ src/demo.erl:
+   │
+ 6 │  unused_fn() -> ok.
+   │  ╰── Warning: function unused_fn/0 is unused
+
+   ┌─ src/demo.erl:
+   │
+ 7 │  shadow(X) -> Y = 1, X.
+   │  ╰── Warning: function shadow/1 is unused
+
+   ┌─ src/demo.erl:
+   │
+ 7 │  shadow(X) -> Y = 1, X.
+   │               ╰── Warning: variable 'Y' is unused
+
+
+   ┌─ test/demo_SUITE.erl:
+   │
+ 2 │  -compile(export_all).
+   │   ╰── Warning: export_all flag enabled - all functions will be exported
+
+
+===> Performing EUnit tests...
+[0;32m.[0m[0;31mF[0m[0;31mF[0m[0;31mF[0m
+Failures:
+
+  1) demo_tests:add_wrong_test/0
+[0;31m     Failure/Error: ?assertEqual(4, demo : add ( 1 , 2 ))
+       expected: 4
+            got: 3[0m
+[0;36m     %% /work/proj/test/demo_tests.erl:5:in `demo_tests:add_wrong_test/0`[0m
+
+
+  2) demo_tests:greet_test/0
+[0;31m     Failure/Error: ?assertEqual([104,105,32,98,111,98], demo : greet ( "bob" ))
+       expected: "hi bob"
+            got: "hello bob"[0m
+[0;36m     %% /work/proj/test/demo_tests.erl:6:in `demo_tests:greet_test/0`[0m
+
+
+  3) demo_tests:boom_test/0
+[0;31m     Failure/Error: {error,kaboom,
+                        [{demo_tests,boom_test,0,
+                             [{file,"/work/proj/test/demo_tests.erl"},{line,7}]},
+                         {eunit_test,'-mf_wrapper/2-fun-0-',2,
+                             [{file,"eunit_test.erl"},{line,274}]},
+                         {eunit_test,run_testfun,1,
+                             [{file,"eunit_test.erl"},{line,72}]},
+                         {eunit_proc,run_test,1,
+                             [{file,"eunit_proc.erl"},{line,544}]},
+                         {eunit_proc,with_timeout,3,
+                             [{file,"eunit_proc.erl"},{line,369}]},
+                         {eunit_proc,handle_test,2,
+                             [{file,"eunit_proc.erl"},{line,527}]},
+                         {eunit_proc,tests_inorder,3,
+                             [{file,"eunit_proc.erl"},{line,469}]},
+                         {eunit_proc,with_timeout,3,
+                             [{file,"eunit_proc.erl"},{line,359}]}]}
+[0m
+
+Finished in 0.043 seconds
+[0;31m4 tests, 3 failures
+[0m===> Error running tests

@@ -1,0 +1,16 @@
+  Determining projects to restore...
+  Restored /work/dn-compile/Lib/Lib.csproj (in 1 ms).
+  Restored /work/dn-compile/Lib.Tests/Lib.Tests.csproj (in 22 ms).
+/work/dn-compile/Lib/Class1.cs(4,41): error CS0103: The name 'c' does not exist in the current context [/work/dn-compile/Lib/Lib.csproj]
+/work/dn-compile/Lib/Class1.cs(5,40): error CS0029: Cannot implicitly convert type 'int' to 'string' [/work/dn-compile/Lib/Lib.csproj]
+/work/dn-compile/Lib/Class1.cs(6,16): error CS0103: The name 'Undefined' does not exist in the current context [/work/dn-compile/Lib/Lib.csproj]
+
+Build FAILED.
+
+/work/dn-compile/Lib/Class1.cs(4,41): error CS0103: The name 'c' does not exist in the current context [/work/dn-compile/Lib/Lib.csproj]
+/work/dn-compile/Lib/Class1.cs(5,40): error CS0029: Cannot implicitly convert type 'int' to 'string' [/work/dn-compile/Lib/Lib.csproj]
+/work/dn-compile/Lib/Class1.cs(6,16): error CS0103: The name 'Undefined' does not exist in the current context [/work/dn-compile/Lib/Lib.csproj]
+    0 Warning(s)
+    3 Error(s)
+
+Time Elapsed 00:00:00.19

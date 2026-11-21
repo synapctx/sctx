@@ -1,0 +1,35 @@
+
+running 4 tests
+test tests::adds ... ok
+test tests::bad_panic ... FAILED
+test tests::bad_sum ... FAILED
+test tests::bad_unwrap ... FAILED
+
+failures:
+
+---- tests::bad_panic stdout ----
+
+thread 'tests::bad_panic' (32468022) panicked at src/lib.rs:36:9:
+boom
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+---- tests::bad_sum stdout ----
+
+thread 'tests::bad_sum' (32468023) panicked at src/lib.rs:25:9:
+assertion `left == right` failed: sum was wrong
+  left: 5
+ right: 6
+
+---- tests::bad_unwrap stdout ----
+
+thread 'tests::bad_unwrap' (32468024) panicked at src/lib.rs:30:28:
+called `Result::unwrap()` on an `Err` value: ParseIntError { kind: InvalidDigit }
+
+
+failures:
+    tests::bad_panic
+    tests::bad_sum
+    tests::bad_unwrap
+
+test result: FAILED. 1 passed; 3 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

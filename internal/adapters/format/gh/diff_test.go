@@ -26,6 +26,7 @@ func TestAggressivePRDiffNameOnlyCapsFiles(t *testing.T) {
 }
 
 func TestAggressivePRDiffDelegatesNativePatch(t *testing.T) {
+	t.Setenv("SCT__DIFF_FIDELITY_LINES", "0") // small fixture: switch the fidelity floor off
 	raw := "diff --git a/a.go b/a.go\nindex 111..222 100644\n--- a/a.go\n+++ b/a.go\n@@ -1,4 +1,4 @@\n-old\n+new\n context\n context\n context\n"
 	out, err := New().Aggressive(context.Background(), format.Input{
 		Argv: []string{"gh", "pr", "diff", "1"}, Stdout: strings.NewReader(raw),

@@ -26,9 +26,9 @@ func TestNativeGetPodsFixture(t *testing.T) {
 	}
 	body := string(out.Body)
 	for _, want := range []string{
-		"13 items (2 not ready)", "11 ready:", "…+3 more",
+		"13 pods: 11 running, 2 unhealthy",
 		"bad-image 0/1 ImagePullBackOff 0", "crash-loop 0/1 Error 2 (20s ago)",
-		"not ready: NAME | READY | STATUS | RESTARTS",
+		"unhealthy: NAME | READY | STATUS | RESTARTS",
 	} {
 		if !strings.Contains(body, want) {
 			t.Errorf("body missing %q: %q", want, body)

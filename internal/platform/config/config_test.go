@@ -423,8 +423,8 @@ func TestTokenForOrgSectionedConfig(t *testing.T) {
 		`[org.synapctx]`+"\n"+
 		`token = "sctx_live_synapctx"`+"\n"+
 		"\n"+
-		`[org.parlitrack]`+"\n"+
-		`token = "sctx_live_parlitrack"`+"\n")
+		`[org.acme]`+"\n"+
+		`token = "sctx_live_acme"`+"\n")
 
 	cfg, err := Load()
 	if err != nil {
@@ -433,8 +433,8 @@ func TestTokenForOrgSectionedConfig(t *testing.T) {
 	if cfg.DefaultOrg != "synapctx" {
 		t.Errorf("DefaultOrg = %q, want synapctx", cfg.DefaultOrg)
 	}
-	if token, ok := cfg.TokenForOrg("parlitrack"); !ok || token != "sctx_live_parlitrack" {
-		t.Errorf("TokenForOrg(parlitrack) = (%q, %v), want (sctx_live_parlitrack, true)", token, ok)
+	if token, ok := cfg.TokenForOrg("acme"); !ok || token != "sctx_live_acme" {
+		t.Errorf("TokenForOrg(acme) = (%q, %v), want (sctx_live_acme, true)", token, ok)
 	}
 	if token, ok := cfg.TokenForOrg("synapctx"); !ok || token != "sctx_live_synapctx" {
 		t.Errorf("TokenForOrg(synapctx) = (%q, %v), want (sctx_live_synapctx, true)", token, ok)
@@ -444,8 +444,8 @@ func TestTokenForOrgSectionedConfig(t *testing.T) {
 		t.Errorf("TokenForOrg(\"\") = (%q, %v), want (sctx_live_synapctx, true)", token, ok)
 	}
 	// Unknown org with sectioned config present: no key yet, retain-don't-deliver.
-	if token, ok := cfg.TokenForOrg("cloudresty"); ok || token != "" {
-		t.Errorf("TokenForOrg(cloudresty) = (%q, %v), want (\"\", false)", token, ok)
+	if token, ok := cfg.TokenForOrg("globex"); ok || token != "" {
+		t.Errorf("TokenForOrg(globex) = (%q, %v), want (\"\", false)", token, ok)
 	}
 }
 
@@ -464,7 +464,7 @@ func TestTokenForOrgNoAuthDeliversUnauthenticated(t *testing.T) {
 	if cfg.HasAnyToken() {
 		t.Fatalf("HasAnyToken() = true, want false for a bare default config")
 	}
-	for _, org := range []string{"", "synapctx", "parlitrack"} {
+	for _, org := range []string{"", "synapctx", "acme"} {
 		if token, ok := cfg.TokenForOrg(org); !ok || token != "" {
 			t.Errorf("TokenForOrg(%q) = (%q, %v), want (\"\", true) for unauthenticated local delivery", org, token, ok)
 		}
@@ -485,7 +485,7 @@ func TestTokenForOrgEnvOverridesAllOrgs(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
-	for _, org := range []string{"synapctx", "parlitrack", ""} {
+	for _, org := range []string{"synapctx", "acme", ""} {
 		if token, ok := cfg.TokenForOrg(org); !ok || token != "sctx_live_envoverride" {
 			t.Errorf("TokenForOrg(%q) = (%q, %v), want (sctx_live_envoverride, true)", org, token, ok)
 		}
@@ -501,7 +501,7 @@ func TestTokenForOrgLegacyBareToken(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Load: %v", err)
 	}
-	for _, org := range []string{"synapctx", "parlitrack", ""} {
+	for _, org := range []string{"synapctx", "acme", ""} {
 		if token, ok := cfg.TokenForOrg(org); !ok || token != "sctx_live_legacy" {
 			t.Errorf("TokenForOrg(%q) = (%q, %v), want (sctx_live_legacy, true)", org, token, ok)
 		}

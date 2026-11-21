@@ -1,0 +1,16 @@
+warn.c:6:26: warning: data argument not used by format string [-Wformat-extra-args]
+    6 |     printf("%d\n", argc, 3);
+      |            ~~~~~~        ^
+warn.c:7:5: error: non-void function 'main' should return a value [-Wreturn-mismatch]
+    7 |     return;
+      |     ^
+warn.c:3:9: warning: unused variable 'unused' [-Wunused-variable]
+    3 |     int unused;
+      |         ^~~~~~
+warn.c:5:9: warning: unused variable 'i' [-Wunused-variable]
+    5 |     int i = l;
+      |         ^
+warn.c:2:27: warning: unused parameter 'argv' [-Wunused-parameter]
+    2 | int main(int argc, char **argv) {
+      |                           ^
+4 warnings and 1 error generated.

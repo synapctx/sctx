@@ -1,0 +1,24 @@
+2/4 main.test.adds wrong... expected 4, found 3
+FAIL (TestExpectedEqual)
+/work/proj/src/main.zig:5:21: 0x104e887 in test.adds wrong (test)
+3/4 main.test.slices...
+====== expected this output: =========
+hello␃
+
+======== instead found this: =========
+hellp␃
+
+======================================
+First difference occurs on line 1:
+expected:
+hello
+    ^ ('\x6f')
+found:
+hellp
+    ^ ('\x70')
+FAIL (TestExpectedEqual)
+/work/proj/src/main.zig:6:17: 0x104f5ef in test.slices (test)
+2 passed; 0 skipped; 2 failed.
+error: the following test command failed with exit code 1:
+/tmp/zl/o/3641b18392990033e601756acf388be8/test
+…+12 lines (step tree, command lines, passing tests, std frames, source echoes)

@@ -103,3 +103,23 @@ func TestTreeFormatterRelaxed(t *testing.T) {
 		t.Error("Relaxed must not fold stderr for tree")
 	}
 }
+
+func TestTreeCollapsesNoiseDirs(t *testing.T) {
+	var sb strings.Builder
+	sb.WriteString(".\n├── app.js\n└── node_modules\n")
+	for i := 1; i <= 30; i++ {
+		sb.WriteString("    ├── pkg" + strings.Repeat("x", i%3) + string(rune('a'+i%26)) + "\n    │   └── index.js\n")
+	}
+	sb.WriteString("\n31 directories, 32 files\n")
+	out, err := (&treeFormatter{}).Aggressive(testCtx, stdoutInput("tree", sb.String()))
+	if err != nil {
+		t.Fatalf("Aggressive: %v", err)
+	}
+	body := string(out.Body)
+	if !strings.Contains(body, "node_modules …+60 entries (noise dir collapsed)") {
+		t.Errorf("noise dir not collapsed with a descendant count: %q", body)
+	}
+	if strings.Contains(body, "index.js") {
+		t.Errorf("noise contents leaked: %q", body)
+	}
+}

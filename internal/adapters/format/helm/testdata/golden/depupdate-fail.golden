@@ -1,0 +1,4 @@
+…+5 lines (progress ×1, repo lines ×4)
+...Successfully got an update from 5 chart repositories: repo-a, repo-b, repo-c, repo-d, bitnami
+Update Complete. ⎈Happy Helming!⎈
+Error: can't get a valid version for 1 subchart(s): "common" (repository "https://charts.bitnami.com/bitnami", version "99.0.0"). Make sure a matching chart version exists in the repo, or change the version constraint in Chart.yaml

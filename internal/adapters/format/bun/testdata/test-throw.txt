@@ -1,0 +1,22 @@
+bun test v1.4.5 (826ef2a6f)
+
+throw.test.ts:
+1 | import {test,expect} from "bun:test";
+2 | test("throws",()=>{ throw new TypeError("kaboom") });
+                                                    ^
+TypeError: kaboom
+      at <anonymous> (/repo/throw.test.ts:2:49)
+(fail) throws [0.18ms]
+1 | import {test,expect} from "bun:test";
+2 | test("throws",()=>{ throw new TypeError("kaboom") });
+3 | test("async rej",async()=>{ await Promise.reject(new Error("rejected")) });
+                                                         ^
+error: rejected
+      at <anonymous> (/repo/throw.test.ts:3:54)
+(fail) async rej [0.25ms]
+(fail) timeout [51.05ms]
+  ^ this test timed out after 50ms.
+
+ 0 pass
+ 3 fail
+Ran 3 tests across 1 file. [56.00ms]

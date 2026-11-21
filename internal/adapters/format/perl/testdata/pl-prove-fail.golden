@@ -1,0 +1,44 @@
+#   Failed test 'adds wrong'
+#   at t/01-add.t line 5.
+#          got: '3'
+#     expected: '4'
+#   Failed test 'greets'
+#   at t/01-add.t line 6.
+#          got: 'hello bob'
+#     expected: 'hi bob'
+t/01-add.t ...
+Dubious, test returned 2 (wstat 512, 0x200)
+#   Failed test 'list compare'
+#   at t/02-list.t line 4.
+#     Structures begin differing at:
+#          $got->[2] = '3'
+#     $expected->[2] = '4'
+#   Failed test 'hash compare'
+#   at t/02-list.t line 5.
+#     Structures begin differing at:
+#          $got->{b}[1] = '2'
+#     $expected->{b}[1] = '3'
+#   Failed test 'regex'
+#   at t/02-list.t line 7.
+#                   'hello'
+#     doesn't match '(?^:xyz)'
+t/02-list.t ..
+Dubious, test returned 3 (wstat 768, 0x300)
+boom in test at t/04-die.t line 4.
+# Looks like your test exited with 255 just after 1.
+t/04-die.t ...
+Dubious, test returned 255 (wstat 65280, 0xff00)
+Test Summary Report
+-------------------
+t/01-add.t (Wstat: 512 (exited 2) Tests: 3 Failed: 2)
+  Failed tests:  2-3
+  Non-zero exit status: 2
+t/02-list.t (Wstat: 768 (exited 3) Tests: 4 Failed: 3)
+  Failed tests:  1-2, 4
+  Non-zero exit status: 3
+t/04-die.t (Wstat: 65280 (exited 255) Tests: 1 Failed: 0)
+  Non-zero exit status: 255
+  Parse errors: Bad plan.  You planned 2 tests but ran 1.
+Files=4, Tests=20,  1 wallclock secs ( 0.02 usr  0.01 sys +  0.12 cusr  0.04 csys =  0.19 CPU)
+Result: FAIL
+…+12 lines (passing rows, plans, blanks, restated failure counts)

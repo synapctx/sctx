@@ -1,0 +1,22 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.15.2, pytest-9.2.0, pluggy-1.7.0
+rootdir: /work/proj
+configfile: pyproject.toml
+plugins: platformdirs-4.14.8
+collected 0 items / 1 error
+
+==================================== ERRORS ====================================
+____________________ ERROR collecting tests/test_broken.py _____________________
+ImportError while importing test module '/work/proj/tests/test_broken.py'.
+Hint: make sure your test modules/packages have valid Python names.
+Traceback:
+/usr/lib/python3.15/lib/python3.15/importlib/__init__.py:88: in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests/test_broken.py:1: in <module>
+    import nonexistent_mod
+E   ModuleNotFoundError: No module named 'nonexistent_mod'
+=========================== short test summary info ============================
+ERROR tests/test_broken.py
+!!!!!!!!!!!!!!!!!!!! Interrupted: 1 error during collection !!!!!!!!!!!!!!!!!!!!
+=============================== 1 error in 0.14s ===============================

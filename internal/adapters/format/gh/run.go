@@ -69,7 +69,7 @@ func aggressiveRunList(in format.Input) (format.Rendered, error) {
 
 func aggressiveRunView(in format.Input, args []string) (format.Rendered, error) {
 	if hasArg(args, "--log", "--log-failed") {
-		return format.Rendered{}, format.ErrTierInapplicable
+		return aggressiveRunLog(in)
 	}
 	raw := readAll(in.Stdout)
 	lines := splitLines(raw)
