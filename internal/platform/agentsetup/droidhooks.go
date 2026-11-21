@@ -9,14 +9,14 @@ package agentsetup
 // its events at the ROOT of `hooks.json` (no surrounding `"hooks"` key), with
 // a `settings.json` fallback whose `hooks` key Droid merges hooks.json OVER,
 // per event — verified against docs.factory.ai/cli/configuration/hooks-guide
-// and the rtk reference implementation (Droid v0.140-v0.164).
+// and a working third-party integration's source (Droid v0.140-v0.164).
 //
 // This install always targets `hooks.json`: it is the file Droid's own
 // `/hooks` UI reads and writes, and installing into `settings.json` instead
 // would be silently shadowed the moment a root `hooks.json` with a PreToolUse
 // entry appears. If `settings.json` already carries a LIVE PreToolUse hook and
 // no `hooks.json` exists, this still creates `hooks.json` — Droid loads
-// whichever file defines PreToolUse first in the precedence rtk documents,
+// whichever file defines PreToolUse first in the documented precedence,
 // which is `hooks.json`, so installing there is always the entry that wins.
 //
 // Droid also publishes command deny lists (`commandDenylist`/

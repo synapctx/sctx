@@ -256,10 +256,9 @@ var KnownAgents = []Agent{
 		// Cursor 1.7 (Oct 2025) and is a different, newer contract than the
 		// older `beforeShellExecution` hook: that one is allow/deny only and
 		// cannot rewrite a command, which is why this row did not exist before
-		// 1.7 shipped. Verified against the rtk reference implementation
-		// (github.com/rtk-ai/rtk) rather than Cursor's own docs page, which
-		// this change could not fetch (no WebFetch tool available) — cursor.com
-		// pages are confirmed to render nothing usable from a plain HTTP GET.
+		// 1.7 shipped. Verified against a working third-party integration's
+		// source, not Cursor's docs page — cursor.com pages render nothing
+		// usable from a plain HTTP GET.
 		//
 		// Root is `.cursor/AGENTS.md`, by the same reasoning as the Codex row:
 		// AGENTS.md is the cross-vendor convention Cursor's own docs list
@@ -283,16 +282,16 @@ var KnownAgents = []Agent{
 		// (docs.github.com/en/copilot/reference/hooks-reference, fetched
 		// 2026-09-04) accept the event key in either case (`preToolUse` /
 		// `PreToolUse`) and describe a camelCase `toolName`/`toolArgs`
-		// payload answered with `modifiedArgs`. The rtk reference
-		// implementation disagrees on which shape the CLI actually honours in
+		// payload answered with `modifiedArgs`. A working third-party
+		// integration disagrees on which shape the CLI actually honours in
 		// practice: its source records a LIVE verification against Copilot
 		// CLI 1.0.73+ (Linux and Windows 11) that the CLI's shell tool is
 		// reported under the Claude-shaped `tool_name`/`tool_input.command`
-		// schema and answered with `updatedInput` — and rtk's own installer
+		// schema and answered with `updatedInput` — and that integration's installer
 		// now registers ONLY that schema, having found the documented
 		// camelCase registration fires a second, redundant hook invocation
 		// per command once both are present. `sctx hook copilot` follows
-		// rtk's live-verified path and additionally decodes the documented
+		// the live-verified path and additionally decodes the documented
 		// camelCase shape (answered with `modifiedArgs`, per GitHub's docs)
 		// for any install that still has it registered — that second path is
 		// UNVERIFIED against a live CLI by this change.
@@ -310,8 +309,8 @@ var KnownAgents = []Agent{
 	},
 	{
 		// Factory Droid's `PreToolUse` hook (matcher `"Execute"`). Verified
-		// against docs.factory.ai/cli/configuration/hooks-guide and the rtk
-		// reference implementation, which records live verification against
+		// against docs.factory.ai/cli/configuration/hooks-guide and a working
+		// third-party integration, which records live verification against
 		// Droid v0.140 through v0.164. Droid additionally publishes command
 		// deny lists (`commandDenylist`/`commandBlocklist`) across up to four
 		// settings scopes; `sctx hook droid` reads them and steps aside on a
@@ -328,6 +327,50 @@ var KnownAgents = []Agent{
 		Detect:     []string{".factory"},
 		Wrapping:   WrapHook,
 		MinVersion: "0.164.0",
+	},
+	{
+		// Trae's PreToolUse hook (matcher `RunCommand`) in `~/.trae/hooks.json`.
+		// VERIFIED-FROM-THIRD-PARTY-SOURCE: a working third-party installer
+		// (file, version-1 document, grouped entry shape) and hook handler
+		// (envelope: `hookSpecificOutput.updatedInput`
+		// with the whole tool_input, no permissionDecision). The China build's
+		// `~/.trae-cn` is not managed.
+		//
+		// Root is `~/.trae/AGENTS.md` by the same extrapolation as the Cursor,
+		// Copilot and Droid rows: NOT verified (the reference integration installs no instructions for
+		// Trae), inert if wrong, Includes off.
+		ID:       "trae",
+		Name:     "Trae",
+		Root:     ".trae/AGENTS.md",
+		Detect:   []string{".trae"},
+		Wrapping: WrapHook,
+	},
+	{
+		// Mistral Vibe's `pre_tool` hook, declared as a `[[hooks]]` table in
+		// `~/.vibe/hooks.toml` (user scope only). VERIFIED-FROM-THIRD-PARTY-SOURCE: a
+		// working third-party installer (file, entry fields) and hook handler
+		// (envelope:
+		// `hook_specific_output.tool_input`, exit 0 + empty stdout for no
+		// opinion). Root is an UNVERIFIED extrapolation, as for Trae.
+		ID:       "vibe",
+		Name:     "Mistral Vibe",
+		Root:     ".vibe/AGENTS.md",
+		Detect:   []string{".vibe"},
+		Wrapping: WrapHook,
+	},
+	{
+		// Pi (pi-coding-agent): a TypeScript extension in
+		// `~/.pi/agent/extensions/` that mutates the bash tool_call's command in
+		// place. VERIFIED-FROM-THIRD-PARTY-SOURCE: a working third-party Pi
+		// extension and its README (it deliberately injects NO AGENTS.md for Pi, so
+		// Root is an UNVERIFIED extrapolation, as for Trae). Oh My Pi shares the
+		// extension from `~/.omp/agent/extensions/`; not managed here.
+		ID:         "pi",
+		Name:       "Pi",
+		Root:       ".pi/agent/AGENTS.md",
+		Detect:     []string{".pi/agent"},
+		Wrapping:   WrapPlugin,
+		PluginPath: ".pi/agent/extensions/sctx.ts",
 	},
 }
 

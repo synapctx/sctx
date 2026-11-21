@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -39,6 +40,13 @@ func New(dir string, ttl time.Duration, maxBytes int64) *Cache {
 // failure is returned to the caller so it can silently omit the recovery hint;
 // it must never affect the wrapped command.
 func (c *Cache) Store(stdout, stderr []byte) (Entry, error) {
+	return c.StoreFor("", stdout, stderr)
+}
+
+// StoreFor is Store plus the program name (argv[0] base name only, never
+// arguments or paths) that produced the output, kept so `sctx recall --list`
+// can say what each entry was.
+func (c *Cache) StoreFor(program string, stdout, stderr []byte) (Entry, error) {
 	if c == nil || c.Dir == "" || c.TTL <= 0 || c.MaxBytes <= 0 {
 		return Entry{}, errors.New("raw cache disabled")
 	}
@@ -74,6 +82,10 @@ func (c *Cache) Store(stdout, stderr []byte) (Entry, error) {
 		if err := os.WriteFile(filepath.Join(path, "stderr"), stderr, 0o600); err != nil {
 			return Entry{}, fmt.Errorf("writing cached stderr: %w", err)
 		}
+	}
+	if program = sanitizeProgram(program); program != "" {
+		// Best effort: a missing label only blanks a --list column.
+		_ = os.WriteFile(filepath.Join(path, "program"), []byte(program), 0o600)
 	}
 	if err := c.cleanup(0); err != nil {
 		return Entry{}, err
@@ -172,3 +184,75 @@ func validID(value string) bool {
 	_, err := hex.DecodeString(value)
 	return err == nil
 }
+
+// ErrNotFound reports an id that is unknown, malformed or past its TTL.
+var ErrNotFound = errors.New("no such raw output (unknown or expired id)")
+
+// Info describes one live cache entry.
+type Info struct {
+	Entry
+	Program string
+	Bytes   int64
+	Stored  time.Time
+	Expires time.Time
+}
+
+// Lookup resolves an id to a live entry. An expired entry is ErrNotFound, even
+// before cleanup has removed it.
+func (c *Cache) Lookup(id string) (Info, error) {
+	if c == nil || c.Dir == "" || !validID(id) {
+		return Info{}, ErrNotFound
+	}
+	path := filepath.Join(c.Dir, id)
+	info, err := os.Lstat(path)
+	if err != nil || !info.IsDir() {
+		return Info{}, ErrNotFound
+	}
+	if c.now().Sub(info.ModTime()) >= c.TTL {
+		return Info{}, ErrNotFound
+	}
+	prog, _ := os.ReadFile(filepath.Join(path, "program"))
+	return Info{
+		Entry:   Entry{ID: id, Path: path},
+		Program: sanitizeProgram(string(prog)),
+		Bytes:   entrySize(path),
+		Stored:  info.ModTime(),
+		Expires: info.ModTime().Add(c.TTL),
+	}, nil
+}
+
+// List returns live entries, newest first. Expired entries are skipped.
+func (c *Cache) List() ([]Info, error) {
+	if c == nil || c.Dir == "" {
+		return nil, nil
+	}
+	dirs, err := os.ReadDir(c.Dir)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("reading raw cache: %w", err)
+	}
+	var out []Info
+	for _, d := range dirs {
+		if !d.IsDir() || !validID(d.Name()) {
+			continue
+		}
+		if in, err := c.Lookup(d.Name()); err == nil {
+			out = append(out, in)
+		}
+	}
+	sort.Slice(out, func(i, j int) bool { return out[i].Stored.After(out[j].Stored) })
+	return out, nil
+}
+
+func sanitizeProgram(p string) string {
+	p = strings.TrimSpace(filepath.Base(p))
+	if p == "." || p == string(filepath.Separator) || len(p) > 64 || strings.ContainsAny(p, "\n\r\x00") {
+		return ""
+	}
+	return p
+}
+
+// Now reports the cache clock, for callers rendering ages.
+func (c *Cache) Now() time.Time { return c.now() }

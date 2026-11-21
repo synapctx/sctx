@@ -82,6 +82,9 @@ func pluginClientLabel(agentID string) string {
 // the shell PATH a human sees, and "sctx: command not found" inside a plugin is
 // invisible — the command simply never gets wrapped and nothing says why.
 func SctxPluginSource(binary string, agentID string) string {
+	if agentID == "pi" {
+		return piPluginSource(binary)
+	}
 	client := pluginClientLabel(agentID)
 	return pluginMarker + `
 //

@@ -93,3 +93,48 @@ func TestOversizedAndSymlinkCachesDecline(t *testing.T) {
 		t.Fatal("symlink cache root accepted")
 	}
 }
+
+func TestLookupListAndExpiry(t *testing.T) {
+	cache := New(filepath.Join(t.TempDir(), "raw"), time.Hour, 1024)
+	now := time.Now()
+	cache.now = func() time.Time { return now }
+	a, err := cache.StoreFor("/usr/local/bin/go", []byte("one"), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !validID(a.ID) {
+		t.Fatalf("id %q is not a short hex id", a.ID)
+	}
+	later := now.Add(time.Minute)
+	if err := os.Chtimes(a.Path, later, later); err != nil {
+		t.Fatal(err)
+	}
+	b, err := cache.Store([]byte("two!"), []byte("e"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	info, err := cache.Lookup(a.ID)
+	if err != nil || info.Program != "go" || info.Bytes != 3 {
+		t.Fatalf("lookup = %+v, %v", info, err)
+	}
+	if info, err = cache.Lookup(b.ID); err != nil || info.Program != "" || info.Bytes != 5 {
+		t.Fatalf("lookup b = %+v, %v", info, err)
+	}
+	for _, bad := range []string{"", "nothex", "../" + a.ID, strings.Repeat("0", 12)} {
+		if _, err := cache.Lookup(bad); err != ErrNotFound {
+			t.Fatalf("Lookup(%q) = %v, want ErrNotFound", bad, err)
+		}
+	}
+	if list, err := cache.List(); err != nil || len(list) != 2 {
+		t.Fatalf("list = %v, %v", list, err)
+	}
+
+	cache.now = func() time.Time { return now.Add(2 * time.Hour) }
+	if _, err := cache.Lookup(a.ID); err != ErrNotFound {
+		t.Fatalf("expired lookup = %v, want ErrNotFound", err)
+	}
+	if list, _ := cache.List(); len(list) != 0 {
+		t.Fatalf("expired entries listed: %v", list)
+	}
+}

@@ -221,6 +221,69 @@ func (s *Store) Failures(ctx context.Context, opts stats.AggregateOptions, limit
 	return out, nil
 }
 
+// Timeline returns one TimePoint per run matching opts, oldest first.
+func (s *Store) Timeline(ctx context.Context, opts stats.AggregateOptions) ([]stats.TimePoint, error) {
+	where, args := whereClause(opts)
+	rows, err := s.db.QueryContext(ctx,
+		`SELECT at, raw_tokens, out_tokens, saved_tokens FROM runs`+where+` ORDER BY at ASC`, args...)
+	if err != nil {
+		return nil, fmt.Errorf("querying timeline: %w", err)
+	}
+	defer rows.Close()
+
+	var out []stats.TimePoint
+	for rows.Next() {
+		var tp stats.TimePoint
+		var atStr string
+		if err := rows.Scan(&atStr, &tp.RawTokens, &tp.OutTokens, &tp.SavedTokens); err != nil {
+			return nil, fmt.Errorf("scanning timeline: %w", err)
+		}
+		t, err := time.Parse(time.RFC3339Nano, atStr)
+		if err != nil {
+			continue
+		}
+		tp.At = t
+		out = append(out, tp)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterating timeline: %w", err)
+	}
+	return out, nil
+}
+
+// Recent returns the most recent runs matching opts, newest first. It selects
+// the normalized command key only, never argv.
+func (s *Store) Recent(ctx context.Context, opts stats.AggregateOptions, limit int) ([]stats.RecentRun, error) {
+	if limit <= 0 {
+		limit = 20
+	}
+	where, args := whereClause(opts)
+	args = append(args, limit)
+	rows, err := s.db.QueryContext(ctx,
+		`SELECT at, command, tier, raw_tokens, out_tokens, saved_tokens FROM runs`+where+` ORDER BY at DESC LIMIT ?`, args...)
+	if err != nil {
+		return nil, fmt.Errorf("querying recent runs: %w", err)
+	}
+	defer rows.Close()
+
+	var out []stats.RecentRun
+	for rows.Next() {
+		var r stats.RecentRun
+		var atStr string
+		if err := rows.Scan(&atStr, &r.Command, &r.Tier, &r.RawTokens, &r.OutTokens, &r.SavedTokens); err != nil {
+			return nil, fmt.Errorf("scanning recent runs: %w", err)
+		}
+		if t, err := time.Parse(time.RFC3339Nano, atStr); err == nil {
+			r.At = t
+		}
+		out = append(out, r)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterating recent runs: %w", err)
+	}
+	return out, nil
+}
+
 // ByClient aggregates runs matching opts by which coding agent ran them.
 func (s *Store) ByClient(ctx context.Context, opts stats.AggregateOptions) ([]stats.ClientTotals, error) {
 	where, args := whereClause(opts)

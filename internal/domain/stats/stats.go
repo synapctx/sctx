@@ -34,7 +34,7 @@ type Run struct {
 	// trip. See telemetry.Event.ArgvHash.
 	ArgvHash string
 	// Bypass records how sctx's own formatting was skipped for this run: ""
-	// (not bypassed), "force_tier" or "double_dash".
+	// (not bypassed), "force_tier", "double_dash" or "bypass".
 	Bypass string
 	// RedactedCount is how many secrets a redaction pass hid before this run
 	// was recorded. Reserved for a future redaction feature; always 0 today.
@@ -95,7 +95,33 @@ type Store interface {
 	// PostToolUse hook's repeated-identical-run nudge; local-only, reads the
 	// local store, nothing here leaves the machine.
 	IdenticalRunCount(ctx context.Context, sessionID, argv string, rawBytes int64) (int64, error)
+	// Timeline returns one TimePoint per run matching opts, oldest first, for
+	// bucketing into days/weeks/months in the caller's local time zone.
+	Timeline(ctx context.Context, opts AggregateOptions) ([]TimePoint, error)
+	// Recent returns the most recent runs matching opts, newest first, capped
+	// at limit, for `sctx gain --history`.
+	Recent(ctx context.Context, opts AggregateOptions, limit int) ([]RecentRun, error)
 	Close() error
+}
+
+// TimePoint is the token accounting of one run at one instant.
+type TimePoint struct {
+	At          time.Time
+	RawTokens   int64
+	OutTokens   int64
+	SavedTokens int64
+}
+
+// RecentRun is one entry in the `--history` view. It carries the normalized
+// Command key and deliberately NOT Argv: arguments are where paths and secrets
+// live, and a history view is the one most likely to be pasted somewhere.
+type RecentRun struct {
+	At          time.Time
+	Command     string // normalized key, e.g. "go test"
+	Tier        string
+	RawTokens   int64
+	OutTokens   int64
+	SavedTokens int64
 }
 
 // ClientTotals is Totals scoped to one coding-agent Client.

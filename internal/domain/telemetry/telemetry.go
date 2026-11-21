@@ -87,7 +87,7 @@ type Event struct {
 	SessionID string `json:"sessionId,omitempty"`
 	// Bypass records whether sctx's own formatting was skipped, and how: ""
 	// (not bypassed), "force_tier" (SCT__FORCE_TIER=off|verbatim) or
-	// "double_dash" (`sctx -- <cmd>`).
+	// "double_dash" (`sctx -- <cmd>`) or "bypass" (`sctx bypass <cmd>`).
 	Bypass string `json:"bypass,omitempty"`
 	// ArgvHash is a one-way, salted fingerprint of the normalized argv — see
 	// PurposeOf for why this is service data, not improvement data. The salt

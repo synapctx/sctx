@@ -28,6 +28,15 @@ type Rule struct {
 	Re         *regexp.Regexp
 	MinEntropy float64
 	Group      int
+
+	// ValueOnly replaces just the Group span, leaving the rest of the match
+	// (the key name) in place.
+	ValueOnly bool
+	// ANSI marks a Group that may contain CSI colour/erase sequences: the
+	// trailing ones are left out of the replaced span (so a reset survives),
+	// and MinLen and MinEntropy are judged on the ANSI-stripped value.
+	ANSI   bool
+	MinLen int
 }
 
 var (
@@ -52,10 +61,36 @@ func Rules() []Rule {
 			{Name: "bearer", Re: regexp.MustCompile(`(?i)authorization:\s*bearer\s+\S+`)},
 			{Name: "sctx-key", Re: regexp.MustCompile(`sctx_live_[A-Za-z0-9]{8,}`)},
 			{
-				Name:       "generic-secret",
-				Re:         regexp.MustCompile(`(?i)(api[_-]?key|secret|token|password)\s*[=:]\s*['"]?([^\s'"]{12,})`),
+				// kubeconfig embeds client credentials as bare base64 (not PEM), so
+				// neither private-key nor generic-secret sees them: `kubectl config
+				// view --raw` would otherwise put a cluster-admin key in the model's
+				// context. Covers YAML inline, JSON (pretty and compact) and a
+				// one-line YAML block scalar; the key name stays.
+				Name:      "kubeconfig-credential",
+				Re:        regexp.MustCompile(`(client-key-data|client-certificate-data)['"]?\s*:\s*(?:[|>][-+]?\s*)?['"]?([A-Za-z0-9+/]{20,}={0,2})`),
+				Group:     2,
+				ValueOnly: true,
+			},
+			{
+				// The same credential as a YAML block scalar wrapped over several lines.
+				Name:      "kubeconfig-credential",
+				Re:        regexp.MustCompile(`(client-key-data|client-certificate-data)\s*:\s*[|>][-+]?[ \t]*\r?\n[ \t]*([A-Za-z0-9+/]{20,}={0,2}(?:[ \t]*\r?\n[ \t]*[A-Za-z0-9+/]{20,}={0,2})*)`),
+				Group:     2,
+				ValueOnly: true,
+			},
+			{
+				Name: "generic-secret",
+				// The optional `\x1b[…m` runs tolerate colour codes between the key and
+				// its value: tools that colour output (gitleaks prints
+				// `Secret:\x1b[1;3;m<value>`) otherwise hide the value from this rule.
+				// The value may itself contain CSI sequences (grep --color=always
+				// wraps the match in them), so the 12-char minimum and the entropy
+				// are judged on the ANSI-stripped value.
+				Re:         regexp.MustCompile(`(?i)(api[_-]?key|secret|token|password)(?:\x1b\[[0-9;]*m)*\s*[=:]\s*(?:\x1b\[[0-9;]*m)*['"]?((?:[^\s'"\x1b]|\x1b\[[0-9;?]*[A-Za-z])+)`),
 				MinEntropy: 3.5,
 				Group:      2,
+				ANSI:       true,
+				MinLen:     12,
 			},
 		}
 	})
@@ -124,8 +159,22 @@ func Apply(b []byte) ([]byte, Report) {
 					checkStart, checkEnd = m[gi], m[gi+1]
 				}
 			}
-			if !allowed(r, string(head[checkStart:checkEnd])) {
+			value := head[checkStart:checkEnd]
+			if r.ANSI {
+				checkEnd = trimTrailingCSI(head, checkStart, checkEnd)
+				if checkEnd < end {
+					end = checkEnd // the group is the tail of the match
+				}
+				value = stripCSI(head[checkStart:checkEnd])
+				if len(value) < r.MinLen {
+					continue
+				}
+			}
+			if !allowed(r, string(value)) {
 				continue
+			}
+			if r.ValueOnly {
+				start, end = checkStart, checkEnd
 			}
 			spans = append(spans, span{start: start, end: end, name: r.Name})
 		}
@@ -158,6 +207,32 @@ func Apply(b []byte) ([]byte, Report) {
 	out.Write(tail)
 
 	return out.Bytes(), rep
+}
+
+var (
+	csiRe      = regexp.MustCompile(`\x1b\[[0-9;?]*[A-Za-z]`)
+	csiTrailRe = regexp.MustCompile(`^\x1b\[[0-9;?]*[A-Za-z]$`)
+)
+
+// stripCSI returns b without its CSI escape sequences.
+func stripCSI(b []byte) []byte {
+	if bytes.IndexByte(b, 0x1b) < 0 {
+		return b
+	}
+	return csiRe.ReplaceAll(b, nil)
+}
+
+// trimTrailingCSI returns the end of b[start:end] with trailing CSI
+// sequences (a colour reset after the value) removed.
+func trimTrailingCSI(b []byte, start, end int) int {
+	for end > start {
+		i := bytes.LastIndexByte(b[start:end], 0x1b)
+		if i < 0 || !csiTrailRe.Match(b[start+i:end]) {
+			break
+		}
+		end = start + i
+	}
+	return end
 }
 
 // allowed reports whether a candidate match should actually be redacted: a

@@ -197,6 +197,10 @@ func InstallWrapping(home, binary string, docs ...Doc) ([]string, []error) {
 				c, e = InstallCopilotHooks(home, binary)
 			case "droid":
 				c, e = InstallDroidHooks(home, binary)
+			case "trae":
+				c, e = InstallTraeHooks(home, binary)
+			case "vibe":
+				c, e = InstallVibeHooks(home, binary)
 			default:
 				c, e = InstallAgentHooks(home, t.Agent, binary)
 			}
@@ -241,6 +245,12 @@ func simpleHookStatusFor(id, home, binary string) (simpleHookState, bool) {
 		return simpleHookState{path: cs.ConfigPath, installed: cs.Installed, stale: cs.Stale, staleReason: cs.StaleReason, foreign: cs.Foreign, missing: cs.Missing, err: err}, true
 	case "droid":
 		cs, err := InspectDroidHooks(home, binary)
+		return simpleHookState{path: cs.ConfigPath, installed: cs.Installed, stale: cs.Stale, staleReason: cs.StaleReason, missing: cs.Missing, err: err}, true
+	case "trae":
+		cs, err := InspectTraeHooks(home, binary)
+		return simpleHookState{path: cs.ConfigPath, installed: cs.Installed, stale: cs.Stale, staleReason: cs.StaleReason, missing: cs.Missing, err: err}, true
+	case "vibe":
+		cs, err := InspectVibeHooks(home, binary)
 		return simpleHookState{path: cs.ConfigPath, installed: cs.Installed, stale: cs.Stale, staleReason: cs.StaleReason, missing: cs.Missing, err: err}, true
 	}
 	return simpleHookState{}, false

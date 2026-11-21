@@ -30,6 +30,10 @@ type Outcome struct {
 	Stdout   Spill
 	Stderr   Spill
 	Duration time.Duration
+	// OutputCut: a background process still held the output pipes after the
+	// command exited, and reading was stopped after the runner's wait delay —
+	// output it wrote later was not captured.
+	OutputCut bool
 }
 
 // Runner executes a command to completion, forwarding SIGINT/SIGTERM to the

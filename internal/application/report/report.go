@@ -86,10 +86,28 @@ type Options struct {
 	Share bool
 	// Version is the sctx build version, printed on the share card.
 	Version string
+	// Period, when non-empty (PeriodDaily/PeriodWeekly/PeriodMonthly), renders
+	// a per-period table instead of the summary.
+	Period string
+	// Graph renders the tokens-saved-per-day bar chart (`--graph`).
+	Graph bool
+	// History renders the last Limit wrapped commands (`--history [N]`);
+	// Limit <=0 defaults to 20.
+	History bool
+	// Width is the terminal width for --graph; <=0 means unknown (80).
+	Width int
 }
 
 // Render writes the `sctx gain` report to w per opts.
 func Render(ctx context.Context, store stats.Store, w io.Writer, opts Options) error {
+	switch {
+	case opts.Period != "":
+		return renderPeriods(ctx, store, w, opts)
+	case opts.Graph:
+		return renderGraph(ctx, store, w, opts)
+	case opts.History:
+		return renderHistory(ctx, store, w, opts)
+	}
 	if opts.Share {
 		return renderShare(ctx, store, w, opts)
 	}
@@ -113,6 +131,9 @@ func Render(ctx context.Context, store stats.Store, w io.Writer, opts Options) e
 	// local store, telling the developer something useful about their own
 	// habits — not gated behind --by-client, which is a different axis
 	// (WHO ran commands, not WHICH commands repeat).
+	if opts.Format == "csv" {
+		return writeSummaryCSV(w, rep)
+	}
 	var repeated []stats.RepeatedRun
 	var repeatedRuns, repeatedCommands int64
 	if opts.Format != "json" {

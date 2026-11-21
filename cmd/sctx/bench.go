@@ -133,6 +133,12 @@ func (c *captureStore) LatestRawBytes(context.Context, string, string) (int64, b
 func (c *captureStore) IdenticalRunCount(context.Context, string, string, int64) (int64, error) {
 	return 0, nil
 }
+func (c *captureStore) Timeline(context.Context, stats.AggregateOptions) ([]stats.TimePoint, error) {
+	return nil, nil
+}
+func (c *captureStore) Recent(context.Context, stats.AggregateOptions, int) ([]stats.RecentRun, error) {
+	return nil, nil
+}
 func (c *captureStore) Close() error { return nil }
 
 // runBench implements `sctx bench`: a reproducible, publishable benchmark
