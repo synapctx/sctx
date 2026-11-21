@@ -315,14 +315,19 @@ home directory, or into a directory that does not exist, are reported and never
 written to. A document sctx cannot prove it wrote is reported too, with the
 one-time `sctx setup --install --force` that adopts it.
 
-Three more agents get the same rewrite hook, each in its own config file and
-its own envelope:
+Six more agents get the same rewrite hook (Pi: an extension that calls
+`sctx hook rewrite`), each in its own config file and its own envelope. The
+Trae, Vibe and Pi rows follow a working third-party integration's source; their
+instruction-file location is an unverified guess that is inert if wrong:
 
 | Agent | Minimum version | Config file | Event (matcher) | Output field |
 | :--- | :--- | :--- | :--- | :--- |
 | Cursor | 1.7 | `~/.cursor/hooks.json` | `preToolUse` (`"Shell"`) | `updated_input` (Cursor's own envelope — `permission`/`updated_input`, never `hookSpecificOutput`) |
 | GitHub Copilot CLI | 1.0.73 | `~/.copilot/hooks/sctx-rewrite.json` | `PreToolUse` | `updatedInput` (Claude-shaped `tool_input`; a documented camelCase `toolName`/`toolArgs` input is also decoded and answered with `modifiedArgs`) |
 | Factory Droid | 0.164.0 | `~/.factory/hooks.json` | `PreToolUse` (`Execute`) | `updatedInput`, same envelope as Claude Code |
+| Trae | — | `~/.trae/hooks.json` | `PreToolUse` (`RunCommand`) | `updatedInput` (whole `tool_input`, no `permissionDecision`) |
+| Mistral Vibe | — | `~/.vibe/hooks.toml` | `pre_tool` (`bash`) | `hook_specific_output.tool_input` plus a `system_message`; no rewrite is exit 0 with empty output |
+| Pi | — | `~/.pi/agent/extensions/sctx.ts` | `tool_call` (`bash`) | in-place mutation of the command, through `sctx hook rewrite` |
 
 Droid additionally honours its own `commandDenylist`/`commandBlocklist` entries
 (read from every settings scope Droid itself reads): a command already on one
@@ -419,9 +424,12 @@ enforced by tests rather than convention.
 | :--- | :--- |
 | `sctx <cmd> [args...]` | run a command with token-optimized output |
 | `sctx -- <cmd>` | run a command that shares a name with an `sctx` subcommand |
+| `sctx bypass <cmd> [args...]` | run a command with unfiltered output, still counted in `gain` |
+| `sctx recall <id>` | print the byte-exact raw output behind a `sctx: raw output: sctx recall <id>` hint (`--stderr`, `--all`, `--grep RE`, `--from N --lines M`, `--list`, `--path`) |
 | `sctx gain` | savings report, overall and per command |
 | `sctx gain --share` | sanitised, copy-pasteable savings card (aggregate numbers only) |
 | `sctx bench` | reproducible local benchmark against the current repository |
+| `sctx discover` | scan your Claude Code transcripts (local, read-only) for commands that ran without sctx though a rule covers them, and the programs with no formatter; `--since 7d`, `--all`, `--format json` |
 | `sctx setup` | configure the AI coding agents you use |
 | `sctx doctor` | show the effective configuration |
 | `sctx init` | connect this installation to a SynapCTX account |
@@ -623,16 +631,20 @@ single warning and is ignored - configuration problems cannot break a command.
 | `SCT__FORCE_TIER` | *(unset)* | pin the compression level: `aggressive`, `relaxed`, `verbatim`, `off` |
 | `SCT__TELEMETRY_ENABLED` | *(unset)* | force sharing on or off, overriding the saved answer |
 | `SCT__MAX_OUTPUT_BYTES` | `8388608` | output above this size is buffered to disk rather than memory |
-| `SCT__RAW_CACHE_ENABLED` | `false` | retain byte-exact raw output locally when a formatter explicitly omits content |
+| `SCT__RAW_CACHE_ENABLED` | `false` | retain byte-exact raw output locally when a formatter explicitly omits content; the hint `sctx: raw output: sctx recall <id> · PATH (TTL)` names it |
 | `SCT__RAW_CACHE_DIR` | `~/.config/sctx/raw` | owner-only recovery cache directory |
 | `SCT__RAW_CACHE_TTL` | `24h` | maximum lifetime of a recovery entry |
 | `SCT__RAW_CACHE_MAX_BYTES` | `67108864` | total recovery-cache size limit; oldest entries are removed first |
+| `SCT__DIFF_FIDELITY_LINES` | `200` | `git diff`/`git show`/`diff -u`/`gofmt -d` output of at most this many lines is never compacted, because agents derive edits from hunks; `0` disables the floor. Larger diffs are compacted and their first line says so |
+| `SCT__AUTO_MODE_STEP_ASIDE` | *(unset)* | `true` stops the Claude Code hook rewriting while the session is in auto permission mode, where a rewritten input can be refused by auto mode's review and cost a retry. Deny/ask permission rules always stop a rewrite, in every mode |
 | `SCT__STATS_DB_PATH` | `~/.config/sctx/stats.db` | local savings ledger |
 | `SCT__SPOOL_DIR` | `~/.config/sctx/spool` | queue for usage events awaiting delivery |
 | `SCT__TELEMETRY_ENDPOINT` | `http://127.0.0.1:6221/v1/telemetry/exec` | usage-event destination; `sctx init` sets this to `https://sctx.synapctx.com/v1/telemetry/exec` |
 | `SCT__WORKSPACE_PROXY_URL` | `http://127.0.0.1:6220` | destination for `sctx watch`; `https://mcp.synapctx.com` for the hosted platform |
 | `SCT__WATCH_HELPER` | *(unset)* | path to `sctxd`, if it is not installed alongside `sctx` |
 | `SCT__REDACT` | `false` | scrub secrets from output before it reaches your agent - see [Secret redaction](#secret-redaction-opt-in) |
+
+sctx sets `PLAYWRIGHT_HTML_OPEN=never` and `TF_INPUT=0` in the child's environment (never its own) for every wrapped command, unless the variable is already set to a non-empty value (an empty value counts as unset). Both are inert for programs that do not read them, so they also cover `npm test`, `make e2e`, `turbo run e2e` and `make plan`. Playwright's default html reporter otherwise serves the report and blocks forever after a failing run; Terraform otherwise waits on a missing-variable prompt that sctx's buffering would hide, and with `TF_INPUT=0` fails fast with the usual error. `CI` is never set.
 
 &nbsp;
 

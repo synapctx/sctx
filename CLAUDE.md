@@ -102,7 +102,13 @@ make install   # ~/.local/bin/sctx
   sees nothing". Scoped to the subcommand that actually streams, never per
   program: `docker build -f Dockerfile`, `helm install -f values.yaml` and
   `make -f Makefile` all name a FILE, and a blanket rule would silently drop their
-  coverage.
+  coverage. The same rule covers a command that STOPS AT A PROMPT or opens a
+  REPL (`apt-get install` without `-y`, `mysql` without `-e`, `unzip` without
+  `-o`), a follow flag hidden inside a short cluster (`tail -fn 100`,
+  `journalctl -fu x`), and an INNER program run through a launcher
+  (`ssh h tail -f`, `docker run img top`): `hookKnowsInner` runs the SAME
+  decision as the top level (`matchTokens`: wrapper peeling, gates, `streamsForever`),
+  recursing through nested launchers to `maxInnerDepth`.
 - **Write a formatter against output captured from the real binary, on the
   platform the workload runs on.** Tool output differs by implementation and
   platform far more than it looks — capture fixtures by running the thing, never
@@ -406,8 +412,8 @@ load-bearing.
     JSON on every code path, so a miss prints `{}`, not nothing. GitHub
     Copilot CLI's `PreToolUse` hook (`~/.copilot/hooks/*.json`, 1.0.73+) has
     two DISAGREEING sources: GitHub's own docs document a camelCase
-    `toolName`/`toolArgs` payload answered with `modifiedArgs`, while the rtk
-    reference implementation records a LIVE verification that the CLI's shell
+    `toolName`/`toolArgs` payload answered with `modifiedArgs`, while a
+    working third-party integration's source records a LIVE verification that the CLI's shell
     tool is reported under the Claude-shaped `tool_name`/`tool_input.command`
     schema and answers to `updatedInput` — `sctx hook copilot` follows the
     live-verified path and decodes the documented shape too, for anything
@@ -520,12 +526,14 @@ to compress it.
 
 - `Rules()` returns a fixed, `sync.Once`-compiled set of regexes (AWS/GitHub/
   Slack/Stripe/Google/SendGrid/npm/PEM private key/JWT/bearer-header/
-  `sctx_live_`, plus a generic `key|secret|token|password=value` catch-all).
+  `sctx_live_`/kubeconfig `client-key-data`+`client-certificate-data` (bare base64 as YAML inline/block or JSON; the value only, the key name stays), plus a generic `key|secret|token|password=value` catch-all).
   The generic rule additionally requires the captured value clear a 3.5
   bits/char Shannon-entropy bar and not be one of a fixed placeholder deny
   list (`changeme`, `<redacted>`, `xxxxxxxx`, `example`, `placeholder`, any
   `your-...`), so `password=changeme` in a fixture is never reported as a
-  leak.
+  leak. The value may contain ANSI CSI sequences
+  (grep `--color=always`); length and entropy are judged on the stripped value
+  and a trailing colour reset is left outside the replaced span.
 - `Apply(b []byte) ([]byte, Report)` replaces each match with
   `[REDACTED:<rule-name>]`. Overlapping matches resolve leftmost-longest, so
   a JWT found inside `Authorization: Bearer ...` yields one marker, not two.
@@ -536,7 +544,7 @@ to compress it.
   path: it holds back the last 4 KiB of unflushed data on every `Write` so a
   secret split across two writes is reassembled before `Apply` sees it.
   `Report()` is only complete once `Close` has run.
-- Cost is one `FindAll` pass per rule over the buffer (currently 12 rules), not
+- Cost is one `FindAll` pass per rule over the buffer (currently 14 rules), not
   a single combined-alternation scan: `BenchmarkApplyOneMiB` measured
   ~7 MB/s (~145ms/MiB) on a mixed log fixture with a few real secrets
   sprinkled in — acceptable for CLI-sized output, worth revisiting with a
